@@ -151,6 +151,10 @@
               <span class="option-emoji" aria-hidden="true">π</span>
               <span class="option-title">Pi Digits</span>
             </button>
+            <button class="option-card" data-category="calculator">
+              <span class="option-emoji" aria-hidden="true">🧮</span>
+              <span class="option-title">Trip Calculator</span>
+            </button>
           </div>
         </section>
 
@@ -414,6 +418,39 @@
         <div id="emoji-award-buttons" class="player-award-grid"></div>
         <button id="next-emoji" class="secondary-button">Next Emoji</button>
         <button id="finish-emoji" class="primary-button">Finish Face‑Off</button>
+      </div>
+    </section>
+
+    <!-- Trip calculator screen -->
+    <section id="trip-calculator" hidden>
+      <div class="mode-header">
+        <div>
+          <h2 id="calculator-heading">Trip Calculator</h2>
+          <p>Compare how long the same distance takes at two steady speeds.</p>
+        </div>
+        <div class="hunt-route" aria-label="Road math">Road Math</div>
+      </div>
+      <article class="trivia-card">
+        <span class="challenge-badge">Speed vs Time</span>
+        <div class="calculator-grid">
+          <label class="team-name-field" for="calc-miles">
+            <span>Miles left</span>
+            <input id="calc-miles" type="number" min="1" max="3000" inputmode="decimal" value="120" />
+          </label>
+          <label class="team-name-field" for="calc-speed-a">
+            <span>Speed A (mph)</span>
+            <input id="calc-speed-a" type="number" min="1" max="120" inputmode="numeric" value="55" />
+          </label>
+          <label class="team-name-field" for="calc-speed-b">
+            <span>Speed B (mph)</span>
+            <input id="calc-speed-b" type="number" min="1" max="120" inputmode="numeric" value="65" />
+          </label>
+        </div>
+        <p id="calculator-result" class="calculator-result" aria-live="polite"></p>
+      </article>
+      <div class="adventure-actions">
+        <button id="calculate-trip" class="primary-button">Calculate</button>
+        <button id="calculator-swap" class="secondary-button">Swap Speeds</button>
       </div>
     </section>
 

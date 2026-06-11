@@ -850,6 +850,7 @@
     trivia: document.getElementById('trivia'),
     jokes: document.getElementById('jokes'),
     emoji: document.getElementById('emoji-game'),
+    calculator: document.getElementById('trip-calculator'),
     pi: document.getElementById('pi-game'),
     secret: document.getElementById('secret-mode'),
     summary: document.getElementById('summary'),
@@ -926,6 +927,12 @@
   const emojiAwardButtons = document.getElementById('emoji-award-buttons');
   const nextEmojiButton = document.getElementById('next-emoji');
   const finishEmojiButton = document.getElementById('finish-emoji');
+  const calcMiles = document.getElementById('calc-miles');
+  const calcSpeedA = document.getElementById('calc-speed-a');
+  const calcSpeedB = document.getElementById('calc-speed-b');
+  const calculatorResult = document.getElementById('calculator-result');
+  const calculateTripButton = document.getElementById('calculate-trip');
+  const calculatorSwapButton = document.getElementById('calculator-swap');
   const piScoreboard = document.getElementById('pi-scoreboard');
   const piIntro = document.getElementById('pi-intro');
   const piEntryGrid = document.getElementById('pi-entry-grid');
@@ -2369,6 +2376,54 @@
     });
   }
 
+  function formatTravelTime(hours) {
+    const totalMinutes = Math.round(hours * 60);
+    const wholeHours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    if (wholeHours <= 0) return `${minutes} min`;
+    if (minutes === 0) return `${wholeHours} hr`;
+    return `${wholeHours} hr ${minutes} min`;
+  }
+
+  function startTripCalculator() {
+    resetGame();
+    calculateTripTime();
+    showSection('calculator');
+  }
+
+  function calculateTripTime() {
+    const miles = Number.parseFloat(calcMiles.value);
+    const speedA = Number.parseFloat(calcSpeedA.value);
+    const speedB = Number.parseFloat(calcSpeedB.value);
+    if (!Number.isFinite(miles) || miles <= 0 || !Number.isFinite(speedA) || speedA <= 0 || !Number.isFinite(speedB) || speedB <= 0) {
+      calculatorResult.textContent = 'Enter miles left and two speeds greater than zero.';
+      return;
+    }
+
+    const timeA = miles / speedA;
+    const timeB = miles / speedB;
+    const differenceMinutes = Math.abs(Math.round((timeA - timeB) * 60));
+    const fasterSpeed = speedA > speedB ? speedA : speedB;
+    const slowerSpeed = speedA > speedB ? speedB : speedA;
+    const lesson = differenceMinutes <= 5
+      ? 'Lesson: on this distance, the faster speed barely changes arrival time.'
+      : 'Lesson: compare the time saved with safety, speed limits, traffic, and fuel use.';
+
+    calculatorResult.textContent = [
+      `${miles} miles at ${speedA} mph: ${formatTravelTime(timeA)}.`,
+      `${miles} miles at ${speedB} mph: ${formatTravelTime(timeB)}.`,
+      `${fasterSpeed} mph is about ${differenceMinutes} minute${differenceMinutes === 1 ? '' : 's'} faster than ${slowerSpeed} mph.`,
+      lesson,
+    ].join('\n');
+  }
+
+  function swapCalculatorSpeeds() {
+    const oldA = calcSpeedA.value;
+    calcSpeedA.value = calcSpeedB.value;
+    calcSpeedB.value = oldA;
+    calculateTripTime();
+  }
+
   function renderPiEntries() {
     piEntryGrid.innerHTML = '';
     players.forEach(player => {
@@ -2605,6 +2660,8 @@
         startJokeVote();
       } else if (selectedCategory === 'emoji') {
         startEmojiGame();
+      } else if (selectedCategory === 'calculator') {
+        startTripCalculator();
       } else if (selectedCategory === 'pi') {
         startPiChallenge();
       } else if (selectedCategory === 'secret') {
@@ -2728,6 +2785,11 @@
   captureEmojiButton.addEventListener('click', captureEmojiFace);
   nextEmojiButton.addEventListener('click', nextEmojiPrompt);
   finishEmojiButton.addEventListener('click', showEmojiSummary);
+  calculateTripButton.addEventListener('click', calculateTripTime);
+  calculatorSwapButton.addEventListener('click', swapCalculatorSpeeds);
+  [calcMiles, calcSpeedA, calcSpeedB].forEach(input => {
+    input.addEventListener('input', calculateTripTime);
+  });
   savePiScoresButton.addEventListener('click', savePiScores);
   finishPiButton.addEventListener('click', showPiSummary);
   secretSubmitButton.addEventListener('click', submitSecretAnswer);

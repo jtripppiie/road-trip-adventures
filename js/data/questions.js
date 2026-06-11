@@ -3,7 +3,7 @@
 
    Learning prompts can include:
    learnTopic: biology | science | cars | states | constitution | government |
-     solar | cheese | animals | history | facts
+     solar | cheese | animals | history | facts | lifelessons
 */
 (function () {
   window.RTA_LEARN_TOPICS = [
@@ -12,6 +12,7 @@
     { id: 'biology', label: 'Biology', emoji: '🧬' },
     { id: 'science', label: 'Science', emoji: '🔬' },
     { id: 'cars', label: 'Cars', emoji: '🚗' },
+    { id: 'lifelessons', label: 'Life Lessons', emoji: '🧭' },
     { id: 'states', label: 'States', emoji: '🗺️' },
     { id: 'constitution', label: 'Constitution', emoji: '📜' },
     { id: 'government', label: 'Government', emoji: '🏛️' },
@@ -67,6 +68,28 @@
     { id: 'learn-cars-odometer', learnTopic: 'cars', text: 'Car fact: An odometer measures how far a vehicle has traveled.' },
     { id: 'learn-cars-aerodynamics', learnTopic: 'cars', text: 'Car fact: Aerodynamic shapes help vehicles move through air with less drag.' },
     { id: 'learn-cars-catalytic', learnTopic: 'cars', text: 'Car fact: A catalytic converter helps reduce harmful emissions from many gas-powered cars.' },
+
+    // Life Lessons
+    { id: 'learn-life-credit-score', learnTopic: 'lifelessons', text: 'Life lesson: A credit score is a number lenders may use to estimate how likely someone is to repay borrowed money.' },
+    { id: 'learn-life-payment-history', learnTopic: 'lifelessons', text: 'Life lesson: Payment history is a major part of many credit scores, so paying bills on time matters.' },
+    { id: 'learn-life-credit-utilization', learnTopic: 'lifelessons', text: 'Life lesson: Credit utilization compares credit card balances to credit limits; using less of the limit is usually healthier.' },
+    { id: 'learn-life-credit-card-interest', learnTopic: 'lifelessons', text: 'Life lesson: Credit card interest can grow quickly if a balance is carried month to month.' },
+    { id: 'learn-life-minimum-payment', learnTopic: 'lifelessons', text: 'Life lesson: A minimum payment keeps an account current, but it may take a long time to pay off the full balance.' },
+    { id: 'learn-life-emergency-fund', learnTopic: 'lifelessons', text: 'Life lesson: An emergency fund is money set aside for surprises like repairs, medical costs, or a sudden bill.' },
+    { id: 'learn-life-budget', learnTopic: 'lifelessons', text: 'Life lesson: A budget is a plan for where money goes before it disappears into snacks, subscriptions, and mystery purchases.' },
+    { id: 'learn-life-compound-interest', learnTopic: 'lifelessons', text: 'Life lesson: Compound interest means interest can earn interest, which helps savings grow but can also make debt grow.' },
+    { id: 'learn-life-debit-credit', learnTopic: 'lifelessons', text: 'Life lesson: A debit card usually spends money from a bank account; a credit card borrows money that must be paid back.' },
+    { id: 'learn-life-apr', learnTopic: 'lifelessons', text: 'Life lesson: APR stands for annual percentage rate, a yearly way to describe borrowing cost.' },
+    { id: 'learn-life-speeding-time', learnTopic: 'lifelessons', text: 'Life lesson: Driving faster may save less time than people expect, especially on shorter trips.' },
+    { id: 'learn-life-speeding-risk', learnTopic: 'lifelessons', text: 'Life lesson: Higher speed gives drivers less time to react and can make crashes more severe.' },
+    { id: 'learn-life-gas-speed', learnTopic: 'lifelessons', text: 'Life lesson: Many vehicles use more fuel at higher highway speeds because air resistance increases.' },
+    { id: 'learn-life-tire-pressure', learnTopic: 'lifelessons', text: 'Life lesson: Proper tire pressure can help safety, tire wear, and fuel economy.' },
+    { id: 'learn-life-maintenance', learnTopic: 'lifelessons', text: 'Life lesson: Regular maintenance can be cheaper than waiting for a small problem to become a big one.' },
+    { id: 'learn-life-insurance-deductible', learnTopic: 'lifelessons', text: 'Life lesson: An insurance deductible is the amount someone pays before insurance covers the rest of a claim.' },
+    { id: 'learn-life-needs-wants', learnTopic: 'lifelessons', text: 'Life lesson: A need is something essential; a want is something nice to have. Good money choices know the difference.' },
+    { id: 'learn-life-opportunity-cost', learnTopic: 'lifelessons', text: 'Life lesson: Opportunity cost means choosing one thing often means giving up another option.' },
+    { id: 'learn-life-receipts', learnTopic: 'lifelessons', text: 'Life lesson: Keeping receipts can help with returns, warranties, budgeting, and checking charges.' },
+    { id: 'learn-life-read-before-signing', learnTopic: 'lifelessons', text: 'Life lesson: Reading before signing matters because agreements can include fees, deadlines, and responsibilities.' },
 
     // States
     { id: 'learn-states-alaska', learnTopic: 'states', text: 'State fact: Alaska is the largest U.S. state by land area.' },
