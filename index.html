@@ -1,0 +1,448 @@
+<!--
+  Road Trip Adventures — Tiny Adventures for Passengers
+
+  This single‑page application is intentionally built as a fully static website.
+  It runs entirely on the client with no backend server, logins or databases.
+  All game state lives only in the current browser session, and no data is
+  transmitted or persisted anywhere else. See README.md and AGENT.md for
+  further details about the project philosophy and constraints.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Road Trip Adventures</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- We import a dyslexia‑friendly font via Google Fonts.  If offline the
+       system fonts will be used instead.  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- Skip link for screen reader and keyboard users -->
+  <a class="skip-link" href="#main" tabindex="0">Skip to content</a>
+
+  <!-- Loading screen shown at first load.  Hidden after the app initialises. -->
+  <div id="loading-screen" role="dialog" aria-modal="true" aria-labelledby="loading-title" aria-describedby="loading-beta-note driver-check-text">
+    <div class="loading-container">
+      <img class="loading-logo" src="assets/roadside-logo.png" alt="TripperDeeLabs logo" />
+      <h1 id="loading-title" class="loading-title">Road Trip Adventures</h1>
+      <p id="loading-beta-note" class="loading-beta-note">Beta build: judge fairly, play kindly.</p>
+      <p class="loading-quote" id="loading-quote">"The world outside your window is the original screen."</p>
+      <p class="loading-subtext">Take a break from the doom scrolling and enjoy this fun road trip adventure.</p>
+      <p id="driver-check-text" class="loading-subtext">Before we start: are you a passenger and not the driver?</p>
+      <button id="passenger-confirm" class="primary-button loading-confirm-button" type="button">I am not the driver</button>
+    </div>
+  </div>
+
+  <header class="app-header">
+    <div class="nav-controls">
+      <button id="back-button" class="icon-button" aria-label="Go back" hidden>←</button>
+      <button id="home-button" class="icon-button" aria-label="Go home">⌂</button>
+    </div>
+    <div class="brand-lockup">
+      <img class="app-logo" src="assets/roadside-logo.png" alt="TripperDeeLabs logo" />
+      <div>
+        <span class="brand-kicker">TripperDeeLabs presents</span>
+        <h1>Road Trip Adventures</h1>
+      </div>
+    </div>
+    <button id="accessibility-toggle" class="icon-button" aria-label="Accessibility options">
+      🛠️
+    </button>
+  </header>
+
+  <!-- Accessibility options panel.  This menu allows users to toggle high
+       contrast, large text, and reduce motion modes.  The panel is hidden by
+       default and toggled via the accessibility button. -->
+  <div id="accessibility-panel" class="accessibility-panel" aria-hidden="true">
+    <h2>Accessibility Options</h2>
+    <div class="accessibility-option">
+      <input type="checkbox" id="option-large-text" />
+      <label for="option-large-text">Large Text</label>
+    </div>
+    <div class="accessibility-option">
+      <input type="checkbox" id="option-high-contrast" />
+      <label for="option-high-contrast">High Contrast</label>
+    </div>
+    <div class="accessibility-option">
+      <input type="checkbox" id="option-reduce-motion" />
+      <label for="option-reduce-motion">Reduce Motion</label>
+    </div>
+    <button id="close-accessibility" class="close-button" aria-label="Close accessibility options">Close</button>
+  </div>
+
+  <main id="main" tabindex="-1">
+    <section id="passenger-note" class="passenger-note" aria-label="Passenger safety note">
+      <strong>Passengers play. Drivers drive.</strong>
+      <span>Pick a quest, read it aloud, then look up and play together.</span>
+    </section>
+
+    <!-- Player setup -->
+    <section id="setup-teams" class="setup-section" aria-labelledby="setup-teams-heading" hidden>
+      <h2 id="setup-teams-heading">Add player initials</h2>
+      <p>Add 2 to 8 player initials. These keep score across the games ahead.</p>
+      <div id="player-fields" class="team-setup-grid" aria-label="Player initials">
+        <label class="team-name-field" for="player-name-1">
+          <span>Player 1 initials</span>
+          <input id="player-name-1" type="text" maxlength="4" placeholder="P1" autocomplete="off" autocapitalize="characters" />
+        </label>
+        <label class="team-name-field" for="player-name-2">
+          <span>Player 2 initials</span>
+          <input id="player-name-2" type="text" maxlength="4" placeholder="P2" autocomplete="off" autocapitalize="characters" />
+        </label>
+      </div>
+      <div class="adventure-actions">
+        <button id="add-player" class="secondary-button">Add Player</button>
+        <button id="remove-player" class="secondary-button">Remove Player</button>
+        <button id="save-teams" class="primary-button">Continue</button>
+      </div>
+    </section>
+
+    <!-- Section to choose adventure type -->
+    <section id="setup-category" class="setup-section" aria-labelledby="setup-category-heading" hidden>
+      <h2 id="setup-category-heading">Choose your adventure type</h2>
+      <p>Pick what kind of activities you’d like to enjoy.</p>
+      <div class="option-grid" role="group" aria-label="Adventure categories">
+        <button class="option-card" data-category="look">
+          <span class="option-emoji" aria-hidden="true">👀</span>
+          <span class="option-title">Look Outside</span>
+        </button>
+        <button class="option-card" data-category="laugh">
+          <span class="option-emoji" aria-hidden="true">😂</span>
+          <span class="option-title">Laugh Together</span>
+        </button>
+        <button class="option-card" data-category="learn">
+          <span class="option-emoji" aria-hidden="true">🧠</span>
+          <span class="option-title">Learn Something</span>
+        </button>
+        <button class="option-card" data-category="compete">
+          <span class="option-emoji" aria-hidden="true">🏆</span>
+          <span class="option-title">Competition</span>
+        </button>
+        <button class="option-card" data-category="local">
+          <span class="option-emoji" aria-hidden="true">🌎</span>
+          <span class="option-title">Local Explorer</span>
+        </button>
+        <button class="option-card" data-category="scavenger">
+          <span class="option-emoji" aria-hidden="true">🔎</span>
+          <span class="option-title">Scavenger Hunt</span>
+        </button>
+        <button class="option-card" data-category="trivia">
+          <span class="option-emoji" aria-hidden="true">🧩</span>
+          <span class="option-title">Trivia Run</span>
+        </button>
+        <button class="option-card" data-category="jokes">
+          <span class="option-emoji" aria-hidden="true">🎤</span>
+          <span class="option-title">Joke Vote</span>
+        </button>
+        <button class="option-card" data-category="emoji">
+          <span class="option-emoji" aria-hidden="true">😜</span>
+          <span class="option-title">Emoji Face‑Off</span>
+        </button>
+        <button class="option-card" data-category="pi">
+          <span class="option-emoji" aria-hidden="true">π</span>
+          <span class="option-title">Pi Digits</span>
+        </button>
+        <button class="option-card" data-category="random">
+          <span class="option-emoji" aria-hidden="true">🎲</span>
+          <span class="option-title">Mystery Mix</span>
+        </button>
+        <button class="option-card secret-option-card" data-category="secret">
+          <span class="option-emoji" aria-hidden="true">🔒</span>
+          <span class="option-title">Secret Mode</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Optional manual region selection for Local Explorer -->
+    <section id="setup-region" class="setup-section" aria-labelledby="setup-region-heading" hidden>
+      <h2 id="setup-region-heading">Where are you exploring?</h2>
+      <p>Choose a region for local trivia. The app never uses location sensors or tracks your trip.</p>
+      <p class="privacy-note">Local trivia is manual only. No GPS, no browser location prompt, no tracking.</p>
+      <div class="option-grid" role="group" aria-label="Local explorer regions">
+        <button class="option-card" data-region="CA">
+          <span class="option-emoji" aria-hidden="true">🌴</span>
+          <span class="option-title">California</span>
+        </button>
+        <button class="option-card" data-region="AZ">
+          <span class="option-emoji" aria-hidden="true">🏜️</span>
+          <span class="option-title">Arizona</span>
+        </button>
+        <button class="option-card" data-region="NV">
+          <span class="option-emoji" aria-hidden="true">✨</span>
+          <span class="option-title">Nevada</span>
+        </button>
+        <button class="option-card" data-region="UT">
+          <span class="option-emoji" aria-hidden="true">🪨</span>
+          <span class="option-title">Utah</span>
+        </button>
+        <button class="option-card" data-region="CO">
+          <span class="option-emoji" aria-hidden="true">🏔️</span>
+          <span class="option-title">Colorado</span>
+        </button>
+        <button class="option-card" data-region="NM">
+          <span class="option-emoji" aria-hidden="true">🌶️</span>
+          <span class="option-title">New Mexico</span>
+        </button>
+        <button class="option-card" data-region="TX">
+          <span class="option-emoji" aria-hidden="true">⭐</span>
+          <span class="option-title">Texas</span>
+        </button>
+        <button class="option-card" data-region="AR">
+          <span class="option-emoji" aria-hidden="true">💎</span>
+          <span class="option-title">Arkansas</span>
+        </button>
+        <button class="option-card" data-region="*">
+          <span class="option-emoji" aria-hidden="true">🧭</span>
+          <span class="option-title">Anywhere</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Game screen: display each challenge -->
+    <section id="adventure" hidden>
+      <h2 id="adventure-heading">Your Adventure</h2>
+      <div id="progress-bar" class="progress-bar" aria-hidden="true">
+        <div id="progress-fill" class="progress-fill"></div>
+      </div>
+      <div id="stamp-trail" class="stamp-trail" aria-label="Passport stamp progress"></div>
+      <div id="challenge-container" class="challenge-container" aria-live="polite"></div>
+      <div id="timer" class="timer" aria-live="polite" hidden></div>
+      <div class="adventure-actions">
+        <button id="extend-timer" class="secondary-button" hidden>+10 seconds</button>
+        <button id="skip-timer" class="secondary-button" hidden>Skip timer</button>
+        <button id="next-challenge" class="primary-button" hidden>Stamp It</button>
+      </div>
+    </section>
+
+    <!-- Scavenger hunt screen: players claim real-world sightings -->
+    <section id="scavenger" hidden>
+      <div class="hunt-header">
+        <div>
+          <h2 id="scavenger-heading">Road Trip Scavenger Hunt</h2>
+          <p>Read the current targets aloud, then look outside. Tap a player when someone spots one.</p>
+          <p class="hunt-prize">Winner chooses the car karaoke song everyone else has to sing.</p>
+        </div>
+        <div class="hunt-route" aria-label="Route">Any Route</div>
+      </div>
+      <div id="hunt-scoreboard" class="team-scoreboard" aria-live="polite"></div>
+      <p id="hunt-status" class="hunt-status">Your current targets are below. Draw a new batch whenever the list gets stale.</p>
+      <div class="hunt-minigames" aria-label="Scavenger hunt side games">
+        <button id="hunt-lightning" class="secondary-button">Lightning Round</button>
+        <button id="hunt-twenty" class="secondary-button">20 Questions</button>
+        <button id="hunt-alphabet" class="secondary-button">Alphabet Game</button>
+        <button id="hunt-eta" class="secondary-button">ETA Guess</button>
+      </div>
+      <article id="hunt-side-game" class="side-game-card" aria-live="polite" hidden>
+        <span id="side-game-label" class="challenge-badge">Side Game</span>
+        <h3 id="side-game-title"></h3>
+        <p id="side-game-text"></p>
+        <div id="side-game-actions" class="adventure-actions"></div>
+      </article>
+      <div id="hunt-grid" class="hunt-grid" aria-label="Scavenger hunt items"></div>
+      <div class="adventure-actions">
+        <button id="draw-hunt-targets" class="secondary-button">Draw New Targets</button>
+        <button id="reset-hunt" class="secondary-button">Reset Hunt</button>
+        <button id="finish-hunt" class="primary-button">Finish Hunt</button>
+      </div>
+    </section>
+
+    <!-- Trivia run screen: broad road trip trivia categories -->
+    <section id="trivia" hidden>
+      <div class="mode-header">
+        <div>
+          <h2 id="trivia-heading">Trivia Run</h2>
+          <p>Pick a lane, take turns answering, and tap the player that gets it right. First to 15 is a legend.</p>
+        </div>
+        <div class="hunt-route" aria-label="Trivia route">Brain → Road</div>
+      </div>
+      <div id="trivia-category-grid" class="trivia-category-grid" aria-label="Trivia categories"></div>
+      <div id="trivia-play" hidden>
+        <div id="trivia-scoreboard" class="team-scoreboard" aria-live="polite"></div>
+        <article class="trivia-card" aria-live="polite">
+          <span id="trivia-category-label" class="challenge-badge">Trivia</span>
+          <h3 id="trivia-question"></h3>
+          <div id="trivia-choices" class="trivia-choices" aria-label="Answer choices"></div>
+          <p id="trivia-answer" hidden></p>
+        </article>
+        <div class="adventure-actions emoji-actions">
+          <button id="show-trivia-answer" class="secondary-button">Show Answer</button>
+          <div id="trivia-award-buttons" class="player-award-grid"></div>
+          <button id="next-trivia" class="primary-button">Next Question</button>
+        </div>
+      </div>
+      <div class="adventure-actions">
+        <button id="finish-trivia" class="primary-button">Finish Trivia</button>
+      </div>
+    </section>
+
+    <!-- Joke vote screen: family joke contest -->
+    <section id="jokes" hidden>
+      <div class="mode-header">
+        <div>
+          <h2 id="jokes-heading">Joke Vote</h2>
+          <p>Each player tells a clean joke. Vote for the winner, then award the style.</p>
+        </div>
+        <div class="hunt-route" aria-label="Joke stage">Car Karaoke Mic</div>
+      </div>
+      <div id="joke-scoreboard" class="team-scoreboard" aria-live="polite"></div>
+      <article class="trivia-card">
+        <span class="challenge-badge">Round <span id="joke-round">1</span></span>
+        <h3 id="joke-prompt">Tell your best road-trip joke.</h3>
+        <p id="joke-award">Award style: Dad Joke Crown or Mom Joke Mic.</p>
+      </article>
+      <div class="adventure-actions">
+        <div id="joke-award-buttons" class="player-award-grid"></div>
+        <button id="dad-joke-award" class="secondary-button">Dad Joke Award</button>
+        <button id="mom-joke-award" class="secondary-button">Mom Joke Award</button>
+        <button id="finish-jokes" class="primary-button">Finish Joke Vote</button>
+      </div>
+    </section>
+
+    <!-- Emoji face-off screen: local camera party game -->
+    <section id="emoji-game" hidden>
+      <div class="mode-header">
+        <div>
+          <h2 id="emoji-heading">Emoji Face‑Off</h2>
+          <p>Copy the emoji face, snap an attempt, then vote for the closest match.</p>
+          <p class="hunt-prize">Photos stay on this device and are not uploaded or saved.</p>
+        </div>
+        <div id="emoji-target" class="emoji-target" aria-label="Emoji prompt">😜</div>
+      </div>
+      <div id="emoji-scoreboard" class="team-scoreboard" aria-live="polite"></div>
+      <div class="emoji-stage">
+        <video id="emoji-video" class="emoji-video" autoplay playsinline muted hidden></video>
+        <canvas id="emoji-canvas" class="emoji-photo" hidden></canvas>
+        <p id="emoji-camera-message" class="hunt-status">Start the camera when everyone is ready.</p>
+      </div>
+      <div class="adventure-actions">
+        <button id="start-camera" class="secondary-button">Start Camera</button>
+        <button id="capture-emoji" class="primary-button" disabled>Snap Face</button>
+        <div id="emoji-award-buttons" class="player-award-grid"></div>
+        <button id="next-emoji" class="secondary-button">Next Emoji</button>
+        <button id="finish-emoji" class="primary-button">Finish Face‑Off</button>
+      </div>
+    </section>
+
+    <!-- Pi digits challenge screen -->
+    <section id="pi-game" hidden>
+      <div class="mode-header">
+        <div>
+          <h2 id="pi-heading">Pi Digits Challenge</h2>
+          <p>Take turns reciting pi. Enter how many correct digits each player gets after 3.14.</p>
+        </div>
+        <div class="emoji-target" aria-label="Pi symbol">π</div>
+      </div>
+      <div id="pi-scoreboard" class="team-scoreboard" aria-live="polite"></div>
+      <article class="trivia-card">
+        <span class="challenge-badge">Starter</span>
+        <h3>3.14159265358979323846264338327950288419716939937510</h3>
+        <p>Use the starter as the judge key. Count digits after the decimal.</p>
+      </article>
+      <div id="pi-entry-grid" class="team-setup-grid" aria-label="Pi digit scores"></div>
+      <div class="adventure-actions">
+        <button id="save-pi-scores" class="primary-button">Update Scores</button>
+        <button id="finish-pi" class="secondary-button">Finish Pi Challenge</button>
+      </div>
+    </section>
+
+    <!-- Secret mode unlock: local-only car challenge -->
+    <section id="secret-mode" hidden>
+      <div class="mode-header">
+        <div>
+          <h2 id="secret-heading">Secret Mode</h2>
+          <p>Unlock requires answers only this car can know. No searching, no AI, no driver help.</p>
+        </div>
+        <div class="hunt-route" aria-label="Locked mode">Locked</div>
+      </div>
+      <article id="secret-card" class="trivia-card secret-card" aria-live="polite">
+        <span id="secret-progress" class="challenge-badge">Locked</span>
+        <h3 id="secret-question">Secret mode is locked.</h3>
+        <p id="secret-instructions">Answer the car-only questions and have the group verify each one.</p>
+        <label id="secret-answer-field" class="team-name-field" for="secret-answer">
+          <span>Your answer</span>
+          <input id="secret-answer" type="text" maxlength="80" autocomplete="off" placeholder="Type the car's answer" />
+        </label>
+        <p id="secret-status" class="feedback-status" aria-live="polite"></p>
+      </article>
+      <div id="secret-video-wrap" class="secret-video-wrap" hidden>
+        <iframe
+          id="secret-video"
+          title="Secret reward video"
+          src=""
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+        </iframe>
+        <a class="primary-button secret-video-link" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer">Open Reward Video</a>
+      </div>
+      <div class="adventure-actions">
+        <button id="secret-submit" class="primary-button">Car Agrees</button>
+        <button id="secret-skip" class="secondary-button">Try Another Question</button>
+        <button id="secret-reset" class="secondary-button">Reset Lock</button>
+      </div>
+    </section>
+
+    <!-- Summary screen: show results at the end -->
+    <section id="summary" hidden>
+      <h2>Adventure Complete</h2>
+      <p id="summary-text"></p>
+      <ul id="summary-list" class="summary-list"></ul>
+      <button id="play-again" class="primary-button">Play Again</button>
+      <button id="start-over" class="secondary-button">Start Over</button>
+    </section>
+
+    <!-- About / Privacy section accessible from bottom of page -->
+    <footer class="app-footer" role="contentinfo">
+      <p>Created by TripperDeeLabs. No accounts. No ads. No tracking.</p>
+      <div class="footer-actions">
+        <button id="about-button" class="link-button">About &amp; Privacy</button>
+        <button id="feedback-button" class="link-button">Feedback</button>
+        <a id="tip-button" class="link-button" href="https://venmo.com/Tripperdoo" target="_blank" rel="noopener noreferrer">Tip on Venmo</a>
+      </div>
+    </footer>
+  </main>
+
+  <!-- Modal dialog for About and Privacy statement -->
+  <div id="about-modal" class="modal" hidden>
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="about-title">
+      <h2 id="about-title">About Road Trip Adventures</h2>
+      <p>Road Trip Adventures was built to help everyone enjoy the ride together. It offers fun challenges that encourage looking outside, laughing together, learning new facts, and gentle competition. There are no accounts, logins or data collection. All progress and preferences stay on your device and disappear when you close the page.</p>
+      <h3>Family‑Friendly Content</h3>
+      <p>All activities are designed to be appropriate for families.  We avoid profanity, adult themes, political or religious persuasion, insults and dangerous challenges.  If you ever encounter content that doesn’t feel right, please close the adventure and let the creator know.</p>
+      <h3>Privacy</h3>
+      <p>We respect your privacy. This site does not collect personal information, use location sensors, track your trip, or send data to any server. Local trivia is based only on the region you choose manually. There is no GPS, no browser location prompt, and no location data to save or upload.</p>
+      <button id="close-about" class="primary-button">Close</button>
+    </div>
+  </div>
+
+  <!-- Modal dialog for collecting local feedback text -->
+  <div id="feedback-modal" class="modal" hidden>
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="feedback-title">
+      <h2 id="feedback-title">Send Feedback</h2>
+      <p>Tell us what would make Road Trip Adventures better. This stays on your device until you copy it.</p>
+      <label class="team-name-field" for="feedback-text">
+        <span>Your feedback</span>
+        <textarea id="feedback-text" rows="6" placeholder="Ideas, bugs, favorite games, missing trivia categories..."></textarea>
+      </label>
+      <label class="checkbox-row" for="feedback-device-info">
+        <input id="feedback-device-info" type="checkbox" />
+        <span>Include device information</span>
+      </label>
+      <p id="feedback-status" class="feedback-status" aria-live="polite"></p>
+      <div class="adventure-actions">
+        <button id="copy-feedback" class="primary-button">Copy Feedback</button>
+        <button id="close-feedback" class="secondary-button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data/trivia.js"></script>
+  <script src="js/data/community-trivia.js"></script>
+  <script src="js/data/scavenger.js"></script>
+  <script src="js/data/questions.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
