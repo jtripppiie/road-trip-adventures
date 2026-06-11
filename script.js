@@ -759,6 +759,7 @@
     { id: 'p1', name: 'P1' },
     { id: 'p2', name: 'P2' },
   ];
+  let carJudgeId = getStoredJson('rtaCarJudgeId', '');
   let adventureQuestions = [];
   let currentIndex = 0;
   let timerInterval = null;
@@ -842,6 +843,7 @@
   const summaryText = document.getElementById('summary-text');
   const summaryList = document.getElementById('summary-list');
   const playerFields = document.getElementById('player-fields');
+  const carJudgeSelect = document.getElementById('car-judge');
   const addPlayerButton = document.getElementById('add-player');
   const removePlayerButton = document.getElementById('remove-player');
   const saveTeamsButton = document.getElementById('save-teams');
@@ -955,6 +957,10 @@
         name: normalizePlayerInitials(player.name, index),
       }));
     }
+    if (carJudgeId && !players.some(player => player.id === carJudgeId)) {
+      carJudgeId = '';
+      setStoredJson('rtaCarJudgeId', carJudgeId);
+    }
   }
 
   let passengerConfirmStep = 0;
@@ -1039,8 +1045,27 @@
       label.appendChild(input);
       playerFields.appendChild(label);
     });
+    renderCarJudgeOptions();
     addPlayerButton.disabled = players.length >= 8;
     removePlayerButton.disabled = players.length <= 2;
+  }
+
+  function renderCarJudgeOptions() {
+    carJudgeSelect.innerHTML = '';
+    const noJudgeOption = document.createElement('option');
+    noJudgeOption.value = '';
+    noJudgeOption.textContent = 'No judge';
+    carJudgeSelect.appendChild(noJudgeOption);
+
+    players.forEach(player => {
+      const option = document.createElement('option');
+      option.value = player.id;
+      option.textContent = `${player.name} verifies answers`;
+      carJudgeSelect.appendChild(option);
+    });
+
+    if (!players.some(player => player.id === carJudgeId)) carJudgeId = '';
+    carJudgeSelect.value = carJudgeId;
   }
 
   function savePlayers() {
@@ -1052,7 +1077,10 @@
     if (players.length < 2) {
       players.push({ id: 'p2', name: 'P2' });
     }
+    carJudgeId = players.some(player => player.id === carJudgeSelect.value) ? carJudgeSelect.value : '';
     setStoredJson('rtaPlayers', players);
+    setStoredJson('rtaCarJudgeId', carJudgeId);
+    renderCarJudgeOptions();
   }
 
   function createScoreMap() {
@@ -1071,6 +1099,11 @@
     if (!players.length) return 'next passenger';
     const player = players[turnIndex % players.length];
     return player ? player.name : 'next passenger';
+  }
+
+  function getCarJudgeNote() {
+    if (!carJudgeId) return '';
+    return `${getPlayerName(carJudgeId)} verifies answers.`;
   }
 
   function getTopPlayers(scores) {
@@ -1295,15 +1328,16 @@
     const leaderScore = players.length ? Math.max(...players.map(player => scores[player.id] || 0)) : 0;
     const activeCount = getActiveHuntItems().length;
     const claimedCount = getHuntClaims().length;
+    const judgeNote = getCarJudgeNote();
     if (leaderScore >= 10) {
       const leaders = getTopPlayers(scores).map(player => player.name).join(', ');
-      huntStatus.textContent = `${leaders} hit the 10-find milestone. Karaoke power unlocked: choose the song everyone else sings.`;
+      huntStatus.textContent = `${leaders} hit the 10-find milestone. Karaoke power unlocked: choose the song everyone else sings.${judgeNote ? ` ${judgeNote}` : ''}`;
     } else if (!activeCount) {
       huntStatus.textContent = claimedCount
-        ? `${claimedCount} total find${claimedCount === 1 ? '' : 's'} claimed. Draw new targets to keep hunting.`
-        : 'Draw targets to start the hunt.';
+        ? `${claimedCount} total find${claimedCount === 1 ? '' : 's'} claimed. Draw new targets to keep hunting.${judgeNote ? ` ${judgeNote}` : ''}`
+        : `Draw targets to start the hunt.${judgeNote ? ` ${judgeNote}` : ''}`;
     } else {
-      huntStatus.textContent = `${activeCount} current target${activeCount === 1 ? '' : 's'} to watch for. ${10 - leaderScore} more find${10 - leaderScore === 1 ? '' : 's'} to reach the milestone.`;
+      huntStatus.textContent = `${activeCount} current target${activeCount === 1 ? '' : 's'} to watch for. ${10 - leaderScore} more find${10 - leaderScore === 1 ? '' : 's'} to reach the milestone.${judgeNote ? ` ${judgeNote}` : ''}`;
     }
   }
 
@@ -1874,7 +1908,8 @@
     const category = triviaCategories.find(entry => entry.id === item.category);
     const difficultyLabel = activeTriviaDifficulty.charAt(0).toUpperCase() + activeTriviaDifficulty.slice(1);
     triviaCategoryLabel.textContent = category ? `${category.label} · ${difficultyLabel}` : `Trivia · ${difficultyLabel}`;
-    triviaHandoff.textContent = `Hand the phone to ${getTurnPlayerName(triviaIndex)}.`;
+    const judgeNote = getCarJudgeNote();
+    triviaHandoff.textContent = `Hand the phone to ${getTurnPlayerName(triviaIndex)}.${judgeNote ? ` ${judgeNote}` : ''}`;
     triviaQuestion.textContent = item.question;
     triviaAnswer.textContent = item.answer;
     triviaAnswer.hidden = true;
@@ -2130,9 +2165,10 @@
     const total = activeSecretUnlockQuestions.length;
     const question = activeSecretUnlockQuestions[secretUnlockStep];
     secretProgress.textContent = `Lock ${secretUnlockStep + 1}/${total}`;
-    secretHandoff.textContent = `Hand the phone to ${getTurnPlayerName(secretUnlockStep)}.`;
+    const judgeNote = getCarJudgeNote();
+    secretHandoff.textContent = `Hand the phone to ${getTurnPlayerName(secretUnlockStep)}.${judgeNote ? ` ${judgeNote}` : ''}`;
     secretQuestion.textContent = question;
-    secretInstructions.textContent = 'Type the car\'s answer, perform the tiny ritual, and tap Car Agrees only if the passengers verify it. No searching. No driver help.';
+    secretInstructions.textContent = `Type the car's answer, perform the tiny ritual, and tap Car Agrees only if the passengers verify it.${judgeNote ? ` ${judgeNote}` : ''} No searching. No driver help.`;
     secretStatus.textContent = '';
     secretAnswer.value = '';
     secretAnswer.focus();

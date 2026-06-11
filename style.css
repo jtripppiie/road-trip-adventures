@@ -428,7 +428,8 @@ body.large-text {
   font-weight: 700;
 }
 
-.team-name-field input {
+.team-name-field input,
+.team-name-field select {
   width: 100%;
   min-height: 2.75rem;
   padding: 0.65rem 0.75rem;
@@ -436,6 +437,12 @@ body.large-text {
   border-radius: 8px;
   background: var(--color-card);
   color: var(--color-text);
+}
+
+.judge-field {
+  margin: 0 auto 1rem;
+  width: min(100%, 320px);
+  text-align: left;
 }
 
 .team-name-field textarea {
