@@ -189,6 +189,7 @@
     {
       id: 'learn-grand-canyon',
       category: 'learn',
+      learnTopic: 'states',
       ageGroups: ['*'],
       regions: ['AZ'],
       requiresTimer: false,
@@ -198,6 +199,7 @@
     {
       id: 'learn-planets',
       category: 'learn',
+      learnTopic: 'solar',
       ageGroups: ['kids'],
       regions: ['*'],
       requiresTimer: false,
@@ -207,6 +209,7 @@
     {
       id: 'learn-mile-marker',
       category: 'learn',
+      learnTopic: 'cars',
       ageGroups: ['kids', 'teens', 'adults', 'mixed'],
       regions: ['*'],
       requiresTimer: false,
@@ -216,6 +219,7 @@
     {
       id: 'learn-clouds',
       category: 'learn',
+      learnTopic: 'science',
       ageGroups: ['*'],
       regions: ['*'],
       requiresTimer: false,
@@ -225,6 +229,7 @@
     {
       id: 'learn-road-reflectors',
       category: 'learn',
+      learnTopic: 'cars',
       ageGroups: ['kids', 'teens', 'adults', 'mixed'],
       regions: ['*'],
       requiresTimer: false,
@@ -234,6 +239,7 @@
     {
       id: 'learn-birds',
       category: 'learn',
+      learnTopic: 'animals',
       ageGroups: ['kids', 'mixed'],
       regions: ['*'],
       requiresTimer: false,
@@ -448,6 +454,7 @@
       category,
       ageGroups: Array.isArray(prompt.ageGroups) && prompt.ageGroups.length ? prompt.ageGroups : ['*'],
       regions: Array.isArray(prompt.regions) && prompt.regions.length ? prompt.regions : ['*'],
+      learnTopic: prompt.learnTopic || (category === 'learn' ? 'facts' : 'mixed'),
       requiresTimer: Boolean(prompt.requiresTimer),
       text,
       points: Number.isFinite(prompt.points) ? prompt.points : 1,
@@ -457,6 +464,9 @@
   const adventurePromptDatabase = questions
     .concat(window.RTA_ADVENTURE_PROMPTS || [])
     .map(normalizeAdventurePrompt);
+  const learnTopics = window.RTA_LEARN_TOPICS || [
+    { id: 'all', label: 'All Topics', emoji: '🎲' },
+  ];
 
   const scavengerItems = [
     { id: 'plate-delaware', emoji: '🚘', label: 'Delaware license plate', hint: 'Tiny state, huge points.' },
@@ -748,6 +758,7 @@
   const emojiPrompts = ['😜', '😮', '🤨', '😎', '😭', '😡', '🤯', '🥳', '😴', '😬', '🤠', '😇'];
   const triviaDatabase = buildTriviaDatabase();
   let triviaHistory = getStoredJson('rtaTriviaHistory', {});
+  let adventureHistory = getStoredJson('rtaAdventureHistory', {});
   const defaultTripSettings = {
     gameLength: 'long',
     familyFriendlyOnly: true,
@@ -760,6 +771,7 @@
   // Application state
   let selectedAge = 'mixed';
   let selectedCategory = null;
+  let selectedLearnTopic = getStoredJson('rtaLastLearnTopic', 'all');
   let regionCode = null; // Optional region code for local questions
   let currentSectionKey = null;
   let sectionHistory = [];
@@ -832,6 +844,7 @@
     players: document.getElementById('setup-teams'),
     category: document.getElementById('setup-category'),
     settings: document.getElementById('trip-settings'),
+    learnTopics: document.getElementById('learn-topics'),
     region: document.getElementById('setup-region'),
     adventure: document.getElementById('adventure'),
     scavenger: document.getElementById('scavenger'),
@@ -865,6 +878,7 @@
   const settingHardTrivia = document.getElementById('setting-hard-trivia');
   const saveTripSettingsButton = document.getElementById('save-trip-settings');
   const closeTripSettingsButton = document.getElementById('close-trip-settings');
+  const learnTopicGrid = document.getElementById('learn-topic-grid');
   const huntGrid = document.getElementById('hunt-grid');
   const huntStatus = document.getElementById('hunt-status');
   const huntScoreboard = document.getElementById('hunt-scoreboard');
@@ -1235,6 +1249,66 @@
     return question.regions.indexOf(regionCode) !== -1;
   }
 
+  function matchesLearnTopic(question) {
+    if (!learnTopics.some(topic => topic.id === selectedLearnTopic)) selectedLearnTopic = 'all';
+    return selectedLearnTopic === 'all' || question.learnTopic === selectedLearnTopic;
+  }
+
+  function getAdventureHistoryKey(category, topic = '') {
+    return `${category || 'mixed'}:${topic || 'all'}:${regionCode || '*'}`;
+  }
+
+  function selectAdventurePrompts(pool, count, historyKey) {
+    if (!pool.length) return [];
+    const used = new Set(adventureHistory[historyKey] || []);
+    let available = pool.filter(prompt => !used.has(prompt.id));
+    if (!available.length) {
+      adventureHistory[historyKey] = [];
+      setStoredJson('rtaAdventureHistory', adventureHistory);
+      available = pool.slice();
+    }
+    const selected = shuffle(available.slice()).slice(0, count);
+    adventureHistory[historyKey] = adventureHistory[historyKey] || [];
+    selected.forEach(prompt => {
+      if (!adventureHistory[historyKey].includes(prompt.id)) {
+        adventureHistory[historyKey].push(prompt.id);
+      }
+    });
+    setStoredJson('rtaAdventureHistory', adventureHistory);
+    return selected;
+  }
+
+  function renderLearnTopics() {
+    if (!learnTopics.some(topic => topic.id === selectedLearnTopic)) selectedLearnTopic = 'all';
+    learnTopicGrid.innerHTML = '';
+    learnTopics.forEach(topic => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'option-card trivia-category-card';
+      button.dataset.learnTopic = topic.id;
+
+      const icon = document.createElement('span');
+      icon.className = 'option-emoji';
+      icon.setAttribute('aria-hidden', 'true');
+      icon.textContent = topic.emoji;
+
+      const title = document.createElement('span');
+      title.className = 'option-title';
+      title.textContent = topic.label;
+
+      button.appendChild(icon);
+      button.appendChild(title);
+      button.addEventListener('click', () => {
+        selectedCategory = 'learn';
+        selectedLearnTopic = topic.id;
+        setStoredJson('rtaLastLearnTopic', selectedLearnTopic);
+        regionCode = '*';
+        startAdventure();
+      });
+      learnTopicGrid.appendChild(button);
+    });
+  }
+
   function buildMysteryMix(count) {
     const targets = [
       { category: 'look', count: Math.ceil(count * 0.4) },
@@ -1245,7 +1319,7 @@
     const selected = [];
     targets.forEach(target => {
       const pool = shuffle(adventurePromptDatabase.filter(q => matchesAge(q) && q.category === target.category && matchesRegion(q)));
-      selected.push(...pool.slice(0, target.count));
+      selected.push(...selectAdventurePrompts(pool, target.count, getAdventureHistoryKey('random', target.category)));
     });
     const selectedIds = selected.map(q => q.id);
     const refill = shuffle(adventurePromptDatabase.filter(q => matchesAge(q) && matchesRegion(q) && selectedIds.indexOf(q.id) === -1));
@@ -1260,17 +1334,18 @@
       return;
     }
 
-    let filtered = adventurePromptDatabase.filter(q => {
-      return matchesAge(q) && q.category === selectedCategory && matchesRegion(q);
-    });
+    let filtered = adventurePromptDatabase.filter(q => (
+      matchesAge(q)
+      && q.category === selectedCategory
+      && matchesRegion(q)
+      && (selectedCategory !== 'learn' || matchesLearnTopic(q))
+    ));
 
-    if (filtered.length < count) {
-      const selectedIds = filtered.map(q => q.id);
-      const refill = adventurePromptDatabase.filter(q => matchesAge(q) && matchesRegion(q) && selectedIds.indexOf(q.id) === -1);
-      filtered = filtered.concat(refill);
-    }
-
-    adventureQuestions = shuffle(filtered.slice()).slice(0, count);
+    adventureQuestions = selectAdventurePrompts(
+      filtered,
+      count,
+      getAdventureHistoryKey(selectedCategory, selectedCategory === 'learn' ? selectedLearnTopic : '')
+    );
   }
 
   function updateProgress() {
@@ -1303,6 +1378,17 @@
     timerElement.textContent = `${timerRemaining}s`;
   }
 
+  function getChallengeBadgeText(question) {
+    if (question.category === 'look') return 'Look Outside';
+    if (question.category === 'laugh') return 'Laugh Together';
+    if (question.category === 'learn') {
+      const topic = learnTopics.find(entry => entry.id === question.learnTopic);
+      return topic ? `Learn: ${topic.label}` : 'Learn Something';
+    }
+    if (question.category === 'compete') return 'Friendly Challenge';
+    return 'Local Explorer';
+  }
+
   function showChallenge() {
     if (currentIndex >= adventureQuestions.length) {
       // Completed adventure
@@ -1313,7 +1399,7 @@
     challengeContainer.innerHTML = '';
     const badge = document.createElement('span');
     badge.className = `challenge-badge ${q.category}`;
-    badge.textContent = q.category === 'look' ? 'Look Outside' : q.category === 'laugh' ? 'Laugh Together' : q.category === 'learn' ? 'Learn Something' : q.category === 'compete' ? 'Friendly Challenge' : 'Local Explorer';
+    badge.textContent = getChallengeBadgeText(q);
     const p = document.createElement('p');
     p.textContent = q.text;
     challengeContainer.appendChild(badge);
@@ -2472,6 +2558,9 @@
         showSection('region');
       } else if (selectedCategory === 'scavenger') {
         startScavengerHunt();
+      } else if (selectedCategory === 'learn') {
+        renderLearnTopics();
+        showSection('learnTopics');
       } else if (selectedCategory === 'trivia') {
         startTriviaRun();
       } else if (selectedCategory === 'jokes') {
