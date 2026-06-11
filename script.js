@@ -761,7 +761,6 @@
   let adventureHistory = getStoredJson('rtaAdventureHistory', {});
   const defaultTripSettings = {
     gameLength: 'long',
-    familyFriendlyOnly: true,
     noCameraGames: false,
     noPopCulture: false,
     hardTrivia: false,
@@ -872,7 +871,6 @@
   const saveTeamsButton = document.getElementById('save-teams');
   const openTripSettingsButton = document.getElementById('open-trip-settings');
   const settingGameLength = document.getElementById('setting-game-length');
-  const settingFamilyFriendly = document.getElementById('setting-family-friendly');
   const settingNoCamera = document.getElementById('setting-no-camera');
   const settingNoPopCulture = document.getElementById('setting-no-pop-culture');
   const settingHardTrivia = document.getElementById('setting-hard-trivia');
@@ -896,6 +894,7 @@
   const sideGameText = document.getElementById('side-game-text');
   const sideGameActions = document.getElementById('side-game-actions');
   const triviaDifficultyButtons = document.getElementById('trivia-difficulty-buttons');
+  const triviaIntro = document.getElementById('trivia-intro');
   const triviaCategoryGrid = document.getElementById('trivia-category-grid');
   const triviaPlay = document.getElementById('trivia-play');
   const triviaScoreboard = document.getElementById('trivia-scoreboard');
@@ -916,6 +915,7 @@
   const dadJokeAwardButton = document.getElementById('dad-joke-award');
   const momJokeAwardButton = document.getElementById('mom-joke-award');
   const finishJokesButton = document.getElementById('finish-jokes');
+  const emojiIntro = document.getElementById('emoji-intro');
   const emojiTarget = document.getElementById('emoji-target');
   const emojiVideo = document.getElementById('emoji-video');
   const emojiCanvas = document.getElementById('emoji-canvas');
@@ -927,6 +927,7 @@
   const nextEmojiButton = document.getElementById('next-emoji');
   const finishEmojiButton = document.getElementById('finish-emoji');
   const piScoreboard = document.getElementById('pi-scoreboard');
+  const piIntro = document.getElementById('pi-intro');
   const piEntryGrid = document.getElementById('pi-entry-grid');
   const savePiScoresButton = document.getElementById('save-pi-scores');
   const finishPiButton = document.getElementById('finish-pi');
@@ -985,7 +986,6 @@
   function normalizeTripSettings(settings) {
     const merged = Object.assign({}, defaultTripSettings, settings || {});
     merged.gameLength = merged.gameLength === 'short' ? 'short' : 'long';
-    merged.familyFriendlyOnly = Boolean(merged.familyFriendlyOnly);
     merged.noCameraGames = Boolean(merged.noCameraGames);
     merged.noPopCulture = Boolean(merged.noPopCulture);
     merged.hardTrivia = Boolean(merged.hardTrivia);
@@ -995,7 +995,6 @@
   function populateTripSettingsForm() {
     tripSettings = normalizeTripSettings(tripSettings);
     settingGameLength.value = tripSettings.gameLength;
-    settingFamilyFriendly.checked = tripSettings.familyFriendlyOnly;
     settingNoCamera.checked = tripSettings.noCameraGames;
     settingNoPopCulture.checked = tripSettings.noPopCulture;
     settingHardTrivia.checked = tripSettings.hardTrivia;
@@ -1004,7 +1003,6 @@
   function saveTripSettings() {
     tripSettings = normalizeTripSettings({
       gameLength: settingGameLength.value,
-      familyFriendlyOnly: settingFamilyFriendly.checked,
       noCameraGames: settingNoCamera.checked,
       noPopCulture: settingNoPopCulture.checked,
       hardTrivia: settingHardTrivia.checked,
@@ -1024,8 +1022,11 @@
     if (tripSettings.hardTrivia) {
       activeTriviaDifficulty = 'hard';
       setStoredJson('rtaLastTriviaDifficulty', activeTriviaDifficulty);
-      renderTriviaDifficultyButtons();
+    } else if (activeTriviaDifficulty === 'hard' && getStoredJson('rtaLastTriviaDifficulty', 'medium') === 'hard') {
+      activeTriviaDifficulty = 'medium';
+      setStoredJson('rtaLastTriviaDifficulty', activeTriviaDifficulty);
     }
+    renderTriviaDifficultyButtons();
   }
 
   function initSavedUserData() {
@@ -1189,6 +1190,22 @@
     return tripSettings.gameLength === 'short' ? 6 : 10;
   }
 
+  function getAdventurePromptCount() {
+    return tripSettings.gameLength === 'short' ? 6 : 12;
+  }
+
+  function getTriviaQuestionLimit() {
+    return tripSettings.gameLength === 'short' ? 8 : 15;
+  }
+
+  function getJokeRoundLimit() {
+    return tripSettings.gameLength === 'short' ? Math.max(2, players.length) : Math.max(5, players.length * 2);
+  }
+
+  function getEmojiRoundLimit() {
+    return tripSettings.gameLength === 'short' ? Math.max(4, players.length) : Math.max(8, players.length * 2);
+  }
+
   function getTopPlayers(scores) {
     if (!players.length) return [];
     const highScore = Math.max(...players.map(player => scores[player.id] || 0));
@@ -1323,12 +1340,14 @@
     });
     const selectedIds = selected.map(q => q.id);
     const refill = shuffle(adventurePromptDatabase.filter(q => matchesAge(q) && matchesRegion(q) && selectedIds.indexOf(q.id) === -1));
-    return shuffle(selected.concat(refill)).slice(0, count);
+    const refillCount = Math.max(0, count - selected.length);
+    const refillSelected = selectAdventurePrompts(refill, refillCount, getAdventureHistoryKey('random', 'refill'));
+    return shuffle(selected.concat(refillSelected)).slice(0, count);
   }
 
   // Build adventure questions based on selections
   function buildAdventure() {
-    const count = 12;
+    const count = getAdventurePromptCount();
     if (selectedCategory === 'random') {
       adventureQuestions = buildMysteryMix(count);
       return;
@@ -1505,6 +1524,12 @@
 
   function drawHuntTargets(count = 6) {
     if (!huntDeck.length) buildHuntDeck();
+    activeHuntIds.forEach(itemId => {
+      const item = scavengerItems.find(entry => entry.id === itemId);
+      if (item && !item.claimedBy && !huntDeck.includes(itemId)) {
+        huntDeck.unshift(itemId);
+      }
+    });
     activeHuntIds = [];
     while (activeHuntIds.length < count && huntDeck.length) {
       const nextId = huntDeck.pop();
@@ -1988,7 +2013,7 @@
       setStoredJson('rtaTriviaHistory', triviaHistory);
       available = candidates.slice();
     }
-    return shuffle(available.slice());
+    return shuffle(available.slice()).slice(0, getTriviaQuestionLimit());
   }
 
   function getTriviaHistoryKey(categoryId) {
@@ -2116,6 +2141,7 @@
     renderScoreboard(triviaScoreboard, triviaScore);
     triviaPlay.hidden = true;
     finishTriviaButton.hidden = true;
+    triviaIntro.textContent = `Pick a lane, take turns answering, and tap the player that gets it right. This run has up to ${getTriviaQuestionLimit()} questions.`;
     renderTriviaCategories();
     renderTriviaDifficultyButtons();
     showSection('trivia');
@@ -2206,7 +2232,7 @@
     ];
     renderScoreboard(jokeScoreboard, jokePlayerScores);
     renderAwardButtons(jokeAwardButtons, 'Wins Round', awardJokeRound);
-    jokeRoundElement.textContent = jokeRound;
+    jokeRoundElement.textContent = `${jokeRound}/${getJokeRoundLimit()}`;
     jokePrompt.textContent = prompts[(jokeRound - 1) % prompts.length];
     jokeAward.textContent = `Awards so far: Dad Joke ${jokeAwards.dad}, Mom Joke ${jokeAwards.mom}.`;
   }
@@ -2214,6 +2240,10 @@
   function awardJokeRound(playerId) {
     jokePlayerScores[playerId] = (jokePlayerScores[playerId] || 0) + 1;
     jokeRound++;
+    if (jokeRound > getJokeRoundLimit()) {
+      showJokeSummary();
+      return;
+    }
     renderJokeVote();
   }
 
@@ -2238,6 +2268,7 @@
   }
 
   function renderEmojiGame() {
+    emojiIntro.textContent = `Copy the emoji face, snap an attempt, then vote for the closest match. Round ${emojiIndex + 1}/${getEmojiRoundLimit()}.`;
     emojiTarget.textContent = emojiPrompts[emojiIndex % emojiPrompts.length];
     renderScoreboard(emojiScoreboard, emojiScore);
     renderAwardButtons(emojiAwardButtons, 'Wins Face', awardEmojiFace, emojiFaceAwarded);
@@ -2302,6 +2333,10 @@
   }
 
   function nextEmojiPrompt() {
+    if (emojiIndex + 1 >= getEmojiRoundLimit()) {
+      showEmojiSummary();
+      return;
+    }
     emojiIndex++;
     emojiFaceAwarded = false;
     emojiCanvas.hidden = true;
@@ -2362,6 +2397,9 @@
   function startPiChallenge() {
     resetGame();
     piScore = createScoreMap();
+    piIntro.textContent = tripSettings.gameLength === 'short'
+      ? 'Quick round: each player gets one attempt. Enter correct digits after 3.14.'
+      : 'Long round: each player gets two attempts. Enter each player\'s best correct digit count after 3.14.';
     renderScoreboard(piScoreboard, piScore);
     renderPiEntries();
     showSection('pi');
