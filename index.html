@@ -105,55 +105,78 @@
     <section id="setup-category" class="setup-section" aria-labelledby="setup-category-heading" hidden>
       <h2 id="setup-category-heading">Choose your adventure type</h2>
       <p>Pick what kind of activities you’d like to enjoy.</p>
-      <div class="option-grid" role="group" aria-label="Adventure categories">
-        <button class="option-card" data-category="look">
-          <span class="option-emoji" aria-hidden="true">👀</span>
-          <span class="option-title">Look Outside</span>
-        </button>
-        <button class="option-card" data-category="laugh">
-          <span class="option-emoji" aria-hidden="true">😂</span>
-          <span class="option-title">Laugh Together</span>
-        </button>
-        <button class="option-card" data-category="learn">
-          <span class="option-emoji" aria-hidden="true">🧠</span>
-          <span class="option-title">Learn Something</span>
-        </button>
-        <button class="option-card" data-category="compete">
-          <span class="option-emoji" aria-hidden="true">🏆</span>
-          <span class="option-title">Competition</span>
-        </button>
-        <button class="option-card" data-category="local">
-          <span class="option-emoji" aria-hidden="true">🌎</span>
-          <span class="option-title">Local Explorer</span>
-        </button>
-        <button class="option-card" data-category="scavenger">
-          <span class="option-emoji" aria-hidden="true">🔎</span>
-          <span class="option-title">Scavenger Hunt</span>
-        </button>
-        <button class="option-card" data-category="trivia">
-          <span class="option-emoji" aria-hidden="true">🧩</span>
-          <span class="option-title">Trivia Run</span>
-        </button>
-        <button class="option-card" data-category="jokes">
-          <span class="option-emoji" aria-hidden="true">🎤</span>
-          <span class="option-title">Joke Vote</span>
-        </button>
-        <button class="option-card" data-category="emoji">
-          <span class="option-emoji" aria-hidden="true">😜</span>
-          <span class="option-title">Emoji Face‑Off</span>
-        </button>
-        <button class="option-card" data-category="pi">
-          <span class="option-emoji" aria-hidden="true">π</span>
-          <span class="option-title">Pi Digits</span>
-        </button>
-        <button class="option-card" data-category="random">
-          <span class="option-emoji" aria-hidden="true">🎲</span>
-          <span class="option-title">Mystery Mix</span>
-        </button>
-        <button class="option-card secret-option-card" data-category="secret">
-          <span class="option-emoji" aria-hidden="true">🔒</span>
-          <span class="option-title">Secret Mode</span>
-        </button>
+      <div class="mode-group-list" aria-label="Adventure categories">
+        <section class="mode-group" aria-labelledby="mode-look-heading">
+          <h3 id="mode-look-heading">Look Outside</h3>
+          <div class="option-grid compact-option-grid" role="group" aria-label="Look Outside games">
+            <button class="option-card" data-category="look">
+              <span class="option-emoji" aria-hidden="true">👀</span>
+              <span class="option-title">Look Outside</span>
+            </button>
+            <button class="option-card" data-category="local">
+              <span class="option-emoji" aria-hidden="true">🌎</span>
+              <span class="option-title">Local Explorer</span>
+            </button>
+            <button class="option-card" data-category="scavenger">
+              <span class="option-emoji" aria-hidden="true">🔎</span>
+              <span class="option-title">Scavenger Hunt</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="mode-group" aria-labelledby="mode-brain-heading">
+          <h3 id="mode-brain-heading">Trivia &amp; Brain</h3>
+          <div class="option-grid compact-option-grid" role="group" aria-label="Trivia and brain games">
+            <button class="option-card" data-category="learn">
+              <span class="option-emoji" aria-hidden="true">🧠</span>
+              <span class="option-title">Learn Something</span>
+            </button>
+            <button class="option-card" data-category="trivia">
+              <span class="option-emoji" aria-hidden="true">🧩</span>
+              <span class="option-title">Trivia Run</span>
+            </button>
+            <button class="option-card" data-category="pi">
+              <span class="option-emoji" aria-hidden="true">π</span>
+              <span class="option-title">Pi Digits</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="mode-group" aria-labelledby="mode-party-heading">
+          <h3 id="mode-party-heading">Party Games</h3>
+          <div class="option-grid compact-option-grid" role="group" aria-label="Party games">
+            <button class="option-card" data-category="laugh">
+              <span class="option-emoji" aria-hidden="true">😂</span>
+              <span class="option-title">Laugh Together</span>
+            </button>
+            <button class="option-card" data-category="compete">
+              <span class="option-emoji" aria-hidden="true">🏆</span>
+              <span class="option-title">Competition</span>
+            </button>
+            <button class="option-card" data-category="jokes">
+              <span class="option-emoji" aria-hidden="true">🎤</span>
+              <span class="option-title">Joke Vote</span>
+            </button>
+            <button class="option-card" data-category="emoji">
+              <span class="option-emoji" aria-hidden="true">😜</span>
+              <span class="option-title">Emoji Face‑Off</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="mode-group" aria-labelledby="mode-bonus-heading">
+          <h3 id="mode-bonus-heading">Bonus</h3>
+          <div class="option-grid compact-option-grid" role="group" aria-label="Bonus games">
+            <button class="option-card" data-category="random">
+              <span class="option-emoji" aria-hidden="true">🎲</span>
+              <span class="option-title">Mystery Mix</span>
+            </button>
+            <button class="option-card secret-option-card" data-category="secret">
+              <span class="option-emoji" aria-hidden="true">🔒</span>
+              <span class="option-title">Secret Mode</span>
+            </button>
+          </div>
+        </section>
       </div>
     </section>
 

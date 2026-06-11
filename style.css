@@ -325,11 +325,35 @@ body.large-text {
   font-weight: 700;
 }
 
+.mode-group-list {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+  text-align: left;
+}
+
+.mode-group {
+  padding: 0.85rem;
+  border: 2px solid rgba(9, 35, 63, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.mode-group h3 {
+  margin: 0 0 0.65rem;
+  color: var(--color-primary);
+  font-size: 1rem;
+}
+
 .option-grid {
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   margin-top: 1rem;
+}
+
+.compact-option-grid {
+  margin-top: 0;
 }
 
 .option-card {
