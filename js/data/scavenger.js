@@ -116,6 +116,42 @@
       label: 'Car you would never own',
       hint: 'Everyone explains why.',
     },
+    {
+      id: 'vehicle-with-one-headlight',
+      emoji: '👁️',
+      label: 'One-headlight vehicle',
+      hint: 'A motorcycle counts, but only if someone calls it before the debate begins.',
+    },
+    {
+      id: 'vehicle-with-boat-name',
+      emoji: '🚤',
+      label: 'Boat with a name',
+      hint: 'On a trailer, marina sign, storage yard, or actual water.',
+    },
+    {
+      id: 'vehicle-with-dog-sticker',
+      emoji: '🐶',
+      label: 'Dog sticker vehicle',
+      hint: 'Paw print, dog breed, rescue sticker, or dog family decal.',
+    },
+    {
+      id: 'truck-with-mud-flaps',
+      emoji: '🚚',
+      label: 'Mud flaps',
+      hint: 'Big truck, pickup, trailer, or RV mud flaps.',
+    },
+    {
+      id: 'vehicle-with-missing-hubcap',
+      emoji: '🛞',
+      label: 'Missing hubcap',
+      hint: 'At least one wheel looks different from the others.',
+    },
+    {
+      id: 'vehicle-with-loud-color-wrap',
+      emoji: '🎨',
+      label: 'Wild vehicle wrap',
+      hint: 'Full-body ad, bright pattern, camo, chrome, or color-shift wrap.',
+    },
 
     // License Plate Finds
     {
@@ -197,6 +233,30 @@
       label: 'Food vanity plate',
       hint: 'Unexpected cravings.',
     },
+    {
+      id: 'license-plate-two-state-name',
+      emoji: '🗺️',
+      label: 'State name in plate frame',
+      hint: 'A plate frame that mentions a different state than the plate.',
+    },
+    {
+      id: 'license-plate-birthday-year',
+      emoji: '🎂',
+      label: 'Birthday year plate',
+      hint: 'A plate containing a year someone in the car recognizes.',
+    },
+    {
+      id: 'license-plate-word-with-no-vowels',
+      emoji: '🔤',
+      label: 'No-vowel plate word',
+      hint: 'A vanity plate or abbreviation with no A, E, I, O, or U.',
+    },
+    {
+      id: 'license-plate-double-letter',
+      emoji: '🔁',
+      label: 'Double letters on a plate',
+      hint: 'Examples: LL, SS, TT, or any repeated letter side by side.',
+    },
 
     // Carried Gear And Campers
     {
@@ -241,6 +301,24 @@
       label: 'Named camper or RV',
       hint: 'Look for a model name, custom name, or decal.',
     },
+    {
+      id: 'truck-carrying-lumber',
+      emoji: '🪵',
+      label: 'Truck carrying lumber',
+      hint: 'Boards, beams, pallets, or a load that looks like a weekend project.',
+    },
+    {
+      id: 'vehicle-with-surfboard',
+      emoji: '🏄',
+      label: 'Surfboard on a vehicle',
+      hint: 'Surfboard, paddleboard, or board-shaped cargo.',
+    },
+    {
+      id: 'rv-with-bikes',
+      emoji: '🚲',
+      label: 'RV carrying bikes',
+      hint: 'Bike rack, hitch rack, ladder rack, or bikes on a trailer.',
+    },
 
     // Work, Service, And Road Vehicles
     {
@@ -279,6 +357,24 @@
       label: 'Moving truck',
       hint: 'Rental truck, box truck, or moving-company vehicle.',
     },
+    {
+      id: 'tow-truck',
+      emoji: '🪝',
+      label: 'Tow truck',
+      hint: 'Flatbed, hook truck, roadside assistance, or recovery vehicle.',
+    },
+    {
+      id: 'street-sweeper',
+      emoji: '🧹',
+      label: 'Street sweeper',
+      hint: 'A city cleaning truck or road-cleaning machine.',
+    },
+    {
+      id: 'food-truck',
+      emoji: '🌮',
+      label: 'Food truck',
+      hint: 'Parked, driving, on a sign, or at an event.',
+    },
 
     // Road Work Gear
     {
@@ -292,6 +388,18 @@
       emoji: '🟠',
       label: 'Orange traffic barrel',
       hint: 'Construction barrel, lane divider, or work-zone marker.',
+    },
+    {
+      id: 'portable-message-board',
+      emoji: '💬',
+      label: 'Portable message board',
+      hint: 'Digital road sign with warnings, travel times, or construction info.',
+    },
+    {
+      id: 'worker-in-safety-vest',
+      emoji: '🦺',
+      label: 'Safety vest',
+      hint: 'Road worker, crossing guard, event staff, or construction crew.',
     },
   ];
 
@@ -514,6 +622,42 @@
       label: 'Temperature display',
       hint: 'Bank, pharmacy, school, car wash, or digital sign showing temperature.',
     },
+    {
+      id: 'sign-with-misspelling',
+      emoji: '✏️',
+      label: 'Misspelled sign',
+      hint: 'A typo, backwards letter, missing apostrophe, or suspicious spelling.',
+    },
+    {
+      id: 'sign-with-two-arrows',
+      emoji: '↔️',
+      label: 'Two-arrow sign',
+      hint: 'Any sign with arrows pointing in two different directions.',
+    },
+    {
+      id: 'sign-with-distance-over-100',
+      emoji: '💯',
+      label: 'Distance over 100 miles',
+      hint: 'A city, attraction, or route distance greater than 100.',
+    },
+    {
+      id: 'sign-with-animal-logo',
+      emoji: '🐾',
+      label: 'Animal logo sign',
+      hint: 'A business, school, team, park, or warning sign with an animal image.',
+    },
+    {
+      id: 'sign-with-old-font',
+      emoji: '🔤',
+      label: 'Old-timey lettering',
+      hint: 'Retro, western, diner, motel, carnival, or vintage-style letters.',
+    },
+    {
+      id: 'sign-with-phone-number',
+      emoji: '☎️',
+      label: 'Phone number on a sign',
+      hint: 'Billboard, work truck, storefront, or yard sign.',
+    },
   ];
 
   // Places, Services, And Stops
@@ -554,6 +698,30 @@
       emoji: '🥕',
       label: 'Farmers market sign',
       hint: 'Market sign, banner, billboard, or roadside notice.',
+    },
+    {
+      id: 'coffee-roaster-or-cafe',
+      emoji: '☕',
+      label: 'Local coffee spot',
+      hint: 'Coffee shop, roaster, cafe sign, or drive-thru coffee stand.',
+    },
+    {
+      id: 'bakery-sign',
+      emoji: '🥐',
+      label: 'Bakery sign',
+      hint: 'Bread, donuts, pastries, cakes, bagels, or bakery window.',
+    },
+    {
+      id: 'taco-or-burrito-sign',
+      emoji: '🌯',
+      label: 'Taco or burrito sign',
+      hint: 'Restaurant, food truck, billboard, or menu board.',
+    },
+    {
+      id: 'giant-food-statue',
+      emoji: '🍩',
+      label: 'Giant food statue',
+      hint: 'Oversized donut, burger, ice cream cone, fruit, or snack.',
     },
 
     // Business Names And Claims
@@ -605,6 +773,24 @@
       label: 'Neon sign',
       hint: 'Old-school cool.',
     },
+    {
+      id: 'business-with-number-name',
+      emoji: '#️⃣',
+      label: 'Number in business name',
+      hint: 'Any business name with a digit, like 5, 24, 66, or 101.',
+    },
+    {
+      id: 'business-with-family-name',
+      emoji: '👨‍👩‍👧‍👦',
+      label: 'Family business',
+      hint: 'A sign that says family owned, sons, brothers, sisters, or family.',
+    },
+    {
+      id: 'business-with-giant-banner',
+      emoji: '📣',
+      label: 'Giant sale banner',
+      hint: 'Grand opening, liquidation, sale, now open, or closing soon.',
+    },
 
     // Travel Services
     {
@@ -642,6 +828,24 @@
       emoji: '♻️',
       label: 'Recycling bin',
       hint: 'Public bin, rest-stop bin, business bin, or recycling sign.',
+    },
+    {
+      id: 'weigh-station',
+      emoji: '⚖️',
+      label: 'Truck weigh station',
+      hint: 'Open or closed both count.',
+    },
+    {
+      id: 'scenic-overlook',
+      emoji: '🏞️',
+      label: 'Scenic overlook',
+      hint: 'Viewpoint, vista point, pullout, scenic turnout, or overlook sign.',
+    },
+    {
+      id: 'visitor-center',
+      emoji: 'ℹ️',
+      label: 'Visitor center',
+      hint: 'Town, state, park, attraction, or welcome center.',
     },
 
     // Community Places
@@ -687,6 +891,24 @@
       label: 'Sports stadium or field',
       hint: 'Professional, school, community, or roadside field.',
     },
+    {
+      id: 'fire-station',
+      emoji: '🚒',
+      label: 'Fire station',
+      hint: 'Station building, sign, garage doors, or fire training site.',
+    },
+    {
+      id: 'post-office',
+      emoji: '📮',
+      label: 'Post office',
+      hint: 'Building, sign, mailbox cluster, or postal truck at the site.',
+    },
+    {
+      id: 'community-mural',
+      emoji: '🖼️',
+      label: 'Community mural',
+      hint: 'Painted wall showing local history, pride, nature, or culture.',
+    },
 
     // Local Landmarks And Buildings
     {
@@ -724,6 +946,24 @@
       emoji: '🎨',
       label: 'Decorated water tower',
       hint: 'Painted logo, town name, mascot, mural, or unusual color.',
+    },
+    {
+      id: 'tiny-church-or-chapel',
+      emoji: '⛪',
+      label: 'Tiny chapel',
+      hint: 'Small church, roadside chapel, wedding chapel, or miniature worship building.',
+    },
+    {
+      id: 'old-brick-building',
+      emoji: '🧱',
+      label: 'Old brick building',
+      hint: 'Historic downtown, factory, school, station, or warehouse.',
+    },
+    {
+      id: 'building-with-painted-date',
+      emoji: '📅',
+      label: 'Building with a date',
+      hint: 'A year painted, carved, or displayed on the building.',
     },
 
     // Homes And Yards
@@ -813,6 +1053,18 @@
       emoji: '📡',
       label: 'Satellite dish',
       hint: 'On a roof, building, yard, truck, or communications site.',
+    },
+    {
+      id: 'power-substation',
+      emoji: '⚡',
+      label: 'Power substation',
+      hint: 'Fenced electrical equipment, transformers, or utility yard.',
+    },
+    {
+      id: 'water-treatment-site',
+      emoji: '💧',
+      label: 'Water treatment site',
+      hint: 'Water plant, pump station, reservoir sign, or utility tanks.',
     },
   ];
 
@@ -904,6 +1156,24 @@
       label: 'Nest or birdhouse',
       hint: 'Real nest, birdhouse, nesting platform, or bird sign.',
     },
+    {
+      id: 'goat-or-sheep',
+      emoji: '🐐',
+      label: 'Goat or sheep',
+      hint: 'Real animal, farm sign, logo, mural, or statue.',
+    },
+    {
+      id: 'hawk-or-vulture',
+      emoji: '🦅',
+      label: 'Big bird circling',
+      hint: 'Hawk, eagle, vulture, or any large bird riding the air.',
+    },
+    {
+      id: 'animal-on-billboard',
+      emoji: '🐾',
+      label: 'Animal on a billboard',
+      hint: 'Mascot, cartoon, photo, logo, or warning image.',
+    },
 
     // Trees, Plants, And Rocks
     {
@@ -991,6 +1261,30 @@
       label: 'Interesting rock formation',
       hint: 'Nature gets weird.',
     },
+    {
+      id: 'palm-tree',
+      emoji: '🌴',
+      label: 'Palm tree',
+      hint: 'Real, planted, logo, mural, or sign image.',
+    },
+    {
+      id: 'tree-with-weird-shape',
+      emoji: '🌳',
+      label: 'Weird-shaped tree',
+      hint: 'Bent, split, twisted, extra huge, or shaped like something else.',
+    },
+    {
+      id: 'field-with-rows',
+      emoji: '🌱',
+      label: 'Perfect crop rows',
+      hint: 'Farm rows, vineyard rows, orchard rows, or planted landscaping.',
+    },
+    {
+      id: 'desert-plant',
+      emoji: '🏜️',
+      label: 'Desert plant',
+      hint: 'Yucca, cactus, agave, Joshua tree, or desert landscaping.',
+    },
 
     // Water And Sky
     {
@@ -1029,6 +1323,24 @@
       label: 'Weather change',
       hint: 'Clear to cloudy, rain starting, fog, wind, snow, or sunshine breaking through.',
     },
+    {
+      id: 'contrail-cross',
+      emoji: '✈️',
+      label: 'Crossed contrails',
+      hint: 'Two airplane trails crossing or making a clear angle.',
+    },
+    {
+      id: 'cloud-shaped-like-face',
+      emoji: '☁️',
+      label: 'Cloud face',
+      hint: 'A cloud that looks like a face, animal, object, or character.',
+    },
+    {
+      id: 'fog-or-mist',
+      emoji: '🌫️',
+      label: 'Fog or mist',
+      hint: 'Low clouds, mist over fields, fog on hills, or steam-like haze.',
+    },
 
     // Natural Features And Energy
     {
@@ -1055,6 +1367,24 @@
       label: 'Wind turbine',
       hint: 'One turbine counts; a whole field is bragging rights.',
     },
+    {
+      id: 'waterfall-or-fountain',
+      emoji: '⛲',
+      label: 'Waterfall or fountain',
+      hint: 'Natural waterfall, decorative fountain, water feature, or sign image.',
+    },
+    {
+      id: 'solar-farm',
+      emoji: '☀️',
+      label: 'Solar farm',
+      hint: 'Rows of ground-mounted solar panels.',
+    },
+    {
+      id: 'river-name-sign',
+      emoji: '🏞️',
+      label: 'Named river sign',
+      hint: 'Bridge sign, park sign, waterway marker, or road sign naming a river.',
+    },
   ];
 
   // Landmarks, Art, And Oddities
@@ -1077,6 +1407,24 @@
       emoji: '🎨',
       label: 'Train car art',
       hint: 'Colorful freight car, mural, logo, or family-friendly graffiti.',
+    },
+    {
+      id: 'painted-utility-box',
+      emoji: '🎨',
+      label: 'Painted utility box',
+      hint: 'Traffic box, electrical box, cabinet, or roadside equipment turned into art.',
+    },
+    {
+      id: 'mosaic-or-tile-art',
+      emoji: '🧩',
+      label: 'Mosaic or tile art',
+      hint: 'Wall, sign, bench, mural, fountain, or public display.',
+    },
+    {
+      id: 'roadside-memorial',
+      emoji: '🕯️',
+      label: 'Roadside memorial',
+      hint: 'Flowers, crosses, markers, signs, or decorated memorial spaces.',
     },
 
     // Flags And Towers
@@ -1103,6 +1451,18 @@
       emoji: '📡',
       label: 'Disguised cell tower',
       hint: 'Tree tower, flagpole tower, or something trying to blend in.',
+    },
+    {
+      id: 'flag-with-animal',
+      emoji: '🏳️',
+      label: 'Flag with an animal',
+      hint: 'State, country, school, business, or team flag with an animal on it.',
+    },
+    {
+      id: 'tower-with-blinking-light',
+      emoji: '🔴',
+      label: 'Blinking tower light',
+      hint: 'Radio tower, water tower, wind turbine, crane, or tall building.',
     },
 
     // Fantasy And Character Finds
@@ -1166,6 +1526,24 @@
       label: 'Princess reference',
       hint: 'Royalty appears everywhere.',
     },
+    {
+      id: 'alien-reference',
+      emoji: '👽',
+      label: 'Alien reference',
+      hint: 'UFO sign, alien mascot, space shop, mural, toy, or sticker.',
+    },
+    {
+      id: 'bigfoot-reference',
+      emoji: '🐾',
+      label: 'Bigfoot reference',
+      hint: 'Sasquatch sign, sticker, statue, mural, or roadside joke.',
+    },
+    {
+      id: 'unicorn-reference',
+      emoji: '🦄',
+      label: 'Unicorn reference',
+      hint: 'Toy, sign, mural, mascot, decal, or decoration.',
+    },
 
     // Conversation Starters
     {
@@ -1211,6 +1589,24 @@
       emoji: '🚇',
       label: 'Tunnel',
       hint: 'Road tunnel, pedestrian tunnel, or train tunnel.',
+    },
+    {
+      id: 'oversized-chair',
+      emoji: '🪑',
+      label: 'Oversized chair',
+      hint: 'Giant chair, bench, throne, porch rocker, or photo-op seat.',
+    },
+    {
+      id: 'giant-roadside-object',
+      emoji: '📏',
+      label: 'Giant roadside object',
+      hint: 'Huge boot, chair, fruit, animal, tool, bottle, statue, or sign prop.',
+    },
+    {
+      id: 'something-perfectly-tiny',
+      emoji: '🔎',
+      label: 'Something perfectly tiny',
+      hint: 'Tiny house, tiny sign, tiny statue, tiny car, or miniature display.',
     },
   ];
 
