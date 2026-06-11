@@ -671,6 +671,40 @@ body.large-text {
   min-height: 7rem;
 }
 
+.trivia-difficulty {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: center;
+  margin: 1rem auto 0;
+  font-weight: 700;
+}
+
+.segmented-control {
+  display: inline-grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border: 2px solid var(--color-primary);
+  border-radius: 8px;
+  background: var(--color-card);
+}
+
+.segmented-control button {
+  min-height: 2.5rem;
+  padding: 0.45rem 0.75rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.segmented-control button.active {
+  background: var(--color-primary);
+  color: var(--color-card);
+}
+
 .secret-option-card {
   border-style: dashed;
   background: linear-gradient(180deg, #ffffff, #f7fbff);

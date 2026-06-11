@@ -697,6 +697,15 @@
     { category: 'twentytwenties', question: '2020s Trivia: Which NASA rover landed on Mars in 2021?', answer: 'Perseverance.', choices: ['Perseverance.', 'Curiosity.', 'Opportunity.', 'Spirit.'] },
   ];
 
+  function inferTriviaDifficulty(item) {
+    if (item.difficulty) return item.difficulty;
+    const category = item.category || 'mixed';
+    if (['capitals', 'nicknames', 'plates', 'math', 'facts', 'food'].includes(category)) return 'easy';
+    if (['weirdlaws', 'nationalparks', 'alaska', 'ballet', 'hockey', 'inventions', 'space'].includes(category)) return 'hard';
+    if (/hard|remote|largest|highest|formula|spectrum|founded|capital of|nickname/i.test(item.question || '')) return 'medium';
+    return 'medium';
+  }
+
   function buildTriviaDatabase() {
     const stateQuestions = [];
     stateFacts.forEach(([state, capital, nickname]) => {
@@ -731,6 +740,7 @@
         question: item.question || 'Trivia question missing.',
         answer: normalizedAnswer,
         choices: Array.isArray(item.choices) ? item.choices.slice() : null,
+        difficulty: inferTriviaDifficulty(item),
       };
     });
   }
@@ -757,6 +767,7 @@
   let triviaIndex = 0;
   let triviaScore = {};
   let activeTriviaCategory = getStoredJson('rtaLastTriviaCategory', 'mixed');
+  let activeTriviaDifficulty = getStoredJson('rtaLastTriviaDifficulty', 'medium');
   let triviaQuestionAwarded = false;
   let jokePlayerScores = {};
   let jokeAwards = { dad: 0, mom: 0 };
@@ -849,6 +860,7 @@
   const sideGameTitle = document.getElementById('side-game-title');
   const sideGameText = document.getElementById('side-game-text');
   const sideGameActions = document.getElementById('side-game-actions');
+  const triviaDifficultyButtons = document.getElementById('trivia-difficulty-buttons');
   const triviaCategoryGrid = document.getElementById('trivia-category-grid');
   const triviaPlay = document.getElementById('trivia-play');
   const triviaScoreboard = document.getElementById('trivia-scoreboard');
@@ -1706,24 +1718,32 @@
   }
 
   function buildTriviaQuestions(categoryId) {
-    const candidates = categoryId === 'mixed'
+    const baseCandidates = categoryId === 'mixed'
       ? triviaDatabase
       : triviaDatabase.filter(item => item.category === categoryId);
-    if (!candidates.length) return [];
+    if (!baseCandidates.length) return [];
 
-    const used = new Set(triviaHistory[categoryId] || []);
+    const filteredCandidates = baseCandidates.filter(item => item.difficulty === activeTriviaDifficulty);
+    const candidates = filteredCandidates.length ? filteredCandidates : baseCandidates;
+    const historyKey = getTriviaHistoryKey(categoryId);
+    const used = new Set(triviaHistory[historyKey] || []);
     let available = candidates.filter(item => !used.has(item.id));
+
     if (!available.length) {
-      triviaHistory[categoryId] = [];
+      triviaHistory[historyKey] = [];
       setStoredJson('rtaTriviaHistory', triviaHistory);
       available = candidates.slice();
     }
     return shuffle(available.slice());
   }
 
+  function getTriviaHistoryKey(categoryId) {
+    return `${categoryId || 'mixed'}:${activeTriviaDifficulty}`;
+  }
+
   function markTriviaSeen(item) {
     if (!item || !item.id) return;
-    const categoryKey = activeTriviaCategory || item.category;
+    const categoryKey = getTriviaHistoryKey(activeTriviaCategory || item.category);
     if (!triviaHistory[categoryKey]) triviaHistory[categoryKey] = [];
     if (!triviaHistory[categoryKey].includes(item.id)) {
       triviaHistory[categoryKey].push(item.id);
@@ -1793,6 +1813,15 @@
     });
   }
 
+  function renderTriviaDifficultyButtons() {
+    if (!triviaDifficultyButtons) return;
+    Array.from(triviaDifficultyButtons.querySelectorAll('button[data-difficulty]')).forEach(button => {
+      const isActive = button.dataset.difficulty === activeTriviaDifficulty;
+      button.classList.toggle('active', isActive);
+      button.setAttribute('aria-pressed', String(isActive));
+    });
+  }
+
   function startTriviaRun() {
     resetGame();
     triviaDeck = [];
@@ -1803,12 +1832,14 @@
     triviaPlay.hidden = true;
     finishTriviaButton.hidden = true;
     renderTriviaCategories();
+    renderTriviaDifficultyButtons();
     showSection('trivia');
   }
 
   function startTriviaCategory(categoryId) {
     activeTriviaCategory = categoryId;
     setStoredJson('rtaLastTriviaCategory', categoryId);
+    renderTriviaDifficultyButtons();
     triviaDeck = buildTriviaQuestions(categoryId);
     triviaIndex = 0;
     triviaScore = createScoreMap();
@@ -1833,7 +1864,8 @@
     }
     markTriviaSeen(item);
     const category = triviaCategories.find(entry => entry.id === item.category);
-    triviaCategoryLabel.textContent = category ? category.label : 'Trivia';
+    const difficultyLabel = activeTriviaDifficulty.charAt(0).toUpperCase() + activeTriviaDifficulty.slice(1);
+    triviaCategoryLabel.textContent = category ? `${category.label} · ${difficultyLabel}` : `Trivia · ${difficultyLabel}`;
     triviaQuestion.textContent = item.question;
     triviaAnswer.textContent = item.answer;
     triviaAnswer.hidden = true;
@@ -2323,6 +2355,16 @@
   huntEtaButton.addEventListener('click', startEtaGuess);
   showTriviaAnswerButton.addEventListener('click', () => {
     triviaAnswer.hidden = false;
+  });
+  triviaDifficultyButtons.addEventListener('click', event => {
+    const button = event.target.closest('button[data-difficulty]');
+    if (!button) return;
+    activeTriviaDifficulty = button.dataset.difficulty;
+    setStoredJson('rtaLastTriviaDifficulty', activeTriviaDifficulty);
+    renderTriviaDifficultyButtons();
+    if (!triviaPlay.hidden && activeTriviaCategory) {
+      startTriviaCategory(activeTriviaCategory);
+    }
   });
   nextTriviaButton.addEventListener('click', () => {
     triviaIndex++;
