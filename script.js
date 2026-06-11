@@ -748,6 +748,14 @@
   const emojiPrompts = ['😜', '😮', '🤨', '😎', '😭', '😡', '🤯', '🥳', '😴', '😬', '🤠', '😇'];
   const triviaDatabase = buildTriviaDatabase();
   let triviaHistory = getStoredJson('rtaTriviaHistory', {});
+  const defaultTripSettings = {
+    gameLength: 'long',
+    familyFriendlyOnly: true,
+    noCameraGames: false,
+    noPopCulture: false,
+    hardTrivia: false,
+  };
+  let tripSettings = Object.assign({}, defaultTripSettings, getStoredJson('rtaTripSettings', {}));
 
   // Application state
   let selectedAge = 'mixed';
@@ -823,6 +831,7 @@
   const sections = {
     players: document.getElementById('setup-teams'),
     category: document.getElementById('setup-category'),
+    settings: document.getElementById('trip-settings'),
     region: document.getElementById('setup-region'),
     adventure: document.getElementById('adventure'),
     scavenger: document.getElementById('scavenger'),
@@ -848,6 +857,14 @@
   const addPlayerButton = document.getElementById('add-player');
   const removePlayerButton = document.getElementById('remove-player');
   const saveTeamsButton = document.getElementById('save-teams');
+  const openTripSettingsButton = document.getElementById('open-trip-settings');
+  const settingGameLength = document.getElementById('setting-game-length');
+  const settingFamilyFriendly = document.getElementById('setting-family-friendly');
+  const settingNoCamera = document.getElementById('setting-no-camera');
+  const settingNoPopCulture = document.getElementById('setting-no-pop-culture');
+  const settingHardTrivia = document.getElementById('setting-hard-trivia');
+  const saveTripSettingsButton = document.getElementById('save-trip-settings');
+  const closeTripSettingsButton = document.getElementById('close-trip-settings');
   const huntGrid = document.getElementById('hunt-grid');
   const huntStatus = document.getElementById('hunt-status');
   const huntScoreboard = document.getElementById('hunt-scoreboard');
@@ -949,6 +966,52 @@
     optionLargeText.checked = large;
     optionHighContrast.checked = contrast;
     optionReduceMotion.checked = reduce;
+  }
+
+  function normalizeTripSettings(settings) {
+    const merged = Object.assign({}, defaultTripSettings, settings || {});
+    merged.gameLength = merged.gameLength === 'short' ? 'short' : 'long';
+    merged.familyFriendlyOnly = Boolean(merged.familyFriendlyOnly);
+    merged.noCameraGames = Boolean(merged.noCameraGames);
+    merged.noPopCulture = Boolean(merged.noPopCulture);
+    merged.hardTrivia = Boolean(merged.hardTrivia);
+    return merged;
+  }
+
+  function populateTripSettingsForm() {
+    tripSettings = normalizeTripSettings(tripSettings);
+    settingGameLength.value = tripSettings.gameLength;
+    settingFamilyFriendly.checked = tripSettings.familyFriendlyOnly;
+    settingNoCamera.checked = tripSettings.noCameraGames;
+    settingNoPopCulture.checked = tripSettings.noPopCulture;
+    settingHardTrivia.checked = tripSettings.hardTrivia;
+  }
+
+  function saveTripSettings() {
+    tripSettings = normalizeTripSettings({
+      gameLength: settingGameLength.value,
+      familyFriendlyOnly: settingFamilyFriendly.checked,
+      noCameraGames: settingNoCamera.checked,
+      noPopCulture: settingNoPopCulture.checked,
+      hardTrivia: settingHardTrivia.checked,
+    });
+    setStoredJson('rtaTripSettings', tripSettings);
+    applyTripSettings();
+    showSection('category');
+  }
+
+  function applyTripSettings() {
+    tripSettings = normalizeTripSettings(tripSettings);
+    const emojiButton = document.querySelector('[data-category="emoji"]');
+    if (emojiButton) {
+      emojiButton.hidden = tripSettings.noCameraGames;
+      emojiButton.disabled = tripSettings.noCameraGames;
+    }
+    if (tripSettings.hardTrivia) {
+      activeTriviaDifficulty = 'hard';
+      setStoredJson('rtaLastTriviaDifficulty', activeTriviaDifficulty);
+      renderTriviaDifficultyButtons();
+    }
   }
 
   function initSavedUserData() {
@@ -1106,6 +1169,10 @@
   function getCarJudgeNote() {
     if (!carJudgeId) return '';
     return `${getPlayerName(carJudgeId)} verifies answers.`;
+  }
+
+  function getHuntMilestone() {
+    return tripSettings.gameLength === 'short' ? 6 : 10;
   }
 
   function getTopPlayers(scores) {
@@ -1375,15 +1442,17 @@
     const claimedCount = getHuntClaims().length;
     const judgeNote = getCarJudgeNote();
     const themeLabel = getHuntThemeLabel();
-    if (leaderScore >= 10) {
+    const milestone = getHuntMilestone();
+    const remainingFinds = Math.max(0, milestone - leaderScore);
+    if (leaderScore >= milestone) {
       const leaders = getTopPlayers(scores).map(player => player.name).join(', ');
-      huntStatus.textContent = `${leaders} hit the 10-find milestone. Karaoke power unlocked: choose the song everyone else sings.${judgeNote ? ` ${judgeNote}` : ''}`;
+      huntStatus.textContent = `${leaders} hit the ${milestone}-find milestone. Karaoke power unlocked: choose the song everyone else sings.${judgeNote ? ` ${judgeNote}` : ''}`;
     } else if (!activeCount) {
       huntStatus.textContent = claimedCount
         ? `${claimedCount} total find${claimedCount === 1 ? '' : 's'} claimed. Draw ${themeLabel} targets to keep hunting.${judgeNote ? ` ${judgeNote}` : ''}`
         : `Draw ${themeLabel} targets to start the hunt.${judgeNote ? ` ${judgeNote}` : ''}`;
     } else {
-      huntStatus.textContent = `${themeLabel}: ${activeCount} current target${activeCount === 1 ? '' : 's'} to watch for. ${10 - leaderScore} more find${10 - leaderScore === 1 ? '' : 's'} to reach the milestone.${judgeNote ? ` ${judgeNote}` : ''}`;
+      huntStatus.textContent = `${themeLabel}: ${activeCount} current target${activeCount === 1 ? '' : 's'} to watch for. ${remainingFinds} more find${remainingFinds === 1 ? '' : 's'} to reach the milestone.${judgeNote ? ` ${judgeNote}` : ''}`;
     }
   }
 
@@ -1818,10 +1887,12 @@
     const baseCandidates = categoryId === 'mixed'
       ? triviaDatabase
       : triviaDatabase.filter(item => item.category === categoryId);
-    if (!baseCandidates.length) return [];
+    const settingsCandidates = baseCandidates.filter(triviaItemAllowedBySettings);
+    const candidatePool = settingsCandidates.length ? settingsCandidates : baseCandidates;
+    if (!candidatePool.length) return [];
 
-    const filteredCandidates = baseCandidates.filter(item => item.difficulty === activeTriviaDifficulty);
-    const candidates = filteredCandidates.length ? filteredCandidates : baseCandidates;
+    const filteredCandidates = candidatePool.filter(item => item.difficulty === activeTriviaDifficulty);
+    const candidates = filteredCandidates.length ? filteredCandidates : candidatePool;
     const historyKey = getTriviaHistoryKey(categoryId);
     const used = new Set(triviaHistory[historyKey] || []);
     let available = candidates.filter(item => !used.has(item.id));
@@ -1836,6 +1907,30 @@
 
   function getTriviaHistoryKey(categoryId) {
     return `${categoryId || 'mixed'}:${activeTriviaDifficulty}`;
+  }
+
+  function isPopCultureTriviaCategory(categoryId) {
+    return [
+      'movies',
+      'music',
+      'tv',
+      'southpark',
+      'rickmorty',
+      'seinfeld',
+      'friends',
+      'kpop',
+      'taylorswift',
+      'eighties',
+      'nineties',
+      'twothousands',
+      'twentytens',
+      'twentytwenties',
+    ].includes(categoryId);
+  }
+
+  function triviaItemAllowedBySettings(item) {
+    if (!tripSettings.noPopCulture) return true;
+    return !isPopCultureTriviaCategory(item.category);
   }
 
   function markTriviaSeen(item) {
@@ -1888,7 +1983,10 @@
 
   function renderTriviaCategories() {
     triviaCategoryGrid.innerHTML = '';
-    triviaCategories.forEach(category => {
+    const visibleCategories = triviaCategories.filter(category => (
+      !tripSettings.noPopCulture || !isPopCultureTriviaCategory(category.id)
+    ));
+    visibleCategories.forEach(category => {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'option-card trivia-category-card';
@@ -1921,6 +2019,10 @@
 
   function startTriviaRun() {
     resetGame();
+    if (tripSettings.hardTrivia) {
+      activeTriviaDifficulty = 'hard';
+      setStoredJson('rtaLastTriviaDifficulty', activeTriviaDifficulty);
+    }
     triviaDeck = [];
     triviaIndex = 0;
     triviaScore = createScoreMap();
@@ -2334,6 +2436,14 @@
     savePlayers();
     showSection('category');
   });
+  openTripSettingsButton.addEventListener('click', () => {
+    populateTripSettingsForm();
+    showSection('settings');
+  });
+  saveTripSettingsButton.addEventListener('click', saveTripSettings);
+  closeTripSettingsButton.addEventListener('click', () => {
+    showSection('category');
+  });
   addPlayerButton.addEventListener('click', () => {
     savePlayers();
     if (players.length >= 8) return;
@@ -2569,6 +2679,9 @@
   window.addEventListener('load', () => {
     initPreferences();
     initSavedUserData();
+    tripSettings = normalizeTripSettings(tripSettings);
+    populateTripSettingsForm();
+    applyTripSettings();
     renderPlayerFields();
     passengerConfirmButton.addEventListener('click', confirmPassengerStatus);
     passengerConfirmButton.focus();

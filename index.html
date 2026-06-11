@@ -111,6 +111,7 @@
     <section id="setup-category" class="setup-section" aria-labelledby="setup-category-heading" hidden>
       <h2 id="setup-category-heading">Choose your adventure type</h2>
       <p>Pick what kind of activities you’d like to enjoy.</p>
+      <button id="open-trip-settings" class="secondary-button settings-button">Trip Settings</button>
       <button class="quick-start-card" data-category="quickstart">
         <span class="option-emoji" aria-hidden="true">🚗</span>
         <span class="option-title">Start a Road Trip Mix</span>
@@ -188,6 +189,41 @@
             </button>
           </div>
         </section>
+      </div>
+    </section>
+
+    <!-- Tiny local-only settings screen -->
+    <section id="trip-settings" class="setup-section" aria-labelledby="trip-settings-heading" hidden>
+      <h2 id="trip-settings-heading">Trip Settings</h2>
+      <p>These preferences stay on this device.</p>
+      <div class="settings-panel">
+        <label class="team-name-field" for="setting-game-length">
+          <span>Game length</span>
+          <select id="setting-game-length">
+            <option value="short">Short game</option>
+            <option value="long">Long game</option>
+          </select>
+        </label>
+        <label class="checkbox-row" for="setting-family-friendly">
+          <input id="setting-family-friendly" type="checkbox" />
+          <span>Family-friendly only</span>
+        </label>
+        <label class="checkbox-row" for="setting-no-camera">
+          <input id="setting-no-camera" type="checkbox" />
+          <span>No camera games</span>
+        </label>
+        <label class="checkbox-row" for="setting-no-pop-culture">
+          <input id="setting-no-pop-culture" type="checkbox" />
+          <span>No pop culture</span>
+        </label>
+        <label class="checkbox-row" for="setting-hard-trivia">
+          <input id="setting-hard-trivia" type="checkbox" />
+          <span>Hard trivia</span>
+        </label>
+      </div>
+      <div class="adventure-actions">
+        <button id="save-trip-settings" class="primary-button">Save Settings</button>
+        <button id="close-trip-settings" class="secondary-button">Back</button>
       </div>
     </section>
 
