@@ -618,6 +618,29 @@ body.large-text {
   font-weight: 700;
 }
 
+.hunt-theme-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.hunt-theme-buttons button {
+  min-height: 2.5rem;
+  padding: 0.5rem 0.7rem;
+  border: 2px solid var(--color-primary);
+  border-radius: 8px;
+  background: var(--color-card);
+  color: var(--color-primary);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.hunt-theme-buttons button.active {
+  background: var(--color-primary);
+  color: var(--color-card);
+}
+
 .hunt-minigames {
   display: flex;
   flex-wrap: wrap;

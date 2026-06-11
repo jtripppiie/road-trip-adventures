@@ -781,6 +781,7 @@
   let alphabetIndex = 0;
   let huntDeck = [];
   let activeHuntIds = [];
+  let activeHuntTheme = getStoredJson('rtaHuntTheme', 'mixed');
   let emojiIndex = 0;
   let emojiScore = {};
   let emojiFaceAwarded = false;
@@ -850,6 +851,7 @@
   const huntGrid = document.getElementById('hunt-grid');
   const huntStatus = document.getElementById('hunt-status');
   const huntScoreboard = document.getElementById('hunt-scoreboard');
+  const huntThemeButtons = document.getElementById('hunt-theme-buttons');
   const drawHuntTargetsButton = document.getElementById('draw-hunt-targets');
   const resetHuntButton = document.getElementById('reset-hunt');
   const finishHuntButton = document.getElementById('finish-hunt');
@@ -1301,8 +1303,51 @@
       .filter(Boolean);
   }
 
+  function getHuntItemSearchText(item) {
+    return `${item.id || ''} ${item.label || ''} ${item.hint || ''}`.toLowerCase();
+  }
+
+  function huntItemMatchesTheme(item, theme) {
+    if (theme === 'mixed') return true;
+    const text = getHuntItemSearchText(item);
+    if (theme === 'vehicles') {
+      return /car|vehicle|truck|plate|motorcycle|camper|rv|trailer|tire|bike|bus|van|semi|tow|fuel|gas/.test(text);
+    }
+    if (theme === 'signs') {
+      return /sign|billboard|exit|mile|route|highway|road|street|logo|slogan|marker|license plate|plate/.test(text);
+    }
+    if (theme === 'nature') {
+      return /animal|bird|tree|cloud|sky|mountain|hill|river|lake|water|desert|flower|plant|farm|horse|cow|dog|wildlife|sun|moon/.test(text);
+    }
+    if (theme === 'weird') {
+      return /weird|funny|unusual|odd|giant|tiny|strange|mystery|mascot|superhero|batmobile|eyelash|flame|sticker|homemade|expensive|never own|named/.test(text);
+    }
+    if (theme === 'easy') {
+      return /car|truck|sign|billboard|gas|flag|bridge|tree|cloud|animal|trailer|bus|food|restaurant|water|construction|emergency/.test(text);
+    }
+    return true;
+  }
+
+  function getHuntThemeLabel() {
+    const activeButton = huntThemeButtons.querySelector(`button[data-hunt-theme="${activeHuntTheme}"]`);
+    return activeButton ? activeButton.textContent : 'Mixed';
+  }
+
+  function renderHuntThemeButtons() {
+    Array.from(huntThemeButtons.querySelectorAll('button[data-hunt-theme]')).forEach(button => {
+      const isActive = button.dataset.huntTheme === activeHuntTheme;
+      button.classList.toggle('active', isActive);
+      button.setAttribute('aria-pressed', String(isActive));
+    });
+  }
+
   function buildHuntDeck() {
-    huntDeck = shuffle(scavengerItems.filter(item => !item.claimedBy).map(item => item.id));
+    const unclaimedItems = scavengerItems.filter(item => !item.claimedBy);
+    const themedItems = activeHuntTheme === 'mixed'
+      ? unclaimedItems
+      : unclaimedItems.filter(item => huntItemMatchesTheme(item, activeHuntTheme));
+    const deckItems = themedItems.length ? themedItems : unclaimedItems;
+    huntDeck = shuffle(deckItems.map(item => item.id));
   }
 
   function drawHuntTargets(count = 6) {
@@ -1329,19 +1374,21 @@
     const activeCount = getActiveHuntItems().length;
     const claimedCount = getHuntClaims().length;
     const judgeNote = getCarJudgeNote();
+    const themeLabel = getHuntThemeLabel();
     if (leaderScore >= 10) {
       const leaders = getTopPlayers(scores).map(player => player.name).join(', ');
       huntStatus.textContent = `${leaders} hit the 10-find milestone. Karaoke power unlocked: choose the song everyone else sings.${judgeNote ? ` ${judgeNote}` : ''}`;
     } else if (!activeCount) {
       huntStatus.textContent = claimedCount
-        ? `${claimedCount} total find${claimedCount === 1 ? '' : 's'} claimed. Draw new targets to keep hunting.${judgeNote ? ` ${judgeNote}` : ''}`
-        : `Draw targets to start the hunt.${judgeNote ? ` ${judgeNote}` : ''}`;
+        ? `${claimedCount} total find${claimedCount === 1 ? '' : 's'} claimed. Draw ${themeLabel} targets to keep hunting.${judgeNote ? ` ${judgeNote}` : ''}`
+        : `Draw ${themeLabel} targets to start the hunt.${judgeNote ? ` ${judgeNote}` : ''}`;
     } else {
-      huntStatus.textContent = `${activeCount} current target${activeCount === 1 ? '' : 's'} to watch for. ${10 - leaderScore} more find${10 - leaderScore === 1 ? '' : 's'} to reach the milestone.${judgeNote ? ` ${judgeNote}` : ''}`;
+      huntStatus.textContent = `${themeLabel}: ${activeCount} current target${activeCount === 1 ? '' : 's'} to watch for. ${10 - leaderScore} more find${10 - leaderScore === 1 ? '' : 's'} to reach the milestone.${judgeNote ? ` ${judgeNote}` : ''}`;
     }
   }
 
   function renderHunt() {
+    renderHuntThemeButtons();
     huntGrid.innerHTML = '';
     const activeItems = getActiveHuntItems();
     activeItems.forEach(item => {
@@ -1405,6 +1452,14 @@
   }
 
   function drawFreshHuntTargets() {
+    drawHuntTargets();
+  }
+
+  function setHuntTheme(theme) {
+    activeHuntTheme = theme || 'mixed';
+    setStoredJson('rtaHuntTheme', activeHuntTheme);
+    huntDeck = [];
+    activeHuntIds = [];
     drawHuntTargets();
   }
 
@@ -2396,6 +2451,11 @@
   drawHuntTargetsButton.addEventListener('click', drawFreshHuntTargets);
   resetHuntButton.addEventListener('click', resetHunt);
   finishHuntButton.addEventListener('click', showHuntSummary);
+  huntThemeButtons.addEventListener('click', event => {
+    const button = event.target.closest('button[data-hunt-theme]');
+    if (!button) return;
+    setHuntTheme(button.dataset.huntTheme);
+  });
   huntLightningButton.addEventListener('click', startLightningRound);
   huntTwentyButton.addEventListener('click', startTwentyQuestions);
   huntAlphabetButton.addEventListener('click', startAlphabetGame);
