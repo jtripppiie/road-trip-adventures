@@ -300,6 +300,7 @@
         <div id="trivia-scoreboard" class="team-scoreboard" aria-live="polite"></div>
         <article class="trivia-card" aria-live="polite">
           <span id="trivia-category-label" class="challenge-badge">Trivia</span>
+          <p id="trivia-handoff" class="handoff-prompt"></p>
           <h3 id="trivia-question"></h3>
           <div id="trivia-choices" class="trivia-choices" aria-label="Answer choices"></div>
           <p id="trivia-answer" hidden></p>
@@ -396,6 +397,7 @@
       </div>
       <article id="secret-card" class="trivia-card secret-card" aria-live="polite">
         <span id="secret-progress" class="challenge-badge">Locked</span>
+        <p id="secret-handoff" class="handoff-prompt"></p>
         <h3 id="secret-question">Secret mode is locked.</h3>
         <p id="secret-instructions">Answer the car-only questions and have the group verify each one.</p>
         <label id="secret-answer-field" class="team-name-field" for="secret-answer">

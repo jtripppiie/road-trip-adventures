@@ -736,6 +736,16 @@ body.large-text {
   overflow-wrap: anywhere;
 }
 
+.trivia-card .handoff-prompt {
+  margin: 0.75rem auto 0;
+  padding: 0.45rem 0.7rem;
+  width: fit-content;
+  max-width: 100%;
+  background: #fff2d8;
+  color: #6b3b00;
+  font-weight: 800;
+}
+
 .secret-card .team-name-field {
   margin-top: 1rem;
   text-align: left;

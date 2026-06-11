@@ -865,6 +865,7 @@
   const triviaPlay = document.getElementById('trivia-play');
   const triviaScoreboard = document.getElementById('trivia-scoreboard');
   const triviaCategoryLabel = document.getElementById('trivia-category-label');
+  const triviaHandoff = document.getElementById('trivia-handoff');
   const triviaQuestion = document.getElementById('trivia-question');
   const triviaChoices = document.getElementById('trivia-choices');
   const triviaAnswer = document.getElementById('trivia-answer');
@@ -895,6 +896,7 @@
   const savePiScoresButton = document.getElementById('save-pi-scores');
   const finishPiButton = document.getElementById('finish-pi');
   const secretProgress = document.getElementById('secret-progress');
+  const secretHandoff = document.getElementById('secret-handoff');
   const secretQuestion = document.getElementById('secret-question');
   const secretInstructions = document.getElementById('secret-instructions');
   const secretAnswerField = document.getElementById('secret-answer-field');
@@ -1063,6 +1065,12 @@
   function getPlayerName(playerId) {
     const player = players.find(entry => entry.id === playerId);
     return player ? player.name : 'P?';
+  }
+
+  function getTurnPlayerName(turnIndex) {
+    if (!players.length) return 'next passenger';
+    const player = players[turnIndex % players.length];
+    return player ? player.name : 'next passenger';
   }
 
   function getTopPlayers(scores) {
@@ -1866,6 +1874,7 @@
     const category = triviaCategories.find(entry => entry.id === item.category);
     const difficultyLabel = activeTriviaDifficulty.charAt(0).toUpperCase() + activeTriviaDifficulty.slice(1);
     triviaCategoryLabel.textContent = category ? `${category.label} · ${difficultyLabel}` : `Trivia · ${difficultyLabel}`;
+    triviaHandoff.textContent = `Hand the phone to ${getTurnPlayerName(triviaIndex)}.`;
     triviaQuestion.textContent = item.question;
     triviaAnswer.textContent = item.answer;
     triviaAnswer.hidden = true;
@@ -2121,6 +2130,7 @@
     const total = activeSecretUnlockQuestions.length;
     const question = activeSecretUnlockQuestions[secretUnlockStep];
     secretProgress.textContent = `Lock ${secretUnlockStep + 1}/${total}`;
+    secretHandoff.textContent = `Hand the phone to ${getTurnPlayerName(secretUnlockStep)}.`;
     secretQuestion.textContent = question;
     secretInstructions.textContent = 'Type the car\'s answer, perform the tiny ritual, and tap Car Agrees only if the passengers verify it. No searching. No driver help.';
     secretStatus.textContent = '';
@@ -2150,6 +2160,7 @@
 
   function unlockSecretMode() {
     secretProgress.textContent = 'Unlocked';
+    secretHandoff.textContent = 'Phone can return to the group.';
     secretQuestion.textContent = 'The vault opens.';
     secretInstructions.textContent = 'Your reward is ready. Play it loud enough for the passengers, not the driver.';
     secretStatus.textContent = '';
