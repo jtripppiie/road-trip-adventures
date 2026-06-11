@@ -2139,6 +2139,25 @@
     renderSecretUnlock();
   }
 
+  function startQuickStart() {
+    const quickModes = ['random', 'scavenger', 'trivia', 'jokes', 'pi'];
+    const mode = quickModes[Math.floor(Math.random() * quickModes.length)];
+    selectedCategory = mode;
+    if (mode === 'scavenger') {
+      startScavengerHunt();
+    } else if (mode === 'trivia') {
+      startTriviaRun();
+      startTriviaCategory('mixed');
+    } else if (mode === 'jokes') {
+      startJokeVote();
+    } else if (mode === 'pi') {
+      startPiChallenge();
+    } else {
+      regionCode = '*';
+      startAdventure();
+    }
+  }
+
   function resetGame() {
     // Clear score and timers
     score = { look: 0, laugh: 0, learn: 0, compete: 0, local: 0 };
@@ -2196,14 +2215,16 @@
 
   // Setup section event delegation
   document.addEventListener('click', event => {
-    const target = event.target.closest('button.option-card');
+    const target = event.target.closest('button[data-category], button.option-card');
     if (!target) return;
     // Determine which section this belongs to
     const section = target.closest('.setup-section');
     if (!section) return;
     if (section.id === 'setup-category') {
       selectedCategory = target.getAttribute('data-category');
-      if (selectedCategory === 'local') {
+      if (selectedCategory === 'quickstart') {
+        startQuickStart();
+      } else if (selectedCategory === 'local') {
         showSection('region');
       } else if (selectedCategory === 'scavenger') {
         startScavengerHunt();

@@ -332,6 +332,27 @@ body.large-text {
   text-align: left;
 }
 
+.quick-start-card {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  width: min(100%, 640px);
+  margin: 1rem auto 0;
+  padding: 1rem;
+  border: 3px solid var(--color-secondary);
+  border-radius: 8px;
+  background: var(--color-primary);
+  color: var(--color-card);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  text-align: center;
+}
+
+.quick-start-card .option-subtitle {
+  color: var(--color-accent);
+}
+
 .mode-group {
   padding: 0.85rem;
   border: 2px solid rgba(9, 35, 63, 0.16);
