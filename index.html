@@ -208,6 +208,19 @@
             <option value="long">Long game</option>
           </select>
         </label>
+        <label class="team-name-field" for="setting-trip-preset">
+          <span>Trip preset</span>
+          <select id="setting-trip-preset">
+            <option value="any">Any route</option>
+            <option value="city">City drive</option>
+            <option value="highway">Highway</option>
+            <option value="desert">Desert</option>
+            <option value="mountains">Mountains</option>
+            <option value="smalltown">Small towns</option>
+            <option value="rainy">Rainy day</option>
+            <option value="night">Night drive</option>
+          </select>
+        </label>
         <label class="checkbox-row" for="setting-no-camera">
           <input id="setting-no-camera" type="checkbox" />
           <span>No camera games</span>
@@ -303,7 +316,7 @@
           <p>Read the current targets aloud, then look outside. Tap a player when someone spots one.</p>
           <p class="hunt-prize">Winner chooses the car karaoke song everyone else has to sing.</p>
         </div>
-        <div class="hunt-route" aria-label="Route">Any Route</div>
+        <div id="hunt-route" class="hunt-route" aria-label="Route">Any Route</div>
       </div>
       <div id="hunt-scoreboard" class="team-scoreboard" aria-live="polite"></div>
       <p id="hunt-status" class="hunt-status">Your current targets are below. Draw a new batch whenever the list gets stale.</p>
@@ -311,8 +324,10 @@
         <button type="button" data-hunt-theme="mixed">Mixed</button>
         <button type="button" data-hunt-theme="vehicles">Vehicles</button>
         <button type="button" data-hunt-theme="signs">Signs</button>
+        <button type="button" data-hunt-theme="places">Places</button>
         <button type="button" data-hunt-theme="nature">Nature</button>
         <button type="button" data-hunt-theme="weird">Weird Stuff</button>
+        <button type="button" data-hunt-theme="jackpot">Jackpot</button>
         <button type="button" data-hunt-theme="easy">Easy Mode</button>
       </div>
       <div class="hunt-minigames" aria-label="Scavenger hunt side games">

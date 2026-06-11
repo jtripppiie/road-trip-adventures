@@ -761,9 +761,20 @@
   let adventureHistory = getStoredJson('rtaAdventureHistory', {});
   const defaultTripSettings = {
     gameLength: 'long',
+    tripPreset: 'any',
     noCameraGames: false,
     noPopCulture: false,
     hardTrivia: false,
+  };
+  const tripPresets = {
+    any: { label: 'Any Route', themes: ['mixed'] },
+    city: { label: 'City Drive', themes: ['places', 'signs', 'easy'] },
+    highway: { label: 'Highway', themes: ['vehicles', 'signs', 'easy'] },
+    desert: { label: 'Desert', themes: ['nature', 'signs', 'weird'] },
+    mountains: { label: 'Mountains', themes: ['nature', 'signs', 'jackpot'] },
+    smalltown: { label: 'Small Towns', themes: ['places', 'weird', 'signs'] },
+    rainy: { label: 'Rainy Day', themes: ['signs', 'vehicles', 'easy'] },
+    night: { label: 'Night Drive', themes: ['signs', 'places', 'easy'] },
   };
   let tripSettings = Object.assign({}, defaultTripSettings, getStoredJson('rtaTripSettings', {}));
 
@@ -872,6 +883,7 @@
   const saveTeamsButton = document.getElementById('save-teams');
   const openTripSettingsButton = document.getElementById('open-trip-settings');
   const settingGameLength = document.getElementById('setting-game-length');
+  const settingTripPreset = document.getElementById('setting-trip-preset');
   const settingNoCamera = document.getElementById('setting-no-camera');
   const settingNoPopCulture = document.getElementById('setting-no-pop-culture');
   const settingHardTrivia = document.getElementById('setting-hard-trivia');
@@ -881,6 +893,7 @@
   const huntGrid = document.getElementById('hunt-grid');
   const huntStatus = document.getElementById('hunt-status');
   const huntScoreboard = document.getElementById('hunt-scoreboard');
+  const huntRoute = document.getElementById('hunt-route');
   const huntThemeButtons = document.getElementById('hunt-theme-buttons');
   const drawHuntTargetsButton = document.getElementById('draw-hunt-targets');
   const resetHuntButton = document.getElementById('reset-hunt');
@@ -993,6 +1006,7 @@
   function normalizeTripSettings(settings) {
     const merged = Object.assign({}, defaultTripSettings, settings || {});
     merged.gameLength = merged.gameLength === 'short' ? 'short' : 'long';
+    merged.tripPreset = tripPresets[merged.tripPreset] ? merged.tripPreset : 'any';
     merged.noCameraGames = Boolean(merged.noCameraGames);
     merged.noPopCulture = Boolean(merged.noPopCulture);
     merged.hardTrivia = Boolean(merged.hardTrivia);
@@ -1002,6 +1016,7 @@
   function populateTripSettingsForm() {
     tripSettings = normalizeTripSettings(tripSettings);
     settingGameLength.value = tripSettings.gameLength;
+    settingTripPreset.value = tripSettings.tripPreset;
     settingNoCamera.checked = tripSettings.noCameraGames;
     settingNoPopCulture.checked = tripSettings.noPopCulture;
     settingHardTrivia.checked = tripSettings.hardTrivia;
@@ -1010,6 +1025,7 @@
   function saveTripSettings() {
     tripSettings = normalizeTripSettings({
       gameLength: settingGameLength.value,
+      tripPreset: settingTripPreset.value,
       noCameraGames: settingNoCamera.checked,
       noPopCulture: settingNoPopCulture.checked,
       hardTrivia: settingHardTrivia.checked,
@@ -1495,11 +1511,17 @@
     if (theme === 'signs') {
       return /sign|billboard|exit|mile|route|highway|road|street|logo|slogan|marker|license plate|plate/.test(text);
     }
+    if (theme === 'places') {
+      return /business|restaurant|diner|coffee|bakery|gas|station|museum|library|school|park|stadium|motel|hotel|visitor|post office|fire station|building|church|chapel|playground|rest area|car wash|drive-thru|market/.test(text);
+    }
     if (theme === 'nature') {
       return /animal|bird|tree|cloud|sky|mountain|hill|river|lake|water|desert|flower|plant|farm|horse|cow|dog|wildlife|sun|moon/.test(text);
     }
     if (theme === 'weird') {
       return /weird|funny|unusual|odd|giant|tiny|strange|mystery|mascot|superhero|batmobile|eyelash|flame|sticker|homemade|expensive|never own|named/.test(text);
+    }
+    if (theme === 'jackpot') {
+      return /rare|jackpot|giant|tiny|classic|convertible|dinosaur|dragon|alien|bigfoot|unicorn|tunnel|waterfall|rainbow|mural|retro|world famous|vanity|palindrome|purple|monster|decorated|odd-shaped|futuristic/.test(text);
     }
     if (theme === 'easy') {
       return /car|truck|sign|billboard|gas|flag|bridge|tree|cloud|animal|trailer|bus|food|restaurant|water|construction|emergency/.test(text);
@@ -1520,16 +1542,30 @@
     });
   }
 
+  function getTripPreset() {
+    return tripPresets[tripSettings.tripPreset] || tripPresets.any;
+  }
+
+  function huntItemMatchesTripPreset(item) {
+    const preset = getTripPreset();
+    if (!preset || preset.themes.includes('mixed')) return true;
+    return preset.themes.some(theme => huntItemMatchesTheme(item, theme));
+  }
+
   function buildHuntDeck() {
     const unclaimedItems = scavengerItems.filter(item => !item.claimedBy);
     const themedItems = activeHuntTheme === 'mixed'
-      ? unclaimedItems
-      : unclaimedItems.filter(item => huntItemMatchesTheme(item, activeHuntTheme));
+      ? unclaimedItems.filter(huntItemMatchesTripPreset)
+      : unclaimedItems.filter(item => huntItemMatchesTheme(item, activeHuntTheme) && huntItemMatchesTripPreset(item));
     const deckItems = themedItems.length ? themedItems : unclaimedItems;
     huntDeck = shuffle(deckItems.map(item => item.id));
   }
 
-  function drawHuntTargets(count = 6) {
+  function getHuntBatchSize() {
+    return tripSettings.gameLength === 'short' ? 6 : 9;
+  }
+
+  function drawHuntTargets(count = getHuntBatchSize()) {
     if (!huntDeck.length) buildHuntDeck();
     activeHuntIds.forEach(itemId => {
       const item = scavengerItems.find(entry => entry.id === itemId);
@@ -1560,6 +1596,7 @@
     const claimedCount = getHuntClaims().length;
     const judgeNote = getCarJudgeNote();
     const themeLabel = getHuntThemeLabel();
+    const presetLabel = getTripPreset().label;
     const milestone = getHuntMilestone();
     const remainingFinds = Math.max(0, milestone - leaderScore);
     if (leaderScore >= milestone) {
@@ -1567,15 +1604,16 @@
       huntStatus.textContent = `${leaders} hit the ${milestone}-find milestone. Karaoke power unlocked: choose the song everyone else sings.${judgeNote ? ` ${judgeNote}` : ''}`;
     } else if (!activeCount) {
       huntStatus.textContent = claimedCount
-        ? `${claimedCount} total find${claimedCount === 1 ? '' : 's'} claimed. Draw ${themeLabel} targets to keep hunting.${judgeNote ? ` ${judgeNote}` : ''}`
-        : `Draw ${themeLabel} targets to start the hunt.${judgeNote ? ` ${judgeNote}` : ''}`;
+        ? `${claimedCount} total find${claimedCount === 1 ? '' : 's'} claimed. Draw ${themeLabel} targets for ${presetLabel}.${judgeNote ? ` ${judgeNote}` : ''}`
+        : `Draw ${themeLabel} targets for ${presetLabel}.${judgeNote ? ` ${judgeNote}` : ''}`;
     } else {
-      huntStatus.textContent = `${themeLabel}: ${activeCount} current target${activeCount === 1 ? '' : 's'} to watch for. ${remainingFinds} more find${remainingFinds === 1 ? '' : 's'} to reach the milestone.${judgeNote ? ` ${judgeNote}` : ''}`;
+      huntStatus.textContent = `${presetLabel} • ${themeLabel}: ${activeCount} current target${activeCount === 1 ? '' : 's'} to watch for. ${remainingFinds} more find${remainingFinds === 1 ? '' : 's'} to reach the milestone.${judgeNote ? ` ${judgeNote}` : ''}`;
     }
   }
 
   function renderHunt() {
     renderHuntThemeButtons();
+    if (huntRoute) huntRoute.textContent = getTripPreset().label;
     huntGrid.innerHTML = '';
     const activeItems = getActiveHuntItems();
     activeItems.forEach(item => {
@@ -2555,7 +2593,7 @@
   }
 
   function startQuickStart() {
-    const quickModes = ['random', 'scavenger', 'trivia', 'jokes', 'pi'];
+    const quickModes = ['random', 'scavenger', 'trivia', 'jokes', 'pi', 'learn', 'look', 'laugh', 'compete'];
     const mode = quickModes[Math.floor(Math.random() * quickModes.length)];
     selectedCategory = mode;
     if (mode === 'scavenger') {
@@ -2567,6 +2605,11 @@
       startJokeVote();
     } else if (mode === 'pi') {
       startPiChallenge();
+    } else if (mode === 'learn') {
+      selectedLearnTopic = 'all';
+      setStoredJson('rtaLastLearnTopic', selectedLearnTopic);
+      regionCode = '*';
+      startAdventure();
     } else {
       regionCode = '*';
       startAdventure();
