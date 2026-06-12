@@ -716,6 +716,19 @@
     return 'medium';
   }
 
+  const triviaQuestionDenylist = new Set([
+    // Keep generated packs intact, but hide items that are awkward, hard to verify,
+    // or too urban-legend-ish for a family road trip game.
+    'weirdlaws-in-alabama-it-was-once-illegal-to-wear-what-kind-of-fake-mustache-in-c',
+    'weirdlaws-in-alabama-fake-mustaches-in-church-were-prohibited-if-they-caused-wha',
+    'weirdlaws-in-alaska-waking-a-sleeping-bear-for-a-photograph-was-once-prohibited-',
+    'weirdlaws-in-georgia-what-animal-is-famously-not-allowed-to-be-tied-to-a-telepho',
+    'weirdlaws-in-georgia-what-animal-was-once-prohibited-from-being-tied-to-a-teleph',
+    'weirdlaws-in-ohio-what-animal-is-commonly-cited-as-illegal-to-get-drunk',
+    'weirdlaws-in-west-virginia-what-animal-is-commonly-cited-in-a-law-about-roadkill',
+    'weirdlaws-in-west-virginia-what-can-legally-become-dinner-if-reported',
+  ]);
+
   function buildTriviaDatabase() {
     const stateQuestions = [];
     stateFacts.forEach(([state, capital, nickname]) => {
@@ -741,7 +754,9 @@
     });
 
     const externalQuestions = window.RTA_TRIVIA_QUESTIONS || [];
-    return stateQuestions.concat(triviaBaseQuestions, externalQuestions).map((item, index) => {
+    return stateQuestions.concat(triviaBaseQuestions, externalQuestions).filter(item => {
+      return !triviaQuestionDenylist.has(item.id);
+    }).map((item, index) => {
       const answer = String(item.answer || '').trim();
       const normalizedAnswer = answer.endsWith('.') || answer.endsWith('!') || answer.endsWith('?') ? answer : `${answer}.`;
       return {
@@ -848,38 +863,6 @@
       unlockTitle: 'The vault opens.',
       unlockText: 'Your reward is ready. Play it loud enough for the passengers, not the driver.',
       videoSrc: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0',
-    },
-    sofie: {
-      title: 'Sofie Mode',
-      intro: 'A dramatic, slightly awkward, fully passenger-approved challenge for Sofie.',
-      badge: 'Cringe Lock',
-      questions: [
-        'Everyone must nominate one song Sofie would pretend not to like but secretly know. What song won?',
-        'Sofie gives the car a fake influencer slogan for this exact trip. What is the slogan?',
-        'Everyone points to the most embarrassing snack in the car. What snack got exposed?',
-        'Someone gives Sofie a compliment so dramatic it becomes awkward. What compliment survived the vote?',
-        'Sofie must rate the current car vibe from 1 to "please never speak of this again." What rating did she choose?',
-        'Create a fake award for Sofie based on this trip. What is the award called?',
-      ],
-      unlockTitle: 'Sofie Mode unlocked.',
-      unlockText: 'Reward: Sofie gets one veto on a song, snack, or group photo pose. Use the power wisely and dramatically.',
-      videoSrc: '',
-    },
-    daniel: {
-      title: 'Daniel Mode',
-      intro: 'A hockey-and-robots lock built for Daniel. The car verifies every answer.',
-      badge: 'Robot Lock',
-      questions: [
-        'Daniel names a hockey team made entirely of robots. What is the team called?',
-        'Everyone invents one robot goalie feature. Which feature would stop the most shots?',
-        'Daniel chooses the robot captain’s jersey number. What number did he pick?',
-        'The car designs a slapshot-powered robot. What is its special move called?',
-        'Everyone picks a hockey arena sound effect for a robot crowd. What sound won?',
-        'Daniel names the final boss robot goalie. What is the boss called?',
-      ],
-      unlockTitle: 'Daniel Mode unlocked.',
-      unlockText: 'Reward: Daniel gets to call the next mini-game: hockey chant, robot voice round, or snack draft.',
-      videoSrc: '',
     },
   };
   let score = {
@@ -2841,7 +2824,9 @@
     const triviaCount = triviaDatabase.length;
     const scavengerCount = scavengerItems.length;
     const learnCount = questions.filter(question => question.category === 'learn').length;
-    adminCounts.textContent = `${triviaCount} trivia questions, ${scavengerCount} scavenger items, ${learnCount} learn prompts, ${Object.keys(secretModeConfigs).length} secret modes.`;
+    const secretModeCount = Object.keys(secretModeConfigs).length;
+    const secretModeLabel = secretModeCount === 1 ? 'secret mode' : 'secret modes';
+    adminCounts.textContent = `${triviaCount} trivia questions, ${scavengerCount} scavenger items, ${learnCount} learn prompts, ${secretModeCount} ${secretModeLabel}.`;
   }
 
   function openAdminMode() {
@@ -2871,10 +2856,6 @@
     selectedCategory = mode;
     if (mode === 'secret') {
       startSecretMode();
-    } else if (mode === 'secret-sofie') {
-      startSecretMode('sofie');
-    } else if (mode === 'secret-daniel') {
-      startSecretMode('daniel');
     } else if (mode === 'pong') {
       startPongGame();
     } else if (mode === 'scavenger') {
@@ -3089,10 +3070,6 @@
         startPongGame();
       } else if (selectedCategory === 'secret') {
         startSecretMode();
-      } else if (selectedCategory === 'secret-sofie') {
-        startSecretMode('sofie');
-      } else if (selectedCategory === 'secret-daniel') {
-        startSecretMode('daniel');
       } else {
         regionCode = '*';
         startAdventure();
@@ -3158,7 +3135,7 @@
       startPongGame();
       return;
     }
-    if (selectedCategory === 'secret' || selectedCategory === 'secret-sofie' || selectedCategory === 'secret-daniel') {
+    if (selectedCategory === 'secret') {
       startSecretMode(activeSecretMode);
       return;
     }

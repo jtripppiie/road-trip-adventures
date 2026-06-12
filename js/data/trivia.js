@@ -44,11 +44,8 @@
     { id: 'alaskarail-spike', category: 'alaskarail', question: 'What is a railroad spike used for?', answer: 'Fastening rails or track parts in place.', choices: ['Fastening rails or track parts in place.', 'Measuring snowfall.', 'Cooking soup.', 'Cleaning windows.'] },
     { id: 'alaskarail-snow-shed', category: 'alaskarail', question: 'In snowy mountain areas, a snow shed helps protect trains from what?', answer: 'Snow slides and avalanches.', choices: ['Snow slides and avalanches.', 'Mosquitoes.', 'Too much sunshine.', 'Radio commercials.'] },
 
-    { id: 'weirdlaws-stl-firefighter', category: 'weirdlaws', question: 'A famously weird St. Louis law is often joked about as limiting firefighters from rescuing whom?', answer: 'Undressed women.', choices: ['Undressed women.', 'People wearing hats.', 'Left-handed musicians.', 'People eating ice cream.'] },
     { id: 'weirdlaws-oklahoma-christmas', category: 'weirdlaws', question: 'Which state is often cited as the last U.S. state to make Christmas a legal holiday, in 1907?', answer: 'Oklahoma.', choices: ['Oklahoma.', 'Delaware.', 'Alaska.', 'Arizona.'] },
-    { id: 'weirdlaws-indonesia-hula', category: 'weirdlaws', question: 'In a famous odd-law trivia item, Indonesia reportedly banned what for being too exciting?', answer: 'Hula hoops.', choices: ['Hula hoops.', 'Yo-yos.', 'Kites.', 'Roller skates.'] },
     { id: 'weirdlaws-exit-signs', category: 'weirdlaws', question: 'By U.S. safety rules, exit signs are usually one of which two colors?', answer: 'Red or green.', choices: ['Red or green.', 'Blue or purple.', 'Yellow or black.', 'Orange or white.'] },
-    { id: 'weirdlaws-age-alcohol-us', category: 'weirdlaws', question: 'In the United States, what is the legal drinking age?', answer: '21.', choices: ['21.', '18.', '19.', '25.'] },
 
     { id: 'history-dollar-bill', category: 'history', question: 'Which U.S. president appears on the one-dollar bill?', answer: 'George Washington.', choices: ['George Washington.', 'Abraham Lincoln.', 'Thomas Jefferson.', 'Theodore Roosevelt.'] },
     { id: 'history-hundred-bill', category: 'history', question: 'Who is pictured on the U.S. hundred-dollar bill?', answer: 'Benjamin Franklin.', choices: ['Benjamin Franklin.', 'Alexander Hamilton.', 'Ulysses S. Grant.', 'John Adams.'] },
