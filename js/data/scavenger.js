@@ -466,6 +466,54 @@
       label: 'Railroad crossing',
       hint: 'Tracks, crossing gates, warning sign, or station.',
     },
+    {
+      id: 'alaska-train-tracks',
+      emoji: '🛤️',
+      label: 'Train tracks',
+      hint: 'Any visible rails, railroad crossing, siding, or track sign.',
+    },
+    {
+      id: 'alaska-train-station',
+      emoji: '🚉',
+      label: 'Train station or depot',
+      hint: 'Passenger station, historic depot, platform, or rail stop sign.',
+    },
+    {
+      id: 'alaska-train-signal',
+      emoji: '🚦',
+      label: 'Rail signal',
+      hint: 'Signal lights, crossing arms, warning bells, or rail control boxes.',
+    },
+    {
+      id: 'alaska-train-bridge',
+      emoji: '🌉',
+      label: 'Rail bridge',
+      hint: 'A bridge for trains, a trestle, or a bridge sign near tracks.',
+    },
+    {
+      id: 'alaska-train-car',
+      emoji: '🚃',
+      label: 'Passenger train car',
+      hint: 'Any passenger rail car, dome car, dining car, or train image on a sign.',
+    },
+    {
+      id: 'alaska-train-freight-car',
+      emoji: '🚂',
+      label: 'Freight train car',
+      hint: 'Boxcar, tanker, flatcar, hopper, or freight yard car.',
+    },
+    {
+      id: 'alaska-train-caboose',
+      emoji: '🚃',
+      label: 'Caboose',
+      hint: 'Real caboose, museum display, mural, logo, or toy train sign.',
+    },
+    {
+      id: 'alaska-train-conductor',
+      emoji: '🎫',
+      label: 'Conductor reference',
+      hint: 'Conductor hat, ticket booth, rail worker sign, or train museum display.',
+    },
 
     {
       id: 'roundabout',
@@ -1384,6 +1432,54 @@
       emoji: '🏞️',
       label: 'Named river sign',
       hint: 'Bridge sign, park sign, waterway marker, or road sign naming a river.',
+    },
+    {
+      id: 'alaska-train-snowy-peak',
+      emoji: '🏔️',
+      label: 'Snowy mountain peak',
+      hint: 'Real peak, mountain sign, mural, photo, or logo with snow on top.',
+    },
+    {
+      id: 'alaska-train-glacier-reference',
+      emoji: '🧊',
+      label: 'Glacier reference',
+      hint: 'Glacier sign, photo, map, mural, tour ad, or actual glacier view.',
+    },
+    {
+      id: 'alaska-train-evergreen-forest',
+      emoji: '🌲',
+      label: 'Evergreen forest',
+      hint: 'A thick stand of spruce, pine, fir, or evergreen trees.',
+    },
+    {
+      id: 'alaska-train-river-bend',
+      emoji: '💧',
+      label: 'River bend',
+      hint: 'A visible curve in a river, creek, canal, or waterway.',
+    },
+    {
+      id: 'alaska-train-wildlife-crossing',
+      emoji: '⚠️',
+      label: 'Wildlife crossing sign',
+      hint: 'Moose, bear, caribou, deer, elk, or any animal crossing sign.',
+    },
+    {
+      id: 'alaska-train-bald-eagle',
+      emoji: '🦅',
+      label: 'Bald eagle',
+      hint: 'Real eagle, sign, statue, flag image, mural, or logo.',
+    },
+    {
+      id: 'alaska-train-log-cabin',
+      emoji: '🪵',
+      label: 'Log cabin',
+      hint: 'Actual cabin, cabin sign, lodge logo, or rustic building.',
+    },
+    {
+      id: 'alaska-train-tunnel-or-snow-shed',
+      emoji: '🚇',
+      label: 'Tunnel or snow shed',
+      hint: 'Train tunnel, road tunnel, avalanche shed, or tunnel warning sign.',
     },
   ];
 

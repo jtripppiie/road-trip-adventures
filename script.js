@@ -773,6 +773,7 @@
     desert: { label: 'Desert', themes: ['nature', 'signs', 'weird'] },
     mountains: { label: 'Mountains', themes: ['nature', 'signs', 'jackpot'] },
     smalltown: { label: 'Small Towns', themes: ['places', 'weird', 'signs'] },
+    'alaska-train': { label: 'Alaska Train', themes: ['alaska-train', 'nature', 'signs'] },
     rainy: { label: 'Rainy Day', themes: ['signs', 'vehicles', 'easy'] },
     night: { label: 'Night Drive', themes: ['signs', 'places', 'easy'] },
   };
@@ -819,6 +820,7 @@
   let piScore = {};
   let secretUnlockStep = 0;
   let activeSecretUnlockQuestions = [];
+  let activeSecretMode = 'default';
   const secretUnlockQuestionPool = [
     'The car council must choose a secret password from something visible inside the car right now. What password did you choose?',
     'Find the next readable sign outside. Type the weirdest word on it, then have the car repeat it dramatically.',
@@ -829,6 +831,49 @@
     'Everyone predicts the next vehicle color before looking too hard. What color did the first clear vehicle turn out to be?',
     'Choose the passenger most likely to survive a snack shortage. Type their initials and have the group approve.',
   ];
+  const secretModeConfigs = {
+    default: {
+      title: 'Secret Mode',
+      intro: 'Unlock requires answers only this car can know. No searching, no AI, no driver help.',
+      badge: 'Locked',
+      questions: secretUnlockQuestionPool,
+      unlockTitle: 'The vault opens.',
+      unlockText: 'Your reward is ready. Play it loud enough for the passengers, not the driver.',
+      videoSrc: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0',
+    },
+    sofie: {
+      title: 'Sofie Mode',
+      intro: 'A dramatic, slightly awkward, fully passenger-approved challenge for Sofie.',
+      badge: 'Cringe Lock',
+      questions: [
+        'Everyone must nominate one song Sofie would pretend not to like but secretly know. What song won?',
+        'Sofie gives the car a fake influencer slogan for this exact trip. What is the slogan?',
+        'Everyone points to the most embarrassing snack in the car. What snack got exposed?',
+        'Someone gives Sofie a compliment so dramatic it becomes awkward. What compliment survived the vote?',
+        'Sofie must rate the current car vibe from 1 to "please never speak of this again." What rating did she choose?',
+        'Create a fake award for Sofie based on this trip. What is the award called?',
+      ],
+      unlockTitle: 'Sofie Mode unlocked.',
+      unlockText: 'Reward: Sofie gets one veto on a song, snack, or group photo pose. Use the power wisely and dramatically.',
+      videoSrc: '',
+    },
+    daniel: {
+      title: 'Daniel Mode',
+      intro: 'A hockey-and-robots lock built for Daniel. The car verifies every answer.',
+      badge: 'Robot Lock',
+      questions: [
+        'Daniel names a hockey team made entirely of robots. What is the team called?',
+        'Everyone invents one robot goalie feature. Which feature would stop the most shots?',
+        'Daniel chooses the robot captain’s jersey number. What number did he pick?',
+        'The car designs a slapshot-powered robot. What is its special move called?',
+        'Everyone picks a hockey arena sound effect for a robot crowd. What sound won?',
+        'Daniel names the final boss robot goalie. What is the boss called?',
+      ],
+      unlockTitle: 'Daniel Mode unlocked.',
+      unlockText: 'Reward: Daniel gets to call the next mini-game: hockey chant, robot voice round, or snack draft.',
+      videoSrc: '',
+    },
+  };
   let score = {
     look: 0,
     laugh: 0,
@@ -952,6 +997,8 @@
   const savePiScoresButton = document.getElementById('save-pi-scores');
   const finishPiButton = document.getElementById('finish-pi');
   const secretProgress = document.getElementById('secret-progress');
+  const secretHeading = document.getElementById('secret-heading');
+  const secretIntro = document.getElementById('secret-intro');
   const secretHandoff = document.getElementById('secret-handoff');
   const secretQuestion = document.getElementById('secret-question');
   const secretInstructions = document.getElementById('secret-instructions');
@@ -1516,6 +1563,9 @@
     }
     if (theme === 'nature') {
       return /animal|bird|tree|cloud|sky|mountain|hill|river|lake|water|desert|flower|plant|farm|horse|cow|dog|wildlife|sun|moon/.test(text);
+    }
+    if (theme === 'alaska-train') {
+      return /alaska|train|rail|railroad|track|station|depot|bridge|river|mountain|snow|glacier|moose|bear|eagle|forest|tunnel|signal|conductor|caboose/.test(text);
     }
     if (theme === 'weird') {
       return /weird|funny|unusual|odd|giant|tiny|strange|mystery|mascot|superhero|batmobile|eyelash|flame|sticker|homemade|expensive|never own|named/.test(text);
@@ -2522,10 +2572,18 @@
     summaryList.appendChild(li);
   }
 
-  function startSecretMode() {
+  function getSecretModeConfig() {
+    return secretModeConfigs[activeSecretMode] || secretModeConfigs.default;
+  }
+
+  function startSecretMode(mode = 'default') {
     resetGame();
+    activeSecretMode = mode;
+    const config = getSecretModeConfig();
     secretUnlockStep = 0;
-    activeSecretUnlockQuestions = shuffle(secretUnlockQuestionPool.slice()).slice(0, 5);
+    activeSecretUnlockQuestions = shuffle(config.questions.slice()).slice(0, 5);
+    secretHeading.textContent = config.title;
+    secretIntro.textContent = config.intro;
     secretVideo.src = '';
     secretVideoWrap.hidden = true;
     secretAnswerField.hidden = false;
@@ -2536,9 +2594,10 @@
   }
 
   function renderSecretUnlock() {
+    const config = getSecretModeConfig();
     const total = activeSecretUnlockQuestions.length;
     const question = activeSecretUnlockQuestions[secretUnlockStep];
-    secretProgress.textContent = `Lock ${secretUnlockStep + 1}/${total}`;
+    secretProgress.textContent = `${config.badge} ${secretUnlockStep + 1}/${total}`;
     const judgeNote = getCarJudgeNote();
     secretHandoff.textContent = `Hand the phone to ${getTurnPlayerName(secretUnlockStep)}.${judgeNote ? ` ${judgeNote}` : ''}`;
     secretQuestion.textContent = question;
@@ -2569,21 +2628,28 @@
   }
 
   function unlockSecretMode() {
+    const config = getSecretModeConfig();
     secretProgress.textContent = 'Unlocked';
     secretHandoff.textContent = 'Phone can return to the group.';
-    secretQuestion.textContent = 'The vault opens.';
-    secretInstructions.textContent = 'Your reward is ready. Play it loud enough for the passengers, not the driver.';
+    secretQuestion.textContent = config.unlockTitle;
+    secretInstructions.textContent = config.unlockText;
     secretStatus.textContent = '';
     secretAnswerField.hidden = true;
     secretSubmitButton.hidden = true;
     secretSkipButton.hidden = true;
-    secretVideo.src = 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0';
-    secretVideoWrap.hidden = false;
+    if (config.videoSrc) {
+      secretVideo.src = config.videoSrc;
+      secretVideoWrap.hidden = false;
+    } else {
+      secretVideo.src = '';
+      secretVideoWrap.hidden = true;
+    }
   }
 
   function resetSecretMode() {
     secretUnlockStep = 0;
-    activeSecretUnlockQuestions = shuffle(secretUnlockQuestionPool.slice()).slice(0, 5);
+    const config = getSecretModeConfig();
+    activeSecretUnlockQuestions = shuffle(config.questions.slice()).slice(0, 5);
     secretVideo.src = '';
     secretVideoWrap.hidden = true;
     secretAnswerField.hidden = false;
@@ -2709,6 +2775,10 @@
         startPiChallenge();
       } else if (selectedCategory === 'secret') {
         startSecretMode();
+      } else if (selectedCategory === 'secret-sofie') {
+        startSecretMode('sofie');
+      } else if (selectedCategory === 'secret-daniel') {
+        startSecretMode('daniel');
       } else {
         regionCode = '*';
         startAdventure();
@@ -2770,8 +2840,8 @@
       startPiChallenge();
       return;
     }
-    if (selectedCategory === 'secret') {
-      startSecretMode();
+    if (selectedCategory === 'secret' || selectedCategory === 'secret-sofie' || selectedCategory === 'secret-daniel') {
+      startSecretMode(activeSecretMode);
       return;
     }
     // Replay with same configuration

@@ -191,6 +191,14 @@
               <span class="option-emoji" aria-hidden="true">🔒</span>
               <span class="option-title">Secret Mode</span>
             </button>
+            <button class="option-card secret-option-card" data-category="secret-sofie">
+              <span class="option-emoji" aria-hidden="true">😳</span>
+              <span class="option-title">Sofie Mode</span>
+            </button>
+            <button class="option-card secret-option-card" data-category="secret-daniel">
+              <span class="option-emoji" aria-hidden="true">🤖</span>
+              <span class="option-title">Daniel Mode</span>
+            </button>
           </div>
         </section>
       </div>
@@ -217,6 +225,7 @@
             <option value="desert">Desert</option>
             <option value="mountains">Mountains</option>
             <option value="smalltown">Small towns</option>
+            <option value="alaska-train">Alaska train</option>
             <option value="rainy">Rainy day</option>
             <option value="night">Night drive</option>
           </select>
@@ -326,6 +335,7 @@
         <button type="button" data-hunt-theme="signs">Signs</button>
         <button type="button" data-hunt-theme="places">Places</button>
         <button type="button" data-hunt-theme="nature">Nature</button>
+        <button type="button" data-hunt-theme="alaska-train">Alaska Train</button>
         <button type="button" data-hunt-theme="weird">Weird Stuff</button>
         <button type="button" data-hunt-theme="jackpot">Jackpot</button>
         <button type="button" data-hunt-theme="easy">Easy Mode</button>
@@ -496,7 +506,7 @@
       <div class="mode-header">
         <div>
           <h2 id="secret-heading">Secret Mode</h2>
-          <p>Unlock requires answers only this car can know. No searching, no AI, no driver help.</p>
+          <p id="secret-intro">Unlock requires answers only this car can know. No searching, no AI, no driver help.</p>
         </div>
         <div class="hunt-route" aria-label="Locked mode">Locked</div>
       </div>
