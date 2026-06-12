@@ -786,6 +786,7 @@
   let regionCode = null; // Optional region code for local questions
   let currentSectionKey = null;
   let sectionHistory = [];
+  let syncingBrowserHistory = false;
   let players = [
     { id: 'p1', name: 'P1' },
     { id: 'p2', name: 'P2' },
@@ -1152,6 +1153,20 @@
     backButton.hidden = sectionHistory.length === 0;
   }
 
+  function syncBrowserHistory(key, replace = false) {
+    if (syncingBrowserHistory || !key || !window.history || !window.history.pushState) return;
+    const state = {
+      rta: true,
+      sectionKey: key,
+      sectionHistory: sectionHistory.slice(),
+    };
+    if (replace || !window.history.state || !window.history.state.rta) {
+      window.history.replaceState(state, '', window.location.href);
+    } else {
+      window.history.pushState(state, '', window.location.href);
+    }
+  }
+
   function showSection(key, options = {}) {
     if (currentSectionKey === 'adventure' && key !== 'adventure') stopTimer();
     if (currentSectionKey === 'emoji' && key !== 'emoji') stopEmojiCamera();
@@ -1173,12 +1188,19 @@
         heading.setAttribute('tabindex', '-1');
         heading.focus();
       }
+      if (!options.skipBrowserHistory) {
+        syncBrowserHistory(key, Boolean(options.replace));
+      }
     }
   }
 
   function goBack() {
+    if (!sectionHistory.length) return;
+    if (window.history && window.history.state && window.history.state.rta) {
+      window.history.back();
+      return;
+    }
     const previous = sectionHistory.pop();
-    if (!previous) return;
     showSection(previous, { replace: true });
   }
 
@@ -3311,6 +3333,15 @@
         accessibilityToggle.focus();
       }
     }
+  });
+
+  window.addEventListener('popstate', event => {
+    const state = event.state;
+    if (!state || !state.rta || !state.sectionKey || !sections[state.sectionKey]) return;
+    syncingBrowserHistory = true;
+    sectionHistory = Array.isArray(state.sectionHistory) ? state.sectionHistory.slice() : [];
+    showSection(state.sectionKey, { replace: true, skipBrowserHistory: true });
+    syncingBrowserHistory = false;
   });
 
   // Start the app after a short delay to display the loading screen
