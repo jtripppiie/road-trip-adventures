@@ -818,6 +818,12 @@
   let emojiFaceAwarded = false;
   let emojiStream = null;
   let piScore = {};
+  let pongAnimationFrame = null;
+  let pongRunning = false;
+  let pongKeys = {};
+  let pongState = null;
+  let logoClickCount = 0;
+  let logoClickTimer = null;
   let secretUnlockStep = 0;
   let activeSecretUnlockQuestions = [];
   let activeSecretMode = 'default';
@@ -908,6 +914,8 @@
     emoji: document.getElementById('emoji-game'),
     calculator: document.getElementById('trip-calculator'),
     pi: document.getElementById('pi-game'),
+    pong: document.getElementById('pong-game'),
+    admin: document.getElementById('admin-mode'),
     secret: document.getElementById('secret-mode'),
     summary: document.getElementById('summary'),
   };
@@ -996,6 +1004,20 @@
   const piEntryGrid = document.getElementById('pi-entry-grid');
   const savePiScoresButton = document.getElementById('save-pi-scores');
   const finishPiButton = document.getElementById('finish-pi');
+  const pongCanvas = document.getElementById('pong-canvas');
+  const pongScore = document.getElementById('pong-score');
+  const pongStatus = document.getElementById('pong-status');
+  const pongStartButton = document.getElementById('pong-start');
+  const pongResetButton = document.getElementById('pong-reset');
+  const pongFinishButton = document.getElementById('pong-finish');
+  const pongLeftUpButton = document.getElementById('pong-left-up');
+  const pongLeftDownButton = document.getElementById('pong-left-down');
+  const pongRightUpButton = document.getElementById('pong-right-up');
+  const pongRightDownButton = document.getElementById('pong-right-down');
+  const appLogo = document.querySelector('.app-logo');
+  const adminCounts = document.getElementById('admin-counts');
+  const logoPrank = document.getElementById('logo-prank');
+  const closeLogoPrankButton = document.getElementById('close-logo-prank');
   const secretProgress = document.getElementById('secret-progress');
   const secretHeading = document.getElementById('secret-heading');
   const secretIntro = document.getElementById('secret-intro');
@@ -1135,6 +1157,7 @@
   function showSection(key, options = {}) {
     if (currentSectionKey === 'adventure' && key !== 'adventure') stopTimer();
     if (currentSectionKey === 'emoji' && key !== 'emoji') stopEmojiCamera();
+    if (currentSectionKey === 'pong' && key !== 'pong') stopPong();
     if (!options.replace && currentSectionKey && currentSectionKey !== key) {
       sectionHistory.push(currentSectionKey);
     }
@@ -1163,6 +1186,7 @@
 
   function goHome() {
     stopEmojiCamera();
+    stopPong();
     resetGame();
     resetHunt();
     triviaDeck = [];
@@ -2572,6 +2596,237 @@
     summaryList.appendChild(li);
   }
 
+  function createPongState() {
+    const width = pongCanvas.width;
+    const height = pongCanvas.height;
+    return {
+      width,
+      height,
+      paddleWidth: 14,
+      paddleHeight: 86,
+      leftY: height / 2 - 43,
+      rightY: height / 2 - 43,
+      ballX: width / 2,
+      ballY: height / 2,
+      ballVX: 4.5 * (Math.random() > 0.5 ? 1 : -1),
+      ballVY: 2.5 * (Math.random() > 0.5 ? 1 : -1),
+      ballSize: 12,
+      leftScore: 0,
+      rightScore: 0,
+      targetScore: 7,
+    };
+  }
+
+  function resetPongBall(direction = Math.random() > 0.5 ? 1 : -1) {
+    if (!pongState) return;
+    pongState.ballX = pongState.width / 2;
+    pongState.ballY = pongState.height / 2;
+    pongState.ballVX = 4.5 * direction;
+    pongState.ballVY = (Math.random() * 4) - 2;
+  }
+
+  function drawPong() {
+    if (!pongCanvas || !pongState) return;
+    const ctx = pongCanvas.getContext('2d');
+    ctx.clearRect(0, 0, pongState.width, pongState.height);
+    ctx.fillStyle = '#08284a';
+    ctx.fillRect(0, 0, pongState.width, pongState.height);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.24)';
+    for (let y = 12; y < pongState.height; y += 28) {
+      ctx.fillRect(pongState.width / 2 - 2, y, 4, 14);
+    }
+
+    ctx.fillStyle = '#f58220';
+    ctx.fillRect(22, pongState.leftY, pongState.paddleWidth, pongState.paddleHeight);
+    ctx.fillStyle = '#7c4dff';
+    ctx.fillRect(pongState.width - 36, pongState.rightY, pongState.paddleWidth, pongState.paddleHeight);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(pongState.ballX - pongState.ballSize / 2, pongState.ballY - pongState.ballSize / 2, pongState.ballSize, pongState.ballSize);
+  }
+
+  function updatePongScore() {
+    if (!pongState) return;
+    const leftName = players[0] ? players[0].name : 'P1';
+    const rightName = players[1] ? players[1].name : 'P2';
+    pongScore.textContent = `${pongState.leftScore} : ${pongState.rightScore}`;
+    pongStatus.textContent = `${leftName} left paddle, ${rightName} right paddle. First to ${pongState.targetScore} wins.`;
+  }
+
+  function movePongPaddles() {
+    const speed = 7;
+    const maxY = pongState.height - pongState.paddleHeight;
+    if (pongKeys.leftUp) pongState.leftY -= speed;
+    if (pongKeys.leftDown) pongState.leftY += speed;
+    if (pongKeys.rightUp) pongState.rightY -= speed;
+    if (pongKeys.rightDown) pongState.rightY += speed;
+
+    if (!pongKeys.rightUp && !pongKeys.rightDown && players.length < 2) {
+      const target = pongState.ballY - pongState.paddleHeight / 2;
+      pongState.rightY += Math.sign(target - pongState.rightY) * Math.min(4, Math.abs(target - pongState.rightY));
+    }
+
+    pongState.leftY = Math.max(0, Math.min(maxY, pongState.leftY));
+    pongState.rightY = Math.max(0, Math.min(maxY, pongState.rightY));
+  }
+
+  function tickPong() {
+    if (!pongRunning || !pongState) return;
+    movePongPaddles();
+    pongState.ballX += pongState.ballVX;
+    pongState.ballY += pongState.ballVY;
+
+    if (pongState.ballY <= pongState.ballSize / 2 || pongState.ballY >= pongState.height - pongState.ballSize / 2) {
+      pongState.ballVY *= -1;
+    }
+
+    const leftHit = pongState.ballX <= 36 + pongState.ballSize / 2
+      && pongState.ballY >= pongState.leftY
+      && pongState.ballY <= pongState.leftY + pongState.paddleHeight;
+    const rightHit = pongState.ballX >= pongState.width - 36 - pongState.ballSize / 2
+      && pongState.ballY >= pongState.rightY
+      && pongState.ballY <= pongState.rightY + pongState.paddleHeight;
+    if (leftHit || rightHit) {
+      const paddleY = leftHit ? pongState.leftY : pongState.rightY;
+      const offset = (pongState.ballY - (paddleY + pongState.paddleHeight / 2)) / (pongState.paddleHeight / 2);
+      pongState.ballVX *= -1.06;
+      pongState.ballVY = offset * 5;
+    }
+
+    if (pongState.ballX < 0) {
+      pongState.rightScore++;
+      resetPongBall(-1);
+      updatePongScore();
+    } else if (pongState.ballX > pongState.width) {
+      pongState.leftScore++;
+      resetPongBall(1);
+      updatePongScore();
+    }
+
+    if (pongState.leftScore >= pongState.targetScore || pongState.rightScore >= pongState.targetScore) {
+      stopPong();
+      const winner = pongState.leftScore > pongState.rightScore
+        ? (players[0] ? players[0].name : 'Left player')
+        : (players[1] ? players[1].name : 'Right player');
+      pongStatus.textContent = `${winner} wins Road Pong. Winner gets first pick in the next road-trip game.`;
+      drawPong();
+      return;
+    }
+
+    drawPong();
+    pongAnimationFrame = window.requestAnimationFrame(tickPong);
+  }
+
+  function startPongRound() {
+    if (!pongState) pongState = createPongState();
+    if (pongRunning) return;
+    pongRunning = true;
+    pongStatus.textContent = 'Pong is live. Tap and hold the controls or use W/S and ↑/↓.';
+    tickPong();
+  }
+
+  function stopPong() {
+    pongRunning = false;
+    if (pongAnimationFrame) {
+      window.cancelAnimationFrame(pongAnimationFrame);
+      pongAnimationFrame = null;
+    }
+  }
+
+  function resetPongGame() {
+    stopPong();
+    pongState = createPongState();
+    pongKeys = {};
+    updatePongScore();
+    drawPong();
+  }
+
+  function startPongGame() {
+    resetGame();
+    resetPongGame();
+    showSection('pong');
+  }
+
+  function showPongSummary() {
+    stopPong();
+    showSection('summary');
+    if (!pongState) pongState = createPongState();
+    const leftName = players[0] ? players[0].name : 'P1';
+    const rightName = players[1] ? players[1].name : 'P2';
+    const leaders = pongState.leftScore === pongState.rightScore
+      ? []
+      : [pongState.leftScore > pongState.rightScore ? leftName : rightName];
+    summaryText.textContent = leaders.length
+      ? `${leaders[0]} wins Road Pong, ${pongState.leftScore} to ${pongState.rightScore}.`
+      : `Road Pong ends in a tie, ${pongState.leftScore} to ${pongState.rightScore}.`;
+    summaryList.innerHTML = '';
+    const li = document.createElement('li');
+    li.textContent = 'Prize idea: winner chooses the next mini-game or gets one song veto.';
+    summaryList.appendChild(li);
+  }
+
+  function setPongButtonControl(button, key) {
+    if (!button) return;
+    const press = event => {
+      event.preventDefault();
+      pongKeys[key] = true;
+    };
+    const release = event => {
+      event.preventDefault();
+      pongKeys[key] = false;
+    };
+    button.addEventListener('pointerdown', press);
+    button.addEventListener('pointerup', release);
+    button.addEventListener('pointercancel', release);
+    button.addEventListener('pointerleave', release);
+  }
+
+  function renderAdminCounts() {
+    if (!adminCounts) return;
+    const triviaCount = triviaDatabase.length;
+    const scavengerCount = scavengerItems.length;
+    const learnCount = questions.filter(question => question.category === 'learn').length;
+    adminCounts.textContent = `${triviaCount} trivia questions, ${scavengerCount} scavenger items, ${learnCount} learn prompts, ${Object.keys(secretModeConfigs).length} secret modes.`;
+  }
+
+  function openAdminMode() {
+    renderAdminCounts();
+    showSection('admin');
+  }
+
+  function showLogoPrank() {
+    if (!logoPrank) return;
+    logoPrank.hidden = false;
+  }
+
+  function handleLogoClick() {
+    logoClickCount++;
+    window.clearTimeout(logoClickTimer);
+    logoClickTimer = window.setTimeout(() => {
+      if (logoClickCount >= 4) {
+        showLogoPrank();
+      } else if (logoClickCount === 3) {
+        openAdminMode();
+      }
+      logoClickCount = 0;
+    }, 420);
+  }
+
+  function launchAdminMode(mode) {
+    selectedCategory = mode;
+    if (mode === 'secret') {
+      startSecretMode();
+    } else if (mode === 'secret-sofie') {
+      startSecretMode('sofie');
+    } else if (mode === 'secret-daniel') {
+      startSecretMode('daniel');
+    } else if (mode === 'pong') {
+      startPongGame();
+    } else if (mode === 'scavenger') {
+      startScavengerHunt();
+    }
+  }
+
   function getSecretModeConfig() {
     return secretModeConfigs[activeSecretMode] || secretModeConfigs.default;
   }
@@ -2659,7 +2914,7 @@
   }
 
   function startQuickStart() {
-    const quickModes = ['random', 'scavenger', 'trivia', 'jokes', 'pi', 'learn', 'look', 'laugh', 'compete'];
+    const quickModes = ['random', 'scavenger', 'trivia', 'jokes', 'pi', 'pong', 'learn', 'look', 'laugh', 'compete'];
     const mode = quickModes[Math.floor(Math.random() * quickModes.length)];
     selectedCategory = mode;
     if (mode === 'scavenger') {
@@ -2671,6 +2926,8 @@
       startJokeVote();
     } else if (mode === 'pi') {
       startPiChallenge();
+    } else if (mode === 'pong') {
+      startPongGame();
     } else if (mode === 'learn') {
       selectedLearnTopic = 'all';
       setStoredJson('rtaLastLearnTopic', selectedLearnTopic);
@@ -2773,6 +3030,8 @@
         startTripCalculator();
       } else if (selectedCategory === 'pi') {
         startPiChallenge();
+      } else if (selectedCategory === 'pong') {
+        startPongGame();
       } else if (selectedCategory === 'secret') {
         startSecretMode();
       } else if (selectedCategory === 'secret-sofie') {
@@ -2840,6 +3099,10 @@
       startPiChallenge();
       return;
     }
+    if (selectedCategory === 'pong') {
+      startPongGame();
+      return;
+    }
     if (selectedCategory === 'secret' || selectedCategory === 'secret-sofie' || selectedCategory === 'secret-daniel') {
       startSecretMode(activeSecretMode);
       return;
@@ -2905,6 +3168,37 @@
   });
   savePiScoresButton.addEventListener('click', savePiScores);
   finishPiButton.addEventListener('click', showPiSummary);
+  pongStartButton.addEventListener('click', startPongRound);
+  pongResetButton.addEventListener('click', resetPongGame);
+  pongFinishButton.addEventListener('click', showPongSummary);
+  setPongButtonControl(pongLeftUpButton, 'leftUp');
+  setPongButtonControl(pongLeftDownButton, 'leftDown');
+  setPongButtonControl(pongRightUpButton, 'rightUp');
+  setPongButtonControl(pongRightDownButton, 'rightDown');
+  document.addEventListener('keydown', event => {
+    if (currentSectionKey !== 'pong') return;
+    if (event.key === 'w' || event.key === 'W') pongKeys.leftUp = true;
+    if (event.key === 's' || event.key === 'S') pongKeys.leftDown = true;
+    if (event.key === 'ArrowUp') pongKeys.rightUp = true;
+    if (event.key === 'ArrowDown') pongKeys.rightDown = true;
+  });
+  document.addEventListener('keyup', event => {
+    if (event.key === 'w' || event.key === 'W') pongKeys.leftUp = false;
+    if (event.key === 's' || event.key === 'S') pongKeys.leftDown = false;
+    if (event.key === 'ArrowUp') pongKeys.rightUp = false;
+    if (event.key === 'ArrowDown') pongKeys.rightDown = false;
+  });
+  if (appLogo) appLogo.addEventListener('click', handleLogoClick);
+  if (closeLogoPrankButton) {
+    closeLogoPrankButton.addEventListener('click', () => {
+      logoPrank.hidden = true;
+    });
+  }
+  document.addEventListener('click', event => {
+    const adminButton = event.target.closest('button[data-admin-launch]');
+    if (!adminButton) return;
+    launchAdminMode(adminButton.dataset.adminLaunch);
+  });
   secretSubmitButton.addEventListener('click', submitSecretAnswer);
   secretSkipButton.addEventListener('click', skipSecretQuestion);
   secretResetButton.addEventListener('click', resetSecretMode);

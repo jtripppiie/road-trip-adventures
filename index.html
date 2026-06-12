@@ -199,6 +199,10 @@
               <span class="option-emoji" aria-hidden="true">🤖</span>
               <span class="option-title">Daniel Mode</span>
             </button>
+            <button class="option-card" data-category="pong">
+              <span class="option-emoji" aria-hidden="true">🏓</span>
+              <span class="option-title">Road Pong</span>
+            </button>
           </div>
         </section>
       </div>
@@ -538,6 +542,64 @@
       </div>
     </section>
 
+    <!-- Road Pong mini game -->
+    <section id="pong-game" hidden>
+      <div class="mode-header">
+        <div>
+          <h2 id="pong-heading">Road Pong</h2>
+          <p>Quick passenger arcade break. First to 7 wins.</p>
+        </div>
+        <div id="pong-score" class="emoji-target" aria-label="Pong score">0 : 0</div>
+      </div>
+      <canvas id="pong-canvas" class="pong-canvas" width="720" height="420" aria-label="Road Pong game board"></canvas>
+      <p id="pong-status" class="hunt-status" aria-live="polite">Use the controls below. Player 1 is left, Player 2 is right.</p>
+      <div class="pong-controls" aria-label="Pong controls">
+        <div>
+          <strong>Left</strong>
+          <button id="pong-left-up" class="secondary-button" type="button">Up</button>
+          <button id="pong-left-down" class="secondary-button" type="button">Down</button>
+        </div>
+        <div>
+          <strong>Right</strong>
+          <button id="pong-right-up" class="secondary-button" type="button">Up</button>
+          <button id="pong-right-down" class="secondary-button" type="button">Down</button>
+        </div>
+      </div>
+      <div class="adventure-actions">
+        <button id="pong-start" class="primary-button">Start Round</button>
+        <button id="pong-reset" class="secondary-button">Reset Pong</button>
+        <button id="pong-finish" class="secondary-button">Finish Pong</button>
+      </div>
+    </section>
+
+    <!-- Hidden local-only admin vault -->
+    <section id="admin-mode" hidden>
+      <div class="mode-header">
+        <div>
+          <h2 id="admin-heading">Admin Vault</h2>
+          <p>Local-only shortcut panel for secret stuff and quick testing.</p>
+        </div>
+        <div class="hunt-route" aria-label="Admin mode">Unlocked</div>
+      </div>
+      <article class="trivia-card">
+        <span class="challenge-badge">Logo x3</span>
+        <h3>Secret Shortcuts</h3>
+        <p>These buttons are hidden helpers. No accounts, passwords, or server access.</p>
+        <div class="adventure-actions">
+          <button class="secondary-button" data-admin-launch="secret">Secret Mode</button>
+          <button class="secondary-button" data-admin-launch="secret-sofie">Sofie Mode</button>
+          <button class="secondary-button" data-admin-launch="secret-daniel">Daniel Mode</button>
+          <button class="secondary-button" data-admin-launch="pong">Road Pong</button>
+          <button class="secondary-button" data-admin-launch="scavenger">Scavenger Hunt</button>
+        </div>
+      </article>
+      <article class="trivia-card">
+        <span class="challenge-badge">Content</span>
+        <h3>Fast Counts</h3>
+        <p id="admin-counts">Counts load when the vault opens.</p>
+      </article>
+    </section>
+
     <!-- Summary screen: show results at the end -->
     <section id="summary" hidden>
       <h2>Adventure Complete</h2>
@@ -557,6 +619,15 @@
       </div>
     </footer>
   </main>
+
+  <div id="logo-prank" class="logo-prank" role="dialog" aria-live="polite" aria-label="Logo prank" hidden>
+    <div class="logo-prank-card">
+      <div class="logo-prank-hair" aria-hidden="true"></div>
+      <p class="logo-prank-face" aria-hidden="true">😏</p>
+      <p class="logo-prank-quote">"Eat my shorts."</p>
+      <button id="close-logo-prank" class="secondary-button" type="button">Close</button>
+    </div>
+  </div>
 
   <!-- Modal dialog for About and Privacy statement -->
   <div id="about-modal" class="modal" hidden>
