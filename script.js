@@ -2641,12 +2641,8 @@
     if (!actor) return null;
     const room = getHideSeekRoom(actor.roomId);
     return room.spots.find(spot => {
-      const radius = spot.interactionRadius || 82;
-      const actorCenterX = actor.x + actor.width / 2;
-      const actorCenterY = actor.y + actor.height / 2;
-      const spotCenterX = spot.x + spot.width / 2;
-      const spotCenterY = spot.y + spot.height / 2;
-      return Math.hypot(actorCenterX - spotCenterX, actorCenterY - spotCenterY) <= radius;
+      const radius = spot.interactionRadius || 42;
+      return getHideSeekDistanceToRect(actor, spot) <= radius;
     }) || null;
   }
 
@@ -2796,20 +2792,23 @@
     }
 
     if (hideSeekState.phase === HideSeekGameState.HIDER_TURN) {
-      hideSeekFoundButton.textContent = nearbySpot ? `Hide in ${nearbySpot.label}` : 'Move to a hiding spot';
+      hideSeekFoundButton.textContent = nearbySpot ? `Hide Here: ${nearbySpot.label}` : 'Find a hiding spot';
+      hideSeekFoundButton.setAttribute('aria-label', nearbySpot ? `Hide here in ${nearbySpot.label}` : 'Move near a hiding spot');
       hideSeekFoundButton.disabled = !nearbySpot;
       hideSeekRoundTitle.textContent = `${hiderName}, hide somewhere sneaky.`;
       hideSeekRoundText.textContent = nearbySpot
         ? `You can hide in the ${nearbySpot.label}. ${seekerName} should not watch this turn.`
         : `Move through the rooms and stop near a glowing hiding spot. ${seekerName} looks away.`;
-      setHideSeekMessage(nearbySpot ? `Press Interact to hide in the ${nearbySpot.label}.` : `${hiderName} is hiding. Look for glowing spots.`);
+      setHideSeekMessage(nearbySpot ? `Tap Hide Here to hide in the ${nearbySpot.label}.` : `${hiderName} is hiding. Look for glowing spots.`);
     } else if (hideSeekState.phase === HideSeekGameState.SEEKER_LOOK_AWAY) {
       hideSeekFoundButton.textContent = `${seekerName} Starts Searching`;
+      hideSeekFoundButton.setAttribute('aria-label', `${seekerName} starts searching`);
       hideSeekRoundTitle.textContent = `${hiderName} is hidden.`;
       hideSeekRoundText.textContent = `Pass the phone to ${seekerName}. The map resets to the start room, and wrong inspections cost time.`;
       setHideSeekMessage(`${seekerName}, no peeking until you tap start searching.`);
     } else if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
-      hideSeekFoundButton.textContent = nearbySpot ? `Inspect ${nearbySpot.label}` : 'Move to inspect a spot';
+      hideSeekFoundButton.textContent = nearbySpot ? `Inspect: ${nearbySpot.label}` : 'Find a spot to inspect';
+      hideSeekFoundButton.setAttribute('aria-label', nearbySpot ? `Inspect ${nearbySpot.label}` : 'Move near a hiding spot to inspect it');
       hideSeekFoundButton.disabled = !nearbySpot;
       hideSeekRoundTitle.textContent = `${seekerName}, find the hider.`;
       hideSeekRoundText.textContent = nearbySpot
@@ -3062,15 +3061,19 @@
     const length = Math.hypot(dx, dy) || 1;
     const room = getHideSeekRoom(actor.roomId);
     const speedMultiplier = getHideSeekSpeedMultiplier(actor, room);
-    const nextActor = Object.assign({}, actor, {
-      x: actor.x + (dx / length) * actor.speed * speedMultiplier * delta,
-      y: actor.y + (dy / length) * actor.speed * speedMultiplier * delta,
+    const moveX = (dx / length) * actor.speed * speedMultiplier * delta;
+    const moveY = (dy / length) * actor.speed * speedMultiplier * delta;
+    const nextXActor = Object.assign({}, actor, {
+      x: Math.max(38, Math.min(738, actor.x + moveX)),
     });
-    nextActor.x = Math.max(38, Math.min(738, nextActor.x));
-    nextActor.y = Math.max(62, Math.min(382, nextActor.y));
-    if (!wouldHitHideSeekBlock(nextActor, room)) {
-      actor.x = nextActor.x;
-      actor.y = nextActor.y;
+    if (!wouldHitHideSeekBlock(nextXActor, room)) {
+      actor.x = nextXActor.x;
+    }
+    const nextYActor = Object.assign({}, actor, {
+      y: Math.max(62, Math.min(382, actor.y + moveY)),
+    });
+    if (!wouldHitHideSeekBlock(nextYActor, room)) {
+      actor.y = nextYActor.y;
     }
     checkHideSeekExits(actor, room);
     hideSeekState.activeRoomId = actor.roomId;
@@ -3082,7 +3085,10 @@
   }
 
   function wouldHitHideSeekBlock(actor, room) {
-    return (room.obstacles || []).some(obstacle => obstacle.type === 'block' && isHideSeekOverlapping(actor, obstacle));
+    const collider = getHideSeekActorCollider(actor);
+    const hitsObstacle = (room.obstacles || []).some(obstacle => obstacle.type === 'block' && isHideSeekOverlapping(collider, obstacle));
+    const hitsSpot = (room.spots || []).some(spot => spot.solid !== false && isHideSeekOverlapping(collider, getHideSeekSpotCollisionRect(spot)));
+    return hitsObstacle || hitsSpot;
   }
 
   function checkHideSeekExits(actor, room) {
@@ -3098,6 +3104,41 @@
 
   function isHideSeekOverlapping(a, b) {
     return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+  }
+
+  function getHideSeekActorCollider(actor) {
+    return {
+      x: actor.x + 4,
+      y: actor.y + 12,
+      width: Math.max(8, actor.width - 8),
+      height: Math.max(8, actor.height - 8),
+    };
+  }
+
+  function getHideSeekSpotCollisionRect(spot) {
+    const insets = {
+      bed: { x: 6, y: 16, width: -12, height: -18 },
+      bench: { x: 8, y: 18, width: -16, height: -24 },
+      bush: { x: 10, y: 20, width: -20, height: -26 },
+      car: { x: 16, y: 20, width: -32, height: -24 },
+      curtain: { x: 8, y: 12, width: -16, height: -18 },
+      fountain: { x: 12, y: 14, width: -24, height: -22 },
+      tree: { x: 12, y: 24, width: -24, height: -28 },
+    }[spot.kind] || { x: 6, y: 8, width: -12, height: -12 };
+    return {
+      x: spot.x + insets.x,
+      y: spot.y + insets.y,
+      width: Math.max(18, spot.width + insets.width),
+      height: Math.max(18, spot.height + insets.height),
+    };
+  }
+
+  function getHideSeekDistanceToRect(actor, rect) {
+    const actorCenterX = actor.x + actor.width / 2;
+    const actorCenterY = actor.y + actor.height / 2;
+    const nearestX = Math.max(rect.x, Math.min(actorCenterX, rect.x + rect.width));
+    const nearestY = Math.max(rect.y, Math.min(actorCenterY, rect.y + rect.height));
+    return Math.hypot(actorCenterX - nearestX, actorCenterY - nearestY);
   }
 
   function drawHideSeek() {
