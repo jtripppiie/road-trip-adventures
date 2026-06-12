@@ -840,20 +840,20 @@ body.large-text {
   touch-action: none;
 }
 
-.pong-controls {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
-  margin: 1rem 0;
+#pong-game:fullscreen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: none;
+  width: 100vw;
+  height: 100vh;
+  padding: 1rem;
+  background: var(--color-bg);
 }
 
-.pong-controls > div {
-  display: grid;
-  gap: 0.5rem;
-  padding: 0.75rem;
-  border: 2px solid rgba(8, 40, 74, 0.16);
-  border-radius: 8px;
-  background: #fff;
+#pong-game:fullscreen .pong-canvas {
+  width: min(100%, 1200px);
+  max-height: 68vh;
 }
 
 .logo-prank {
@@ -1357,8 +1357,7 @@ body.reduce-motion .stamp.earned {
   }
 
   .adventure-actions,
-  .emoji-actions,
-  .pong-controls {
+  .emoji-actions {
     grid-template-columns: 1fr;
   }
 

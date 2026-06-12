@@ -822,6 +822,7 @@
   let pongRunning = false;
   let pongKeys = {};
   let pongState = null;
+  let pongPointerSides = {};
   let logoClickCount = 0;
   let logoClickTimer = null;
   let secretUnlockStep = 0;
@@ -1008,6 +1009,7 @@
   const pongScore = document.getElementById('pong-score');
   const pongStatus = document.getElementById('pong-status');
   const pongStartButton = document.getElementById('pong-start');
+  const pongFullscreenButton = document.getElementById('pong-fullscreen');
   const pongResetButton = document.getElementById('pong-reset');
   const pongFinishButton = document.getElementById('pong-finish');
   const pongLeftUpButton = document.getElementById('pong-left-up');
@@ -2650,7 +2652,57 @@
     const leftName = players[0] ? players[0].name : 'P1';
     const rightName = players[1] ? players[1].name : 'P2';
     pongScore.textContent = `${pongState.leftScore} : ${pongState.rightScore}`;
-    pongStatus.textContent = `${leftName} left paddle, ${rightName} right paddle. First to ${pongState.targetScore} wins.`;
+    pongStatus.textContent = `${leftName} controls the left half, ${rightName} controls the right half. Drag on the board. First to ${pongState.targetScore} wins.`;
+  }
+
+  function movePongPaddleTo(side, clientY) {
+    if (!pongState || !pongCanvas) return;
+    const rect = pongCanvas.getBoundingClientRect();
+    const yRatio = (clientY - rect.top) / rect.height;
+    const centerY = Math.max(0, Math.min(1, yRatio)) * pongState.height;
+    const nextY = centerY - pongState.paddleHeight / 2;
+    const maxY = pongState.height - pongState.paddleHeight;
+    if (side === 'left') {
+      pongState.leftY = Math.max(0, Math.min(maxY, nextY));
+    } else {
+      pongState.rightY = Math.max(0, Math.min(maxY, nextY));
+    }
+    drawPong();
+  }
+
+  function getPongPointerSide(clientX) {
+    const rect = pongCanvas.getBoundingClientRect();
+    return clientX - rect.left < rect.width / 2 ? 'left' : 'right';
+  }
+
+  function handlePongPointer(event) {
+    if (!pongCanvas) return;
+    event.preventDefault();
+    const side = pongPointerSides[event.pointerId] || getPongPointerSide(event.clientX);
+    pongPointerSides[event.pointerId] = side;
+    movePongPaddleTo(side, event.clientY);
+  }
+
+  function releasePongPointer(event) {
+    delete pongPointerSides[event.pointerId];
+  }
+
+  async function togglePongFullscreen() {
+    const target = sections.pong || pongCanvas;
+    try {
+      if (!document.fullscreenElement && target && target.requestFullscreen) {
+        await target.requestFullscreen();
+      } else if (document.fullscreenElement && document.exitFullscreen) {
+        await document.exitFullscreen();
+      }
+    } catch (error) {
+      pongStatus.textContent = 'Full screen is not available in this browser.';
+    }
+  }
+
+  function updatePongFullscreenButton() {
+    if (!pongFullscreenButton) return;
+    pongFullscreenButton.textContent = document.fullscreenElement ? 'Exit Full Screen' : 'Full Screen';
   }
 
   function movePongPaddles() {
@@ -2721,7 +2773,7 @@
     if (!pongState) pongState = createPongState();
     if (pongRunning) return;
     pongRunning = true;
-    pongStatus.textContent = 'Pong is live. Tap and hold the controls or use W/S and ↑/↓.';
+    pongStatus.textContent = 'Pong is live. Drag on either half of the board, or use W/S and ↑/↓.';
     tickPong();
   }
 
@@ -2737,6 +2789,7 @@
     stopPong();
     pongState = createPongState();
     pongKeys = {};
+    pongPointerSides = {};
     updatePongScore();
     drawPong();
   }
@@ -3169,8 +3222,18 @@
   savePiScoresButton.addEventListener('click', savePiScores);
   finishPiButton.addEventListener('click', showPiSummary);
   pongStartButton.addEventListener('click', startPongRound);
+  pongFullscreenButton.addEventListener('click', togglePongFullscreen);
   pongResetButton.addEventListener('click', resetPongGame);
   pongFinishButton.addEventListener('click', showPongSummary);
+  if (pongCanvas) {
+    pongCanvas.addEventListener('pointerdown', event => {
+      pongCanvas.setPointerCapture(event.pointerId);
+      handlePongPointer(event);
+    });
+    pongCanvas.addEventListener('pointermove', handlePongPointer);
+    pongCanvas.addEventListener('pointerup', releasePongPointer);
+    pongCanvas.addEventListener('pointercancel', releasePongPointer);
+  }
   setPongButtonControl(pongLeftUpButton, 'leftUp');
   setPongButtonControl(pongLeftDownButton, 'leftDown');
   setPongButtonControl(pongRightUpButton, 'rightUp');
@@ -3188,6 +3251,7 @@
     if (event.key === 'ArrowUp') pongKeys.rightUp = false;
     if (event.key === 'ArrowDown') pongKeys.rightDown = false;
   });
+  document.addEventListener('fullscreenchange', updatePongFullscreenButton);
   if (appLogo) appLogo.addEventListener('click', handleLogoClick);
   if (closeLogoPrankButton) {
     closeLogoPrankButton.addEventListener('click', () => {
