@@ -188,7 +188,7 @@
               <span class="option-title">Emoji Face‑Off</span>
               <span class="mode-pill scored">Scored</span>
             </button>
-            <button class="option-card" data-category="hideSeek">
+            <button class="option-card" data-category="hide-seek">
               <span class="option-emoji" aria-hidden="true">🫥</span>
               <span class="option-title">Hide & Seek</span>
               <span class="mode-pill">Party</span>
@@ -203,6 +203,11 @@
               <span class="option-emoji" aria-hidden="true">🎲</span>
               <span class="option-title">Surprise Me</span>
               <span class="mode-pill">Mixed</span>
+            </button>
+            <button class="option-card" data-category="hide-seek">
+              <span class="option-emoji" aria-hidden="true">🔦</span>
+              <span class="option-title">Hide & Seek</span>
+              <span class="mode-pill">Party</span>
             </button>
             <button class="option-card" data-category="pong">
               <span class="option-emoji" aria-hidden="true">🏓</span>
@@ -670,7 +675,7 @@
         </div>
         <div id="gorillas-score" class="emoji-target" aria-label="Banana Towers score">0 : 0</div>
       </div>
-      <article class="trivia-card">
+      <article class="trivia-card gorillas-control-card">
         <div class="gorillas-setup">
           <label class="team-name-field" for="gorillas-angle">
             <span>Angle</span>
@@ -686,6 +691,7 @@
       <p id="gorillas-status" class="hunt-status" aria-live="polite">Set your angle and power, then launch the banana.</p>
       <div class="adventure-actions">
         <button id="gorillas-fire" class="primary-button">Throw Banana</button>
+        <button id="gorillas-fullscreen" class="secondary-button">Full Screen</button>
         <button id="gorillas-reset" class="secondary-button">Reset Game</button>
         <button id="gorillas-finish" class="secondary-button">Finish Game</button>
       </div>

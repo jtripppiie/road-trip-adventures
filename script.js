@@ -1062,6 +1062,7 @@
   const gorillasAngle = document.getElementById('gorillas-angle');
   const gorillasPower = document.getElementById('gorillas-power');
   const gorillasFireButton = document.getElementById('gorillas-fire');
+  const gorillasFullscreenButton = document.getElementById('gorillas-fullscreen');
   const gorillasResetButton = document.getElementById('gorillas-reset');
   const gorillasFinishButton = document.getElementById('gorillas-finish');
   const appLogo = document.querySelector('.app-logo');
@@ -1106,6 +1107,13 @@
     }
     const initials = rawValue.replace(/\s+/g, '').toUpperCase().slice(0, 4);
     return initials || getDefaultPlayerInitials(index);
+  }
+
+  function normalizeCategoryKey(category) {
+    const value = String(category || '').trim();
+    if (['hideSeek', 'hideseek', 'hide-seek', 'hide_seek'].includes(value)) return 'hideSeek';
+    if (['banana-towers', 'bananaTowers', 'gorilla', 'gorillas'].includes(value)) return 'gorillas';
+    return value;
   }
 
   const modeRuleCards = {
@@ -2582,6 +2590,12 @@
     renderHideSeek();
   }
 
+  function startHideSeekGame() {
+    resetGame();
+    resetHideSeek();
+    showSection('hideSeek');
+  }
+
   function showHideSeekSummary() {
     stopHideSeekTimer();
     showSection('summary');
@@ -3396,6 +3410,10 @@
       projectile: null,
       winner: null,
       gravity: 860,
+      wind: Math.round((Math.random() * 2 - 1) * 22),
+      trail: [],
+      explosion: null,
+      sparks: [],
     };
   }
 
@@ -3422,53 +3440,229 @@
     return turnIndex % 2 === 0 ? 'left' : 'right';
   }
 
+  function getGorillasWindLabel() {
+    if (!gorillasState || gorillasState.wind === 0) return 'calm wind';
+    return `${Math.abs(gorillasState.wind)} mph ${gorillasState.wind > 0 ? 'tailwind right' : 'tailwind left'}`;
+  }
+
   function renderGorillasControls() {
     if (!gorillasFireButton) return;
     gorillasFireButton.disabled = !gorillasState || Boolean(gorillasState.projectile) || Boolean(gorillasState.winner);
+  }
+
+  async function toggleGorillasFullscreen() {
+    const target = sections.gorillas || gorillasCanvas;
+    try {
+      if (!document.fullscreenElement && target && target.requestFullscreen) {
+        await target.requestFullscreen();
+      } else if (document.fullscreenElement && document.exitFullscreen) {
+        await document.exitFullscreen();
+      }
+    } catch (error) {
+      gorillasStatus.textContent = 'Full screen is not available in this browser.';
+    }
+  }
+
+  function updateGorillasFullscreenButton() {
+    if (!gorillasFullscreenButton) return;
+    const active = document.fullscreenElement === sections.gorillas;
+    gorillasFullscreenButton.textContent = active ? 'Exit Full Screen' : 'Full Screen';
+  }
+
+  function drawPixelGorilla(ctx, x, y, facing) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(facing, 1);
+    ctx.fillStyle = '#1a1620';
+    ctx.fillRect(-10, -20, 20, 18);
+    ctx.fillRect(-13, -10, 26, 16);
+    ctx.fillRect(-17, -7, 8, 18);
+    ctx.fillRect(9, -7, 8, 18);
+    ctx.fillRect(-8, 5, 6, 12);
+    ctx.fillRect(2, 5, 6, 12);
+    ctx.fillStyle = '#f7d8b5';
+    ctx.fillRect(-5, -16, 10, 7);
+    ctx.fillStyle = '#f58220';
+    ctx.fillRect(9, -27, 6, 11);
+    ctx.restore();
+  }
+
+  function drawBananaSprite(ctx, x, y, angle) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    ctx.fillStyle = '#ffd74a';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 10, 4, -0.35, 0.2, Math.PI * 1.75);
+    ctx.strokeStyle = '#6b3f00';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawGorillasBackdrop(ctx) {
+    const sky = ctx.createLinearGradient(0, 0, 0, gorillasState.height);
+    sky.addColorStop(0, '#73d7ff');
+    sky.addColorStop(0.5, '#d8f6ff');
+    sky.addColorStop(1, '#f7fbff');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, gorillasState.width, gorillasState.height);
+
+    ctx.fillStyle = '#ffd86b';
+    ctx.beginPath();
+    ctx.arc(gorillasState.width - 72, 58, 24, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = 'rgba(255,255,255,0.88)';
+    [[90, 54], [170, 82], [515, 70]].forEach(([x, y]) => {
+      ctx.beginPath();
+      ctx.arc(x, y, 18, 0, Math.PI * 2);
+      ctx.arc(x + 22, y + 3, 14, 0, Math.PI * 2);
+      ctx.arc(x - 22, y + 5, 12, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    ctx.fillStyle = '#7b9fb0';
+    ctx.beginPath();
+    ctx.moveTo(0, 220);
+    ctx.lineTo(110, 130);
+    ctx.lineTo(235, 220);
+    ctx.lineTo(350, 145);
+    ctx.lineTo(500, 220);
+    ctx.lineTo(640, 120);
+    ctx.lineTo(gorillasState.width, 220);
+    ctx.lineTo(gorillasState.width, gorillasState.height);
+    ctx.lineTo(0, gorillasState.height);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function drawGorillasBillboard(ctx) {
+    const x = gorillasState.width / 2 - 72;
+    const y = gorillasState.height - 94;
+    ctx.fillStyle = '#09233f';
+    ctx.fillRect(x + 12, y + 42, 8, 44);
+    ctx.fillRect(x + 124, y + 42, 8, 44);
+    ctx.fillStyle = '#f7fbff';
+    ctx.fillRect(x, y, 144, 48);
+    ctx.strokeStyle = '#09233f';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(x, y, 144, 48);
+    ctx.fillStyle = '#f58220';
+    ctx.font = '900 14px Atkinson Hyperlegible, Arial, sans-serif';
+    ctx.fillText('BANANA', x + 18, y + 21);
+    ctx.fillText('TOWERS', x + 20, y + 38);
+  }
+
+  function drawGorillasHud(ctx) {
+    ctx.fillStyle = 'rgba(247,251,255,0.82)';
+    ctx.fillRect(10, 10, 238, 48);
+    ctx.strokeStyle = 'rgba(9,35,63,0.3)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(10, 10, 238, 48);
+    ctx.fillStyle = '#09233f';
+    ctx.font = '900 14px Atkinson Hyperlegible, Arial, sans-serif';
+    ctx.fillText(getGorillasWindLabel(), 22, 30);
+    ctx.fillText(`${getGorillasPlayerName(gorillasTurn)} aiming`, 22, 49);
+
+    const arrowX = 224;
+    const arrowY = 27;
+    ctx.fillStyle = '#f58220';
+    ctx.beginPath();
+    if (gorillasState.wind >= 0) {
+      ctx.moveTo(arrowX, arrowY);
+      ctx.lineTo(arrowX + 16, arrowY + 8);
+      ctx.lineTo(arrowX, arrowY + 16);
+    } else {
+      ctx.moveTo(arrowX + 16, arrowY);
+      ctx.lineTo(arrowX, arrowY + 8);
+      ctx.lineTo(arrowX + 16, arrowY + 16);
+    }
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function createGorillasSparks(x, y) {
+    return Array.from({ length: 12 }, (_, index) => {
+      const angle = (Math.PI * 2 * index) / 12;
+      return {
+        x,
+        y,
+        vx: Math.cos(angle) * (2 + Math.random() * 4),
+        vy: Math.sin(angle) * (2 + Math.random() * 4),
+      };
+    });
   }
 
   function drawGorillas() {
     if (!gorillasCanvas || !gorillasState) return;
     const ctx = gorillasCanvas.getContext('2d');
     ctx.clearRect(0, 0, gorillasState.width, gorillasState.height);
-    ctx.fillStyle = '#0c1f38';
-    ctx.fillRect(0, 0, gorillasState.width, gorillasState.height);
-    ctx.fillStyle = '#7ed6ff';
-    ctx.fillRect(0, 0, gorillasState.width, 90);
-    ctx.fillStyle = '#e8c27d';
+    drawGorillasBackdrop(ctx);
+    ctx.fillStyle = '#26384f';
     ctx.fillRect(0, gorillasState.height - 36, gorillasState.width, 36);
+    drawGorillasBillboard(ctx);
+    ctx.fillStyle = '#f58220';
+    for (let x = 0; x < gorillasState.width; x += 38) {
+      ctx.fillRect(x, gorillasState.height - 24, 20, 4);
+    }
     gorillasState.buildings.forEach((building, index) => {
       const x = building.x + 4;
       const y = building.roofY;
-      ctx.fillStyle = index % 2 === 0 ? '#203b60' : '#2a4c76';
+      const buildingGradient = ctx.createLinearGradient(x, y, x, gorillasState.height - 36);
+      buildingGradient.addColorStop(0, index % 2 === 0 ? '#203b60' : '#2a4c76');
+      buildingGradient.addColorStop(1, index % 2 === 0 ? '#10243f' : '#173453');
+      ctx.fillStyle = buildingGradient;
       ctx.fillRect(x, y, building.width, building.height);
-      ctx.fillStyle = '#f7fbff';
+      ctx.fillStyle = 'rgba(255,255,255,0.78)';
       for (let row = 0; row < Math.max(2, Math.floor(building.height / 44)); row++) {
-        for (let col = 0; col < 2; col++) {
+        for (let col = 0; col < Math.max(2, Math.floor(building.width / 28)); col++) {
           const wx = x + 10 + col * 18;
           const wy = y + 14 + row * 22;
           if (wx + 8 < x + building.width - 8 && wy + 12 < gorillasState.height - 40) {
-            ctx.fillRect(wx, wy, 10, 14);
+            ctx.fillRect(wx, wy, 9, 12);
           }
         }
       }
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      ctx.fillRect(x, y, building.width, 4);
     });
     const leftGorilla = gorillasState.buildings[0];
     const rightGorilla = gorillasState.buildings[gorillasState.buildings.length - 1];
-    ctx.fillStyle = '#061524';
-    ctx.beginPath();
-    ctx.arc(leftGorilla.x + leftGorilla.width * 0.62, leftGorilla.roofY - 12, 16, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(rightGorilla.x + rightGorilla.width * 0.38, rightGorilla.roofY - 12, 16, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,0.18)';
-    ctx.fillRect(gorillasState.width / 2 - 2, 0, 4, gorillasState.height - 36);
-    if (gorillasState.projectile) {
-      ctx.fillStyle = '#f58220';
+    drawPixelGorilla(ctx, leftGorilla.x + leftGorilla.width * 0.62, leftGorilla.roofY - 2, 1);
+    drawPixelGorilla(ctx, rightGorilla.x + rightGorilla.width * 0.38, rightGorilla.roofY - 2, -1);
+    ctx.fillStyle = 'rgba(9,35,63,0.45)';
+    ctx.fillRect(gorillasState.width / 2 - 2, 96, 4, gorillasState.height - 132);
+    drawGorillasHud(ctx);
+    if (gorillasState.trail.length > 1) {
+      ctx.strokeStyle = 'rgba(245,130,32,0.55)';
+      ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.arc(gorillasState.projectile.x, gorillasState.projectile.y, 6, 0, Math.PI * 2);
+      gorillasState.trail.forEach((point, index) => {
+        if (index === 0) ctx.moveTo(point.x, point.y);
+        else ctx.lineTo(point.x, point.y);
+      });
+      ctx.stroke();
+    }
+    if (gorillasState.projectile) {
+      drawBananaSprite(ctx, gorillasState.projectile.x, gorillasState.projectile.y, Math.atan2(gorillasState.projectile.vy, gorillasState.projectile.vx));
+    }
+    if (gorillasState.explosion) {
+      ctx.fillStyle = 'rgba(245,130,32,0.85)';
+      ctx.beginPath();
+      ctx.arc(gorillasState.explosion.x, gorillasState.explosion.y, 24, 0, Math.PI * 2);
       ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(gorillasState.explosion.x, gorillasState.explosion.y, 10, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    if (gorillasState.sparks.length) {
+      ctx.fillStyle = '#ffd74a';
+      gorillasState.sparks.forEach(spark => {
+        ctx.fillRect(spark.x - 2, spark.y - 2, 4, 4);
+      });
     }
   }
 
@@ -3479,13 +3673,15 @@
     gorillasLastFrameTs = 0;
     renderGorillasScore();
     renderGorillasControls();
+    updateGorillasFullscreenButton();
     showSection('gorillas');
-    gorillasStatus.textContent = `${getGorillasPlayerName(gorillasTurn)} goes first. Set angle and power, then throw.`;
+    gorillasStatus.textContent = `${getGorillasPlayerName(gorillasTurn)} goes first. Wind is ${getGorillasWindLabel()}. Set angle and power, then throw.`;
     drawGorillas();
   }
 
   function advanceGorillasTurn(scored) {
     if (!gorillasState) return;
+    const impact = gorillasState.projectile ? { x: gorillasState.projectile.x, y: gorillasState.projectile.y } : null;
     gorillasRunning = false;
     gorillasLastFrameTs = 0;
     if (gorillasAnimationFrame) {
@@ -3499,14 +3695,20 @@
       renderGorillasScore();
       if (gorillasState[scorer] >= 5) {
         gorillasState.winner = scorer;
+        gorillasState.explosion = impact;
+        gorillasState.sparks = impact ? createGorillasSparks(impact.x, impact.y) : [];
         gorillasStatus.textContent = `${shooterName} wins Banana Towers!`;
         stopGorillas();
         renderGorillasControls();
         drawGorillas();
         return;
       }
+      gorillasState.explosion = impact;
+      gorillasState.sparks = impact ? createGorillasSparks(impact.x, impact.y) : [];
       gorillasStatus.textContent = `${shooterName} scored!`;
     } else {
+      gorillasState.explosion = impact && impact.y < gorillasState.height - 40 ? impact : null;
+      gorillasState.sparks = gorillasState.explosion ? createGorillasSparks(gorillasState.explosion.x, gorillasState.explosion.y) : [];
       gorillasStatus.textContent = `${shooterName} missed.`;
     }
     gorillasTurn += 1;
@@ -3529,6 +3731,9 @@
       vx: Math.cos(radians) * speed * direction,
       vy: -Math.sin(radians) * speed,
     };
+    gorillasState.trail = [{ x: gorillasState.projectile.x, y: gorillasState.projectile.y }];
+    gorillasState.explosion = null;
+    gorillasState.sparks = [];
     gorillasStatus.textContent = `${getGorillasPlayerName(gorillasTurn)} launches the banana!`;
     gorillasRunning = true;
     gorillasLastFrameTs = 0;
@@ -3541,9 +3746,12 @@
     const dt = gorillasLastFrameTs ? Math.min(0.032, (timestamp - gorillasLastFrameTs) / 1000) : 0.016;
     gorillasLastFrameTs = timestamp;
     const projectile = gorillasState.projectile;
+    projectile.vx += gorillasState.wind * dt;
     projectile.vy += gorillasState.gravity * dt;
     projectile.x += projectile.vx * dt;
     projectile.y += projectile.vy * dt;
+    gorillasState.trail.push({ x: projectile.x, y: projectile.y });
+    if (gorillasState.trail.length > 42) gorillasState.trail.shift();
 
     const groundY = gorillasState.height - 36;
     const target = getGorillasSide(gorillasTurn) === 'left'
@@ -3595,7 +3803,7 @@
     gorillasLastFrameTs = 0;
     renderGorillasScore();
     renderGorillasControls();
-    gorillasStatus.textContent = 'Set your angle and power, then throw the banana.';
+    gorillasStatus.textContent = `New skyline loaded. Wind is ${getGorillasWindLabel()}. Set angle and power, then throw.`;
     drawGorillas();
   }
 
@@ -3685,14 +3893,14 @@
   }
 
   function launchAdminMode(mode) {
-    selectedCategory = mode;
-    if (mode === 'secret') {
+    selectedCategory = normalizeCategoryKey(mode);
+    if (selectedCategory === 'secret') {
       startSecretMode();
-    } else if (mode === 'pong') {
+    } else if (selectedCategory === 'pong') {
       startPongGame();
-    } else if (mode === 'gorillas') {
+    } else if (selectedCategory === 'gorillas') {
       startGorillasGame();
-    } else if (mode === 'scavenger') {
+    } else if (selectedCategory === 'scavenger') {
       startScavengerHunt();
     }
   }
@@ -3784,7 +3992,9 @@
   }
 
   function renderModeRules(category) {
-    const rules = modeRuleCards[category];
+    const normalizedCategory = normalizeCategoryKey(category);
+    selectedCategory = normalizedCategory;
+    const rules = modeRuleCards[normalizedCategory];
     if (!rules) {
       launchSelectedMode();
       return;
@@ -3830,8 +4040,7 @@
     } else if (selectedCategory === 'gorillas') {
       startGorillasGame();
     } else if (selectedCategory === 'hideSeek') {
-      resetHideSeek();
-      showSection('hideSeek');
+      startHideSeekGame();
     } else {
       regionCode = '*';
       startAdventure();
@@ -3856,8 +4065,7 @@
     } else if (mode === 'gorillas') {
       startGorillasGame();
     } else if (mode === 'hideSeek') {
-      resetHideSeek();
-      showSection('hideSeek');
+      startHideSeekGame();
     } else if (mode === 'learn') {
       selectedLearnTopic = 'all';
       setStoredJson('rtaLastLearnTopic', selectedLearnTopic);
@@ -3945,7 +4153,7 @@
     const section = target.closest('.setup-section');
     if (!section) return;
     if (section.id === 'setup-category') {
-      selectedCategory = target.getAttribute('data-category');
+      selectedCategory = normalizeCategoryKey(target.getAttribute('data-category'));
       if (selectedCategory === 'quickstart') {
         startQuickStart();
       } else {
@@ -4012,8 +4220,7 @@
       return;
     }
     if (selectedCategory === 'hideSeek') {
-      resetHideSeek();
-      showSection('hideSeek');
+      startHideSeekGame();
       return;
     }
     if (selectedCategory === 'secret') {
@@ -4149,6 +4356,7 @@
     }
   });
   document.addEventListener('fullscreenchange', updatePongFullscreenButton);
+  document.addEventListener('fullscreenchange', updateGorillasFullscreenButton);
   if (appLogo) appLogo.addEventListener('click', handleLogoClick);
   if (closeLogoPrankButton) {
     closeLogoPrankButton.addEventListener('click', () => {
@@ -4161,6 +4369,7 @@
     launchAdminMode(adminButton.dataset.adminLaunch);
   });
   gorillasFireButton.addEventListener('click', fireGorillasShot);
+  gorillasFullscreenButton.addEventListener('click', toggleGorillasFullscreen);
   gorillasResetButton.addEventListener('click', resetGorillasGame);
   gorillasFinishButton.addEventListener('click', showGorillasSummary);
   [gorillasAngle, gorillasPower].forEach(input => {
