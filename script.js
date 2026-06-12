@@ -1012,10 +1012,6 @@
   const pongFullscreenButton = document.getElementById('pong-fullscreen');
   const pongResetButton = document.getElementById('pong-reset');
   const pongFinishButton = document.getElementById('pong-finish');
-  const pongLeftUpButton = document.getElementById('pong-left-up');
-  const pongLeftDownButton = document.getElementById('pong-left-down');
-  const pongRightUpButton = document.getElementById('pong-right-up');
-  const pongRightDownButton = document.getElementById('pong-right-down');
   const appLogo = document.querySelector('.app-logo');
   const adminCounts = document.getElementById('admin-counts');
   const logoPrank = document.getElementById('logo-prank');
@@ -2818,22 +2814,6 @@
     summaryList.appendChild(li);
   }
 
-  function setPongButtonControl(button, key) {
-    if (!button) return;
-    const press = event => {
-      event.preventDefault();
-      pongKeys[key] = true;
-    };
-    const release = event => {
-      event.preventDefault();
-      pongKeys[key] = false;
-    };
-    button.addEventListener('pointerdown', press);
-    button.addEventListener('pointerup', release);
-    button.addEventListener('pointercancel', release);
-    button.addEventListener('pointerleave', release);
-  }
-
   function renderAdminCounts() {
     if (!adminCounts) return;
     const triviaCount = triviaDatabase.length;
@@ -3234,10 +3214,6 @@
     pongCanvas.addEventListener('pointerup', releasePongPointer);
     pongCanvas.addEventListener('pointercancel', releasePongPointer);
   }
-  setPongButtonControl(pongLeftUpButton, 'leftUp');
-  setPongButtonControl(pongLeftDownButton, 'leftDown');
-  setPongButtonControl(pongRightUpButton, 'rightUp');
-  setPongButtonControl(pongRightDownButton, 'rightDown');
   document.addEventListener('keydown', event => {
     if (currentSectionKey !== 'pong') return;
     if (event.key === 'w' || event.key === 'W') pongKeys.leftUp = true;
@@ -3326,6 +3302,9 @@
         feedbackModal.hidden = true;
         feedbackButton.focus();
       }
+      if (logoPrank && !logoPrank.hidden) {
+        logoPrank.hidden = true;
+      }
       if (accessibilityPanel.classList.contains('show')) {
         accessibilityPanel.classList.remove('show');
         accessibilityPanel.setAttribute('aria-hidden', 'true');
@@ -3335,7 +3314,10 @@
   });
 
   // Start the app after a short delay to display the loading screen
-  window.addEventListener('beforeunload', stopEmojiCamera);
+  window.addEventListener('beforeunload', () => {
+    stopEmojiCamera();
+    stopPong();
+  });
   window.addEventListener('load', () => {
     initPreferences();
     initSavedUserData();
