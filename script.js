@@ -727,6 +727,16 @@
     'weirdlaws-in-ohio-what-animal-is-commonly-cited-as-illegal-to-get-drunk',
     'weirdlaws-in-west-virginia-what-animal-is-commonly-cited-in-a-law-about-roadkill',
     'weirdlaws-in-west-virginia-what-can-legally-become-dinner-if-reported',
+    'general-roulette-sum',
+    'food-guinness-origin',
+    'food-pina-colada',
+    'food-bond-drink',
+    'food-mageirocophobia',
+    'food-fancy-sauce',
+  ]);
+
+  const hiddenTriviaCategories = new Set([
+    'weirdlaws',
   ]);
 
   function buildTriviaDatabase() {
@@ -826,6 +836,20 @@
   let lightningDeck = [];
   let alphabetTheme = null;
   let alphabetIndex = 0;
+  let hideSeekRound = 0;
+  let hideSeekTimerInterval = null;
+  let hideSeekState = {
+    mode: 'pass-and-play',
+    countdown: 30,
+    winnerGoal: 'first-found',
+    hiderIndex: 0,
+    seekerIndex: 1,
+    hiding: false,
+    seeking: false,
+    found: false,
+    countdownRemaining: 0,
+    hideScore: {},
+  };
   let huntDeck = [];
   let activeHuntIds = [];
   let activeHuntTheme = getStoredJson('rtaHuntTheme', 'mixed');
@@ -834,11 +858,21 @@
   let emojiFaceAwarded = false;
   let emojiStream = null;
   let piScore = {};
+  const defaultPongSettings = {
+    opponentMode: 'computer',
+    difficulty: 'normal',
+  };
+  let pongSettings = Object.assign({}, defaultPongSettings, getStoredJson('rtaPongSettings', {}));
   let pongAnimationFrame = null;
   let pongRunning = false;
   let pongKeys = {};
   let pongState = null;
   let pongPointerSides = {};
+  let gorillasAnimationFrame = null;
+  let gorillasRunning = false;
+  let gorillasState = null;
+  let gorillasTurn = 0;
+  let gorillasLastFrameTs = 0;
   let logoClickCount = 0;
   let logoClickTimer = null;
   let secretUnlockStep = 0;
@@ -889,6 +923,7 @@
   const sections = {
     players: document.getElementById('setup-teams'),
     category: document.getElementById('setup-category'),
+    rules: document.getElementById('mode-rules'),
     settings: document.getElementById('trip-settings'),
     learnTopics: document.getElementById('learn-topics'),
     region: document.getElementById('setup-region'),
@@ -900,6 +935,7 @@
     calculator: document.getElementById('trip-calculator'),
     pi: document.getElementById('pi-game'),
     pong: document.getElementById('pong-game'),
+    gorillas: document.getElementById('gorillas-game'),
     admin: document.getElementById('admin-mode'),
     secret: document.getElementById('secret-mode'),
     summary: document.getElementById('summary'),
@@ -920,6 +956,12 @@
   const removePlayerButton = document.getElementById('remove-player');
   const saveTeamsButton = document.getElementById('save-teams');
   const openTripSettingsButton = document.getElementById('open-trip-settings');
+  const modeRulesType = document.getElementById('mode-rules-type');
+  const modeRulesHeading = document.getElementById('mode-rules-heading');
+  const modeRulesSummary = document.getElementById('mode-rules-summary');
+  const modeRulesList = document.getElementById('mode-rules-list');
+  const modeRulesStartButton = document.getElementById('mode-rules-start');
+  const modeRulesBackButton = document.getElementById('mode-rules-back');
   const settingGameLength = document.getElementById('setting-game-length');
   const settingTripPreset = document.getElementById('setting-trip-preset');
   const settingNoCamera = document.getElementById('setting-no-camera');
@@ -978,6 +1020,22 @@
   const emojiAwardButtons = document.getElementById('emoji-award-buttons');
   const nextEmojiButton = document.getElementById('next-emoji');
   const finishEmojiButton = document.getElementById('finish-emoji');
+  const hideSeekScoreboard = document.getElementById('hide-seek-scoreboard');
+  const hideSeekBadge = document.getElementById('hide-seek-badge');
+  const hideSeekStatus = document.getElementById('hide-seek-status');
+  const hideSeekMode = document.getElementById('hide-seek-mode');
+  const hideSeekCountdown = document.getElementById('hide-seek-countdown');
+  const hideSeekWinner = document.getElementById('hide-seek-winner');
+  const hideSeekPhase = document.getElementById('hide-seek-phase');
+  const hideSeekRoundTitle = document.getElementById('hide-seek-round-title');
+  const hideSeekRoundText = document.getElementById('hide-seek-round-text');
+  const hideSeekCountdownText = document.getElementById('hide-seek-countdown-text');
+  const hideSeekAssets = document.getElementById('hide-seek-assets');
+  const hideSeekStartButton = document.getElementById('hide-seek-start');
+  const hideSeekFoundButton = document.getElementById('hide-seek-found');
+  const hideSeekNextButton = document.getElementById('hide-seek-next');
+  const hideSeekResetButton = document.getElementById('hide-seek-reset');
+  const hideSeekFinishButton = document.getElementById('hide-seek-finish');
   const calcMiles = document.getElementById('calc-miles');
   const calcSpeedA = document.getElementById('calc-speed-a');
   const calcSpeedB = document.getElementById('calc-speed-b');
@@ -992,10 +1050,20 @@
   const pongCanvas = document.getElementById('pong-canvas');
   const pongScore = document.getElementById('pong-score');
   const pongStatus = document.getElementById('pong-status');
+  const pongOpponentButtons = document.getElementById('pong-opponent-buttons');
+  const pongDifficultyButtons = document.getElementById('pong-difficulty-buttons');
   const pongStartButton = document.getElementById('pong-start');
   const pongFullscreenButton = document.getElementById('pong-fullscreen');
   const pongResetButton = document.getElementById('pong-reset');
   const pongFinishButton = document.getElementById('pong-finish');
+  const gorillasCanvas = document.getElementById('gorillas-canvas');
+  const gorillasScore = document.getElementById('gorillas-score');
+  const gorillasStatus = document.getElementById('gorillas-status');
+  const gorillasAngle = document.getElementById('gorillas-angle');
+  const gorillasPower = document.getElementById('gorillas-power');
+  const gorillasFireButton = document.getElementById('gorillas-fire');
+  const gorillasResetButton = document.getElementById('gorillas-reset');
+  const gorillasFinishButton = document.getElementById('gorillas-finish');
   const appLogo = document.querySelector('.app-logo');
   const adminCounts = document.getElementById('admin-counts');
   const logoPrank = document.getElementById('logo-prank');
@@ -1039,6 +1107,178 @@
     const initials = rawValue.replace(/\s+/g, '').toUpperCase().slice(0, 4);
     return initials || getDefaultPlayerInitials(index);
   }
+
+  const modeRuleCards = {
+    look: {
+      title: 'Window Quests',
+      type: 'Just for fun',
+      scored: false,
+      summary: 'Quick prompts that get everyone looking outside instead of staring down.',
+      rules: [
+        'Read each prompt aloud.',
+        'Everyone looks outside or answers together.',
+        'Tap Stamp It when the car has tried it. No winner needed.',
+      ],
+    },
+    local: {
+      title: 'Local Explorer',
+      type: 'Just for fun',
+      scored: false,
+      summary: 'Manual region prompts. No GPS, no location sensors, no tracking.',
+      rules: [
+        'Choose the region yourself.',
+        'Read each local prompt aloud.',
+        'Complete prompts together and move on when the car is ready.',
+      ],
+    },
+    scavenger: {
+      title: 'Scavenger Hunt',
+      type: 'Scored Game',
+      scored: true,
+      summary: 'Keep a small target list active and race to spot things outside.',
+      rules: [
+        'The app shows 4 or 5 targets at a time.',
+        'First player to clearly spot a target gets 1 point.',
+        'A judge can settle close calls. First to the milestone unlocks karaoke power.',
+      ],
+    },
+    learn: {
+      title: 'Learn Something',
+      type: 'Just for fun',
+      scored: false,
+      summary: 'Short facts and mini-lessons to pass around the car.',
+      rules: [
+        'Pick a topic lane.',
+        'Pass the phone and read the fact aloud.',
+        'No points. The goal is to make the next mile a little smarter.',
+      ],
+    },
+    trivia: {
+      title: 'Trivia Run',
+      type: 'Scored Game',
+      scored: true,
+      summary: 'Turn-based multiple choice trivia with automatic scoring.',
+      rules: [
+        'The app names whose turn it is.',
+        'That player chooses an answer. Correct choice gives 1 point automatically.',
+        'Use override points only when the car judge needs to fix a mistake.',
+      ],
+    },
+    pi: {
+      title: 'Pi Digits',
+      type: 'Scored Game',
+      scored: true,
+      summary: 'Players recite pi and enter how many digits they got right.',
+      rules: [
+        'Take turns reciting digits after 3.14.',
+        'Use the starter line as the judge key.',
+        'Highest correct digit count wins.',
+      ],
+    },
+    calculator: {
+      title: 'Trip Calculator',
+      type: 'Tool',
+      scored: false,
+      summary: 'Compare how long the same distance takes at two steady speeds.',
+      rules: [
+        'Enter miles left.',
+        'Compare two speeds.',
+        'Use it as road math, not a driving recommendation.',
+      ],
+    },
+    laugh: {
+      title: 'Car Laughs',
+      type: 'Just for fun',
+      scored: false,
+      summary: 'Silly prompts for voices, stories, and quick bits.',
+      rules: [
+        'Read the prompt aloud.',
+        'Everyone plays if they want to.',
+        'Tap Stamp It when the moment is done.',
+      ],
+    },
+    compete: {
+      title: 'Quick Challenges',
+      type: 'Just for fun',
+      scored: false,
+      summary: 'Tiny car challenges with group judgment instead of a saved scoreboard.',
+      rules: [
+        'Read the challenge aloud.',
+        'The car decides the winner for that prompt.',
+        'Use it for quick laughs, not serious scoring.',
+      ],
+    },
+    jokes: {
+      title: 'Joke Vote',
+      type: 'Scored Game',
+      scored: true,
+      summary: 'Players tell clean jokes and vote for the round winner.',
+      rules: [
+        'Each round has a joke prompt.',
+        'Tap the player who wins the round.',
+        'Dad Joke and Mom Joke awards are separate style awards.',
+      ],
+    },
+    emoji: {
+      title: 'Emoji Face-Off',
+      type: 'Scored Game',
+      scored: true,
+      summary: 'Players copy an emoji face and the car votes for the closest match.',
+      rules: [
+        'Camera is optional and stays on this device.',
+        'Snap a face or just act it out.',
+        'Tap the player who wins each face-off.',
+      ],
+    },
+    hideSeek: {
+      title: 'Hide & Seek',
+      type: 'Party Game',
+      scored: false,
+      summary: 'A pass-and-play round where one player hides and the rest race the timer.',
+      rules: [
+        'Choose a hide time, round style, and winner goal.',
+        'Hand the phone to the hider while the countdown runs.',
+        'Tap Found It when the seeker wins the round.',
+        'Use the reset button to start a fresh round without losing the flow.',
+      ],
+    },
+    random: {
+      title: 'Surprise Me',
+      type: 'Mixed',
+      scored: false,
+      summary: 'A mixed prompt run for when nobody wants to pick a mode.',
+      rules: [
+        'The app mixes looking, laughing, learning, and quick challenges.',
+        'Prompts are completed, not scored.',
+        'Use this when the car needs instant momentum.',
+      ],
+    },
+    pong: {
+      title: 'Road Pong',
+      type: 'Scored Game',
+      scored: true,
+      summary: 'Choose a local match or a computer opponent, then pick how mean the AI should be.',
+      rules: [
+        'Choose local player or computer before starting.',
+        'Pick a difficulty from easy to death match.',
+        'Drag your paddle with a finger or pointer.',
+        'First side to the target score wins.',
+        'Death Match AI is meant to be nearly impossible to beat.',
+      ],
+    },
+    gorillas: {
+      title: 'Banana Towers',
+      type: 'Scored Game',
+      scored: true,
+      summary: 'A simple turn-based banana toss game with city buildings and friendly chaos.',
+      rules: [
+        'Each player chooses an angle and power on their turn.',
+        'The banana arcs over the buildings and can hit the opponent.',
+        'Direct hits score a point and start the next turn.',
+        'First to 5 wins the round.',
+      ],
+    },
+  };
 
   // Initialise preferences and UI
   function initPreferences() {
@@ -1154,6 +1394,8 @@
     if (currentSectionKey === 'adventure' && key !== 'adventure') stopTimer();
     if (currentSectionKey === 'emoji' && key !== 'emoji') stopEmojiCamera();
     if (currentSectionKey === 'pong' && key !== 'pong') stopPong();
+    if (currentSectionKey === 'gorillas' && key !== 'gorillas') stopGorillas();
+    if (currentSectionKey === 'hideSeek' && key !== 'hideSeek') stopHideSeekTimer();
     if (!options.replace && currentSectionKey && currentSectionKey !== key) {
       sectionHistory.push(currentSectionKey);
     }
@@ -1190,7 +1432,10 @@
   function goHome() {
     stopEmojiCamera();
     stopPong();
+    stopGorillas();
+    stopHideSeekTimer();
     resetGame();
+    resetHideSeek();
     resetHunt();
     triviaDeck = [];
     triviaIndex = 0;
@@ -1276,6 +1521,12 @@
     if (!players.length) return 'next passenger';
     const player = players[turnIndex % players.length];
     return player ? player.name : 'next passenger';
+  }
+
+  function getTurnPlayerId(turnIndex) {
+    if (!players.length) return '';
+    const player = players[turnIndex % players.length];
+    return player ? player.id : '';
   }
 
   function getCarJudgeNote() {
@@ -1546,19 +1797,29 @@
 
   function showSummary() {
     showSection('summary');
-    // Build summary text
-    const total = Object.values(score).reduce((a, b) => a + b, 0);
-    summaryText.textContent = `You completed ${total} quest${total === 1 ? '' : 's'}.`;
+    const completed = Math.min(currentIndex, adventureQuestions.length);
+    summaryText.textContent = `You completed ${completed} prompt${completed === 1 ? '' : 's'}.`;
     summaryList.innerHTML = '';
-    ['look', 'laugh', 'learn', 'compete', 'local'].forEach(type => {
-      const count = score[type];
-      if (count > 0) {
-        const li = document.createElement('li');
-        const label = type === 'look' ? 'Discoveries' : type === 'laugh' ? 'Laughs' : type === 'learn' ? 'Facts' : type === 'compete' ? 'Wins' : 'Local';
-        li.textContent = `${label}: ${count}`;
-        summaryList.appendChild(li);
-      }
+    const modeLabels = {
+      look: 'Window Quests',
+      laugh: 'Car Laughs',
+      learn: 'Learn Something',
+      compete: 'Quick Challenges',
+      local: 'Local Explorer',
+    };
+    const seenModes = [];
+    adventureQuestions.forEach(item => {
+      const label = modeLabels[item.category];
+      if (label && !seenModes.includes(label)) seenModes.push(label);
     });
+    if (seenModes.length) {
+      const li = document.createElement('li');
+      li.textContent = `Prompt games played: ${seenModes.join(', ')}.`;
+      summaryList.appendChild(li);
+    }
+    const note = document.createElement('li');
+    note.textContent = 'Prompt games do not use scores. Scored games still keep their own winner rules.';
+    summaryList.appendChild(note);
     progressFill.style.width = '100%';
   }
 
@@ -1639,7 +1900,7 @@
   }
 
   function getHuntBatchSize() {
-    return tripSettings.gameLength === 'short' ? 6 : 9;
+    return tripSettings.gameLength === 'short' ? 4 : 5;
   }
 
   function drawHuntTargets(count = getHuntBatchSize()) {
@@ -1684,7 +1945,7 @@
         ? `${claimedCount} total find${claimedCount === 1 ? '' : 's'} claimed. Draw ${themeLabel} targets for ${presetLabel}.${judgeNote ? ` ${judgeNote}` : ''}`
         : `Draw ${themeLabel} targets for ${presetLabel}.${judgeNote ? ` ${judgeNote}` : ''}`;
     } else {
-      huntStatus.textContent = `${presetLabel} • ${themeLabel}: ${activeCount} current target${activeCount === 1 ? '' : 's'} to watch for. ${remainingFinds} more find${remainingFinds === 1 ? '' : 's'} to reach the milestone.${judgeNote ? ` ${judgeNote}` : ''}`;
+      huntStatus.textContent = `${presetLabel} • ${themeLabel}: keep these ${activeCount} target${activeCount === 1 ? '' : 's'} in mind. ${remainingFinds} more find${remainingFinds === 1 ? '' : 's'} to reach the milestone.${judgeNote ? ` ${judgeNote}` : ''}`;
     }
   }
 
@@ -2104,6 +2365,237 @@
     ]);
   }
 
+  function stopHideSeekTimer() {
+    if (hideSeekTimerInterval) {
+      clearInterval(hideSeekTimerInterval);
+      hideSeekTimerInterval = null;
+    }
+  }
+
+  function getHideSeekRoster() {
+    return players.length ? players : [{ id: 'p1', name: 'P1' }];
+  }
+
+  function getHideSeekPlayerName(index) {
+    const roster = getHideSeekRoster();
+    const player = roster[index % roster.length];
+    return player ? player.name : 'P1';
+  }
+
+  function buildHideSeekIcon(type) {
+    const svgs = {
+      flashlight: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#f7fbff"/><rect x="14" y="40" width="22" height="8" rx="4" fill="#09233f"/><rect x="31" y="26" width="12" height="18" rx="4" fill="#f58220"/><path d="M41 35 L58 28 L58 36 L41 43 Z" fill="#2ec7d3"/></svg>',
+      couch: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#f7fbff"/><rect x="10" y="30" width="44" height="14" rx="5" fill="#7b4ee6"/><rect x="13" y="25" width="12" height="8" rx="3" fill="#09233f"/><rect x="39" y="25" width="12" height="8" rx="3" fill="#09233f"/><rect x="13" y="44" width="6" height="8" rx="2" fill="#09233f"/><rect x="45" y="44" width="6" height="8" rx="2" fill="#09233f"/></svg>',
+      box: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#f7fbff"/><path d="M14 22h36v26H14z" fill="#f58220"/><path d="M14 22l18 10 18-10" fill="none" stroke="#09233f" stroke-width="4" stroke-linejoin="round"/><path d="M32 32v16" fill="none" stroke="#09233f" stroke-width="3"/></svg>',
+      tree: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#f7fbff"/><rect x="28" y="36" width="8" height="16" rx="3" fill="#6b3f2a"/><circle cx="32" cy="26" r="14" fill="#2ec7d3"/><circle cx="23" cy="30" r="9" fill="#1f9fa9"/><circle cx="41" cy="30" r="9" fill="#1f9fa9"/></svg>',
+      carseat: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#f7fbff"/><rect x="18" y="18" width="26" height="10" rx="4" fill="#09233f"/><rect x="20" y="27" width="20" height="17" rx="4" fill="#f58220"/><rect x="15" y="40" width="34" height="6" rx="3" fill="#09233f"/><rect x="22" y="44" width="5" height="8" rx="2" fill="#09233f"/><rect x="36" y="44" width="5" height="8" rx="2" fill="#09233f"/></svg>',
+      curtain: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#f7fbff"/><rect x="12" y="14" width="40" height="8" rx="4" fill="#09233f"/><path d="M16 22h12v28H16c4-6 4-20 0-28z" fill="#7b4ee6"/><path d="M52 22H40v28h12c-4-6-4-20 0-28z" fill="#f58220"/><path d="M28 22h8v28h-8z" fill="#2ec7d3"/></svg>',
+    };
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svgs[type] || svgs.flashlight)}`;
+  }
+
+  const hideSeekAssetSets = {
+    'pass-and-play': [
+      { type: 'flashlight', label: 'Flashlight' },
+      { type: 'couch', label: 'Couch' },
+      { type: 'box', label: 'Box' },
+      { type: 'curtain', label: 'Curtain' },
+      { type: 'tree', label: 'Tree' },
+      { type: 'carseat', label: 'Car Seat' },
+    ],
+    'round-robin': [
+      { type: 'flashlight', label: 'Turn Marker' },
+      { type: 'couch', label: 'Hide Spot' },
+      { type: 'box', label: 'Sneaky Box' },
+      { type: 'tree', label: 'Tree' },
+      { type: 'curtain', label: 'Curtain' },
+      { type: 'carseat', label: 'Car Seat' },
+    ],
+    'alaska-train': [
+      { type: 'flashlight', label: 'Cab Light' },
+      { type: 'carseat', label: 'Train Seat' },
+      { type: 'box', label: 'Luggage' },
+      { type: 'curtain', label: 'Window Shade' },
+      { type: 'tree', label: 'Snowy Tree' },
+      { type: 'box', label: 'Supply Crate' },
+    ],
+    roadside: [
+      { type: 'flashlight', label: 'Road Light' },
+      { type: 'carseat', label: 'Back Seat' },
+      { type: 'tree', label: 'Roadside Tree' },
+      { type: 'box', label: 'Cooler' },
+      { type: 'curtain', label: 'Sun Shade' },
+      { type: 'couch', label: 'Rest Stop Bench' },
+    ],
+  };
+
+  function getHideSeekScoreMap() {
+    return getHideSeekRoster().reduce((scores, player) => {
+      scores[player.id] = hideSeekState.hideScore[player.id] || 0;
+      return scores;
+    }, {});
+  }
+
+  function renderHideSeekScoreboard() {
+    renderScoreboard(hideSeekScoreboard, getHideSeekScoreMap());
+  }
+
+  function renderHideSeekAssets() {
+    if (!hideSeekAssets) return;
+    const assetSet = hideSeekAssetSets[hideSeekState.mode] || hideSeekAssetSets['pass-and-play'];
+    hideSeekAssets.innerHTML = '';
+    assetSet.forEach((asset, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'hide-seek-asset';
+      button.disabled = true;
+      if (index === (hideSeekRound % assetSet.length)) button.classList.add('active');
+
+      const image = document.createElement('img');
+      image.src = buildHideSeekIcon(asset.type);
+      image.alt = '';
+      image.setAttribute('aria-hidden', 'true');
+
+      const label = document.createElement('span');
+      label.textContent = asset.label;
+
+      button.appendChild(image);
+      button.appendChild(label);
+      hideSeekAssets.appendChild(button);
+    });
+  }
+
+  function updateHideSeekStatus(text) {
+    hideSeekStatus.textContent = text;
+  }
+
+  function renderHideSeek() {
+    renderHideSeekScoreboard();
+    hideSeekMode.value = hideSeekState.mode;
+    hideSeekCountdown.value = String(hideSeekState.countdown);
+    hideSeekWinner.value = hideSeekState.winnerGoal;
+    hideSeekBadge.textContent = hideSeekState.hiding ? 'Hiding' : hideSeekState.seeking ? 'Seeking' : 'Setup';
+    hideSeekPhase.textContent = hideSeekState.hiding ? 'Hide' : hideSeekState.seeking ? 'Seek' : 'Ready';
+    renderHideSeekAssets();
+    hideSeekStartButton.hidden = hideSeekState.hiding || hideSeekState.seeking;
+    hideSeekFoundButton.hidden = !hideSeekState.seeking;
+    hideSeekNextButton.hidden = !hideSeekState.found;
+    hideSeekCountdownText.hidden = !hideSeekState.hiding && !hideSeekState.seeking;
+    if (hideSeekState.hiding || hideSeekState.seeking) {
+      hideSeekCountdownText.textContent = `${hideSeekState.countdownRemaining}s`;
+    }
+    const hiderName = getHideSeekPlayerName(hideSeekState.hiderIndex);
+    const seekerName = getHideSeekPlayerName(hideSeekState.seekerIndex);
+    if (!hideSeekState.hiding && !hideSeekState.seeking) {
+      hideSeekRoundTitle.textContent = `Round ${hideSeekRound + 1}: choose the hidden player.`;
+      hideSeekRoundText.textContent = `Hider: ${hiderName}. Seeker: ${seekerName}. Pick the timer, then tap Start Hide Round.`;
+      updateHideSeekStatus(`Round ${hideSeekRound + 1} is ready. ${hiderName} hides, ${seekerName} seeks.`);
+      return;
+    }
+    if (hideSeekState.hiding) {
+      hideSeekRoundTitle.textContent = `${hiderName} is hiding now.`;
+      hideSeekRoundText.textContent = `Everyone else looks away. ${seekerName} waits for the countdown to finish.`;
+      updateHideSeekStatus(`Hand the phone to ${hiderName}. No peeking.`);
+      return;
+    }
+    hideSeekRoundTitle.textContent = `${seekerName} is on the hunt.`;
+    hideSeekRoundText.textContent = `Tap Found It when the seeker finds the hiding player. ${hideSeekState.winnerGoal === 'slowest-found' ? 'Last find wins this round.' : hideSeekState.winnerGoal === 'best-hide' ? 'Rate the hide after the round.' : 'First find wins this round.'}`;
+    updateHideSeekStatus(`${seekerName} is searching. Tap Found It when the round ends.`);
+  }
+
+  function hideSeekAdvancePlayers() {
+    const roster = getHideSeekRoster();
+    const nextHider = (hideSeekState.hiderIndex + 1) % roster.length;
+    hideSeekState.hiderIndex = nextHider;
+    hideSeekState.seekerIndex = (nextHider + 1) % roster.length;
+  }
+
+  function startHideSeekRound() {
+    stopHideSeekTimer();
+    hideSeekState = Object.assign({}, hideSeekState, {
+      mode: hideSeekMode.value,
+      countdown: Number(hideSeekCountdown.value) || 30,
+      winnerGoal: hideSeekWinner.value,
+      hiding: true,
+      seeking: false,
+      found: false,
+      countdownRemaining: Number(hideSeekCountdown.value) || 30,
+    });
+    renderHideSeek();
+    hideSeekTimerInterval = window.setInterval(() => {
+      hideSeekState.countdownRemaining -= 1;
+      if (hideSeekState.countdownRemaining <= 0) {
+        stopHideSeekTimer();
+        hideSeekState.hiding = false;
+        hideSeekState.seeking = true;
+        hideSeekState.countdownRemaining = 0;
+        hideSeekFoundButton.hidden = false;
+        hideSeekStartButton.hidden = true;
+        hideSeekPhase.textContent = 'Seek';
+        updateHideSeekStatus(`${getHideSeekPlayerName(hideSeekState.seekerIndex)} can start looking now.`);
+        renderHideSeek();
+        return;
+      }
+      renderHideSeek();
+    }, 1000);
+    updateHideSeekStatus(`${getHideSeekPlayerName(hideSeekState.hiderIndex)} is hiding. No peeking.`);
+  }
+
+  function markHideSeekFound() {
+    if (!hideSeekState.seeking) return;
+    stopHideSeekTimer();
+    const winnerId = hideSeekState.winnerGoal === 'slowest-found' || hideSeekState.winnerGoal === 'best-hide'
+      ? getHideSeekRoster()[hideSeekState.hiderIndex].id
+      : getHideSeekRoster()[hideSeekState.seekerIndex].id;
+    hideSeekState.hideScore[winnerId] = (hideSeekState.hideScore[winnerId] || 0) + 1;
+    hideSeekState.found = true;
+    hideSeekState.seeking = false;
+    hideSeekRound += 1;
+    renderHideSeek();
+    updateHideSeekStatus(`${getPlayerName(winnerId)} gets the round. Tap Next Round to switch roles.`);
+  }
+
+  function nextHideSeekRound() {
+    hideSeekAdvancePlayers();
+    hideSeekState.found = false;
+    hideSeekState.hiding = false;
+    hideSeekState.seeking = false;
+    hideSeekState.countdownRemaining = hideSeekState.countdown;
+    renderHideSeek();
+  }
+
+  function resetHideSeek() {
+    stopHideSeekTimer();
+    hideSeekRound = 0;
+    hideSeekState = {
+      mode: hideSeekMode.value || 'pass-and-play',
+      countdown: Number(hideSeekCountdown.value) || 30,
+      winnerGoal: hideSeekWinner.value || 'first-found',
+      hiderIndex: 0,
+      seekerIndex: 1,
+      hiding: false,
+      seeking: false,
+      found: false,
+      countdownRemaining: 0,
+      hideScore: {},
+    };
+    renderHideSeek();
+  }
+
+  function showHideSeekSummary() {
+    stopHideSeekTimer();
+    showSection('summary');
+    const scores = getHideSeekScoreMap();
+    const leaders = getWinningPlayers(scores);
+    const winner = formatWinner(leaders, leader => `${leader.name} wins Hide & Seek`, 'Hide & Seek ends in a tie');
+    const scoreText = getHideSeekRoster().map(player => `${player.name}: ${scores[player.id] || 0}`).join(', ');
+    summaryText.textContent = `${winner}. ${scoreText}.`;
+    summaryList.innerHTML = '';
+    const li = document.createElement('li');
+    li.textContent = `Mode: ${hideSeekState.mode}. Goal: ${hideSeekState.winnerGoal}.`;
+    summaryList.appendChild(li);
+  }
+
   function getDeviceFeedbackInfo() {
     return [
       '',
@@ -2120,8 +2612,9 @@
     const baseCandidates = categoryId === 'mixed'
       ? triviaDatabase
       : triviaDatabase.filter(item => item.category === categoryId);
-    const settingsCandidates = baseCandidates.filter(triviaItemAllowedBySettings);
-    const candidatePool = settingsCandidates.length ? settingsCandidates : baseCandidates;
+    const qualityCandidates = baseCandidates.filter(item => !hiddenTriviaCategories.has(item.category));
+    const settingsCandidates = qualityCandidates.filter(triviaItemAllowedBySettings);
+    const candidatePool = settingsCandidates.length ? settingsCandidates : qualityCandidates;
     if (!candidatePool.length) return [];
 
     const filteredCandidates = candidatePool.filter(item => item.difficulty === activeTriviaDifficulty);
@@ -2196,6 +2689,7 @@
 
   function renderTriviaChoices(item) {
     triviaChoices.innerHTML = '';
+    const turnPlayerId = getTurnPlayerId(triviaIndex);
     getTriviaChoices(item).forEach(choice => {
       const button = document.createElement('button');
       button.type = 'button';
@@ -2209,6 +2703,11 @@
           if (choiceButton.textContent === item.answer) choiceButton.classList.add('correct');
         });
         triviaAnswer.hidden = false;
+        if (isCorrect && turnPlayerId) {
+          awardTrivia(turnPlayerId);
+        } else {
+          renderAwardButtons(triviaAwardButtons, 'Gets Override Point', awardTrivia, false);
+        }
       });
       triviaChoices.appendChild(button);
     });
@@ -2217,7 +2716,8 @@
   function renderTriviaCategories() {
     triviaCategoryGrid.innerHTML = '';
     const visibleCategories = triviaCategories.filter(category => (
-      !tripSettings.noPopCulture || !isPopCultureTriviaCategory(category.id)
+      !hiddenTriviaCategories.has(category.id)
+      && (!tripSettings.noPopCulture || !isPopCultureTriviaCategory(category.id))
     ));
     visibleCategories.forEach(category => {
       const button = document.createElement('button');
@@ -2263,7 +2763,7 @@
     renderScoreboard(triviaScoreboard, triviaScore);
     triviaPlay.hidden = true;
     finishTriviaButton.hidden = true;
-    triviaIntro.textContent = `Pick a lane, take turns answering, and tap the player that gets it right. This run has up to ${getTriviaQuestionLimit()} questions.`;
+    triviaIntro.textContent = `Pick a lane. Each question names the player whose turn it is. A correct choice gives that player 1 point. This run has up to ${getTriviaQuestionLimit()} questions.`;
     renderTriviaCategories();
     renderTriviaDifficultyButtons();
     showSection('trivia');
@@ -2278,7 +2778,7 @@
     triviaScore = createScoreMap();
     triviaQuestionAwarded = false;
     renderScoreboard(triviaScoreboard, triviaScore);
-    renderAwardButtons(triviaAwardButtons, 'Got It', awardTrivia);
+    renderAwardButtons(triviaAwardButtons, 'Gets Override Point', awardTrivia, true);
     triviaPlay.hidden = false;
     finishTriviaButton.hidden = false;
     showTriviaQuestion();
@@ -2300,13 +2800,13 @@
     const difficultyLabel = activeTriviaDifficulty.charAt(0).toUpperCase() + activeTriviaDifficulty.slice(1);
     triviaCategoryLabel.textContent = category ? `${category.label} · ${difficultyLabel}` : `Trivia · ${difficultyLabel}`;
     const judgeNote = getCarJudgeNote();
-    triviaHandoff.textContent = `Hand the phone to ${getTurnPlayerName(triviaIndex)}.${judgeNote ? ` ${judgeNote}` : ''}`;
+    triviaHandoff.textContent = `${getTurnPlayerName(triviaIndex)} answers this one.${judgeNote ? ` ${judgeNote}` : ''}`;
     triviaQuestion.textContent = item.question;
     triviaAnswer.textContent = item.answer;
     triviaAnswer.hidden = true;
     renderTriviaChoices(item);
     triviaQuestionAwarded = false;
-    renderAwardButtons(triviaAwardButtons, 'Got It', awardTrivia);
+    renderAwardButtons(triviaAwardButtons, 'Gets Override Point', awardTrivia, true);
   }
 
   function awardTrivia(playerId) {
@@ -2599,33 +3099,76 @@
     summaryList.appendChild(li);
   }
 
+  function normalizePongSettings(settings) {
+    const merged = Object.assign({}, defaultPongSettings, settings || {});
+    merged.opponentMode = merged.opponentMode === 'local' ? 'local' : 'computer';
+    merged.difficulty = ['easy', 'normal', 'hard', 'deathmatch'].includes(merged.difficulty) ? merged.difficulty : 'normal';
+    return merged;
+  }
+
+  function getPongDifficultyConfig() {
+    const configs = {
+      easy: { targetScore: 5, paddleHeight: 100, humanSpeed: 7, aiSpeed: 3.6, aiError: 34, reaction: 0.14, ballSpeed: 4.0, aiPerfect: false },
+      normal: { targetScore: 7, paddleHeight: 92, humanSpeed: 7, aiSpeed: 5.6, aiError: 16, reaction: 0.08, ballSpeed: 4.5, aiPerfect: false },
+      hard: { targetScore: 7, paddleHeight: 84, humanSpeed: 7, aiSpeed: 7.6, aiError: 5, reaction: 0.03, ballSpeed: 5.0, aiPerfect: false },
+      deathmatch: { targetScore: 7, paddleHeight: 112, humanSpeed: 7, aiSpeed: 14, aiError: 0, reaction: 0, ballSpeed: 5.4, aiPerfect: true },
+    };
+    return configs[pongSettings.difficulty] || configs.normal;
+  }
+
+  function renderPongSettings() {
+    pongSettings = normalizePongSettings(pongSettings);
+    setStoredJson('rtaPongSettings', pongSettings);
+    if (pongOpponentButtons) {
+      Array.from(pongOpponentButtons.querySelectorAll('button[data-pong-opponent]')).forEach(button => {
+        const active = button.dataset.pongOpponent === pongSettings.opponentMode;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', String(active));
+      });
+    }
+    if (pongDifficultyButtons) {
+      Array.from(pongDifficultyButtons.querySelectorAll('button[data-pong-difficulty]')).forEach(button => {
+        const active = button.dataset.pongDifficulty === pongSettings.difficulty;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', String(active));
+      });
+    }
+    if (pongStatus && !pongRunning) {
+      pongStatus.textContent = pongSettings.opponentMode === 'computer'
+        ? `Choose your setup, then start the round. You will control the left paddle against ${pongSettings.difficulty} AI.`
+        : 'Choose your setup, then start the round. Player 1 controls the left paddle and Player 2 controls the right paddle.';
+    }
+  }
+
   function createPongState() {
+    const config = getPongDifficultyConfig();
     const width = pongCanvas.width;
     const height = pongCanvas.height;
     return {
       width,
       height,
       paddleWidth: 14,
-      paddleHeight: 86,
-      leftY: height / 2 - 43,
-      rightY: height / 2 - 43,
+      paddleHeight: config.paddleHeight,
+      leftY: height / 2 - config.paddleHeight / 2,
+      rightY: height / 2 - config.paddleHeight / 2,
       ballX: width / 2,
       ballY: height / 2,
-      ballVX: 4.5 * (Math.random() > 0.5 ? 1 : -1),
-      ballVY: 2.5 * (Math.random() > 0.5 ? 1 : -1),
+      ballVX: config.ballSpeed * (Math.random() > 0.5 ? 1 : -1),
+      ballVY: (config.ballSpeed * 0.55) * (Math.random() > 0.5 ? 1 : -1),
       ballSize: 12,
       leftScore: 0,
       rightScore: 0,
-      targetScore: 7,
+      targetScore: config.targetScore,
     };
   }
 
   function resetPongBall(direction = Math.random() > 0.5 ? 1 : -1) {
     if (!pongState) return;
+    const config = getPongDifficultyConfig();
     pongState.ballX = pongState.width / 2;
     pongState.ballY = pongState.height / 2;
-    pongState.ballVX = 4.5 * direction;
-    pongState.ballVY = (Math.random() * 4) - 2;
+    pongState.ballVX = config.ballSpeed * direction;
+    pongState.ballVY = (config.ballSpeed * 0.55) * (Math.random() > 0.5 ? 1 : -1);
   }
 
   function drawPong() {
@@ -2651,9 +3194,14 @@
   function updatePongScore() {
     if (!pongState) return;
     const leftName = players[0] ? players[0].name : 'P1';
-    const rightName = players[1] ? players[1].name : 'P2';
+    const rightName = pongSettings.opponentMode === 'computer'
+      ? (pongSettings.difficulty === 'deathmatch' ? 'Death Match AI' : 'Computer')
+      : (players[1] ? players[1].name : 'P2');
+    const modeLabel = pongSettings.opponentMode === 'computer'
+      ? `${pongSettings.difficulty} AI`
+      : 'local match';
     pongScore.textContent = `${pongState.leftScore} : ${pongState.rightScore}`;
-    pongStatus.textContent = `${leftName} controls the left half, ${rightName} controls the right half. Drag on the board. First to ${pongState.targetScore} wins.`;
+    pongStatus.textContent = `${leftName} controls the left paddle, ${rightName} controls the right paddle. ${modeLabel}. First to ${pongState.targetScore} wins.`;
   }
 
   function movePongPaddleTo(side, clientY) {
@@ -2680,6 +3228,7 @@
     if (!pongCanvas) return;
     event.preventDefault();
     const side = pongPointerSides[event.pointerId] || getPongPointerSide(event.clientX);
+    if (pongSettings.opponentMode === 'computer' && side === 'right') return;
     pongPointerSides[event.pointerId] = side;
     movePongPaddleTo(side, event.clientY);
   }
@@ -2707,20 +3256,47 @@
   }
 
   function movePongPaddles() {
-    const speed = 7;
+    const config = getPongDifficultyConfig();
+    const speed = config.humanSpeed;
     const maxY = pongState.height - pongState.paddleHeight;
     if (pongKeys.leftUp) pongState.leftY -= speed;
     if (pongKeys.leftDown) pongState.leftY += speed;
-    if (pongKeys.rightUp) pongState.rightY -= speed;
-    if (pongKeys.rightDown) pongState.rightY += speed;
-
-    if (!pongKeys.rightUp && !pongKeys.rightDown && players.length < 2) {
-      const target = pongState.ballY - pongState.paddleHeight / 2;
-      pongState.rightY += Math.sign(target - pongState.rightY) * Math.min(4, Math.abs(target - pongState.rightY));
+    if (pongSettings.opponentMode === 'local') {
+      if (pongKeys.rightUp) pongState.rightY -= speed;
+      if (pongKeys.rightDown) pongState.rightY += speed;
+    } else {
+      const targetY = predictPongInterceptY() - pongState.paddleHeight / 2;
+      const delta = targetY - pongState.rightY;
+      if (config.aiPerfect) {
+        pongState.rightY = targetY;
+      } else if (Math.abs(delta) > config.aiError) {
+        pongState.rightY += Math.sign(delta) * Math.min(config.aiSpeed, Math.abs(delta));
+      } else {
+        pongState.rightY += Math.sign(delta) * Math.min(2.5, Math.abs(delta));
+      }
     }
 
     pongState.leftY = Math.max(0, Math.min(maxY, pongState.leftY));
     pongState.rightY = Math.max(0, Math.min(maxY, pongState.rightY));
+  }
+
+  function predictPongInterceptY() {
+    if (!pongState) return 0;
+    if (pongState.ballVX <= 0) return pongState.height / 2;
+    const boundsMin = pongState.ballSize / 2;
+    const boundsMax = pongState.height - pongState.ballSize / 2;
+    const targetX = pongState.width - 36 - pongState.ballSize / 2;
+    const timeToTarget = (targetX - pongState.ballX) / pongState.ballVX;
+    if (!Number.isFinite(timeToTarget) || timeToTarget < 0) return pongState.ballY;
+    let predicted = pongState.ballY + pongState.ballVY * timeToTarget;
+    while (predicted < boundsMin || predicted > boundsMax) {
+      if (predicted < boundsMin) {
+        predicted = boundsMin + (boundsMin - predicted);
+      } else if (predicted > boundsMax) {
+        predicted = boundsMax - (predicted - boundsMax);
+      }
+    }
+    return predicted;
   }
 
   function tickPong() {
@@ -2774,7 +3350,9 @@
     if (!pongState) pongState = createPongState();
     if (pongRunning) return;
     pongRunning = true;
-    pongStatus.textContent = 'Pong is live. Drag on either half of the board, or use W/S and ↑/↓.';
+    pongStatus.textContent = pongSettings.opponentMode === 'computer'
+      ? `Pong is live. You control the left paddle. ${pongSettings.difficulty === 'deathmatch' ? 'Death Match AI is locked in.' : 'Computer on ' + pongSettings.difficulty + ' mode.'}`
+      : 'Pong is live. Player 1 controls the left paddle and Player 2 controls the right paddle.';
     tickPong();
   }
 
@@ -2786,8 +3364,259 @@
     }
   }
 
+  function stopGorillas() {
+    gorillasRunning = false;
+    if (gorillasAnimationFrame) {
+      window.cancelAnimationFrame(gorillasAnimationFrame);
+      gorillasAnimationFrame = null;
+    }
+  }
+
+  function createGorillasState() {
+    const width = gorillasCanvas.width;
+    const height = gorillasCanvas.height;
+    const buildings = [];
+    const count = 7;
+    const buildingWidth = width / count;
+    for (let i = 0; i < count; i++) {
+      const buildingBase = height * (0.22 + Math.random() * 0.28);
+      buildings.push({
+        x: i * buildingWidth,
+        width: buildingWidth - 8,
+        height: buildingBase,
+        roofY: height - buildingBase - 36,
+      });
+    }
+    return {
+      width,
+      height,
+      buildings,
+      scoreLeft: 0,
+      scoreRight: 0,
+      projectile: null,
+      winner: null,
+      gravity: 860,
+    };
+  }
+
+  function normalizeGorillasInputs() {
+    const angle = Math.max(10, Math.min(80, Number(gorillasAngle.value) || 45));
+    const power = Math.max(20, Math.min(100, Number(gorillasPower.value) || 70));
+    gorillasAngle.value = String(angle);
+    gorillasPower.value = String(power);
+    return { angle, power };
+  }
+
+  function renderGorillasScore() {
+    if (!gorillasState) return;
+    gorillasScore.textContent = `${gorillasState.scoreLeft} : ${gorillasState.scoreRight}`;
+  }
+
+  function getGorillasPlayerName(turnIndex) {
+    const sideIndex = getGorillasSide(turnIndex) === 'left' ? 0 : 1;
+    const player = players[sideIndex];
+    return player ? player.name : `P${sideIndex + 1}`;
+  }
+
+  function getGorillasSide(turnIndex) {
+    return turnIndex % 2 === 0 ? 'left' : 'right';
+  }
+
+  function renderGorillasControls() {
+    if (!gorillasFireButton) return;
+    gorillasFireButton.disabled = !gorillasState || Boolean(gorillasState.projectile) || Boolean(gorillasState.winner);
+  }
+
+  function drawGorillas() {
+    if (!gorillasCanvas || !gorillasState) return;
+    const ctx = gorillasCanvas.getContext('2d');
+    ctx.clearRect(0, 0, gorillasState.width, gorillasState.height);
+    ctx.fillStyle = '#0c1f38';
+    ctx.fillRect(0, 0, gorillasState.width, gorillasState.height);
+    ctx.fillStyle = '#7ed6ff';
+    ctx.fillRect(0, 0, gorillasState.width, 90);
+    ctx.fillStyle = '#e8c27d';
+    ctx.fillRect(0, gorillasState.height - 36, gorillasState.width, 36);
+    gorillasState.buildings.forEach((building, index) => {
+      const x = building.x + 4;
+      const y = building.roofY;
+      ctx.fillStyle = index % 2 === 0 ? '#203b60' : '#2a4c76';
+      ctx.fillRect(x, y, building.width, building.height);
+      ctx.fillStyle = '#f7fbff';
+      for (let row = 0; row < Math.max(2, Math.floor(building.height / 44)); row++) {
+        for (let col = 0; col < 2; col++) {
+          const wx = x + 10 + col * 18;
+          const wy = y + 14 + row * 22;
+          if (wx + 8 < x + building.width - 8 && wy + 12 < gorillasState.height - 40) {
+            ctx.fillRect(wx, wy, 10, 14);
+          }
+        }
+      }
+    });
+    const leftGorilla = gorillasState.buildings[0];
+    const rightGorilla = gorillasState.buildings[gorillasState.buildings.length - 1];
+    ctx.fillStyle = '#061524';
+    ctx.beginPath();
+    ctx.arc(leftGorilla.x + leftGorilla.width * 0.62, leftGorilla.roofY - 12, 16, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(rightGorilla.x + rightGorilla.width * 0.38, rightGorilla.roofY - 12, 16, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    ctx.fillRect(gorillasState.width / 2 - 2, 0, 4, gorillasState.height - 36);
+    if (gorillasState.projectile) {
+      ctx.fillStyle = '#f58220';
+      ctx.beginPath();
+      ctx.arc(gorillasState.projectile.x, gorillasState.projectile.y, 6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function startGorillasGame() {
+    stopGorillas();
+    gorillasState = createGorillasState();
+    gorillasTurn = 0;
+    gorillasLastFrameTs = 0;
+    renderGorillasScore();
+    renderGorillasControls();
+    showSection('gorillas');
+    gorillasStatus.textContent = `${getGorillasPlayerName(gorillasTurn)} goes first. Set angle and power, then throw.`;
+    drawGorillas();
+  }
+
+  function advanceGorillasTurn(scored) {
+    if (!gorillasState) return;
+    gorillasRunning = false;
+    gorillasLastFrameTs = 0;
+    if (gorillasAnimationFrame) {
+      window.cancelAnimationFrame(gorillasAnimationFrame);
+      gorillasAnimationFrame = null;
+    }
+    const shooterName = getGorillasPlayerName(gorillasTurn);
+    if (scored) {
+      const scorer = getGorillasSide(gorillasTurn) === 'left' ? 'scoreLeft' : 'scoreRight';
+      gorillasState[scorer] += 1;
+      renderGorillasScore();
+      if (gorillasState[scorer] >= 5) {
+        gorillasState.winner = scorer;
+        gorillasStatus.textContent = `${shooterName} wins Banana Towers!`;
+        stopGorillas();
+        renderGorillasControls();
+        drawGorillas();
+        return;
+      }
+      gorillasStatus.textContent = `${shooterName} scored!`;
+    } else {
+      gorillasStatus.textContent = `${shooterName} missed.`;
+    }
+    gorillasTurn += 1;
+    gorillasState.projectile = null;
+    renderGorillasControls();
+    drawGorillas();
+  }
+
+  function fireGorillasShot() {
+    if (!gorillasState || gorillasState.projectile || gorillasState.winner) return;
+    const { angle, power } = normalizeGorillasInputs();
+    const side = getGorillasSide(gorillasTurn);
+    const shooterBuilding = side === 'left' ? gorillasState.buildings[0] : gorillasState.buildings[gorillasState.buildings.length - 1];
+    const direction = side === 'left' ? 1 : -1;
+    const radians = angle * Math.PI / 180;
+    const speed = power * 10.2;
+    gorillasState.projectile = {
+      x: side === 'left' ? shooterBuilding.x + shooterBuilding.width + 6 : shooterBuilding.x - 6,
+      y: shooterBuilding.roofY - 12,
+      vx: Math.cos(radians) * speed * direction,
+      vy: -Math.sin(radians) * speed,
+    };
+    gorillasStatus.textContent = `${getGorillasPlayerName(gorillasTurn)} launches the banana!`;
+    gorillasRunning = true;
+    gorillasLastFrameTs = 0;
+    renderGorillasControls();
+    gorillasAnimationFrame = window.requestAnimationFrame(tickGorillas);
+  }
+
+  function tickGorillas(timestamp = performance.now()) {
+    if (!gorillasRunning || !gorillasState || !gorillasState.projectile) return;
+    const dt = gorillasLastFrameTs ? Math.min(0.032, (timestamp - gorillasLastFrameTs) / 1000) : 0.016;
+    gorillasLastFrameTs = timestamp;
+    const projectile = gorillasState.projectile;
+    projectile.vy += gorillasState.gravity * dt;
+    projectile.x += projectile.vx * dt;
+    projectile.y += projectile.vy * dt;
+
+    const groundY = gorillasState.height - 36;
+    const target = getGorillasSide(gorillasTurn) === 'left'
+      ? gorillasState.buildings[gorillasState.buildings.length - 1]
+      : gorillasState.buildings[0];
+    const targetRect = {
+      x: target.x + 4,
+      y: target.roofY,
+      width: target.width,
+      height: target.height,
+    };
+    const hitTarget = projectile.x >= targetRect.x
+      && projectile.x <= targetRect.x + targetRect.width
+      && projectile.y >= targetRect.y - 10
+      && projectile.y <= targetRect.y + targetRect.height;
+    const hitAnyBuilding = gorillasState.buildings.some(building => {
+      const rect = {
+        x: building.x + 4,
+        y: building.roofY,
+        width: building.width,
+        height: building.height,
+      };
+      return projectile.x >= rect.x
+        && projectile.x <= rect.x + rect.width
+        && projectile.y >= rect.y
+        && projectile.y <= rect.y + rect.height;
+    });
+    const hitGround = projectile.y >= groundY;
+    const outOfBounds = projectile.x < 0 || projectile.x > gorillasState.width;
+
+    drawGorillas();
+
+    if (hitTarget) {
+      advanceGorillasTurn(true);
+      return;
+    }
+    if (hitAnyBuilding || hitGround || outOfBounds) {
+      advanceGorillasTurn(false);
+      return;
+    }
+
+    gorillasAnimationFrame = window.requestAnimationFrame(tickGorillas);
+  }
+
+  function resetGorillasGame() {
+    stopGorillas();
+    gorillasState = createGorillasState();
+    gorillasTurn = 0;
+    gorillasLastFrameTs = 0;
+    renderGorillasScore();
+    renderGorillasControls();
+    gorillasStatus.textContent = 'Set your angle and power, then throw the banana.';
+    drawGorillas();
+  }
+
+  function showGorillasSummary() {
+    stopGorillas();
+    showSection('summary');
+    const leader = gorillasState.scoreLeft === gorillasState.scoreRight
+      ? null
+      : (gorillasState.scoreLeft > gorillasState.scoreRight ? players[0] : players[1]);
+    summaryText.textContent = leader
+      ? `${leader.name} wins Banana Towers, ${gorillasState.scoreLeft} to ${gorillasState.scoreRight}.`
+      : `Banana Towers ends in a tie, ${gorillasState.scoreLeft} to ${gorillasState.scoreRight}.`;
+    summaryList.innerHTML = '';
+    const li = document.createElement('li');
+    li.textContent = 'Each turn: pick angle, pick power, throw banana, then swap turns.';
+    summaryList.appendChild(li);
+  }
+
   function resetPongGame() {
     stopPong();
+    renderPongSettings();
     pongState = createPongState();
     pongKeys = {};
     pongPointerSides = {};
@@ -2798,6 +3627,7 @@
   function startPongGame() {
     resetGame();
     resetPongGame();
+    renderPongSettings();
     showSection('pong');
   }
 
@@ -2806,7 +3636,9 @@
     showSection('summary');
     if (!pongState) pongState = createPongState();
     const leftName = players[0] ? players[0].name : 'P1';
-    const rightName = players[1] ? players[1].name : 'P2';
+    const rightName = pongSettings.opponentMode === 'computer'
+      ? (pongSettings.difficulty === 'deathmatch' ? 'Death Match AI' : 'Computer')
+      : (players[1] ? players[1].name : 'P2');
     const leaders = pongState.leftScore === pongState.rightScore
       ? []
       : [pongState.leftScore > pongState.rightScore ? leftName : rightName];
@@ -2815,7 +3647,7 @@
       : `Road Pong ends in a tie, ${pongState.leftScore} to ${pongState.rightScore}.`;
     summaryList.innerHTML = '';
     const li = document.createElement('li');
-    li.textContent = 'Prize idea: winner chooses the next mini-game or gets one song veto.';
+    li.textContent = `Mode: ${pongSettings.opponentMode === 'computer' ? `${pongSettings.difficulty} AI` : 'local player'}. Prize idea: winner chooses the next mini-game or gets one song veto.`;
     summaryList.appendChild(li);
   }
 
@@ -2858,6 +3690,8 @@
       startSecretMode();
     } else if (mode === 'pong') {
       startPongGame();
+    } else if (mode === 'gorillas') {
+      startGorillasGame();
     } else if (mode === 'scavenger') {
       startScavengerHunt();
     }
@@ -2949,8 +3783,63 @@
     renderSecretUnlock();
   }
 
+  function renderModeRules(category) {
+    const rules = modeRuleCards[category];
+    if (!rules) {
+      launchSelectedMode();
+      return;
+    }
+    modeRulesType.textContent = rules.type;
+    modeRulesType.classList.toggle('scored', rules.scored);
+    modeRulesHeading.textContent = rules.title;
+    modeRulesSummary.textContent = rules.summary;
+    modeRulesList.innerHTML = '';
+    rules.rules.forEach(rule => {
+      const li = document.createElement('li');
+      li.textContent = rule;
+      modeRulesList.appendChild(li);
+    });
+    modeRulesStartButton.textContent = category === 'learn'
+      ? 'Choose Topic'
+      : category === 'local'
+        ? 'Choose Region'
+        : `Start ${rules.title}`;
+    showSection('rules');
+  }
+
+  function launchSelectedMode() {
+    if (selectedCategory === 'local') {
+      showSection('region');
+    } else if (selectedCategory === 'scavenger') {
+      startScavengerHunt();
+    } else if (selectedCategory === 'learn') {
+      renderLearnTopics();
+      showSection('learnTopics');
+    } else if (selectedCategory === 'trivia') {
+      startTriviaRun();
+    } else if (selectedCategory === 'jokes') {
+      startJokeVote();
+    } else if (selectedCategory === 'emoji') {
+      startEmojiGame();
+    } else if (selectedCategory === 'calculator') {
+      startTripCalculator();
+    } else if (selectedCategory === 'pi') {
+      startPiChallenge();
+    } else if (selectedCategory === 'pong') {
+      startPongGame();
+    } else if (selectedCategory === 'gorillas') {
+      startGorillasGame();
+    } else if (selectedCategory === 'hideSeek') {
+      resetHideSeek();
+      showSection('hideSeek');
+    } else {
+      regionCode = '*';
+      startAdventure();
+    }
+  }
+
   function startQuickStart() {
-    const quickModes = ['random', 'scavenger', 'trivia', 'jokes', 'pi', 'pong', 'learn', 'look', 'laugh', 'compete'];
+    const quickModes = ['random', 'scavenger', 'trivia', 'jokes', 'learn', 'look', 'laugh', 'compete', 'hideSeek', 'gorillas'];
     const mode = quickModes[Math.floor(Math.random() * quickModes.length)];
     selectedCategory = mode;
     if (mode === 'scavenger') {
@@ -2964,6 +3853,11 @@
       startPiChallenge();
     } else if (mode === 'pong') {
       startPongGame();
+    } else if (mode === 'gorillas') {
+      startGorillasGame();
+    } else if (mode === 'hideSeek') {
+      resetHideSeek();
+      showSection('hideSeek');
     } else if (mode === 'learn') {
       selectedLearnTopic = 'all';
       setStoredJson('rtaLastLearnTopic', selectedLearnTopic);
@@ -2981,6 +3875,7 @@
     currentIndex = 0;
     clearInterval(timerInterval);
     timerInterval = null;
+    stopHideSeekTimer();
     timerRemaining = 0;
     hideTimerControls();
     nextButton.hidden = true;
@@ -3025,6 +3920,10 @@
   closeTripSettingsButton.addEventListener('click', () => {
     showSection('category');
   });
+  modeRulesStartButton.addEventListener('click', launchSelectedMode);
+  modeRulesBackButton.addEventListener('click', () => {
+    showSection('category');
+  });
   addPlayerButton.addEventListener('click', () => {
     savePlayers();
     if (players.length >= 8) return;
@@ -3049,30 +3948,8 @@
       selectedCategory = target.getAttribute('data-category');
       if (selectedCategory === 'quickstart') {
         startQuickStart();
-      } else if (selectedCategory === 'local') {
-        showSection('region');
-      } else if (selectedCategory === 'scavenger') {
-        startScavengerHunt();
-      } else if (selectedCategory === 'learn') {
-        renderLearnTopics();
-        showSection('learnTopics');
-      } else if (selectedCategory === 'trivia') {
-        startTriviaRun();
-      } else if (selectedCategory === 'jokes') {
-        startJokeVote();
-      } else if (selectedCategory === 'emoji') {
-        startEmojiGame();
-      } else if (selectedCategory === 'calculator') {
-        startTripCalculator();
-      } else if (selectedCategory === 'pi') {
-        startPiChallenge();
-      } else if (selectedCategory === 'pong') {
-        startPongGame();
-      } else if (selectedCategory === 'secret') {
-        startSecretMode();
       } else {
-        regionCode = '*';
-        startAdventure();
+        renderModeRules(selectedCategory);
       }
     } else if (section.id === 'setup-region') {
       regionCode = target.getAttribute('data-region');
@@ -3090,11 +3967,6 @@
   nextButton.addEventListener('click', () => {
     stopTimer();
     hideTimerControls();
-    // Update score for last question
-    const last = adventureQuestions[currentIndex];
-    if (last) {
-      score[last.category]++;
-    }
     currentIndex++;
     showChallenge();
   });
@@ -3135,6 +4007,15 @@
       startPongGame();
       return;
     }
+    if (selectedCategory === 'gorillas') {
+      startGorillasGame();
+      return;
+    }
+    if (selectedCategory === 'hideSeek') {
+      resetHideSeek();
+      showSection('hideSeek');
+      return;
+    }
     if (selectedCategory === 'secret') {
       startSecretMode(activeSecretMode);
       return;
@@ -3164,6 +4045,7 @@
   huntEtaButton.addEventListener('click', startEtaGuess);
   showTriviaAnswerButton.addEventListener('click', () => {
     triviaAnswer.hidden = false;
+    renderAwardButtons(triviaAwardButtons, 'Gets Override Point', awardTrivia, triviaQuestionAwarded);
   });
   triviaDifficultyButtons.addEventListener('click', event => {
     const button = event.target.closest('button[data-difficulty]');
@@ -3193,6 +4075,24 @@
   captureEmojiButton.addEventListener('click', captureEmojiFace);
   nextEmojiButton.addEventListener('click', nextEmojiPrompt);
   finishEmojiButton.addEventListener('click', showEmojiSummary);
+  hideSeekStartButton.addEventListener('click', startHideSeekRound);
+  hideSeekFoundButton.addEventListener('click', markHideSeekFound);
+  hideSeekNextButton.addEventListener('click', nextHideSeekRound);
+  hideSeekResetButton.addEventListener('click', resetHideSeek);
+  hideSeekFinishButton.addEventListener('click', showHideSeekSummary);
+  hideSeekMode.addEventListener('change', () => {
+    hideSeekState.mode = hideSeekMode.value;
+    renderHideSeek();
+  });
+  hideSeekCountdown.addEventListener('change', () => {
+    hideSeekState.countdown = Number(hideSeekCountdown.value) || 30;
+    hideSeekState.countdownRemaining = hideSeekState.countdown;
+    renderHideSeek();
+  });
+  hideSeekWinner.addEventListener('change', () => {
+    hideSeekState.winnerGoal = hideSeekWinner.value;
+    renderHideSeek();
+  });
   calculateTripButton.addEventListener('click', calculateTripTime);
   calculatorSwapButton.addEventListener('click', swapCalculatorSpeeds);
   [calcMiles, calcSpeedA, calcSpeedB].forEach(input => {
@@ -3200,6 +4100,24 @@
   });
   savePiScoresButton.addEventListener('click', savePiScores);
   finishPiButton.addEventListener('click', showPiSummary);
+  if (pongOpponentButtons) {
+    pongOpponentButtons.addEventListener('click', event => {
+      const button = event.target.closest('button[data-pong-opponent]');
+      if (!button) return;
+      pongSettings.opponentMode = button.dataset.pongOpponent;
+      renderPongSettings();
+      if (pongState) resetPongGame();
+    });
+  }
+  if (pongDifficultyButtons) {
+    pongDifficultyButtons.addEventListener('click', event => {
+      const button = event.target.closest('button[data-pong-difficulty]');
+      if (!button) return;
+      pongSettings.difficulty = button.dataset.pongDifficulty;
+      renderPongSettings();
+      if (pongState) resetPongGame();
+    });
+  }
   pongStartButton.addEventListener('click', startPongRound);
   pongFullscreenButton.addEventListener('click', togglePongFullscreen);
   pongResetButton.addEventListener('click', resetPongGame);
@@ -3217,14 +4135,18 @@
     if (currentSectionKey !== 'pong') return;
     if (event.key === 'w' || event.key === 'W') pongKeys.leftUp = true;
     if (event.key === 's' || event.key === 'S') pongKeys.leftDown = true;
-    if (event.key === 'ArrowUp') pongKeys.rightUp = true;
-    if (event.key === 'ArrowDown') pongKeys.rightDown = true;
+    if (pongSettings.opponentMode === 'local') {
+      if (event.key === 'ArrowUp') pongKeys.rightUp = true;
+      if (event.key === 'ArrowDown') pongKeys.rightDown = true;
+    }
   });
   document.addEventListener('keyup', event => {
     if (event.key === 'w' || event.key === 'W') pongKeys.leftUp = false;
     if (event.key === 's' || event.key === 'S') pongKeys.leftDown = false;
-    if (event.key === 'ArrowUp') pongKeys.rightUp = false;
-    if (event.key === 'ArrowDown') pongKeys.rightDown = false;
+    if (pongSettings.opponentMode === 'local') {
+      if (event.key === 'ArrowUp') pongKeys.rightUp = false;
+      if (event.key === 'ArrowDown') pongKeys.rightDown = false;
+    }
   });
   document.addEventListener('fullscreenchange', updatePongFullscreenButton);
   if (appLogo) appLogo.addEventListener('click', handleLogoClick);
@@ -3237,6 +4159,14 @@
     const adminButton = event.target.closest('button[data-admin-launch]');
     if (!adminButton) return;
     launchAdminMode(adminButton.dataset.adminLaunch);
+  });
+  gorillasFireButton.addEventListener('click', fireGorillasShot);
+  gorillasResetButton.addEventListener('click', resetGorillasGame);
+  gorillasFinishButton.addEventListener('click', showGorillasSummary);
+  [gorillasAngle, gorillasPower].forEach(input => {
+    input.addEventListener('input', () => {
+      normalizeGorillasInputs();
+    });
   });
   secretSubmitButton.addEventListener('click', submitSecretAnswer);
   secretSkipButton.addEventListener('click', skipSecretQuestion);
@@ -3325,12 +4255,14 @@
   window.addEventListener('beforeunload', () => {
     stopEmojiCamera();
     stopPong();
+    stopGorillas();
   });
   window.addEventListener('load', () => {
     initPreferences();
     initSavedUserData();
     tripSettings = normalizeTripSettings(tripSettings);
     populateTripSettingsForm();
+    renderPongSettings();
     applyTripSettings();
     renderPlayerFields();
     passengerConfirmButton.addEventListener('click', confirmPassengerStatus);

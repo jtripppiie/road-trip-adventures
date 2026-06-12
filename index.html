@@ -109,8 +109,8 @@
 
     <!-- Section to choose adventure type -->
     <section id="setup-category" class="setup-section" aria-labelledby="setup-category-heading" hidden>
-      <h2 id="setup-category-heading">Choose your adventure type</h2>
-      <p>Pick what kind of activities you’d like to enjoy.</p>
+      <h2 id="setup-category-heading">What should the car play?</h2>
+      <p>Scored games crown a winner. Explore modes are just prompts to get everyone looking, laughing, and talking.</p>
       <button id="open-trip-settings" class="secondary-button settings-button">Trip Settings</button>
       <button class="quick-start-card" data-category="quickstart">
         <span class="option-emoji" aria-hidden="true">🚗</span>
@@ -123,15 +123,18 @@
           <div class="option-grid compact-option-grid" role="group" aria-label="Look Outside games">
             <button class="option-card" data-category="look">
               <span class="option-emoji" aria-hidden="true">👀</span>
-              <span class="option-title">Look Outside</span>
+              <span class="option-title">Window Quests</span>
+              <span class="mode-pill">Just for fun</span>
             </button>
             <button class="option-card" data-category="local">
               <span class="option-emoji" aria-hidden="true">🌎</span>
               <span class="option-title">Local Explorer</span>
+              <span class="mode-pill">Just for fun</span>
             </button>
             <button class="option-card" data-category="scavenger">
               <span class="option-emoji" aria-hidden="true">🔎</span>
               <span class="option-title">Scavenger Hunt</span>
+              <span class="mode-pill scored">Scored</span>
             </button>
           </div>
         </section>
@@ -142,18 +145,22 @@
             <button class="option-card" data-category="learn">
               <span class="option-emoji" aria-hidden="true">🧠</span>
               <span class="option-title">Learn Something</span>
+              <span class="mode-pill">Just for fun</span>
             </button>
             <button class="option-card" data-category="trivia">
               <span class="option-emoji" aria-hidden="true">🧩</span>
               <span class="option-title">Trivia Run</span>
+              <span class="mode-pill scored">Scored</span>
             </button>
             <button class="option-card" data-category="pi">
               <span class="option-emoji" aria-hidden="true">π</span>
               <span class="option-title">Pi Digits</span>
+              <span class="mode-pill scored">Scored</span>
             </button>
             <button class="option-card" data-category="calculator">
               <span class="option-emoji" aria-hidden="true">🧮</span>
               <span class="option-title">Trip Calculator</span>
+              <span class="mode-pill">Tool</span>
             </button>
           </div>
         </section>
@@ -163,19 +170,28 @@
           <div class="option-grid compact-option-grid" role="group" aria-label="Party games">
             <button class="option-card" data-category="laugh">
               <span class="option-emoji" aria-hidden="true">😂</span>
-              <span class="option-title">Laugh Together</span>
+              <span class="option-title">Car Laughs</span>
+              <span class="mode-pill">Just for fun</span>
             </button>
             <button class="option-card" data-category="compete">
               <span class="option-emoji" aria-hidden="true">🏆</span>
-              <span class="option-title">Competition</span>
+              <span class="option-title">Quick Challenges</span>
+              <span class="mode-pill">Just for fun</span>
             </button>
             <button class="option-card" data-category="jokes">
               <span class="option-emoji" aria-hidden="true">🎤</span>
               <span class="option-title">Joke Vote</span>
+              <span class="mode-pill scored">Scored</span>
             </button>
             <button class="option-card" data-category="emoji">
               <span class="option-emoji" aria-hidden="true">😜</span>
               <span class="option-title">Emoji Face‑Off</span>
+              <span class="mode-pill scored">Scored</span>
+            </button>
+            <button class="option-card" data-category="hideSeek">
+              <span class="option-emoji" aria-hidden="true">🫥</span>
+              <span class="option-title">Hide & Seek</span>
+              <span class="mode-pill">Party</span>
             </button>
           </div>
         </section>
@@ -185,14 +201,33 @@
           <div class="option-grid compact-option-grid" role="group" aria-label="Bonus games">
             <button class="option-card" data-category="random">
               <span class="option-emoji" aria-hidden="true">🎲</span>
-              <span class="option-title">Mystery Mix</span>
+              <span class="option-title">Surprise Me</span>
+              <span class="mode-pill">Mixed</span>
             </button>
             <button class="option-card" data-category="pong">
               <span class="option-emoji" aria-hidden="true">🏓</span>
               <span class="option-title">Road Pong</span>
+              <span class="mode-pill scored">Scored</span>
+            </button>
+            <button class="option-card" data-category="gorillas">
+              <span class="option-emoji" aria-hidden="true">🍌</span>
+              <span class="option-title">Banana Towers</span>
+              <span class="mode-pill scored">Scored</span>
             </button>
           </div>
         </section>
+      </div>
+    </section>
+
+    <!-- Mode rule card -->
+    <section id="mode-rules" class="setup-section" aria-labelledby="mode-rules-heading" hidden>
+      <span id="mode-rules-type" class="mode-rule-type">Scored Game</span>
+      <h2 id="mode-rules-heading">Game Rules</h2>
+      <p id="mode-rules-summary"></p>
+      <ul id="mode-rules-list" class="mode-rules-list"></ul>
+      <div class="adventure-actions">
+        <button id="mode-rules-start" class="primary-button">Start</button>
+        <button id="mode-rules-back" class="secondary-button">Back</button>
       </div>
     </section>
 
@@ -314,7 +349,7 @@
       <div class="hunt-header">
         <div>
           <h2 id="scavenger-heading">Road Trip Scavenger Hunt</h2>
-          <p>Read the current targets aloud, then look outside. Tap a player when someone spots one.</p>
+          <p>Keep only a few targets active. Read them aloud, look outside, then tap the player who spots one first.</p>
           <p class="hunt-prize">Winner chooses the car karaoke song everyone else has to sing.</p>
         </div>
         <div id="hunt-route" class="hunt-route" aria-label="Route">Any Route</div>
@@ -357,7 +392,7 @@
       <div class="mode-header">
         <div>
           <h2 id="trivia-heading">Trivia Run</h2>
-          <p id="trivia-intro">Pick a lane, take turns answering, and tap the player that gets it right.</p>
+          <p id="trivia-intro">Pick a lane. The phone names whose turn it is, and a correct answer gives that player 1 point.</p>
         </div>
         <div class="hunt-route" aria-label="Trivia route">Brain → Road</div>
       </div>
@@ -435,6 +470,65 @@
         <div id="emoji-award-buttons" class="player-award-grid"></div>
         <button id="next-emoji" class="secondary-button">Next Emoji</button>
         <button id="finish-emoji" class="primary-button">Finish Face‑Off</button>
+      </div>
+    </section>
+
+    <!-- Hide and seek screen: pass-and-play party game -->
+    <section id="hide-seek-game" hidden>
+      <div class="mode-header">
+        <div>
+          <h2 id="hide-seek-heading">Hide &amp; Seek</h2>
+          <p id="hide-seek-intro">A pass-and-play round for the car. One person hides, one person seeks, and the timer keeps it dramatic.</p>
+        </div>
+        <div class="hunt-route" aria-label="Hide and seek route">Pass &amp; Play</div>
+      </div>
+      <div id="hide-seek-scoreboard" class="team-scoreboard" aria-live="polite"></div>
+      <article class="trivia-card">
+        <span id="hide-seek-badge" class="challenge-badge">Setup</span>
+        <p id="hide-seek-status" class="hunt-status">Pick who is hiding, pick the countdown, then hand the phone over.</p>
+        <div class="hide-seek-setup">
+          <label class="team-name-field" for="hide-seek-mode">
+            <span>Round mode</span>
+            <select id="hide-seek-mode">
+              <option value="pass-and-play">Pass and Play</option>
+              <option value="round-robin">Round Robin</option>
+              <option value="alaska-train">Alaska Train</option>
+              <option value="roadside">Roadside Stop</option>
+            </select>
+          </label>
+          <label class="team-name-field" for="hide-seek-countdown">
+            <span>Hide time</span>
+            <select id="hide-seek-countdown">
+              <option value="10">10 seconds</option>
+              <option value="20">20 seconds</option>
+              <option value="30" selected>30 seconds</option>
+              <option value="45">45 seconds</option>
+              <option value="60">60 seconds</option>
+            </select>
+          </label>
+          <label class="team-name-field" for="hide-seek-winner">
+            <span>Winner goal</span>
+            <select id="hide-seek-winner">
+              <option value="first-found">First found wins</option>
+              <option value="slowest-found">Last found wins</option>
+              <option value="best-hide">Best hiding spot</option>
+            </select>
+          </label>
+        </div>
+      </article>
+      <div id="hide-seek-assets" class="hide-seek-assets" aria-label="Hide spot ideas"></div>
+      <article id="hide-seek-round-card" class="trivia-card" aria-live="polite">
+        <span id="hide-seek-phase" class="challenge-badge">Ready</span>
+        <h3 id="hide-seek-round-title">Choose who is hiding.</h3>
+        <p id="hide-seek-round-text">Everyone agrees on the round, then tap start.</p>
+        <p id="hide-seek-countdown-text" class="timer" hidden></p>
+      </article>
+      <div class="adventure-actions">
+        <button id="hide-seek-start" class="primary-button">Start Hide Round</button>
+        <button id="hide-seek-found" class="primary-button" hidden>Found It</button>
+        <button id="hide-seek-next" class="secondary-button" hidden>Next Round</button>
+        <button id="hide-seek-reset" class="secondary-button">Reset Game</button>
+        <button id="hide-seek-finish" class="secondary-button">Finish Hide &amp; Seek</button>
       </div>
     </section>
 
@@ -535,9 +629,27 @@
       <div class="mode-header">
         <div>
           <h2 id="pong-heading">Road Pong</h2>
-          <p>Quick passenger arcade break. First to 7 wins.</p>
+          <p>Quick passenger arcade break. Pick an opponent and a level, then start a round.</p>
         </div>
         <div id="pong-score" class="emoji-target" aria-label="Pong score">0 : 0</div>
+      </div>
+      <div class="pong-setup" aria-label="Pong settings">
+        <label class="pong-choice">
+          <span>Opponent</span>
+          <div id="pong-opponent-buttons" class="segmented-control pong-segmented" role="group" aria-label="Pong opponent">
+            <button type="button" data-pong-opponent="computer">Computer</button>
+            <button type="button" data-pong-opponent="local">Local player</button>
+          </div>
+        </label>
+        <label class="pong-choice">
+          <span>Level</span>
+          <div id="pong-difficulty-buttons" class="segmented-control pong-segmented pong-levels" role="group" aria-label="Pong difficulty">
+            <button type="button" data-pong-difficulty="easy">Easy</button>
+            <button type="button" data-pong-difficulty="normal">Normal</button>
+            <button type="button" data-pong-difficulty="hard">Hard</button>
+            <button type="button" data-pong-difficulty="deathmatch">Death Match</button>
+          </div>
+        </label>
       </div>
       <canvas id="pong-canvas" class="pong-canvas" width="720" height="420" aria-label="Road Pong game board"></canvas>
       <p id="pong-status" class="hunt-status" aria-live="polite">Drag on the left or right half of the game board to move that paddle.</p>
@@ -546,6 +658,36 @@
         <button id="pong-fullscreen" class="secondary-button">Full Screen</button>
         <button id="pong-reset" class="secondary-button">Reset Pong</button>
         <button id="pong-finish" class="secondary-button">Finish Pong</button>
+      </div>
+    </section>
+
+    <!-- Banana towers mini game -->
+    <section id="gorillas-game" hidden>
+      <div class="mode-header">
+        <div>
+          <h2 id="gorillas-heading">Banana Towers</h2>
+          <p>Player one sets the shot, throws the banana, then the other player gets a turn.</p>
+        </div>
+        <div id="gorillas-score" class="emoji-target" aria-label="Banana Towers score">0 : 0</div>
+      </div>
+      <article class="trivia-card">
+        <div class="gorillas-setup">
+          <label class="team-name-field" for="gorillas-angle">
+            <span>Angle</span>
+            <input id="gorillas-angle" type="number" min="10" max="80" value="45" inputmode="numeric" />
+          </label>
+          <label class="team-name-field" for="gorillas-power">
+            <span>Power</span>
+            <input id="gorillas-power" type="number" min="20" max="100" value="70" inputmode="numeric" />
+          </label>
+        </div>
+      </article>
+      <canvas id="gorillas-canvas" class="pong-canvas" width="720" height="420" aria-label="Banana Towers game board"></canvas>
+      <p id="gorillas-status" class="hunt-status" aria-live="polite">Set your angle and power, then launch the banana.</p>
+      <div class="adventure-actions">
+        <button id="gorillas-fire" class="primary-button">Throw Banana</button>
+        <button id="gorillas-reset" class="secondary-button">Reset Game</button>
+        <button id="gorillas-finish" class="secondary-button">Finish Game</button>
       </div>
     </section>
 
@@ -565,6 +707,7 @@
         <div class="adventure-actions">
           <button class="secondary-button" data-admin-launch="secret">Secret Mode</button>
           <button class="secondary-button" data-admin-launch="pong">Road Pong</button>
+          <button class="secondary-button" data-admin-launch="gorillas">Banana Towers</button>
           <button class="secondary-button" data-admin-launch="scavenger">Scavenger Hunt</button>
         </div>
       </article>

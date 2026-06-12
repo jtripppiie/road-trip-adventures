@@ -568,6 +568,44 @@ body.large-text {
   font-weight: 700;
 }
 
+.mode-pill,
+.mode-rule-type {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  margin-top: 0.35rem;
+  padding: 0.22rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(9, 38, 66, 0.08);
+  color: var(--color-ink);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.mode-pill.scored,
+.mode-rule-type.scored {
+  background: rgba(245, 130, 32, 0.18);
+  color: var(--color-primary);
+}
+
+.mode-rules-list {
+  display: grid;
+  gap: 0.65rem;
+  max-width: 620px;
+  margin: 1rem auto;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.mode-rules-list li {
+  padding: 0.75rem 0.85rem;
+  border: 2px solid rgba(9, 38, 66, 0.12);
+  border-radius: 8px;
+  background: var(--color-card);
+}
+
 .team-scoreboard {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -751,6 +789,33 @@ body.large-text {
   color: var(--color-card);
 }
 
+.pong-setup {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.pong-choice {
+  display: grid;
+  gap: 0.4rem;
+  justify-items: center;
+  font-weight: 700;
+}
+
+.pong-segmented {
+  width: 100%;
+  max-width: 720px;
+}
+
+.pong-segmented.pong-levels {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.pong-segmented:not(.pong-levels) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .secret-option-card {
   border-style: dashed;
   background: linear-gradient(180deg, #ffffff, #f7fbff);
@@ -790,6 +855,50 @@ body.large-text {
   background: #fff2d8;
   color: #6b3b00;
   font-weight: 800;
+}
+
+.hide-seek-assets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 0.5rem;
+  width: min(100%, 680px);
+  margin: 1rem auto;
+}
+
+.hide-seek-asset {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  min-height: 7rem;
+  padding: 0.6rem 0.4rem;
+  border: 2px solid rgba(9, 35, 63, 0.18);
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffffff, #f4fbff);
+  color: var(--color-text);
+}
+
+.hide-seek-asset img {
+  width: 3.25rem;
+  height: 3.25rem;
+  image-rendering: pixelated;
+}
+
+.hide-seek-asset span {
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.hide-seek-asset.active {
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 2px rgba(245, 130, 32, 0.2);
+}
+
+.hide-seek-asset:disabled {
+  opacity: 1;
+  cursor: default;
 }
 
 .calculator-grid {
@@ -854,6 +963,10 @@ body.large-text {
 #pong-game:fullscreen .pong-canvas {
   width: min(100%, 1200px);
   max-height: 68vh;
+}
+
+#pong-game:fullscreen .pong-setup {
+  max-width: 1200px;
 }
 
 .logo-prank {
