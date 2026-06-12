@@ -217,6 +217,11 @@
     { id: 'learn-science-energy-conservation', learnTopic: 'science', text: 'Science fact: Energy cannot be created or destroyed, only transferred or transformed.' },
     { id: 'learn-science-acceleration', learnTopic: 'science', text: 'Science fact: Acceleration is the rate at which an object’s velocity changes.' },
     { id: 'learn-science-speed', learnTopic: 'science', text: 'Science fact: Speed describes how fast an object travels over a certain distance.' },
+    { id: 'learn-science-train-steel-rails', learnTopic: 'science', text: 'Science fact: Trains roll efficiently because steel wheels on steel rails create very low rolling resistance.' },
+    { id: 'learn-science-train-braking-distance', learnTopic: 'science', text: 'Science fact: Trains need long distances to stop because they are extremely heavy and carry lots of momentum.' },
+    { id: 'learn-science-snow-insulation', learnTopic: 'science', text: 'Science fact: Snow can act like insulation because it traps air between ice crystals.' },
+    { id: 'learn-science-aurora-particles', learnTopic: 'science', text: 'Science fact: Auroras happen when charged particles interact with gases high in Earth’s atmosphere.' },
+    { id: 'learn-science-glacier-blue', learnTopic: 'science', text: 'Science fact: Dense glacier ice can look blue because it absorbs more red light and scatters blue light.' },
 
     // Cars
     { id: 'learn-cars-combustion', learnTopic: 'cars', text: 'Car fact: In a gasoline engine, tiny controlled explosions push pistons that help turn the wheels.' },
@@ -355,6 +360,11 @@
     { id: 'learn-life-subscription-audit', learnTopic: 'lifelessons', text: 'Life lesson: Reviewing subscriptions every few months can reveal small charges that quietly add up.' },
     { id: 'learn-life-unit-price', learnTopic: 'lifelessons', text: 'Life lesson: Unit price helps compare different package sizes by showing cost per ounce, pound, item, or serving.' },
     { id: 'learn-life-contract-cancel-date', learnTopic: 'lifelessons', text: 'Life lesson: Before signing up for a trial or plan, look for the renewal date, cancellation steps, and fees.' },
+    { id: 'learn-life-trip-buffer-time', learnTopic: 'lifelessons', text: 'Life lesson: Adding buffer time to a trip can make delays feel less stressful and reduce rushed decisions.' },
+    { id: 'learn-life-shared-playlist', learnTopic: 'lifelessons', text: 'Life lesson: Shared playlists work better when everyone gets a few picks and nobody gets permanent DJ power.' },
+    { id: 'learn-life-snack-budget', learnTopic: 'lifelessons', text: 'Life lesson: A snack budget keeps little road-trip purchases from turning into a surprise expense.' },
+    { id: 'learn-life-paper-map-backup', learnTopic: 'lifelessons', text: 'Life lesson: Downloaded maps or a paper backup can help when service disappears.' },
+    { id: 'learn-life-check-weather', learnTopic: 'lifelessons', text: 'Life lesson: Checking weather before a trip helps with clothing, timing, road conditions, and safety.' },
 
     // Geography
     { id: 'learn-geography-russia', learnTopic: 'geography', text: 'Geography fact: Russia is the largest country in the world by land area, spanning 11 time zones.' },
@@ -407,6 +417,11 @@
     { id: 'learn-geography-istanbul', learnTopic: 'geography', text: 'Geography fact: Istanbul is one of the few major cities in the world located on two continents: Europe and Asia.' },
     { id: 'learn-geography-hawaii', learnTopic: 'geography', text: 'Geography fact: Hawaii is the only U.S. state made entirely of islands.' },
     { id: 'learn-geography-time-zones', learnTopic: 'geography', text: 'Geography fact: France has more time zones than any other country because of its overseas territories.' },
+    { id: 'learn-geography-alaska-rail-belt', learnTopic: 'geography', text: 'Geography fact: Alaska’s rail corridor passes through forests, rivers, mountains, and wide open valleys.' },
+    { id: 'learn-geography-alaska-denali-region', learnTopic: 'geography', text: 'Geography fact: Denali rises so high that it can create its own weather patterns near the mountain.' },
+    { id: 'learn-geography-glacier-valleys', learnTopic: 'geography', text: 'Geography fact: Glaciers can carve U-shaped valleys as they slowly move through mountains.' },
+    { id: 'learn-geography-boreal-forest', learnTopic: 'geography', text: 'Geography fact: Much of interior Alaska is part of the boreal forest, also called taiga.' },
+    { id: 'learn-geography-permafrost', learnTopic: 'geography', text: 'Geography fact: Permafrost is ground that stays frozen for at least two years in a row.' },
 
     // States
     { id: 'learn-states-alaska', learnTopic: 'states', text: 'State fact: Alaska is the largest U.S. state by land area.' },

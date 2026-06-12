@@ -514,6 +514,42 @@
       label: 'Conductor reference',
       hint: 'Conductor hat, ticket booth, rail worker sign, or train museum display.',
     },
+    {
+      id: 'alaska-train-whistle-sign',
+      emoji: '🔊',
+      label: 'Whistle sign',
+      hint: 'Railroad whistle marker, horn sign, quiet-zone sign, or crossing warning.',
+    },
+    {
+      id: 'alaska-train-milepost',
+      emoji: '📍',
+      label: 'Rail milepost',
+      hint: 'Small railroad mile marker, route marker, or distance post near tracks.',
+    },
+    {
+      id: 'alaska-train-switch',
+      emoji: '🔀',
+      label: 'Track switch',
+      hint: 'Where one rail line splits into two or a rail yard has branching tracks.',
+    },
+    {
+      id: 'alaska-train-rail-yard',
+      emoji: '🚂',
+      label: 'Rail yard',
+      hint: 'Multiple tracks, parked rail cars, maintenance equipment, or rail storage.',
+    },
+    {
+      id: 'alaska-train-tank-car',
+      emoji: '🛢️',
+      label: 'Tank rail car',
+      hint: 'Round tanker car on tracks, parked in a yard, or pictured on a sign.',
+    },
+    {
+      id: 'alaska-train-dome-car',
+      emoji: '🔭',
+      label: 'Dome train car',
+      hint: 'A passenger car with big viewing windows or a raised glass top.',
+    },
 
     {
       id: 'roundabout',
@@ -1481,6 +1517,42 @@
       label: 'Tunnel or snow shed',
       hint: 'Train tunnel, road tunnel, avalanche shed, or tunnel warning sign.',
     },
+    {
+      id: 'alaska-train-snow-stakes',
+      emoji: '❄️',
+      label: 'Snow stakes',
+      hint: 'Tall roadside markers used where snow can cover road edges.',
+    },
+    {
+      id: 'alaska-train-mountain-pass',
+      emoji: '⛰️',
+      label: 'Mountain pass',
+      hint: 'A sign naming a pass, summit, grade, or high point.',
+    },
+    {
+      id: 'alaska-train-creek-sign',
+      emoji: '💧',
+      label: 'Creek sign',
+      hint: 'Any named creek, stream, brook, or small water crossing.',
+    },
+    {
+      id: 'alaska-train-ice-on-water',
+      emoji: '🧊',
+      label: 'Ice on water',
+      hint: 'Frozen pond, icy river edge, snow on a lake, or ice warning sign.',
+    },
+    {
+      id: 'alaska-train-mountain-lodge',
+      emoji: '🏔️',
+      label: 'Mountain lodge',
+      hint: 'Lodge, chalet, cabin resort, wilderness inn, or mountain hotel sign.',
+    },
+    {
+      id: 'alaska-train-binoculars',
+      emoji: '🔭',
+      label: 'Wildlife viewing sign',
+      hint: 'Viewing area, binoculars icon, scenic pullout, or wildlife-watch sign.',
+    },
   ];
 
   // Landmarks, Art, And Oddities
@@ -1734,6 +1806,11 @@
     'Everyone guesses the color of the next truck before it appears. The first truck everyone can see decides the winner.',
     'First player to point out something that would make a good album cover wins after giving the album a title.',
     'First player to spot a word with double letters on a sign wins. Example: coffee, mall, speedway.',
+    'Alaska train sprint: first player to point out tracks, a bridge, or a mountain wins. If none appear in 3 minutes, switch to any rail-related sign.',
+    'Scenic conductor: first player to name three things outside that would look good from a train window wins.',
+    'Wildlife watch: first player to spot a real or pictured moose, bear, eagle, fish, or dog wins.',
+    'Rail reporter: first player to see something train-related must give a 10-second news report. The car votes if it counts.',
+    'Glacier guess: everyone points to the coldest-looking thing outside. The group votes for the winner.',
   ];
 
   // ETA Guess Challenges
@@ -1751,6 +1828,10 @@
     'Everyone predicts the next town or city name you will see on a sign. The first readable town or city sign decides.',
     'Guess how many full songs will play before the next stop. Count only songs that start after the guess is made.',
     'If a navigation ETA is visible to a passenger, predict whether the next update changes by 1 minute, 2 minutes, or 3+ minutes.',
+    'Alaska train edition: guess the minute when the next bridge, creek, or river sign appears. The first readable sign decides.',
+    'Alaska train edition: guess how many minutes until the next mountain, hill, or scenic-view sign appears.',
+    'Alaska train edition: predict whether the next animal reference is bird, mammal, fish, or something else.',
+    'Alaska train edition: predict whether the next rail-related thing is a crossing, track, train car, station, or sign.',
   ];
 
   // Alphabet Game Themes
@@ -1779,6 +1860,11 @@
       id: 'roadside',
       label: 'Roadside Finds',
       prompt: 'Spot or name something road-trip related that starts with',
+    },
+    {
+      id: 'alaska-train',
+      label: 'Alaska Train',
+      prompt: 'Name or spot an Alaska, train, mountain, snow, or wildlife thing that starts with',
     },
     {
       id: 'states',
@@ -1816,6 +1902,9 @@
     'First player to spot something that would confuse someone from 100 years ago wins after explaining why.',
     'When the next town name appears, each player describes it using only three words. The car votes for the best description.',
     'Everyone makes up a slogan for the next business you pass. After everyone shares, the car votes for the winner.',
+    'Alaska train scene: everyone invents a dramatic name for the current view. The car votes for the name that sounds most like a travel poster.',
+    'Everyone picks a train job: conductor, engineer, snack boss, wildlife scout, or map expert. Defend your job in one sentence.',
+    'The group creates a fake Alaska train announcement for the next thing outside. Most believable announcement wins.',
   ];
 
   // Mini Bets
@@ -1830,5 +1919,8 @@
     'Before the next unusual vehicle appears, predict whether the group will call it practical or ridiculous. Majority vote decides.',
     'Before the next town slogan is readable, predict whether it will sound serious, funny, or confusing. The car votes after reading it.',
     'Before the next mascot, logo, or statue appears, predict animal, person, object, or other. The first clear mascot-like thing decides.',
+    'Before the next water crossing, predict creek, river, lake, canal, or drainage ditch. The first clear crossing decides.',
+    'Before the next mountain or hill view, predict snowy, rocky, forested, bare, or hidden by clouds. The view decides.',
+    'Before the next train-related find, predict crossing, station, rail car, track, bridge, or sign.',
   ];
 })();
