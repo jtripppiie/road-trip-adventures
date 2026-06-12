@@ -838,17 +838,32 @@
   let alphabetIndex = 0;
   let hideSeekRound = 0;
   let hideSeekTimerInterval = null;
+  let hideSeekAnimationFrame = null;
+  let hideSeekLastFrame = 0;
+  let hideSeekAudioContext = null;
   let hideSeekState = {
-    mode: 'pass-and-play',
-    countdown: 30,
-    winnerGoal: 'first-found',
+    mode: 'roadside-lodge',
+    countdown: 60,
+    winnerGoal: '6',
     hiderIndex: 0,
     seekerIndex: 1,
-    hiding: false,
-    seeking: false,
-    found: false,
-    countdownRemaining: 0,
+    phase: 'TITLE',
+    hiddenSpotId: null,
+    hiddenSpotLabel: '',
+    activeRoomId: 'lobby',
+    timerRemaining: 60,
+    wrongGuesses: 0,
+    roundHiderScore: 0,
+    roundSeekerScore: 0,
+    lastRoundText: '',
+    message: '',
     hideScore: {},
+    actors: {
+      hider: { x: 120, y: 300, width: 24, height: 32, speed: 150, roomId: 'lobby', visible: true, color: '#2ec7d3' },
+      seeker: { x: 120, y: 300, width: 24, height: 32, speed: 150, roomId: 'lobby', visible: false, color: '#f58220' },
+    },
+    input: { up: false, down: false, left: false, right: false },
+    revealPulse: 0,
   };
   let huntDeck = [];
   let activeHuntIds = [];
@@ -932,6 +947,7 @@
     trivia: document.getElementById('trivia'),
     jokes: document.getElementById('jokes'),
     emoji: document.getElementById('emoji-game'),
+    hideSeek: document.getElementById('hide-seek-game'),
     calculator: document.getElementById('trip-calculator'),
     pi: document.getElementById('pi-game'),
     pong: document.getElementById('pong-game'),
@@ -1031,6 +1047,9 @@
   const hideSeekRoundText = document.getElementById('hide-seek-round-text');
   const hideSeekCountdownText = document.getElementById('hide-seek-countdown-text');
   const hideSeekAssets = document.getElementById('hide-seek-assets');
+  const hideSeekCanvas = document.getElementById('hide-seek-canvas');
+  const hideSeekCanvasContext = hideSeekCanvas ? hideSeekCanvas.getContext('2d') : null;
+  const hideSeekOverlay = document.getElementById('hide-seek-overlay');
   const hideSeekStartButton = document.getElementById('hide-seek-start');
   const hideSeekFoundButton = document.getElementById('hide-seek-found');
   const hideSeekNextButton = document.getElementById('hide-seek-next');
@@ -1240,14 +1259,14 @@
     },
     hideSeek: {
       title: 'Hide & Seek',
-      type: 'Party Game',
-      scored: false,
-      summary: 'A pass-and-play round where one player hides and the rest race the timer.',
+      type: 'Scored Party Game',
+      scored: true,
+      summary: 'A local room-search game where hiders choose secret spots and seekers inspect the map.',
       rules: [
-        'Choose a hide time, round style, and winner goal.',
-        'Hand the phone to the hider while the countdown runs.',
-        'Tap Found It when the seeker wins the round.',
-        'Use the reset button to start a fresh round without losing the flow.',
+        'Choose a map, search timer, and match length.',
+        'The hider moves first while the seeker looks away.',
+        'The seeker inspects hiding spots. Wrong guesses cost time.',
+        'Roles rotate each round and both hiding and seeking earn points.',
       ],
     },
     random: {
@@ -2373,73 +2392,318 @@
     ]);
   }
 
+  const HideSeekGameState = {
+    TITLE: 'TITLE',
+    ROUND_START: 'ROUND_START',
+    HIDER_TURN: 'HIDER_TURN',
+    SEEKER_LOOK_AWAY: 'SEEKER_LOOK_AWAY',
+    SEEKER_TURN: 'SEEKER_TURN',
+    FOUND: 'FOUND',
+    ROUND_RESULTS: 'ROUND_RESULTS',
+    GAME_OVER: 'GAME_OVER',
+  };
+
+  const hideSeekMaps = {
+    'roadside-lodge': {
+      id: 'roadside-lodge',
+      name: 'Roadside Lodge',
+      startRoom: 'lobby',
+      palette: { wall: '#28405c', floor: '#d8a85d', trim: '#09233f', accent: '#f58220' },
+      rooms: {
+        lobby: {
+          id: 'lobby',
+          name: 'Lobby',
+          exits: [
+            { label: 'Bedroom', targetRoom: 'bedroom', x: 748, y: 180, width: 28, height: 92, spawnX: 60, spawnY: 232 },
+            { label: 'Garage', targetRoom: 'garage', x: 365, y: 392, width: 110, height: 28, spawnX: 400, spawnY: 74 },
+            { label: 'Courtyard', targetRoom: 'courtyard', x: 24, y: 180, width: 28, height: 92, spawnX: 708, spawnY: 232 },
+          ],
+          spots: [
+            { id: 'lobby-front-desk', label: 'front desk', kind: 'desk', x: 300, y: 245, width: 185, height: 72, difficulty: 2 },
+            { id: 'lobby-curtains', label: 'sunset curtains', kind: 'curtain', x: 92, y: 90, width: 90, height: 190, difficulty: 3 },
+            { id: 'lobby-luggage-cart', label: 'luggage cart', kind: 'luggage', x: 570, y: 270, width: 110, height: 75, difficulty: 4 },
+          ],
+          obstacles: [{ id: 'lobby-rug', type: 'slow', x: 250, y: 328, width: 300, height: 52, speedMultiplier: 0.65 }],
+        },
+        bedroom: {
+          id: 'bedroom',
+          name: 'Guest Room',
+          exits: [{ label: 'Lobby', targetRoom: 'lobby', x: 24, y: 180, width: 28, height: 92, spawnX: 706, spawnY: 232 }],
+          spots: [
+            { id: 'bedroom-bed', label: 'under the bed', kind: 'bed', x: 270, y: 285, width: 220, height: 70, difficulty: 3 },
+            { id: 'bedroom-closet', label: 'closet', kind: 'closet', x: 610, y: 95, width: 100, height: 175, difficulty: 4 },
+            { id: 'bedroom-laundry', label: 'laundry pile', kind: 'box', x: 92, y: 288, width: 112, height: 76, difficulty: 2 },
+          ],
+          obstacles: [{ id: 'bedroom-table', type: 'block', x: 500, y: 305, width: 70, height: 50 }],
+        },
+        garage: {
+          id: 'garage',
+          name: 'Garage',
+          exits: [{ label: 'Lobby', targetRoom: 'lobby', x: 365, y: 24, width: 110, height: 28, spawnX: 400, spawnY: 350 }],
+          spots: [
+            { id: 'garage-toolbox', label: 'tool wall', kind: 'shelf', x: 92, y: 95, width: 145, height: 92, difficulty: 2 },
+            { id: 'garage-cardboard', label: 'cardboard stack', kind: 'box', x: 292, y: 265, width: 155, height: 95, difficulty: 3 },
+            { id: 'garage-van', label: 'behind the van', kind: 'car', x: 535, y: 200, width: 180, height: 105, difficulty: 5 },
+          ],
+          obstacles: [{ id: 'garage-oil', type: 'slow', x: 260, y: 355, width: 170, height: 34, speedMultiplier: 0.55 }],
+        },
+        courtyard: {
+          id: 'courtyard',
+          name: 'Courtyard',
+          exits: [{ label: 'Lobby', targetRoom: 'lobby', x: 748, y: 180, width: 28, height: 92, spawnX: 72, spawnY: 232 }],
+          spots: [
+            { id: 'courtyard-bushes', label: 'desert bushes', kind: 'bush', x: 120, y: 250, width: 160, height: 95, difficulty: 3 },
+            { id: 'courtyard-fountain', label: 'dry fountain', kind: 'fountain', x: 350, y: 185, width: 130, height: 100, difficulty: 4 },
+            { id: 'courtyard-tree', label: 'shade tree', kind: 'tree', x: 610, y: 130, width: 95, height: 200, difficulty: 5 },
+          ],
+          obstacles: [{ id: 'courtyard-planter', type: 'block', x: 315, y: 320, width: 185, height: 42 }],
+        },
+      },
+    },
+    'alaska-train': {
+      id: 'alaska-train',
+      name: 'Alaska Train',
+      startRoom: 'observation',
+      palette: { wall: '#21394f', floor: '#b8d8ea', trim: '#061524', accent: '#2ec7d3' },
+      rooms: {
+        observation: {
+          id: 'observation',
+          name: 'Observation Car',
+          exits: [{ label: 'Sleeper', targetRoom: 'sleeper', x: 748, y: 180, width: 28, height: 92, spawnX: 60, spawnY: 232 }],
+          spots: [
+            { id: 'observation-window-seat', label: 'window seat', kind: 'bench', x: 92, y: 265, width: 150, height: 70, difficulty: 2 },
+            { id: 'observation-coat-hooks', label: 'coat hooks', kind: 'curtain', x: 320, y: 90, width: 110, height: 170, difficulty: 3 },
+            { id: 'observation-snack-cart', label: 'snack cart', kind: 'luggage', x: 575, y: 275, width: 120, height: 74, difficulty: 4 },
+          ],
+          obstacles: [{ id: 'observation-aisle', type: 'slow', x: 250, y: 335, width: 320, height: 40, speedMultiplier: 0.75 }],
+        },
+        sleeper: {
+          id: 'sleeper',
+          name: 'Sleeper Car',
+          exits: [
+            { label: 'Observation', targetRoom: 'observation', x: 24, y: 180, width: 28, height: 92, spawnX: 706, spawnY: 232 },
+            { label: 'Baggage', targetRoom: 'baggage', x: 748, y: 180, width: 28, height: 92, spawnX: 60, spawnY: 232 },
+          ],
+          spots: [
+            { id: 'sleeper-bunk', label: 'upper bunk', kind: 'bed', x: 210, y: 110, width: 210, height: 68, difficulty: 4 },
+            { id: 'sleeper-curtain', label: 'privacy curtain', kind: 'curtain', x: 535, y: 90, width: 95, height: 190, difficulty: 3 },
+            { id: 'sleeper-duffel', label: 'duffel pile', kind: 'box', x: 85, y: 292, width: 130, height: 70, difficulty: 2 },
+          ],
+          obstacles: [],
+        },
+        baggage: {
+          id: 'baggage',
+          name: 'Baggage Car',
+          exits: [{ label: 'Sleeper', targetRoom: 'sleeper', x: 24, y: 180, width: 28, height: 92, spawnX: 706, spawnY: 232 }],
+          spots: [
+            { id: 'baggage-crates', label: 'supply crates', kind: 'box', x: 105, y: 250, width: 170, height: 95, difficulty: 3 },
+            { id: 'baggage-ski-bag', label: 'ski bags', kind: 'luggage', x: 365, y: 105, width: 150, height: 88, difficulty: 4 },
+            { id: 'baggage-door-shadow', label: 'door shadow', kind: 'closet', x: 600, y: 96, width: 98, height: 185, difficulty: 5 },
+          ],
+          obstacles: [{ id: 'baggage-stack', type: 'block', x: 305, y: 275, width: 105, height: 80 }],
+        },
+      },
+    },
+    campground: {
+      id: 'campground',
+      name: 'Campground',
+      startRoom: 'picnic',
+      palette: { wall: '#1d4939', floor: '#75b36a', trim: '#09233f', accent: '#f58220' },
+      rooms: {
+        picnic: {
+          id: 'picnic',
+          name: 'Picnic Loop',
+          exits: [
+            { label: 'Cabin', targetRoom: 'cabin', x: 748, y: 180, width: 28, height: 92, spawnX: 60, spawnY: 232 },
+            { label: 'Trail', targetRoom: 'trail', x: 365, y: 24, width: 110, height: 28, spawnX: 400, spawnY: 358 },
+          ],
+          spots: [
+            { id: 'picnic-table', label: 'picnic table', kind: 'bench', x: 280, y: 255, width: 180, height: 76, difficulty: 2 },
+            { id: 'picnic-cooler', label: 'cooler stack', kind: 'box', x: 88, y: 295, width: 112, height: 70, difficulty: 2 },
+            { id: 'picnic-tall-grass', label: 'tall grass', kind: 'bush', x: 565, y: 260, width: 150, height: 90, difficulty: 4 },
+          ],
+          obstacles: [],
+        },
+        cabin: {
+          id: 'cabin',
+          name: 'Cabin',
+          exits: [{ label: 'Picnic Loop', targetRoom: 'picnic', x: 24, y: 180, width: 28, height: 92, spawnX: 706, spawnY: 232 }],
+          spots: [
+            { id: 'cabin-blankets', label: 'blanket pile', kind: 'bed', x: 260, y: 288, width: 205, height: 68, difficulty: 3 },
+            { id: 'cabin-woodbox', label: 'wood box', kind: 'box', x: 572, y: 292, width: 130, height: 72, difficulty: 3 },
+            { id: 'cabin-pantry', label: 'pantry', kind: 'closet', x: 100, y: 92, width: 110, height: 188, difficulty: 5 },
+          ],
+          obstacles: [],
+        },
+        trail: {
+          id: 'trail',
+          name: 'Forest Trail',
+          exits: [{ label: 'Picnic Loop', targetRoom: 'picnic', x: 365, y: 392, width: 110, height: 28, spawnX: 400, spawnY: 78 }],
+          spots: [
+            { id: 'trail-log', label: 'fallen log', kind: 'tree', x: 135, y: 250, width: 160, height: 80, difficulty: 3 },
+            { id: 'trail-rocks', label: 'rock cluster', kind: 'fountain', x: 360, y: 250, width: 130, height: 95, difficulty: 4 },
+            { id: 'trail-pines', label: 'pine trees', kind: 'tree', x: 590, y: 110, width: 110, height: 220, difficulty: 5 },
+          ],
+          obstacles: [{ id: 'trail-mud', type: 'slow', x: 315, y: 335, width: 190, height: 34, speedMultiplier: 0.55 }],
+        },
+      },
+    },
+    'rest-stop': {
+      id: 'rest-stop',
+      name: 'Rest Stop',
+      startRoom: 'plaza',
+      palette: { wall: '#4b5563', floor: '#d7dce4', trim: '#09233f', accent: '#7b4ee6' },
+      rooms: {
+        plaza: {
+          id: 'plaza',
+          name: 'Main Plaza',
+          exits: [
+            { label: 'Arcade', targetRoom: 'arcade', x: 748, y: 180, width: 28, height: 92, spawnX: 60, spawnY: 232 },
+            { label: 'Picnic Area', targetRoom: 'picnic_area', x: 24, y: 180, width: 28, height: 92, spawnX: 706, spawnY: 232 },
+          ],
+          spots: [
+            { id: 'plaza-bench', label: 'bench', kind: 'bench', x: 285, y: 285, width: 180, height: 65, difficulty: 2 },
+            { id: 'plaza-vending', label: 'vending machines', kind: 'shelf', x: 580, y: 96, width: 125, height: 178, difficulty: 3 },
+            { id: 'plaza-map-kiosk', label: 'map kiosk', kind: 'desk', x: 100, y: 100, width: 125, height: 105, difficulty: 4 },
+          ],
+          obstacles: [],
+        },
+        arcade: {
+          id: 'arcade',
+          name: 'Tiny Arcade',
+          exits: [{ label: 'Main Plaza', targetRoom: 'plaza', x: 24, y: 180, width: 28, height: 92, spawnX: 706, spawnY: 232 }],
+          spots: [
+            { id: 'arcade-cabinet', label: 'game cabinet', kind: 'closet', x: 120, y: 95, width: 105, height: 190, difficulty: 4 },
+            { id: 'arcade-prize-bin', label: 'prize bin', kind: 'box', x: 320, y: 285, width: 160, height: 72, difficulty: 3 },
+            { id: 'arcade-photo-booth', label: 'photo booth', kind: 'curtain', x: 580, y: 92, width: 110, height: 190, difficulty: 5 },
+          ],
+          obstacles: [],
+        },
+        picnic_area: {
+          id: 'picnic_area',
+          name: 'Picnic Area',
+          exits: [{ label: 'Main Plaza', targetRoom: 'plaza', x: 748, y: 180, width: 28, height: 92, spawnX: 72, spawnY: 232 }],
+          spots: [
+            { id: 'picnic-trash-wall', label: 'recycling wall', kind: 'shelf', x: 95, y: 90, width: 145, height: 120, difficulty: 2 },
+            { id: 'picnic-shade-tree', label: 'shade tree', kind: 'tree', x: 345, y: 105, width: 105, height: 220, difficulty: 5 },
+            { id: 'picnic-sign', label: 'information sign', kind: 'desk', x: 570, y: 245, width: 130, height: 95, difficulty: 3 },
+          ],
+          obstacles: [{ id: 'picnic-puddle', type: 'slow', x: 290, y: 350, width: 230, height: 30, speedMultiplier: 0.65 }],
+        },
+      },
+    },
+  };
+
+  function getHideSeekMap() {
+    return hideSeekMaps[hideSeekState.mode] || hideSeekMaps['roadside-lodge'];
+  }
+
+  function getHideSeekRoom(roomId) {
+    const map = getHideSeekMap();
+    return map.rooms[roomId] || map.rooms[map.startRoom];
+  }
+
+  function getHideSeekRoster() {
+    if (players.length >= 2) return players.slice(0, 8);
+    if (players.length === 1) return [players[0], { id: 'p2', name: 'P2' }];
+    return [{ id: 'p1', name: 'P1' }, { id: 'p2', name: 'P2' }];
+  }
+
+  function getHideSeekPlayer(index) {
+    const roster = getHideSeekRoster();
+    return roster[index % roster.length] || roster[0];
+  }
+
+  function getHideSeekPlayerName(index) {
+    return getHideSeekPlayer(index).name || `P${index + 1}`;
+  }
+
+  function getHideSeekMaxRounds() {
+    return Number(hideSeekState.winnerGoal) || 6;
+  }
+
+  function getHideSeekActiveActor() {
+    if (hideSeekState.phase === HideSeekGameState.HIDER_TURN) return hideSeekState.actors.hider;
+    if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) return hideSeekState.actors.seeker;
+    return null;
+  }
+
+  function getHideSeekSpotById(spotId) {
+    const map = getHideSeekMap();
+    for (const room of Object.values(map.rooms)) {
+      const spot = room.spots.find(item => item.id === spotId);
+      if (spot) return Object.assign({ roomId: room.id }, spot);
+    }
+    return null;
+  }
+
+  function getNearbyHideSeekSpot(actor) {
+    if (!actor) return null;
+    const room = getHideSeekRoom(actor.roomId);
+    return room.spots.find(spot => {
+      const radius = spot.interactionRadius || 82;
+      const actorCenterX = actor.x + actor.width / 2;
+      const actorCenterY = actor.y + actor.height / 2;
+      const spotCenterX = spot.x + spot.width / 2;
+      const spotCenterY = spot.y + spot.height / 2;
+      return Math.hypot(actorCenterX - spotCenterX, actorCenterY - spotCenterY) <= radius;
+    }) || null;
+  }
+
+  function setHideSeekMessage(message) {
+    hideSeekState.message = message;
+    if (hideSeekStatus) hideSeekStatus.textContent = message;
+  }
+
+  function playHideSeekTone(type) {
+    try {
+      hideSeekAudioContext = hideSeekAudioContext || new (window.AudioContext || window.webkitAudioContext)();
+      const audio = hideSeekAudioContext;
+      const oscillator = audio.createOscillator();
+      const gain = audio.createGain();
+      const now = audio.currentTime;
+      const tones = {
+        hide: [440, 0.08],
+        wrong: [160, 0.12],
+        found: [660, 0.18],
+        door: [280, 0.07],
+      };
+      const [frequency, duration] = tones[type] || tones.door;
+      oscillator.frequency.setValueAtTime(frequency, now);
+      oscillator.type = type === 'wrong' ? 'sawtooth' : 'square';
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.07, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      oscillator.connect(gain);
+      gain.connect(audio.destination);
+      oscillator.start(now);
+      oscillator.stop(now + duration + 0.02);
+    } catch (error) {
+      // Audio is optional; browsers may block or omit Web Audio.
+    }
+  }
+
   function stopHideSeekTimer() {
     if (hideSeekTimerInterval) {
       clearInterval(hideSeekTimerInterval);
       hideSeekTimerInterval = null;
     }
+    if (hideSeekAnimationFrame) {
+      cancelAnimationFrame(hideSeekAnimationFrame);
+      hideSeekAnimationFrame = null;
+    }
+    hideSeekLastFrame = 0;
+    if (hideSeekState.input) {
+      hideSeekState.input.up = false;
+      hideSeekState.input.down = false;
+      hideSeekState.input.left = false;
+      hideSeekState.input.right = false;
+    }
   }
-
-  function getHideSeekRoster() {
-    return players.length ? players : [{ id: 'p1', name: 'P1' }];
-  }
-
-  function getHideSeekPlayerName(index) {
-    const roster = getHideSeekRoster();
-    const player = roster[index % roster.length];
-    return player ? player.name : 'P1';
-  }
-
-  function buildHideSeekIcon(type) {
-    const svgs = {
-      flashlight: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#f7fbff"/><rect x="14" y="40" width="22" height="8" rx="4" fill="#09233f"/><rect x="31" y="26" width="12" height="18" rx="4" fill="#f58220"/><path d="M41 35 L58 28 L58 36 L41 43 Z" fill="#2ec7d3"/></svg>',
-      couch: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#f7fbff"/><rect x="10" y="30" width="44" height="14" rx="5" fill="#7b4ee6"/><rect x="13" y="25" width="12" height="8" rx="3" fill="#09233f"/><rect x="39" y="25" width="12" height="8" rx="3" fill="#09233f"/><rect x="13" y="44" width="6" height="8" rx="2" fill="#09233f"/><rect x="45" y="44" width="6" height="8" rx="2" fill="#09233f"/></svg>',
-      box: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#f7fbff"/><path d="M14 22h36v26H14z" fill="#f58220"/><path d="M14 22l18 10 18-10" fill="none" stroke="#09233f" stroke-width="4" stroke-linejoin="round"/><path d="M32 32v16" fill="none" stroke="#09233f" stroke-width="3"/></svg>',
-      tree: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#f7fbff"/><rect x="28" y="36" width="8" height="16" rx="3" fill="#6b3f2a"/><circle cx="32" cy="26" r="14" fill="#2ec7d3"/><circle cx="23" cy="30" r="9" fill="#1f9fa9"/><circle cx="41" cy="30" r="9" fill="#1f9fa9"/></svg>',
-      carseat: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#f7fbff"/><rect x="18" y="18" width="26" height="10" rx="4" fill="#09233f"/><rect x="20" y="27" width="20" height="17" rx="4" fill="#f58220"/><rect x="15" y="40" width="34" height="6" rx="3" fill="#09233f"/><rect x="22" y="44" width="5" height="8" rx="2" fill="#09233f"/><rect x="36" y="44" width="5" height="8" rx="2" fill="#09233f"/></svg>',
-      curtain: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#f7fbff"/><rect x="12" y="14" width="40" height="8" rx="4" fill="#09233f"/><path d="M16 22h12v28H16c4-6 4-20 0-28z" fill="#7b4ee6"/><path d="M52 22H40v28h12c-4-6-4-20 0-28z" fill="#f58220"/><path d="M28 22h8v28h-8z" fill="#2ec7d3"/></svg>',
-    };
-    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svgs[type] || svgs.flashlight)}`;
-  }
-
-  const hideSeekAssetSets = {
-    'pass-and-play': [
-      { type: 'flashlight', label: 'Flashlight' },
-      { type: 'couch', label: 'Couch' },
-      { type: 'box', label: 'Box' },
-      { type: 'curtain', label: 'Curtain' },
-      { type: 'tree', label: 'Tree' },
-      { type: 'carseat', label: 'Car Seat' },
-    ],
-    'round-robin': [
-      { type: 'flashlight', label: 'Turn Marker' },
-      { type: 'couch', label: 'Hide Spot' },
-      { type: 'box', label: 'Sneaky Box' },
-      { type: 'tree', label: 'Tree' },
-      { type: 'curtain', label: 'Curtain' },
-      { type: 'carseat', label: 'Car Seat' },
-    ],
-    'alaska-train': [
-      { type: 'flashlight', label: 'Cab Light' },
-      { type: 'carseat', label: 'Train Seat' },
-      { type: 'box', label: 'Luggage' },
-      { type: 'curtain', label: 'Window Shade' },
-      { type: 'tree', label: 'Snowy Tree' },
-      { type: 'box', label: 'Supply Crate' },
-    ],
-    roadside: [
-      { type: 'flashlight', label: 'Road Light' },
-      { type: 'carseat', label: 'Back Seat' },
-      { type: 'tree', label: 'Roadside Tree' },
-      { type: 'box', label: 'Cooler' },
-      { type: 'curtain', label: 'Sun Shade' },
-      { type: 'couch', label: 'Rest Stop Bench' },
-    ],
-  };
 
   function getHideSeekScoreMap() {
     return getHideSeekRoster().reduce((scores, player) => {
-      scores[player.id] = hideSeekState.hideScore[player.id] || 0;
+      scores[player.id] = Math.max(0, Number(hideSeekState.hideScore[player.id]) || 0);
       return scores;
     }, {});
   }
@@ -2450,65 +2714,146 @@
 
   function renderHideSeekAssets() {
     if (!hideSeekAssets) return;
-    const assetSet = hideSeekAssetSets[hideSeekState.mode] || hideSeekAssetSets['pass-and-play'];
+    const map = getHideSeekMap();
     hideSeekAssets.innerHTML = '';
-    assetSet.forEach((asset, index) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'hide-seek-asset';
-      button.disabled = true;
-      if (index === (hideSeekRound % assetSet.length)) button.classList.add('active');
+    Object.values(map.rooms).forEach(room => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'hide-seek-asset';
+      card.disabled = true;
+      if (room.id === hideSeekState.activeRoomId) card.classList.add('active');
 
-      const image = document.createElement('img');
-      image.src = buildHideSeekIcon(asset.type);
-      image.alt = '';
-      image.setAttribute('aria-hidden', 'true');
+      const title = document.createElement('strong');
+      title.textContent = room.name;
+      const detail = document.createElement('span');
+      detail.textContent = `${room.spots.length} hiding spots`;
 
-      const label = document.createElement('span');
-      label.textContent = asset.label;
-
-      button.appendChild(image);
-      button.appendChild(label);
-      hideSeekAssets.appendChild(button);
+      card.appendChild(title);
+      card.appendChild(detail);
+      hideSeekAssets.appendChild(card);
     });
   }
 
-  function updateHideSeekStatus(text) {
-    hideSeekStatus.textContent = text;
+  function resetHideSeekActors() {
+    const map = getHideSeekMap();
+    const startRoom = map.startRoom;
+    hideSeekState.actors = {
+      hider: { x: 120, y: 305, width: 24, height: 32, speed: 150, roomId: startRoom, visible: true, color: '#2ec7d3' },
+      seeker: { x: 120, y: 305, width: 24, height: 32, speed: 150, roomId: startRoom, visible: false, color: '#f58220' },
+    };
+    hideSeekState.activeRoomId = startRoom;
+  }
+
+  function resetHideSeekRoundState(phase) {
+    resetHideSeekActors();
+    hideSeekState.phase = phase || HideSeekGameState.ROUND_START;
+    hideSeekState.hiddenSpotId = null;
+    hideSeekState.hiddenSpotLabel = '';
+    hideSeekState.timerRemaining = hideSeekState.countdown;
+    hideSeekState.wrongGuesses = 0;
+    hideSeekState.roundHiderScore = 0;
+    hideSeekState.roundSeekerScore = 0;
+    hideSeekState.revealPulse = 0;
   }
 
   function renderHideSeek() {
-    renderHideSeekScoreboard();
-    hideSeekMode.value = hideSeekState.mode;
-    hideSeekCountdown.value = String(hideSeekState.countdown);
-    hideSeekWinner.value = hideSeekState.winnerGoal;
-    hideSeekBadge.textContent = hideSeekState.hiding ? 'Hiding' : hideSeekState.seeking ? 'Seeking' : 'Setup';
-    hideSeekPhase.textContent = hideSeekState.hiding ? 'Hide' : hideSeekState.seeking ? 'Seek' : 'Ready';
-    renderHideSeekAssets();
-    hideSeekStartButton.hidden = hideSeekState.hiding || hideSeekState.seeking;
-    hideSeekFoundButton.hidden = !hideSeekState.seeking;
-    hideSeekNextButton.hidden = !hideSeekState.found;
-    hideSeekCountdownText.hidden = !hideSeekState.hiding && !hideSeekState.seeking;
-    if (hideSeekState.hiding || hideSeekState.seeking) {
-      hideSeekCountdownText.textContent = `${hideSeekState.countdownRemaining}s`;
-    }
     const hiderName = getHideSeekPlayerName(hideSeekState.hiderIndex);
     const seekerName = getHideSeekPlayerName(hideSeekState.seekerIndex);
-    if (!hideSeekState.hiding && !hideSeekState.seeking) {
-      hideSeekRoundTitle.textContent = `Round ${hideSeekRound + 1}: choose the hidden player.`;
-      hideSeekRoundText.textContent = `Hider: ${hiderName}. Seeker: ${seekerName}. Pick the timer, then tap Start Hide Round.`;
-      updateHideSeekStatus(`Round ${hideSeekRound + 1} is ready. ${hiderName} hides, ${seekerName} seeks.`);
-      return;
+    const maxRounds = getHideSeekMaxRounds();
+    const nearbySpot = getNearbyHideSeekSpot(getHideSeekActiveActor());
+    const room = getHideSeekRoom(hideSeekState.activeRoomId);
+    const phaseLabel = {
+      TITLE: 'Setup',
+      ROUND_START: 'Ready',
+      HIDER_TURN: 'Hide',
+      SEEKER_LOOK_AWAY: 'Pass',
+      SEEKER_TURN: 'Seek',
+      FOUND: 'Found',
+      ROUND_RESULTS: 'Results',
+      GAME_OVER: 'Game Over',
+    }[hideSeekState.phase] || 'Ready';
+
+    renderHideSeekScoreboard();
+    renderHideSeekAssets();
+    hideSeekMode.value = hideSeekState.mode;
+    hideSeekCountdown.value = String(hideSeekState.countdown);
+    hideSeekWinner.value = String(hideSeekState.winnerGoal);
+    hideSeekBadge.textContent = phaseLabel;
+    hideSeekPhase.textContent = phaseLabel;
+    hideSeekCountdownText.hidden = ![HideSeekGameState.HIDER_TURN, HideSeekGameState.SEEKER_TURN, HideSeekGameState.FOUND, HideSeekGameState.ROUND_RESULTS].includes(hideSeekState.phase);
+    hideSeekCountdownText.textContent = `Round ${Math.min(hideSeekRound + 1, maxRounds)} of ${maxRounds} · ${Math.ceil(hideSeekState.timerRemaining)}s · ${room.name}`;
+
+    hideSeekStartButton.hidden = ![HideSeekGameState.TITLE, HideSeekGameState.ROUND_START, HideSeekGameState.GAME_OVER].includes(hideSeekState.phase);
+    hideSeekFoundButton.hidden = ![HideSeekGameState.HIDER_TURN, HideSeekGameState.SEEKER_LOOK_AWAY, HideSeekGameState.SEEKER_TURN].includes(hideSeekState.phase);
+    hideSeekNextButton.hidden = ![HideSeekGameState.FOUND, HideSeekGameState.ROUND_RESULTS].includes(hideSeekState.phase);
+    hideSeekFoundButton.disabled = false;
+    hideSeekNextButton.textContent = hideSeekRound >= maxRounds ? 'See Winner' : 'Next Round';
+
+    if (hideSeekState.phase === HideSeekGameState.TITLE || hideSeekState.phase === HideSeekGameState.GAME_OVER) {
+      hideSeekStartButton.textContent = hideSeekState.phase === HideSeekGameState.GAME_OVER ? 'Play Again' : 'Start Match';
+    } else {
+      hideSeekStartButton.textContent = 'Start Hider Turn';
     }
-    if (hideSeekState.hiding) {
-      hideSeekRoundTitle.textContent = `${hiderName} is hiding now.`;
-      hideSeekRoundText.textContent = `Everyone else looks away. ${seekerName} waits for the countdown to finish.`;
-      updateHideSeekStatus(`Hand the phone to ${hiderName}. No peeking.`);
-      return;
+
+    if (hideSeekState.phase === HideSeekGameState.HIDER_TURN) {
+      hideSeekFoundButton.textContent = nearbySpot ? `Hide in ${nearbySpot.label}` : 'Move to a hiding spot';
+      hideSeekFoundButton.disabled = !nearbySpot;
+      hideSeekRoundTitle.textContent = `${hiderName}, hide somewhere sneaky.`;
+      hideSeekRoundText.textContent = nearbySpot
+        ? `You can hide in the ${nearbySpot.label}. ${seekerName} should not watch this turn.`
+        : `Move through the rooms and stop near a glowing hiding spot. ${seekerName} looks away.`;
+      setHideSeekMessage(nearbySpot ? `Press Interact to hide in the ${nearbySpot.label}.` : `${hiderName} is hiding. Look for glowing spots.`);
+    } else if (hideSeekState.phase === HideSeekGameState.SEEKER_LOOK_AWAY) {
+      hideSeekFoundButton.textContent = `${seekerName} Starts Searching`;
+      hideSeekRoundTitle.textContent = `${hiderName} is hidden.`;
+      hideSeekRoundText.textContent = `Pass the phone to ${seekerName}. The map resets to the start room, and wrong inspections cost time.`;
+      setHideSeekMessage(`${seekerName}, no peeking until you tap start searching.`);
+    } else if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
+      hideSeekFoundButton.textContent = nearbySpot ? `Inspect ${nearbySpot.label}` : 'Move to inspect a spot';
+      hideSeekFoundButton.disabled = !nearbySpot;
+      hideSeekRoundTitle.textContent = `${seekerName}, find the hider.`;
+      hideSeekRoundText.textContent = nearbySpot
+        ? `Inspect the ${nearbySpot.label}, or keep searching. Wrong guesses subtract time.`
+        : `Move through exits, check suspicious objects, and inspect only when you are close.`;
+      setHideSeekMessage(`${seekerName} is searching ${room.name}. Wrong guesses: ${hideSeekState.wrongGuesses}.`);
+    } else if (hideSeekState.phase === HideSeekGameState.FOUND || hideSeekState.phase === HideSeekGameState.ROUND_RESULTS) {
+      hideSeekRoundTitle.textContent = hideSeekState.phase === HideSeekGameState.FOUND ? 'Found!' : 'Round over.';
+      hideSeekRoundText.textContent = hideSeekState.lastRoundText || `${hiderName} was hidden in the ${hideSeekState.hiddenSpotLabel}.`;
+      setHideSeekMessage(hideSeekState.lastRoundText || 'Round complete.');
+    } else if (hideSeekState.phase === HideSeekGameState.GAME_OVER) {
+      hideSeekRoundTitle.textContent = 'Hide & Seek is complete.';
+      hideSeekRoundText.textContent = 'Check the scoreboard, play again, or finish to the summary screen.';
+      setHideSeekMessage('Match complete.');
+    } else {
+      hideSeekRoundTitle.textContent = `Round ${hideSeekRound + 1}: ${hiderName} hides, ${seekerName} seeks.`;
+      hideSeekRoundText.textContent = `Use ${getHideSeekMap().name}. Hider moves first, then passes the phone to the seeker.`;
+      setHideSeekMessage(`Ready for round ${hideSeekRound + 1}.`);
     }
-    hideSeekRoundTitle.textContent = `${seekerName} is on the hunt.`;
-    hideSeekRoundText.textContent = `Tap Found It when the seeker finds the hiding player. ${hideSeekState.winnerGoal === 'slowest-found' ? 'Last find wins this round.' : hideSeekState.winnerGoal === 'best-hide' ? 'Rate the hide after the round.' : 'First find wins this round.'}`;
-    updateHideSeekStatus(`${seekerName} is searching. Tap Found It when the round ends.`);
+
+    renderHideSeekOverlay();
+    drawHideSeek();
+  }
+
+  function renderHideSeekOverlay() {
+    if (!hideSeekOverlay) return;
+    const hiderName = getHideSeekPlayerName(hideSeekState.hiderIndex);
+    const seekerName = getHideSeekPlayerName(hideSeekState.seekerIndex);
+    const overlayText = {
+      TITLE: ['Local Hide & Seek', 'Start a match, then pass the phone between hider and seeker.'],
+      ROUND_START: [`${seekerName}, look away`, `${hiderName} gets the next hiding turn.`],
+      SEEKER_LOOK_AWAY: [`${seekerName}, your turn`, 'The hider is locked in. Tap start searching when the phone is yours.'],
+      GAME_OVER: ['Match complete', 'Play again or finish to see the final summary.'],
+    }[hideSeekState.phase];
+    hideSeekOverlay.hidden = !overlayText;
+    if (overlayText) {
+      hideSeekOverlay.innerHTML = '';
+      const title = document.createElement('strong');
+      title.textContent = overlayText[0];
+      const detail = document.createElement('span');
+      detail.textContent = overlayText[1];
+      hideSeekOverlay.appendChild(title);
+      hideSeekOverlay.appendChild(detail);
+    }
   }
 
   function hideSeekAdvancePlayers() {
@@ -2518,57 +2863,131 @@
     hideSeekState.seekerIndex = (nextHider + 1) % roster.length;
   }
 
+  function startHideSeekLoop() {
+    if (!hideSeekCanvas || hideSeekAnimationFrame) return;
+    hideSeekLastFrame = 0;
+    hideSeekAnimationFrame = requestAnimationFrame(updateHideSeekLoop);
+  }
+
+  function updateHideSeekLoop(timestamp) {
+    if (!hideSeekCanvas) return;
+    const delta = hideSeekLastFrame ? Math.min(0.05, (timestamp - hideSeekLastFrame) / 1000) : 0;
+    hideSeekLastFrame = timestamp;
+    updateHideSeek(delta);
+    drawHideSeek();
+    hideSeekAnimationFrame = requestAnimationFrame(updateHideSeekLoop);
+  }
+
   function startHideSeekRound() {
-    stopHideSeekTimer();
-    hideSeekState = Object.assign({}, hideSeekState, {
-      mode: hideSeekMode.value,
-      countdown: Number(hideSeekCountdown.value) || 30,
-      winnerGoal: hideSeekWinner.value,
-      hiding: true,
-      seeking: false,
-      found: false,
-      countdownRemaining: Number(hideSeekCountdown.value) || 30,
-    });
+    if (hideSeekState.phase === HideSeekGameState.GAME_OVER) {
+      resetHideSeek();
+    }
+    hideSeekState.mode = hideSeekMode.value || 'roadside-lodge';
+    hideSeekState.countdown = Number(hideSeekCountdown.value) || 60;
+    hideSeekState.winnerGoal = hideSeekWinner.value || '6';
+    resetHideSeekRoundState(HideSeekGameState.HIDER_TURN);
+    startHideSeekLoop();
+    playHideSeekTone('door');
     renderHideSeek();
-    hideSeekTimerInterval = window.setInterval(() => {
-      hideSeekState.countdownRemaining -= 1;
-      if (hideSeekState.countdownRemaining <= 0) {
-        stopHideSeekTimer();
-        hideSeekState.hiding = false;
-        hideSeekState.seeking = true;
-        hideSeekState.countdownRemaining = 0;
-        hideSeekFoundButton.hidden = false;
-        hideSeekStartButton.hidden = true;
-        hideSeekPhase.textContent = 'Seek';
-        updateHideSeekStatus(`${getHideSeekPlayerName(hideSeekState.seekerIndex)} can start looking now.`);
-        renderHideSeek();
-        return;
-      }
-      renderHideSeek();
-    }, 1000);
-    updateHideSeekStatus(`${getHideSeekPlayerName(hideSeekState.hiderIndex)} is hiding. No peeking.`);
+  }
+
+  function beginHideSeekSeekerTurn() {
+    const map = getHideSeekMap();
+    hideSeekState.phase = HideSeekGameState.SEEKER_TURN;
+    hideSeekState.timerRemaining = hideSeekState.countdown;
+    hideSeekState.actors.seeker = { x: 120, y: 305, width: 24, height: 32, speed: 150, roomId: map.startRoom, visible: true, color: '#f58220' };
+    hideSeekState.activeRoomId = map.startRoom;
+    playHideSeekTone('door');
+    renderHideSeek();
   }
 
   function markHideSeekFound() {
-    if (!hideSeekState.seeking) return;
-    stopHideSeekTimer();
-    const winnerId = hideSeekState.winnerGoal === 'slowest-found' || hideSeekState.winnerGoal === 'best-hide'
-      ? getHideSeekRoster()[hideSeekState.hiderIndex].id
-      : getHideSeekRoster()[hideSeekState.seekerIndex].id;
-    hideSeekState.hideScore[winnerId] = (hideSeekState.hideScore[winnerId] || 0) + 1;
-    hideSeekState.found = true;
-    hideSeekState.seeking = false;
+    const actor = getHideSeekActiveActor();
+    const spot = getNearbyHideSeekSpot(actor);
+    if (hideSeekState.phase === HideSeekGameState.SEEKER_LOOK_AWAY) {
+      beginHideSeekSeekerTurn();
+      return;
+    }
+    if (!spot) return;
+    if (hideSeekState.phase === HideSeekGameState.HIDER_TURN) {
+      hideSeekState.hiddenSpotId = spot.id;
+      hideSeekState.hiddenSpotLabel = spot.label;
+      hideSeekState.hiddenRoomId = actor.roomId;
+      hideSeekState.actors.hider.visible = false;
+      hideSeekState.phase = HideSeekGameState.SEEKER_LOOK_AWAY;
+      playHideSeekTone('hide');
+      renderHideSeek();
+      return;
+    }
+    if (hideSeekState.phase !== HideSeekGameState.SEEKER_TURN) return;
+    inspectHideSeekSpot(spot);
+  }
+
+  function inspectHideSeekSpot(spot) {
+    const hider = getHideSeekPlayer(hideSeekState.hiderIndex);
+    const seeker = getHideSeekPlayer(hideSeekState.seekerIndex);
+    if (spot.id !== hideSeekState.hiddenSpotId) {
+      hideSeekState.wrongGuesses += 1;
+      hideSeekState.timerRemaining = Math.max(0, hideSeekState.timerRemaining - 8);
+      hideSeekState.shakingSpotId = spot.id;
+      hideSeekState.shakeTime = 0.55;
+      setHideSeekMessage(`Nope, not in the ${spot.label}. Eight seconds lost.`);
+      playHideSeekTone('wrong');
+      renderHideSeek();
+      if (hideSeekState.timerRemaining <= 0) hideSeekSeekerFailed();
+      return;
+    }
+
+    const foundSpot = getHideSeekSpotById(hideSeekState.hiddenSpotId) || spot;
+    const timeUsed = hideSeekState.countdown - hideSeekState.timerRemaining;
+    hideSeekState.roundSeekerScore = Math.max(0, Math.round(1000 - timeUsed * 8 - hideSeekState.wrongGuesses * 80 + foundSpot.difficulty * 50));
+    hideSeekState.roundHiderScore = Math.max(0, Math.round(timeUsed * 6 + foundSpot.difficulty * 100));
+    hideSeekState.hideScore[seeker.id] = (hideSeekState.hideScore[seeker.id] || 0) + hideSeekState.roundSeekerScore;
+    hideSeekState.hideScore[hider.id] = (hideSeekState.hideScore[hider.id] || 0) + hideSeekState.roundHiderScore;
+    hideSeekState.phase = HideSeekGameState.FOUND;
+    hideSeekState.revealPulse = 1.4;
+    revealHideSeekHider(foundSpot);
     hideSeekRound += 1;
+    hideSeekState.lastRoundText = `${seeker.name} found ${hider.name} in the ${foundSpot.label}. ${seeker.name}: +${hideSeekState.roundSeekerScore}. ${hider.name}: +${hideSeekState.roundHiderScore}. Wrong guesses: ${hideSeekState.wrongGuesses}.`;
+    playHideSeekTone('found');
     renderHideSeek();
-    updateHideSeekStatus(`${getPlayerName(winnerId)} gets the round. Tap Next Round to switch roles.`);
+  }
+
+  function revealHideSeekHider(spot) {
+    const roomId = hideSeekState.hiddenRoomId || hideSeekState.activeRoomId;
+    hideSeekState.actors.hider.visible = true;
+    hideSeekState.actors.hider.roomId = roomId;
+    hideSeekState.actors.hider.x = Math.min(760, spot.x + spot.width / 2);
+    hideSeekState.actors.hider.y = Math.min(390, spot.y + spot.height / 2);
+    hideSeekState.actors.seeker.roomId = roomId;
+    hideSeekState.activeRoomId = roomId;
+  }
+
+  function hideSeekSeekerFailed() {
+    if (hideSeekState.phase !== HideSeekGameState.SEEKER_TURN) return;
+    const hider = getHideSeekPlayer(hideSeekState.hiderIndex);
+    const spot = getHideSeekSpotById(hideSeekState.hiddenSpotId);
+    const difficulty = spot ? spot.difficulty : 3;
+    hideSeekState.roundSeekerScore = 0;
+    hideSeekState.roundHiderScore = 1000 + difficulty * 150;
+    hideSeekState.hideScore[hider.id] = (hideSeekState.hideScore[hider.id] || 0) + hideSeekState.roundHiderScore;
+    hideSeekState.phase = HideSeekGameState.ROUND_RESULTS;
+    hideSeekRound += 1;
+    hideSeekState.lastRoundText = `${hider.name} stayed hidden in the ${hideSeekState.hiddenSpotLabel}. ${hider.name}: +${hideSeekState.roundHiderScore}.`;
+    playHideSeekTone('wrong');
+    renderHideSeek();
   }
 
   function nextHideSeekRound() {
+    if (hideSeekRound >= getHideSeekMaxRounds()) {
+      hideSeekState.phase = HideSeekGameState.GAME_OVER;
+      renderHideSeek();
+      showHideSeekSummary();
+      return;
+    }
     hideSeekAdvancePlayers();
-    hideSeekState.found = false;
-    hideSeekState.hiding = false;
-    hideSeekState.seeking = false;
-    hideSeekState.countdownRemaining = hideSeekState.countdown;
+    resetHideSeekRoundState(HideSeekGameState.HIDER_TURN);
+    playHideSeekTone('door');
     renderHideSeek();
   }
 
@@ -2576,16 +2995,31 @@
     stopHideSeekTimer();
     hideSeekRound = 0;
     hideSeekState = {
-      mode: hideSeekMode.value || 'pass-and-play',
-      countdown: Number(hideSeekCountdown.value) || 30,
-      winnerGoal: hideSeekWinner.value || 'first-found',
+      mode: hideSeekMode.value || 'roadside-lodge',
+      countdown: Number(hideSeekCountdown.value) || 60,
+      winnerGoal: hideSeekWinner.value || '6',
       hiderIndex: 0,
       seekerIndex: 1,
-      hiding: false,
-      seeking: false,
-      found: false,
-      countdownRemaining: 0,
+      phase: HideSeekGameState.TITLE,
+      hiddenSpotId: null,
+      hiddenSpotLabel: '',
+      hiddenRoomId: null,
+      activeRoomId: (hideSeekMaps[hideSeekMode.value] || hideSeekMaps['roadside-lodge']).startRoom,
+      timerRemaining: Number(hideSeekCountdown.value) || 60,
+      wrongGuesses: 0,
+      roundHiderScore: 0,
+      roundSeekerScore: 0,
+      lastRoundText: '',
+      message: '',
       hideScore: {},
+      actors: {
+        hider: { x: 120, y: 305, width: 24, height: 32, speed: 150, roomId: (hideSeekMaps[hideSeekMode.value] || hideSeekMaps['roadside-lodge']).startRoom, visible: true, color: '#2ec7d3' },
+        seeker: { x: 120, y: 305, width: 24, height: 32, speed: 150, roomId: (hideSeekMaps[hideSeekMode.value] || hideSeekMaps['roadside-lodge']).startRoom, visible: false, color: '#f58220' },
+      },
+      input: { up: false, down: false, left: false, right: false },
+      revealPulse: 0,
+      shakeTime: 0,
+      shakingSpotId: null,
     };
     renderHideSeek();
   }
@@ -2594,6 +3028,277 @@
     resetGame();
     resetHideSeek();
     showSection('hideSeek');
+    startHideSeekLoop();
+  }
+
+  function updateHideSeek(delta) {
+    if (!delta) return;
+    if (hideSeekState.phase === HideSeekGameState.HIDER_TURN) {
+      updateHideSeekActor(hideSeekState.actors.hider, delta);
+    } else if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
+      updateHideSeekActor(hideSeekState.actors.seeker, delta);
+      hideSeekState.timerRemaining = Math.max(0, hideSeekState.timerRemaining - delta);
+      if (hideSeekState.timerRemaining <= 0) hideSeekSeekerFailed();
+    }
+    if (hideSeekState.revealPulse > 0) hideSeekState.revealPulse = Math.max(0, hideSeekState.revealPulse - delta);
+    if (hideSeekState.shakeTime > 0) hideSeekState.shakeTime = Math.max(0, hideSeekState.shakeTime - delta);
+    updateHideSeekTimerText();
+  }
+
+  function updateHideSeekTimerText() {
+    if (!hideSeekCountdownText || hideSeekCountdownText.hidden) return;
+    const room = getHideSeekRoom(hideSeekState.activeRoomId);
+    hideSeekCountdownText.textContent = `Round ${Math.min(hideSeekRound + 1, getHideSeekMaxRounds())} of ${getHideSeekMaxRounds()} · ${Math.ceil(hideSeekState.timerRemaining)}s · ${room.name}`;
+  }
+
+  function updateHideSeekActor(actor, delta) {
+    const input = hideSeekState.input;
+    const dx = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+    const dy = (input.down ? 1 : 0) - (input.up ? 1 : 0);
+    if (!dx && !dy) {
+      hideSeekState.activeRoomId = actor.roomId;
+      return;
+    }
+    const length = Math.hypot(dx, dy) || 1;
+    const room = getHideSeekRoom(actor.roomId);
+    const speedMultiplier = getHideSeekSpeedMultiplier(actor, room);
+    const nextActor = Object.assign({}, actor, {
+      x: actor.x + (dx / length) * actor.speed * speedMultiplier * delta,
+      y: actor.y + (dy / length) * actor.speed * speedMultiplier * delta,
+    });
+    nextActor.x = Math.max(38, Math.min(738, nextActor.x));
+    nextActor.y = Math.max(62, Math.min(382, nextActor.y));
+    if (!wouldHitHideSeekBlock(nextActor, room)) {
+      actor.x = nextActor.x;
+      actor.y = nextActor.y;
+    }
+    checkHideSeekExits(actor, room);
+    hideSeekState.activeRoomId = actor.roomId;
+  }
+
+  function getHideSeekSpeedMultiplier(actor, room) {
+    const zone = (room.obstacles || []).find(obstacle => obstacle.type === 'slow' && isHideSeekOverlapping(actor, obstacle));
+    return zone ? zone.speedMultiplier || 0.65 : 1;
+  }
+
+  function wouldHitHideSeekBlock(actor, room) {
+    return (room.obstacles || []).some(obstacle => obstacle.type === 'block' && isHideSeekOverlapping(actor, obstacle));
+  }
+
+  function checkHideSeekExits(actor, room) {
+    const exit = room.exits.find(item => isHideSeekOverlapping(actor, item));
+    if (!exit) return;
+    actor.roomId = exit.targetRoom;
+    actor.x = exit.spawnX;
+    actor.y = exit.spawnY;
+    hideSeekState.activeRoomId = exit.targetRoom;
+    playHideSeekTone('door');
+    renderHideSeek();
+  }
+
+  function isHideSeekOverlapping(a, b) {
+    return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+  }
+
+  function drawHideSeek() {
+    if (!hideSeekCanvasContext || !hideSeekCanvas) return;
+    const ctx = hideSeekCanvasContext;
+    const map = getHideSeekMap();
+    const room = getHideSeekRoom(hideSeekState.activeRoomId);
+    const palette = map.palette;
+    ctx.clearRect(0, 0, hideSeekCanvas.width, hideSeekCanvas.height);
+    drawHideSeekRoom(ctx, room, palette);
+    drawHideSeekSpots(ctx, room);
+    drawHideSeekActors(ctx, room);
+    drawHideSeekHud(ctx, room, map);
+  }
+
+  function drawHideSeekRoom(ctx, room, palette) {
+    ctx.fillStyle = palette.wall;
+    ctx.fillRect(0, 0, 800, 450);
+    ctx.fillStyle = palette.floor;
+    ctx.fillRect(38, 62, 724, 338);
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    for (let x = 55; x < 750; x += 42) {
+      ctx.fillRect(x, 86, 2, 290);
+    }
+    ctx.fillStyle = palette.trim;
+    ctx.fillRect(38, 62, 724, 12);
+    ctx.fillRect(38, 388, 724, 12);
+    ctx.fillRect(38, 62, 12, 338);
+    ctx.fillRect(750, 62, 12, 338);
+    (room.exits || []).forEach(exit => {
+      ctx.fillStyle = palette.accent;
+      ctx.fillRect(exit.x, exit.y, exit.width, exit.height);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '700 12px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(exit.label, exit.x + exit.width / 2, Math.max(46, exit.y - 8));
+    });
+    (room.obstacles || []).forEach(obstacle => {
+      ctx.fillStyle = obstacle.type === 'slow' ? 'rgba(9, 35, 63, 0.25)' : '#6b4b35';
+      ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+      if (obstacle.type === 'slow') {
+        ctx.fillStyle = 'rgba(255,255,255,0.28)';
+        ctx.fillRect(obstacle.x + 8, obstacle.y + obstacle.height / 2 - 2, obstacle.width - 16, 4);
+      }
+    });
+  }
+
+  function drawHideSeekSpots(ctx, room) {
+    const actor = getHideSeekActiveActor();
+    const nearbySpot = getNearbyHideSeekSpot(actor);
+    room.spots.forEach(spot => {
+      const isNearby = nearbySpot && nearbySpot.id === spot.id;
+      const shake = hideSeekState.shakingSpotId === spot.id && hideSeekState.shakeTime > 0 ? Math.sin(hideSeekState.shakeTime * 48) * 4 : 0;
+      ctx.save();
+      ctx.translate(shake, 0);
+      drawHideSeekObject(ctx, spot, isNearby);
+      ctx.restore();
+    });
+  }
+
+  function drawHideSeekObject(ctx, spot, isNearby) {
+    const x = spot.x;
+    const y = spot.y;
+    const w = spot.width;
+    const h = spot.height;
+    const highlight = isNearby ? '#f58220' : 'rgba(255,255,255,0.26)';
+    ctx.lineWidth = isNearby ? 4 : 2;
+    ctx.strokeStyle = highlight;
+    ctx.fillStyle = '#ffffff';
+    if (spot.kind === 'bed') {
+      ctx.fillStyle = '#7b4ee6';
+      ctx.fillRect(x, y + h * 0.28, w, h * 0.72);
+      ctx.fillStyle = '#fff2d8';
+      ctx.fillRect(x + 12, y + 8, w * 0.36, h * 0.35);
+    } else if (spot.kind === 'closet' || spot.kind === 'curtain') {
+      ctx.fillStyle = spot.kind === 'closet' ? '#5b3a2e' : '#7b4ee6';
+      ctx.fillRect(x, y, w, h);
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      ctx.fillRect(x + w / 2 - 2, y + 8, 4, h - 16);
+    } else if (spot.kind === 'box' || spot.kind === 'luggage') {
+      ctx.fillStyle = spot.kind === 'box' ? '#c47b32' : '#2ec7d3';
+      ctx.fillRect(x, y, w, h);
+      ctx.fillStyle = 'rgba(9,35,63,0.28)';
+      ctx.fillRect(x + 8, y + 12, w - 16, 8);
+    } else if (spot.kind === 'tree' || spot.kind === 'bush') {
+      ctx.fillStyle = '#6b3f2a';
+      ctx.fillRect(x + w * 0.42, y + h * 0.42, w * 0.18, h * 0.58);
+      ctx.fillStyle = spot.kind === 'tree' ? '#1f9f68' : '#2fa86f';
+      ctx.beginPath();
+      ctx.ellipse(x + w / 2, y + h * 0.38, w * 0.55, h * 0.34, 0, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (spot.kind === 'car') {
+      ctx.fillStyle = '#09233f';
+      ctx.fillRect(x + 15, y + 20, w - 30, h - 28);
+      ctx.fillStyle = '#2ec7d3';
+      ctx.fillRect(x + 45, y + 5, w - 90, 36);
+      ctx.fillStyle = '#061524';
+      ctx.fillRect(x + 35, y + h - 18, 28, 22);
+      ctx.fillRect(x + w - 63, y + h - 18, 28, 22);
+    } else if (spot.kind === 'fountain') {
+      ctx.fillStyle = '#7aa8b8';
+      ctx.beginPath();
+      ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#dff8ff';
+      ctx.beginPath();
+      ctx.ellipse(x + w / 2, y + h / 2, w / 3, h / 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.fillStyle = '#5d6b7a';
+      ctx.fillRect(x, y, w, h);
+    }
+    ctx.strokeRect(x, y, w, h);
+    ctx.fillStyle = '#061524';
+    ctx.font = '700 13px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(spot.label, x + w / 2, y - 8);
+    if (isNearby) {
+      ctx.fillStyle = '#f58220';
+      ctx.beginPath();
+      ctx.arc(x + w - 12, y + 12, 7, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function drawHideSeekActors(ctx, room) {
+    const actors = [hideSeekState.actors.hider, hideSeekState.actors.seeker];
+    actors.forEach(actor => {
+      if (!actor.visible || actor.roomId !== room.id) return;
+      drawHideSeekActor(ctx, actor);
+    });
+    if (hideSeekState.revealPulse > 0) {
+      ctx.strokeStyle = `rgba(245, 130, 32, ${Math.min(1, hideSeekState.revealPulse)})`;
+      ctx.lineWidth = 8;
+      const actor = hideSeekState.actors.hider;
+      ctx.beginPath();
+      ctx.arc(actor.x + actor.width / 2, actor.y + actor.height / 2, 52 - hideSeekState.revealPulse * 14, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+
+  function drawHideSeekActor(ctx, actor) {
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.beginPath();
+    ctx.ellipse(actor.x + actor.width / 2, actor.y + actor.height + 5, 16, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = actor.color;
+    ctx.fillRect(actor.x, actor.y + 10, actor.width, actor.height - 6);
+    ctx.fillStyle = '#fff2d8';
+    ctx.fillRect(actor.x + 3, actor.y, actor.width - 6, 16);
+    ctx.fillStyle = '#061524';
+    ctx.fillRect(actor.x + 7, actor.y + 6, 4, 4);
+    ctx.fillRect(actor.x + actor.width - 11, actor.y + 6, 4, 4);
+  }
+
+  function drawHideSeekHud(ctx, room, map) {
+    const hiderName = getHideSeekPlayerName(hideSeekState.hiderIndex);
+    const seekerName = getHideSeekPlayerName(hideSeekState.seekerIndex);
+    ctx.fillStyle = 'rgba(6, 21, 36, 0.9)';
+    ctx.fillRect(0, 0, 800, 52);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '700 16px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText(`${map.name} · ${room.name}`, 18, 22);
+    ctx.font = '700 13px Arial';
+    ctx.fillText(`Hider: ${hiderName} · Seeker: ${seekerName} · Wrong: ${hideSeekState.wrongGuesses}`, 18, 42);
+    ctx.textAlign = 'right';
+    ctx.font = '800 22px Arial';
+    ctx.fillText(`${Math.ceil(hideSeekState.timerRemaining)}s`, 778, 31);
+  }
+
+  function setHideSeekInput(direction, active) {
+    if (!hideSeekState.input || !direction) return;
+    hideSeekState.input[direction] = active;
+  }
+
+  function handleHideSeekKey(event, active) {
+    if (currentSectionKey !== 'hideSeek') return;
+    const keyMap = {
+      ArrowUp: 'up',
+      w: 'up',
+      W: 'up',
+      ArrowDown: 'down',
+      s: 'down',
+      S: 'down',
+      ArrowLeft: 'left',
+      a: 'left',
+      A: 'left',
+      ArrowRight: 'right',
+      d: 'right',
+      D: 'right',
+    };
+    if (keyMap[event.key]) {
+      event.preventDefault();
+      setHideSeekInput(keyMap[event.key], active);
+      return;
+    }
+    if (active && ['e', 'E', ' ', 'Enter'].includes(event.key)) {
+      event.preventDefault();
+      markHideSeekFound();
+    }
   }
 
   function showHideSeekSummary() {
@@ -2605,9 +3310,15 @@
     const scoreText = getHideSeekRoster().map(player => `${player.name}: ${scores[player.id] || 0}`).join(', ');
     summaryText.textContent = `${winner}. ${scoreText}.`;
     summaryList.innerHTML = '';
-    const li = document.createElement('li');
-    li.textContent = `Mode: ${hideSeekState.mode}. Goal: ${hideSeekState.winnerGoal}.`;
-    summaryList.appendChild(li);
+    [
+      `Map: ${getHideSeekMap().name}.`,
+      `Rounds completed: ${hideSeekRound} of ${getHideSeekMaxRounds()}.`,
+      hideSeekState.lastRoundText || 'No completed round yet.',
+    ].forEach(text => {
+      const li = document.createElement('li');
+      li.textContent = text;
+      summaryList.appendChild(li);
+    });
   }
 
   function getDeviceFeedbackInfo() {
@@ -4289,16 +5000,32 @@
   hideSeekFinishButton.addEventListener('click', showHideSeekSummary);
   hideSeekMode.addEventListener('change', () => {
     hideSeekState.mode = hideSeekMode.value;
-    renderHideSeek();
+    resetHideSeek();
   });
   hideSeekCountdown.addEventListener('change', () => {
-    hideSeekState.countdown = Number(hideSeekCountdown.value) || 30;
-    hideSeekState.countdownRemaining = hideSeekState.countdown;
+    hideSeekState.countdown = Number(hideSeekCountdown.value) || 60;
+    hideSeekState.timerRemaining = hideSeekState.countdown;
     renderHideSeek();
   });
   hideSeekWinner.addEventListener('change', () => {
     hideSeekState.winnerGoal = hideSeekWinner.value;
     renderHideSeek();
+  });
+  document.addEventListener('keydown', event => handleHideSeekKey(event, true));
+  document.addEventListener('keyup', event => handleHideSeekKey(event, false));
+  document.querySelectorAll('[data-hide-seek-move]').forEach(button => {
+    const direction = button.dataset.hideSeekMove;
+    button.addEventListener('pointerdown', event => {
+      event.preventDefault();
+      button.setPointerCapture(event.pointerId);
+      setHideSeekInput(direction, true);
+    });
+    button.addEventListener('pointerup', event => {
+      event.preventDefault();
+      setHideSeekInput(direction, false);
+    });
+    button.addEventListener('pointercancel', () => setHideSeekInput(direction, false));
+    button.addEventListener('lostpointercapture', () => setHideSeekInput(direction, false));
   });
   calculateTripButton.addEventListener('click', calculateTripTime);
   calculatorSwapButton.addEventListener('click', swapCalculatorSpeeds);

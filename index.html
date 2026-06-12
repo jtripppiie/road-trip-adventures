@@ -204,11 +204,6 @@
               <span class="option-title">Surprise Me</span>
               <span class="mode-pill">Mixed</span>
             </button>
-            <button class="option-card" data-category="hide-seek">
-              <span class="option-emoji" aria-hidden="true">🔦</span>
-              <span class="option-title">Hide & Seek</span>
-              <span class="mode-pill">Party</span>
-            </button>
             <button class="option-card" data-category="pong">
               <span class="option-emoji" aria-hidden="true">🏓</span>
               <span class="option-title">Road Pong</span>
@@ -478,45 +473,44 @@
       </div>
     </section>
 
-    <!-- Hide and seek screen: pass-and-play party game -->
+    <!-- Hide and seek screen: local canvas party game -->
     <section id="hide-seek-game" hidden>
       <div class="mode-header">
         <div>
           <h2 id="hide-seek-heading">Hide &amp; Seek</h2>
-          <p id="hide-seek-intro">A pass-and-play round for the car. One person hides, one person seeks, and the timer keeps it dramatic.</p>
+          <p id="hide-seek-intro">A local two-player room search game. One passenger hides on the map, then hands the phone over so the seeker can inspect spots before time runs out.</p>
         </div>
         <div class="hunt-route" aria-label="Hide and seek route">Pass &amp; Play</div>
       </div>
       <div id="hide-seek-scoreboard" class="team-scoreboard" aria-live="polite"></div>
       <article class="trivia-card">
         <span id="hide-seek-badge" class="challenge-badge">Setup</span>
-        <p id="hide-seek-status" class="hunt-status">Pick who is hiding, pick the countdown, then hand the phone over.</p>
+        <p id="hide-seek-status" class="hunt-status">Pick a map, timer, and match length. The hider gets privacy first, then the seeker searches the rooms.</p>
         <div class="hide-seek-setup">
           <label class="team-name-field" for="hide-seek-mode">
-            <span>Round mode</span>
+            <span>Map</span>
             <select id="hide-seek-mode">
-              <option value="pass-and-play">Pass and Play</option>
-              <option value="round-robin">Round Robin</option>
+              <option value="roadside-lodge">Roadside Lodge</option>
               <option value="alaska-train">Alaska Train</option>
-              <option value="roadside">Roadside Stop</option>
+              <option value="campground">Campground</option>
+              <option value="rest-stop">Rest Stop</option>
             </select>
           </label>
           <label class="team-name-field" for="hide-seek-countdown">
-            <span>Hide time</span>
+            <span>Search timer</span>
             <select id="hide-seek-countdown">
-              <option value="10">10 seconds</option>
-              <option value="20">20 seconds</option>
-              <option value="30" selected>30 seconds</option>
               <option value="45">45 seconds</option>
-              <option value="60">60 seconds</option>
+              <option value="60" selected>60 seconds</option>
+              <option value="90">90 seconds</option>
+              <option value="120">120 seconds</option>
             </select>
           </label>
           <label class="team-name-field" for="hide-seek-winner">
-            <span>Winner goal</span>
+            <span>Match length</span>
             <select id="hide-seek-winner">
-              <option value="first-found">First found wins</option>
-              <option value="slowest-found">Last found wins</option>
-              <option value="best-hide">Best hiding spot</option>
+              <option value="4">4 rounds</option>
+              <option value="6" selected>6 rounds</option>
+              <option value="8">8 rounds</option>
             </select>
           </label>
         </div>
@@ -524,13 +518,26 @@
       <div id="hide-seek-assets" class="hide-seek-assets" aria-label="Hide spot ideas"></div>
       <article id="hide-seek-round-card" class="trivia-card" aria-live="polite">
         <span id="hide-seek-phase" class="challenge-badge">Ready</span>
-        <h3 id="hide-seek-round-title">Choose who is hiding.</h3>
-        <p id="hide-seek-round-text">Everyone agrees on the round, then tap start.</p>
+        <h3 id="hide-seek-round-title">Start the match.</h3>
+        <p id="hide-seek-round-text">Use the arrow keys, WASD, or the on-screen pad. Hiders choose a glowing spot. Seekers inspect one spot at a time.</p>
         <p id="hide-seek-countdown-text" class="timer" hidden></p>
       </article>
+      <div class="hide-seek-stage">
+        <canvas id="hide-seek-canvas" class="hide-seek-canvas" width="800" height="450" aria-label="Hide and Seek room map"></canvas>
+        <div id="hide-seek-overlay" class="hide-seek-overlay">
+          <strong>Ready?</strong>
+          <span>Start the match, then pass the phone when the app says to.</span>
+        </div>
+      </div>
+      <div class="hide-seek-controls" aria-label="Hide and Seek movement controls">
+        <button class="hide-seek-pad" data-hide-seek-move="up" aria-label="Move up">▲</button>
+        <button class="hide-seek-pad" data-hide-seek-move="left" aria-label="Move left">◀</button>
+        <button class="hide-seek-pad" data-hide-seek-move="down" aria-label="Move down">▼</button>
+        <button class="hide-seek-pad" data-hide-seek-move="right" aria-label="Move right">▶</button>
+      </div>
       <div class="adventure-actions">
-        <button id="hide-seek-start" class="primary-button">Start Hide Round</button>
-        <button id="hide-seek-found" class="primary-button" hidden>Found It</button>
+        <button id="hide-seek-start" class="primary-button">Start Match</button>
+        <button id="hide-seek-found" class="primary-button" hidden>Interact</button>
         <button id="hide-seek-next" class="secondary-button" hidden>Next Round</button>
         <button id="hide-seek-reset" class="secondary-button">Reset Game</button>
         <button id="hide-seek-finish" class="secondary-button">Finish Hide &amp; Seek</button>

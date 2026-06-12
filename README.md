@@ -17,6 +17,7 @@ This project was built with **no backend**, **no user accounts** and **no data c
 - **Joke Vote:** Let each player tell clean jokes and award Dad Joke or Mom Joke honors.
 - **Emoji Face-Off:** Copy emoji expressions with an optional local camera snap, then vote for the closest match. Photos are not uploaded or saved by the app.
 - **Pi Digits:** See who can recite the most digits of pi and track scores for every player.
+- **Hide & Seek:** Play a local pass-and-play canvas game with rooms, hiding spots, inspections, wrong-guess penalties and role swaps.
 - **Dynamic adventures:** The app builds an adventure from a pool of questions and prompts.  Timed challenges show a 15 second countdown.
 - **Progress bar:** See how far along your adventure you are.
 - **Summary:** At the end, get a breakdown of how many discoveries, laughs, facts and wins you achieved.
@@ -59,6 +60,38 @@ Open `script.js` and extend the `questions` array.  Each question has:
 | `points` | Reserved for scoring (not used in this version). |
 
 To support additional regions, add manual region buttons in `index.html` and matching region codes in the local trivia data. Do not add browser geolocation or location sensor logic.
+
+### Adding Hide & Seek maps
+
+Hide & Seek maps live in the `hideSeekMaps` object in `script.js`. Each map defines a start room, palette, room exits, hiding spots and optional obstacles.
+
+```js
+const hideSeekMaps = {
+  'my-map': {
+    id: 'my-map',
+    name: 'My Map',
+    startRoom: 'room_one',
+    palette: { wall: '#28405c', floor: '#d8a85d', trim: '#09233f', accent: '#f58220' },
+    rooms: {
+      room_one: {
+        id: 'room_one',
+        name: 'Room One',
+        exits: [
+          { label: 'Room Two', targetRoom: 'room_two', x: 748, y: 180, width: 28, height: 92, spawnX: 60, spawnY: 232 },
+        ],
+        spots: [
+          { id: 'room-one-closet', label: 'closet', kind: 'closet', x: 610, y: 95, width: 100, height: 175, difficulty: 4 },
+        ],
+        obstacles: [
+          { id: 'slow-rug', type: 'slow', x: 250, y: 328, width: 300, height: 52, speedMultiplier: 0.65 },
+        ],
+      },
+    },
+  },
+};
+```
+
+Every hiding spot needs a unique `id`, a short `label`, a `kind`, position, size and `difficulty` from 1 to 5. Supported visual kinds include `bed`, `closet`, `curtain`, `box`, `luggage`, `tree`, `bush`, `car`, `fountain`, `bench`, `desk` and `shelf`. Add a matching `<option>` in `index.html` so players can select the new map.
 
 ### Changing the look and feel
 
