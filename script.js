@@ -848,10 +848,14 @@
   const HIDE_SEEK_WRONG_SEARCH_PENALTY = 10;
   const HIDE_SEEK_INSPECT_SECONDS = 1.1;
   const HIDE_SEEK_MAX_HINTS = 3;
+  const HIDE_SEEK_MAX_STAMINA = 100;
+  const HIDE_SEEK_SPRINT_SPEED_MULTIPLIER = 1.45;
+  const HIDE_SEEK_SPAM_INSPECTION_PENALTY = 6;
+  const HIDE_SEEK_SUSPICION_DISTANCE = 135;
   let hideSeekState = {
     mode: 'roadside-lodge',
     countdown: HIDE_SEEK_DEFAULT_SEARCH_SECONDS,
-    winnerGoal: '6',
+    winnerGoal: '5',
     hiderIndex: 0,
     seekerIndex: 1,
     phase: 'TITLE',
@@ -863,7 +867,9 @@
     spotStates: {},
     hintsRemaining: HIDE_SEEK_MAX_HINTS,
     noiseLevel: 0,
+    stamina: HIDE_SEEK_MAX_STAMINA,
     suspicionSpotId: null,
+    suspicionLevel: 0,
     inspectedSpotId: null,
     inspectTime: 0,
     activeRoomId: 'lobby',
@@ -879,7 +885,7 @@
       hider: { x: 120, y: 300, width: 24, height: 32, speed: 150, roomId: 'lobby', visible: true, color: '#2ec7d3' },
       seeker: { x: 120, y: 300, width: 24, height: 32, speed: 150, roomId: 'lobby', visible: false, color: '#f58220' },
     },
-    input: { up: false, down: false, left: false, right: false },
+    input: { up: false, down: false, left: false, right: false, sprint: false },
     revealPulse: 0,
     searchPulse: null,
     listenPulse: null,
@@ -1074,6 +1080,7 @@
   const hideSeekStartButton = document.getElementById('hide-seek-start');
   const hideSeekFoundButton = document.getElementById('hide-seek-found');
   const hideSeekSpecialButton = document.getElementById('hide-seek-special');
+  const hideSeekSprintButton = document.getElementById('hide-seek-sprint');
   const hideSeekNextButton = document.getElementById('hide-seek-next');
   const hideSeekDebugButton = document.getElementById('hide-seek-debug');
   const hideSeekResetButton = document.getElementById('hide-seek-reset');
@@ -2715,7 +2722,7 @@
   }
 
   function getHideSeekMaxRounds() {
-    return Number(hideSeekState.winnerGoal) || 6;
+    return Number(hideSeekState.winnerGoal) || 5;
   }
 
   function getHideSeekActiveActor() {
@@ -2737,10 +2744,18 @@
     const map = getHideSeekMap();
     return Object.values(map.rooms).reduce((states, room) => {
       (room.spots || []).forEach(spot => {
-        states[spot.id] = 'empty';
+        states[spot.id] = shouldDisableHideSeekSpot(room, spot) ? 'disabled' : 'empty';
       });
       return states;
     }, {});
+  }
+
+  function shouldDisableHideSeekSpot(room, spot) {
+    const spots = room.spots || [];
+    if (spots.length < 4) return false;
+    const spotIndex = spots.findIndex(item => item.id === spot.id);
+    const roundSeed = hideSeekRound + hideSeekState.hiderIndex + hideSeekState.seekerIndex + room.id.length;
+    return spotIndex === roundSeed % spots.length;
   }
 
   function setHideSeekSpotState(spotId, state) {
@@ -2768,6 +2783,7 @@
   function getFallbackHideSeekSpot(actor) {
     const room = getHideSeekRoom(actor.roomId);
     return (room.spots || []).reduce((closest, spot) => {
+      if (getHideSeekSpotState(spot.id) === 'disabled') return closest;
       const distance = getHideSeekDistanceToRect(actor, spot);
       if (!closest || distance < closest.distance) return Object.assign({ distance, roomId: room.id }, spot);
       return closest;
@@ -2778,6 +2794,7 @@
     if (!actor) return null;
     const room = getHideSeekRoom(actor.roomId);
     return room.spots.reduce((closest, spot) => {
+      if (getHideSeekSpotState(spot.id) === 'disabled') return closest;
       const radius = spot.interactionRadius || 42;
       const distance = getHideSeekDistanceToRect(actor, spot);
       if (distance > radius) return closest;
@@ -2873,9 +2890,7 @@
       playHideSeekTone('wrong');
       return;
     }
-    hideSeekState.noiseLevel = Math.min(1, hideSeekState.noiseLevel + (coverQuality.spot.noisy ? 0.38 : 0.22));
-    hideSeekState.suspicionSpotId = coverQuality.spot.id;
-    if (hideSeekState.noiseLevel >= 0.5) setHideSeekSpotState(coverQuality.spot.id, 'suspicious');
+    addHideSeekNoise(actor, coverQuality.spot.noisy ? 0.38 : 0.22);
     hideSeekState.hiderTimeRemaining = Math.max(0, hideSeekState.hiderTimeRemaining - 2);
     hideSeekState.shakingSpotId = coverQuality.spot.id;
     hideSeekState.shakeTime = 0.45;
@@ -2908,6 +2923,44 @@
     setHideSeekMessage(`${clue} Listen costs 4 seconds.`);
     playHideSeekTone('listen');
     renderHideSeek();
+  }
+
+  function addHideSeekNoise(actor, amount) {
+    hideSeekState.noiseLevel = Math.min(1, hideSeekState.noiseLevel + amount);
+    const nearbySpot = getNearbyHideSeekSpot(actor);
+    if (!nearbySpot) return;
+    hideSeekState.suspicionSpotId = nearbySpot.id;
+    if (hideSeekState.noiseLevel >= 0.55) {
+      setHideSeekSpotState(nearbySpot.id, 'suspicious');
+      hideSeekState.shakingSpotId = nearbySpot.id;
+      hideSeekState.shakeTime = Math.max(hideSeekState.shakeTime || 0, 0.28);
+    }
+  }
+
+  function updateHideSeekSuspicion(delta) {
+    if (hideSeekState.phase !== HideSeekGameState.SEEKER_TURN || !hideSeekState.hiddenPosition) return;
+    const seeker = hideSeekState.actors.seeker;
+    if (seeker.roomId !== hideSeekState.hiddenPosition.roomId) {
+      hideSeekState.suspicionLevel = Math.max(0, hideSeekState.suspicionLevel - delta * 7);
+      return;
+    }
+    const seekerCenter = getHideSeekActorCenter(seeker);
+    const hiddenCenter = {
+      x: hideSeekState.hiddenPosition.x + hideSeekState.actors.hider.width / 2,
+      y: hideSeekState.hiddenPosition.y + hideSeekState.actors.hider.height / 2,
+    };
+    const distance = Math.hypot(seekerCenter.x - hiddenCenter.x, seekerCenter.y - hiddenCenter.y);
+    const isClose = distance <= HIDE_SEEK_SUSPICION_DISTANCE;
+    const pressure = Math.max(0, 1 - distance / HIDE_SEEK_SUSPICION_DISTANCE);
+    hideSeekState.suspicionLevel = isClose
+      ? Math.min(100, hideSeekState.suspicionLevel + delta * (10 + pressure * 22 + hideSeekState.noiseLevel * 18))
+      : Math.max(0, hideSeekState.suspicionLevel - delta * 5);
+    if (hideSeekState.suspicionLevel >= 70 && hideSeekState.hiddenSpotId && getHideSeekSpotState(hideSeekState.hiddenSpotId) !== 'found') {
+      setHideSeekSpotState(hideSeekState.hiddenSpotId, 'suspicious');
+      hideSeekState.suspicionSpotId = hideSeekState.hiddenSpotId;
+      hideSeekState.shakingSpotId = hideSeekState.hiddenSpotId;
+      hideSeekState.shakeTime = Math.max(hideSeekState.shakeTime || 0, 0.22);
+    }
   }
 
   function setHideSeekMessage(message) {
@@ -2960,6 +3013,7 @@
       hideSeekState.input.down = false;
       hideSeekState.input.left = false;
       hideSeekState.input.right = false;
+      hideSeekState.input.sprint = false;
     }
   }
 
@@ -2990,11 +3044,14 @@
       const detail = document.createElement('span');
       const searched = room.spots.filter(spot => getHideSeekSpotState(spot.id) === 'searched').length;
       const suspicious = room.spots.filter(spot => getHideSeekSpotState(spot.id) === 'suspicious').length;
+      const disabled = room.spots.filter(spot => getHideSeekSpotState(spot.id) === 'disabled').length;
       detail.textContent = suspicious
         ? `${room.spots.length} spots · ${suspicious} suspicious`
         : searched
           ? `${room.spots.length} spots · ${searched} searched`
-          : `${room.spots.length} hiding spots`;
+          : disabled
+            ? `${room.spots.length - disabled} open · ${disabled} closed`
+            : `${room.spots.length} hiding spots`;
 
       card.appendChild(title);
       card.appendChild(detail);
@@ -3023,7 +3080,9 @@
     hideSeekState.spotStates = buildHideSeekSpotStates();
     hideSeekState.hintsRemaining = HIDE_SEEK_MAX_HINTS;
     hideSeekState.noiseLevel = 0;
+    hideSeekState.stamina = HIDE_SEEK_MAX_STAMINA;
     hideSeekState.suspicionSpotId = null;
+    hideSeekState.suspicionLevel = 0;
     hideSeekState.inspectedSpotId = null;
     hideSeekState.inspectTime = 0;
     hideSeekState.timerRemaining = hideSeekState.countdown;
@@ -3068,9 +3127,12 @@
     hideSeekStartButton.hidden = ![HideSeekGameState.TITLE, HideSeekGameState.ROUND_START, HideSeekGameState.GAME_OVER].includes(hideSeekState.phase);
     hideSeekFoundButton.hidden = ![HideSeekGameState.HIDER_TURN, HideSeekGameState.SEEKER_LOOK_AWAY, HideSeekGameState.SEEKER_TURN].includes(hideSeekState.phase);
     hideSeekSpecialButton.hidden = ![HideSeekGameState.HIDER_TURN, HideSeekGameState.SEEKER_TURN].includes(hideSeekState.phase);
+    hideSeekSprintButton.hidden = ![HideSeekGameState.HIDER_TURN, HideSeekGameState.SEEKER_TURN].includes(hideSeekState.phase);
     hideSeekNextButton.hidden = ![HideSeekGameState.FOUND, HideSeekGameState.ROUND_RESULTS].includes(hideSeekState.phase);
     hideSeekFoundButton.disabled = false;
     hideSeekSpecialButton.disabled = false;
+    hideSeekSprintButton.disabled = hideSeekState.stamina <= 1 || hideSeekState.inspectTime > 0;
+    hideSeekSprintButton.textContent = `Sprint ${Math.round(hideSeekState.stamina)}%`;
     hideSeekDebugButton.textContent = hideSeekDebugEnabled ? 'Debug: On' : 'Debug: Off';
     hideSeekDebugButton.setAttribute('aria-pressed', hideSeekDebugEnabled ? 'true' : 'false');
     hideSeekDebugButton.classList.toggle('is-active', hideSeekDebugEnabled);
@@ -3180,7 +3242,7 @@
     }
     hideSeekState.mode = hideSeekMode.value || 'roadside-lodge';
     hideSeekState.countdown = Number(hideSeekCountdown.value) || HIDE_SEEK_DEFAULT_SEARCH_SECONDS;
-    hideSeekState.winnerGoal = hideSeekWinner.value || '6';
+    hideSeekState.winnerGoal = hideSeekWinner.value || '5';
     resetHideSeekRoundState(HideSeekGameState.HIDER_TURN);
     startHideSeekLoop();
     playHideSeekTone('door');
@@ -3238,7 +3300,7 @@
     hideSeekState.hiddenCoverLabel = coverQuality.label;
     hideSeekState.hiddenRoomId = actor.roomId;
     setHideSeekSpotState(nearbySpot.id, 'occupied');
-    hideSeekState.noiseLevel = nearbySpot.noisy ? 0.45 : 0.18;
+    addHideSeekNoise(actor, nearbySpot.noisy ? 0.45 : 0.18);
     hideSeekState.hiddenPosition = {
       x: actor.x,
       y: actor.y,
@@ -3264,6 +3326,7 @@
       playHideSeekTone('wrong');
       return;
     }
+    const inspectedState = getHideSeekSpotState(inspectedSpot.id);
     hideSeekState.inspectedSpotId = inspectedSpot.id;
     hideSeekState.inspectTime = HIDE_SEEK_INSPECT_SECONDS;
     const sameRoom = inspectedSpot.roomId ? inspectedSpot.roomId === hiddenPosition.roomId : actor.roomId === hiddenPosition.roomId;
@@ -3277,11 +3340,12 @@
     setHideSeekSearchPulse(actor, feedback.tone);
     if (inspectedSpot.id !== hideSeekState.hiddenSpotId) {
       hideSeekState.wrongGuesses += 1;
-      hideSeekState.timerRemaining = Math.max(0, hideSeekState.timerRemaining - HIDE_SEEK_WRONG_SEARCH_PENALTY);
+      const repeatPenalty = inspectedState === 'searched' ? HIDE_SEEK_SPAM_INSPECTION_PENALTY : 0;
+      hideSeekState.timerRemaining = Math.max(0, hideSeekState.timerRemaining - HIDE_SEEK_WRONG_SEARCH_PENALTY - repeatPenalty);
       setHideSeekSpotState(inspectedSpot.id, distance <= HIDE_SEEK_SEARCH_TOLERANCE * 2.8 ? 'suspicious' : 'searched');
       hideSeekState.shakingSpotId = inspectedSpot.id;
       hideSeekState.shakeTime = 0.55;
-      setHideSeekMessage(`${feedback.text} ${HIDE_SEEK_WRONG_SEARCH_PENALTY} seconds lost.`);
+      setHideSeekMessage(`${feedback.text} ${HIDE_SEEK_WRONG_SEARCH_PENALTY + repeatPenalty} seconds lost${repeatPenalty ? ' for re-checking' : ''}.`);
       playHideSeekTone('wrong');
       renderHideSeek();
       if (hideSeekState.timerRemaining <= 0) hideSeekSeekerFailed();
@@ -3359,7 +3423,7 @@
     hideSeekState = {
       mode: hideSeekMode.value || 'roadside-lodge',
       countdown: Number(hideSeekCountdown.value) || HIDE_SEEK_DEFAULT_SEARCH_SECONDS,
-      winnerGoal: hideSeekWinner.value || '6',
+      winnerGoal: hideSeekWinner.value || '5',
       hiderIndex: 0,
       seekerIndex: 1,
       phase: HideSeekGameState.TITLE,
@@ -3371,7 +3435,9 @@
       spotStates: buildHideSeekSpotStates(),
       hintsRemaining: HIDE_SEEK_MAX_HINTS,
       noiseLevel: 0,
+      stamina: HIDE_SEEK_MAX_STAMINA,
       suspicionSpotId: null,
+      suspicionLevel: 0,
       inspectedSpotId: null,
       inspectTime: 0,
       hiddenRoomId: null,
@@ -3388,7 +3454,7 @@
         hider: { x: 120, y: 305, width: 24, height: 32, speed: 150, roomId: (hideSeekMaps[hideSeekMode.value] || hideSeekMaps['roadside-lodge']).startRoom, visible: true, color: '#2ec7d3' },
         seeker: { x: 120, y: 305, width: 24, height: 32, speed: 150, roomId: (hideSeekMaps[hideSeekMode.value] || hideSeekMaps['roadside-lodge']).startRoom, visible: false, color: '#f58220' },
       },
-      input: { up: false, down: false, left: false, right: false },
+      input: { up: false, down: false, left: false, right: false, sprint: false },
       revealPulse: 0,
       searchPulse: null,
       listenPulse: null,
@@ -3436,6 +3502,7 @@
     }
     if (hideSeekState.inspectTime > 0) hideSeekState.inspectTime = Math.max(0, hideSeekState.inspectTime - delta);
     if (hideSeekState.noiseLevel > 0) hideSeekState.noiseLevel = Math.max(0, hideSeekState.noiseLevel - delta * 0.025);
+    updateHideSeekSuspicion(delta);
     hideSeekState.coverGlowPulse = (hideSeekState.coverGlowPulse + delta * 2.2) % (Math.PI * 2);
     if (hideSeekState.shakeTime > 0) hideSeekState.shakeTime = Math.max(0, hideSeekState.shakeTime - delta);
     updateHideSeekTimerText();
@@ -3460,14 +3527,23 @@
     const dx = (input.right ? 1 : 0) - (input.left ? 1 : 0);
     const dy = (input.down ? 1 : 0) - (input.up ? 1 : 0);
     if (!dx && !dy) {
+      hideSeekState.stamina = Math.min(HIDE_SEEK_MAX_STAMINA, hideSeekState.stamina + delta * 24);
       hideSeekState.activeRoomId = actor.roomId;
       return;
     }
     const length = Math.hypot(dx, dy) || 1;
     const room = getHideSeekRoom(actor.roomId);
     const speedMultiplier = getHideSeekSpeedMultiplier(actor, room);
-    const moveX = (dx / length) * actor.speed * speedMultiplier * delta;
-    const moveY = (dy / length) * actor.speed * speedMultiplier * delta;
+    const canSprint = hideSeekState.input.sprint && hideSeekState.stamina > 2 && hideSeekState.inspectTime <= 0;
+    const sprintMultiplier = canSprint ? HIDE_SEEK_SPRINT_SPEED_MULTIPLIER : 1;
+    const moveX = (dx / length) * actor.speed * speedMultiplier * sprintMultiplier * delta;
+    const moveY = (dy / length) * actor.speed * speedMultiplier * sprintMultiplier * delta;
+    if (canSprint) {
+      hideSeekState.stamina = Math.max(0, hideSeekState.stamina - delta * 34);
+      if (hideSeekState.phase === HideSeekGameState.HIDER_TURN) addHideSeekNoise(actor, delta * 0.34);
+    } else {
+      hideSeekState.stamina = Math.min(HIDE_SEEK_MAX_STAMINA, hideSeekState.stamina + delta * 18);
+    }
     const nextXActor = Object.assign({}, actor, {
       x: Math.max(38, Math.min(738, actor.x + moveX)),
     });
@@ -3655,6 +3731,19 @@
       ctx.fillRect(620, 100, 72, 10);
       ctx.fillStyle = '#09233f';
       ctx.fillRect(620, 120, 72, 8);
+    } else if (map.id === 'school-night') {
+      ctx.fillStyle = '#d7dce4';
+      for (let i = 0; i < 4; i += 1) {
+        const x = 95 + i * 135;
+        ctx.fillRect(x, 92, 86, 70);
+        ctx.fillStyle = i % 2 ? '#9aa4b2' : '#ffd166';
+        ctx.fillRect(x + 10, 104, 66, 46);
+        ctx.fillStyle = '#d7dce4';
+      }
+      ctx.fillStyle = 'rgba(255, 209, 102, 0.18)';
+      ctx.beginPath();
+      ctx.ellipse(410, 210, 275, 70, 0, 0, Math.PI * 2);
+      ctx.fill();
     } else {
       ctx.fillStyle = '#fff2d8';
       ctx.fillRect(92, 88, 122, 82);
@@ -3811,6 +3900,7 @@
         ? 'empty'
         : state;
     const stateColors = {
+      disabled: '#4b5563',
       searched: '#9aa4b2',
       suspicious: '#ffd166',
       found: '#2ec7d3',
@@ -3964,7 +4054,19 @@
     }
     ctx.strokeStyle = highlight;
     strokeHideSeekRoundedRect(ctx, x, y, w, h, 9);
-    if (visibleState === 'searched' || visibleState === 'suspicious' || visibleState === 'found') {
+    if (visibleState === 'disabled') {
+      ctx.fillStyle = 'rgba(6,21,36,0.42)';
+      fillHideSeekRoundedRect(ctx, x, y, w, h, 9);
+      ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(x + 12, y + 12);
+      ctx.lineTo(x + w - 12, y + h - 12);
+      ctx.moveTo(x + w - 12, y + 12);
+      ctx.lineTo(x + 12, y + h - 12);
+      ctx.stroke();
+    }
+    if (visibleState === 'disabled' || visibleState === 'searched' || visibleState === 'suspicious' || visibleState === 'found') {
       ctx.fillStyle = visibleState === 'searched' ? 'rgba(6,21,36,0.78)' : 'rgba(6,21,36,0.88)';
       fillHideSeekRoundedRect(ctx, x + 8, y + 8, 86, 20, 10);
       ctx.fillStyle = visibleState === 'searched' ? '#d7dce4' : visibleState === 'found' ? '#bdeff4' : '#fff2d8';
@@ -4011,6 +4113,9 @@
     const actors = [hideSeekState.actors.hider, hideSeekState.actors.seeker];
     actors.forEach(actor => {
       if (!actor.visible || actor.roomId !== room.id) return;
+      if (actor === getHideSeekActiveActor() && hideSeekState.input.sprint && hideSeekState.stamina > 0) {
+        drawHideSeekSprintTrail(ctx, actor);
+      }
       drawHideSeekActor(ctx, actor);
     });
     if (hideSeekState.revealPulse > 0) {
@@ -4021,6 +4126,21 @@
       ctx.arc(actor.x + actor.width / 2, actor.y + actor.height / 2, 52 - hideSeekState.revealPulse * 14, 0, Math.PI * 2);
       ctx.stroke();
     }
+  }
+
+  function drawHideSeekSprintTrail(ctx, actor) {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(189, 239, 244, 0.58)';
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 4; i += 1) {
+      const offset = i * 8;
+      ctx.beginPath();
+      ctx.moveTo(actor.x - 10 - offset, actor.y + actor.height - 4 + i);
+      ctx.lineTo(actor.x - 24 - offset, actor.y + actor.height + 4 + i);
+      ctx.stroke();
+    }
+    ctx.restore();
   }
 
   function drawHideSeekActor(ctx, actor) {
@@ -4053,6 +4173,18 @@
     ctx.fillStyle = '#061524';
     fillHideSeekRoundedRect(ctx, actor.x + 2, actor.y + actor.height + 2, 8, 5, 3);
     fillHideSeekRoundedRect(ctx, actor.x + actor.width - 10, actor.y + actor.height + 2, 8, 5, 3);
+  }
+
+  function drawHideSeekMeter(ctx, x, y, width, value, color, label) {
+    const clamped = Math.max(0, Math.min(100, value));
+    ctx.fillStyle = 'rgba(255,255,255,0.14)';
+    fillHideSeekRoundedRect(ctx, x, y, width, 7, 4);
+    ctx.fillStyle = color;
+    fillHideSeekRoundedRect(ctx, x, y, width * (clamped / 100), 7, 4);
+    ctx.fillStyle = '#bdeff4';
+    ctx.font = '800 9px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText(label, x, y - 2);
   }
 
   function drawHideSeekHud(ctx, room, map) {
@@ -4095,11 +4227,14 @@
       ctx.font = '900 10px Arial';
       ctx.fillText(`Cover: ${quality.label}`, 472, 25);
       ctx.fillText(`Noise: ${Math.round(hideSeekState.noiseLevel * 100)}%`, 472, 42);
+      drawHideSeekMeter(ctx, 544, 39, 38, hideSeekState.stamina, '#2ec7d3', '');
     } else if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
       ctx.fillStyle = '#fff2d8';
       ctx.font = '900 10px Arial';
       ctx.fillText(`Miss: -${HIDE_SEEK_WRONG_SEARCH_PENALTY}s`, 472, 25);
       ctx.fillText(`Listen: ${hideSeekState.hintsRemaining}`, 472, 42);
+      drawHideSeekMeter(ctx, 544, 31, 38, hideSeekState.stamina, '#2ec7d3', '');
+      drawHideSeekMeter(ctx, 544, 47, 38, hideSeekState.suspicionLevel, '#ffd166', '');
     }
 
     ctx.textAlign = 'right';
@@ -4281,12 +4416,17 @@
       setHideSeekInput(keyMap[event.key], active);
       return;
     }
+    if (event.key === 'Shift') {
+      event.preventDefault();
+      setHideSeekInput('sprint', active);
+      return;
+    }
     if (active && ['e', 'E', ' ', 'Enter'].includes(event.key)) {
       event.preventDefault();
       markHideSeekFound();
       return;
     }
-    if (active && ['q', 'Q', 'Shift'].includes(event.key)) {
+    if (active && ['q', 'Q'].includes(event.key)) {
       event.preventDefault();
       useHideSeekSpecialAction();
     }
@@ -6046,6 +6186,17 @@
   hideSeekStartButton.addEventListener('click', startHideSeekRound);
   hideSeekFoundButton.addEventListener('click', markHideSeekFound);
   hideSeekSpecialButton.addEventListener('click', useHideSeekSpecialAction);
+  hideSeekSprintButton.addEventListener('pointerdown', event => {
+    event.preventDefault();
+    hideSeekSprintButton.setPointerCapture(event.pointerId);
+    setHideSeekInput('sprint', true);
+  });
+  hideSeekSprintButton.addEventListener('pointerup', event => {
+    event.preventDefault();
+    setHideSeekInput('sprint', false);
+  });
+  hideSeekSprintButton.addEventListener('pointercancel', () => setHideSeekInput('sprint', false));
+  hideSeekSprintButton.addEventListener('lostpointercapture', () => setHideSeekInput('sprint', false));
   hideSeekNextButton.addEventListener('click', nextHideSeekRound);
   hideSeekDebugButton.addEventListener('click', toggleHideSeekDebug);
   hideSeekResetButton.addEventListener('click', resetHideSeek);

@@ -510,7 +510,8 @@
             <span>Match length</span>
             <select id="hide-seek-winner">
               <option value="4">4 rounds</option>
-              <option value="6" selected>6 rounds</option>
+              <option value="5" selected>Best of 5</option>
+              <option value="6">6 rounds</option>
               <option value="8">8 rounds</option>
             </select>
           </label>
@@ -520,7 +521,7 @@
       <article id="hide-seek-round-card" class="trivia-card" aria-live="polite">
         <span id="hide-seek-phase" class="challenge-badge">Ready</span>
         <h3 id="hide-seek-round-title">Start the match.</h3>
-        <p id="hide-seek-round-text">Use the arrow keys, WASD, or the on-screen pad. Hiders get 1 minute to enter a hiding spot. Seekers inspect objects, listen for clues, and race the timer.</p>
+        <p id="hide-seek-round-text">Use the arrow keys, WASD, or the on-screen pad. Sprint has stamina. Hiders get 1 minute to enter a hiding spot. Seekers inspect objects, listen for clues, and race the timer.</p>
         <p id="hide-seek-countdown-text" class="timer" hidden></p>
       </article>
       <div class="hide-seek-stage">
@@ -540,6 +541,7 @@
         <button id="hide-seek-start" class="primary-button">Start Match</button>
         <button id="hide-seek-found" class="primary-button" hidden>Hide / Inspect</button>
         <button id="hide-seek-special" class="secondary-button" hidden>Listen</button>
+        <button id="hide-seek-sprint" class="secondary-button" hidden>Sprint</button>
         <button id="hide-seek-next" class="secondary-button" hidden>Next Round</button>
         <button id="hide-seek-debug" class="secondary-button" aria-pressed="false">Debug: Off</button>
         <button id="hide-seek-reset" class="secondary-button">Reset Game</button>
