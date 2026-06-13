@@ -709,20 +709,40 @@
     <section id="admin-mode" hidden>
       <div class="mode-header">
         <div>
-          <h2 id="admin-heading">Admin Vault</h2>
-          <p>Local-only shortcut panel for secret stuff and quick testing.</p>
+          <h2 id="admin-heading">Game Lab</h2>
+          <p>Local-only shortcut panel for direct launches, test players, and quick mode QA.</p>
         </div>
-        <div class="hunt-route" aria-label="Admin mode">Unlocked</div>
+        <div class="hunt-route" aria-label="Developer mode">Developer</div>
       </div>
       <article class="trivia-card">
-        <span class="challenge-badge">Logo x3</span>
-        <h3>Secret Shortcuts</h3>
-        <p>These buttons are hidden helpers. No accounts, passwords, or server access.</p>
-        <div class="adventure-actions">
-          <button class="secondary-button" data-admin-launch="secret">Secret Mode</button>
+        <span class="challenge-badge">Dev Tools</span>
+        <h3>Fast Setup</h3>
+        <p>Use test initials and jump directly into any mode without walking through onboarding.</p>
+        <div class="adventure-actions dev-actions">
+          <button class="secondary-button" data-admin-action="test-players">Use Test Players</button>
+          <button class="secondary-button" data-admin-action="open-menu">Open Main Menu</button>
+        </div>
+      </article>
+      <article class="trivia-card">
+        <span class="challenge-badge">Direct Launch</span>
+        <h3>Game Lab Shortcuts</h3>
+        <p>No accounts, passwords, or server access. This is only a local developer convenience.</p>
+        <div class="dev-launch-grid">
+          <button class="secondary-button" data-admin-launch="scavenger">Scavenger Hunt</button>
+          <button class="secondary-button" data-admin-launch="trivia">Trivia Run</button>
+          <button class="secondary-button" data-admin-launch="learn">Learn Something</button>
+          <button class="secondary-button" data-admin-launch="jokes">Joke Vote</button>
+          <button class="secondary-button" data-admin-launch="emoji">Emoji Face-Off</button>
+          <button class="secondary-button" data-admin-launch="pi">Pi Digits</button>
+          <button class="secondary-button" data-admin-launch="hide-seek">Hide &amp; Seek</button>
           <button class="secondary-button" data-admin-launch="pong">Road Pong</button>
           <button class="secondary-button" data-admin-launch="gorillas">Banana Towers</button>
-          <button class="secondary-button" data-admin-launch="scavenger">Scavenger Hunt</button>
+          <button class="secondary-button" data-admin-launch="calculator">Trip Calculator</button>
+          <button class="secondary-button" data-admin-launch="look">Window Quests</button>
+          <button class="secondary-button" data-admin-launch="laugh">Car Laughs</button>
+          <button class="secondary-button" data-admin-launch="compete">Quick Challenges</button>
+          <button class="secondary-button" data-admin-launch="local">Local Explorer</button>
+          <button class="secondary-button" data-admin-launch="secret">Secret Mode</button>
         </div>
       </article>
       <article class="trivia-card">

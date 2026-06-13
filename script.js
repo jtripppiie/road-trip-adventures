@@ -5064,6 +5064,20 @@
     adminCounts.textContent = `${triviaCount} trivia questions, ${scavengerCount} scavenger items, ${learnCount} learn prompts, ${secretModeCount} ${secretModeLabel}.`;
   }
 
+  function useAdminTestPlayers() {
+    players = [
+      { id: 'p1', name: 'JT' },
+      { id: 'p2', name: 'DD' },
+      { id: 'p3', name: 'QA' },
+      { id: 'p4', name: 'UX' },
+    ];
+    carJudgeId = 'p3';
+    setStoredJson('rtaPlayers', players);
+    setStoredJson('rtaCarJudgeId', carJudgeId);
+    renderPlayerFields();
+    renderAdminCounts();
+  }
+
   function openAdminMode() {
     renderAdminCounts();
     showSection('admin');
@@ -5088,6 +5102,7 @@
   }
 
   function launchAdminMode(mode) {
+    savePlayers();
     selectedCategory = normalizeCategoryKey(mode);
     if (selectedCategory === 'secret') {
       startSecretMode();
@@ -5097,6 +5112,50 @@
       startGorillasGame();
     } else if (selectedCategory === 'scavenger') {
       startScavengerHunt();
+    } else if (selectedCategory === 'trivia') {
+      startTriviaRun();
+      startTriviaCategory(activeTriviaCategory || 'mixed');
+    } else if (selectedCategory === 'jokes') {
+      startJokeVote();
+    } else if (selectedCategory === 'emoji') {
+      startEmojiGame();
+    } else if (selectedCategory === 'pi') {
+      startPiChallenge();
+    } else if (selectedCategory === 'calculator') {
+      startTripCalculator();
+    } else if (selectedCategory === 'hideSeek') {
+      startHideSeekGame();
+    } else if (selectedCategory === 'learn') {
+      selectedLearnTopic = 'all';
+      setStoredJson('rtaLastLearnTopic', selectedLearnTopic);
+      regionCode = '*';
+      startAdventure();
+    } else if (selectedCategory === 'local') {
+      regionCode = 'CA';
+      startAdventure();
+    } else if (['look', 'laugh', 'compete', 'random'].includes(selectedCategory)) {
+      regionCode = '*';
+      startAdventure();
+    } else {
+      showSection('category');
+    }
+  }
+
+  function handleAdminAction(action) {
+    if (action === 'test-players') {
+      useAdminTestPlayers();
+      return;
+    }
+    if (action === 'open-menu') {
+      showSection('category');
+    }
+  }
+
+  function maybeOpenDeveloperLab() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('dev') === '1' || window.location.hash === '#admin' || window.location.hash === '#dev') {
+      loadingScreen.style.display = 'none';
+      openAdminMode();
     }
   }
 
@@ -5577,8 +5636,14 @@
   }
   document.addEventListener('click', event => {
     const adminButton = event.target.closest('button[data-admin-launch]');
-    if (!adminButton) return;
-    launchAdminMode(adminButton.dataset.adminLaunch);
+    if (adminButton) {
+      launchAdminMode(adminButton.dataset.adminLaunch);
+      return;
+    }
+    const adminActionButton = event.target.closest('button[data-admin-action]');
+    if (adminActionButton) {
+      handleAdminAction(adminActionButton.dataset.adminAction);
+    }
   });
   gorillasFireButton.addEventListener('click', fireGorillasShot);
   gorillasFullscreenButton.addEventListener('click', toggleGorillasFullscreen);
@@ -5687,6 +5752,9 @@
     applyTripSettings();
     renderPlayerFields();
     passengerConfirmButton.addEventListener('click', confirmPassengerStatus);
-    passengerConfirmButton.focus();
+    maybeOpenDeveloperLab();
+    if (loadingScreen.style.display !== 'none') {
+      passengerConfirmButton.focus();
+    }
   });
 })();

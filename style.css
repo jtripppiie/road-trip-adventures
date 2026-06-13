@@ -559,6 +559,22 @@ body.large-text {
   font-weight: 700;
 }
 
+.dev-actions {
+  justify-content: center;
+}
+
+.dev-launch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.dev-launch-grid .secondary-button {
+  min-height: 3.25rem;
+  padding-inline: 0.65rem;
+}
+
 .hunt-route {
   flex: 0 0 auto;
   padding: 0.5rem 0.75rem;
