@@ -548,6 +548,12 @@ body.large-text {
   margin-bottom: 1rem;
 }
 
+.hunt-header > :first-child,
+.mode-header > :first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .hunt-header h2,
 .hunt-header p,
 .mode-header h2,
@@ -908,6 +914,11 @@ body.large-text {
   gap: 0.5rem;
   width: min(100%, 680px);
   margin: 1rem auto;
+}
+
+#hide-seek-game .mode-header {
+  width: min(100%, 900px);
+  margin-inline: auto;
 }
 
 .hide-seek-asset {
