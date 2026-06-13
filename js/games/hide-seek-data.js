@@ -43,12 +43,12 @@
         garage: {
           id: 'garage',
           name: 'Garage',
-          exits: [{ label: 'Lobby', targetRoom: 'lobby', x: 365, y: 24, width: 110, height: 28, spawnX: 400, spawnY: 350 }],
+          exits: [{ label: 'Lobby', targetRoom: 'lobby', x: 345, y: 24, width: 150, height: 28, spawnX: 400, spawnY: 350 }],
           spots: [
             { id: 'garage-toolbox', label: 'tool wall', kind: 'shelf', x: 92, y: 95, width: 145, height: 92, difficulty: 2 },
-            { id: 'garage-spare-tires', label: 'spare tires', kind: 'box', x: 455, y: 100, width: 86, height: 78, difficulty: 3 },
-            { id: 'garage-cardboard', label: 'cardboard stack', kind: 'box', x: 292, y: 265, width: 155, height: 95, difficulty: 3 },
-            { id: 'garage-van', label: 'behind the pickup truck', kind: 'car', x: 494, y: 178, width: 230, height: 132, difficulty: 5 },
+            { id: 'garage-spare-tires', label: 'spare tires', kind: 'box', x: 570, y: 105, width: 76, height: 70, difficulty: 3 },
+            { id: 'garage-cardboard', label: 'cardboard stack', kind: 'box', x: 218, y: 268, width: 120, height: 84, difficulty: 3 },
+            { id: 'garage-van', label: 'behind the pickup truck', kind: 'car', x: 505, y: 190, width: 198, height: 114, difficulty: 5 },
           ],
           obstacles: [{ id: 'garage-oil', type: 'slow', x: 260, y: 355, width: 170, height: 34, speedMultiplier: 0.55 }],
         },

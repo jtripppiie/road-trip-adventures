@@ -5,6 +5,213 @@
  * can stay framework-free and still reuse the app's existing canvas helpers.
  */
 (function () {
+  const DETAIL_LEVELS = {
+    LOW: 'low',
+    MEDIUM: 'medium',
+    HIGH: 'high',
+  };
+
+  const ART_THEMES = {
+    couch: {
+      base: ['#285d86', '#173f65', '#0b294b'],
+      back: ['#a9e6f5', '#62bfdc', '#337fae'],
+      seat: ['#c2f1fb', '#76d0e6', '#429bbf'],
+      arms: ['#215d8a', '#071f39'],
+      piping: '#d6b37f',
+      leg: '#4a2918',
+      accent: '#f4c96b',
+      shadow: 'rgba(0,0,0,0.32)',
+      outline: 'rgba(4, 18, 34, 0.48)',
+    },
+    truck: {
+      paint: ['#f04836', '#b71c1c', '#651010'],
+      roof: '#c82020',
+      trim: '#f4f4f4',
+      gold: '#e6c35c',
+      glass: '#9ed7f5',
+      chrome: '#d6d6d6',
+      grille: '#bfc4c9',
+      tire: '#10151d',
+      rim: '#d0d4d8',
+      outline: 'rgba(56, 0, 0, 0.62)',
+      shadow: 'rgba(0,0,0,0.32)',
+    },
+    desk: {
+      body: ['#d99046', '#6f3f1f'],
+      top: '#f9dfa8',
+      inset: 'rgba(6,21,36,0.24)',
+      book: '#09233f',
+      knob: '#ffd166',
+      grain: 'rgba(118,60,22,0.28)',
+      highlight: 'rgba(255,255,255,0.2)',
+    },
+    frontDesk: {
+      body: ['#e5a45c', '#85502a'],
+      top: '#ffe1a8',
+      inset: 'rgba(6,21,36,0.2)',
+      book: '#153f63',
+      knob: '#ffd166',
+      grain: 'rgba(118,60,22,0.24)',
+      highlight: 'rgba(255,255,255,0.24)',
+      sign: '#fff2d8',
+      bell: '#f4c96b',
+    },
+    tree: {
+      trunk: '#70411f',
+      leaves: '#1f9f68',
+      bushLeaves: '#2fa86f',
+      fruit: '#f4c96b',
+      shadow: 'rgba(6,21,36,0.09)',
+    },
+  };
+
+  const ART_LAYOUTS = {
+    couch: {
+      base: { x: 0.067, y: 0.5, w: 0.866, h: 0.39, r: 0.07 },
+      backs: [
+        { x: 0.118, y: 0.105, w: 0.357, h: 0.455, r: 0.09 },
+        { x: 0.505, y: 0.116, w: 0.382, h: 0.445, r: 0.09 },
+      ],
+      seats: [
+        { x: 0.11, y: 0.5, w: 0.377, h: 0.29, r: 0.08 },
+        { x: 0.503, y: 0.506, w: 0.385, h: 0.28, r: 0.08 },
+      ],
+      arms: [
+        { x: 0, y: 0.31, w: 0.117, h: 0.56, r: 0.08 },
+        { x: 0.883, y: 0.31, w: 0.117, h: 0.56, r: 0.08 },
+      ],
+      occlusion: [
+        { x: 0.12, y: 0.74, w: 0.77, h: 0.045, r: 0.02 },
+        { x: 0.105, y: 0.54, w: 0.012, h: 0.27, r: 0.01 },
+        { x: 0.883, y: 0.54, w: 0.012, h: 0.27, r: 0.01 },
+      ],
+      seams: [
+        { x1: 0.15, y1: 0.55, x2: 0.47, y2: 0.565 },
+        { x1: 0.545, y1: 0.555, x2: 0.855, y2: 0.57 },
+        { x1: 0.16, y1: 0.165, x2: 0.45, y2: 0.18 },
+        { x1: 0.545, y1: 0.176, x2: 0.855, y2: 0.191 },
+      ],
+      highlights: [
+        { cx: 0.3, cy: 0.28, r: 0.13 },
+        { cx: 0.7, cy: 0.28, r: 0.13 },
+        { cx: 0.3, cy: 0.61, r: 0.13 },
+        { cx: 0.7, cy: 0.61, r: 0.13 },
+      ],
+      pillows: [
+        { cx: 0.36, cy: 0.47, w: 0.16, h: 0.24, angle: -0.09, color: '#f4c96b', accent: '#d6a33d' },
+        { cx: 0.64, cy: 0.46, w: 0.15, h: 0.22, angle: 0.1, color: '#fff2d8', accent: '#d6b37f' },
+      ],
+      legs: [
+        { x: 0.072, y: 0.83, w: 0.07, h: 0.125, lean: -0.015, shineX: 0.086 },
+        { x: 0.858, y: 0.83, w: 0.07, h: 0.125, lean: 0.015, shineX: 0.872 },
+      ],
+    },
+    truck: {
+      bodyRects: [
+        { x: 0.37, y: 0.29, w: 0.47, h: 0.36 },
+        { x: 0.48, y: 0.11, w: 0.25, h: 0.48 },
+        { x: 0.1, y: 0.25, w: 0.39, h: 0.4 },
+      ],
+      roof: { x: 0.45, y: 0.04, w: 0.31, h: 0.17, r: 0.05 },
+      windows: [
+        { x: 0.51, y: 0.17, w: 0.1, h: 0.23, r: 0.04 },
+        { x: 0.63, y: 0.17, w: 0.1, h: 0.23, r: 0.04 },
+      ],
+      headlights: [
+        { cx: 0.047, cy: 0.41 },
+        { cx: 0.047, cy: 0.5 },
+        { cx: 0.082, cy: 0.41 },
+        { cx: 0.082, cy: 0.5 },
+      ],
+      wheels: [
+        { cx: 0.25, cy: 0.73 },
+        { cx: 0.72, cy: 0.73 },
+      ],
+      panelLines: [
+        { x1: 0.17, y1: 0.38, x2: 0.26, y2: 0.36 },
+        { x1: 0.4, y1: 0.62, x2: 0.56, y2: 0.6 },
+        { x1: 0.67, y1: 0.29, x2: 0.8, y2: 0.31 },
+      ],
+    },
+    desk: {
+      body: { x: 0, y: 0.28, w: 1, h: 0.62, r: 0.12 },
+      top: { x: 0.08, y: 0.09, w: 0.84, h: 0.24, r: 0.1 },
+      drawers: [
+        { x: 0.1, y: 0.48, w: 0.36, h: 0.22, r: 0.03, knob: 0.28 },
+        { x: 0.54, y: 0.48, w: 0.36, h: 0.22, r: 0.03, knob: 0.72 },
+      ],
+      book: { x: 0.66, y: 0.42, w: 0.18, h: 0.36, r: 0.05 },
+      shadow: { x: 0.15, y: 0.73, w: 0.7, h: 0.08, r: 0.03 },
+      seams: [
+        { x1: 0.14, y1: 0.42, x2: 0.86, y2: 0.42 },
+        { x1: 0.5, y1: 0.45, x2: 0.5, y2: 0.77 },
+        { x1: 0.1, y1: 0.19, x2: 0.9, y2: 0.19, highlight: true },
+      ],
+    },
+    tree: {
+      trunk: { x: 0.42, y: 0.42, w: 0.18, h: 0.58, r: 0.035 },
+      leafBlobs: [
+        { cx: 0.5, cy: 0.24, rx: 0.44, ry: 0.26, shade: 16 },
+        { cx: 0.34, cy: 0.43, rx: 0.34, ry: 0.22, shade: -5 },
+        { cx: 0.66, cy: 0.43, rx: 0.34, ry: 0.22, shade: -10 },
+        { cx: 0.5, cy: 0.58, rx: 0.45, ry: 0.24, shade: -15 },
+      ],
+      barkLines: [
+        { x1: 0.49, y1: 0.48, cx: 0.44, cy: 0.66, x2: 0.5, y2: 0.92 },
+        { x1: 0.54, y1: 0.5, cx: 0.59, cy: 0.66, x2: 0.55, y2: 0.9 },
+      ],
+      fruit: [
+        { cx: 0.67, cy: 0.36, r: 0.022 },
+        { cx: 0.31, cy: 0.5, r: 0.018 },
+      ],
+    },
+  };
+
+  function getDetailLevel(width) {
+    if (width >= 220) return DETAIL_LEVELS.HIGH;
+    if (width >= 120) return DETAIL_LEVELS.MEDIUM;
+    return DETAIL_LEVELS.LOW;
+  }
+
+  function makeGradient(ctx, x1, y1, x2, y2, stops) {
+    const gradient = ctx.createLinearGradient(x1, y1, x2, y2);
+    stops.forEach((stop, index) => {
+      if (Array.isArray(stop)) gradient.addColorStop(stop[0], stop[1]);
+      else gradient.addColorStop(index / Math.max(1, stops.length - 1), stop);
+    });
+    return gradient;
+  }
+
+  function makeVerticalGradient(ctx, x, y, h, stops) {
+    return makeGradient(ctx, x, y, x, y + h, stops);
+  }
+
+  function makeDiagonalGradient(ctx, x, y, w, h, stops) {
+    return makeGradient(ctx, x, y, x + w, y + h, stops);
+  }
+
+  function ratioRect(frame, rect) {
+    return {
+      x: frame.x + frame.w * rect.x,
+      y: frame.y + frame.h * rect.y,
+      w: frame.w * rect.w,
+      h: frame.h * rect.h,
+      r: frame.h * (rect.r || 0),
+    };
+  }
+
+  function drawRatioLine(ctx, frame, line) {
+    ctx.beginPath();
+    ctx.moveTo(frame.x + frame.w * line.x1, frame.y + frame.h * line.y1);
+    ctx.lineTo(frame.x + frame.w * line.x2, frame.y + frame.h * line.y2);
+    ctx.stroke();
+  }
+
+  function seededUnit(seed) {
+    const value = Math.sin(seed * 12.9898) * 43758.5453;
+    return value - Math.floor(value);
+  }
+
   function drawSoftCushion(ctx, x, y, w, h, radius) {
     const r = Math.min(radius, w * 0.22, h * 0.4);
     ctx.beginPath();
@@ -104,8 +311,8 @@
     ctx.save();
     ctx.fillStyle = color;
     for (let index = 0; index < count; index += 1) {
-      const px = x + ((index * 43 + 17) % 100) / 100 * w;
-      const py = y + ((index * 59 + 29) % 100) / 100 * h;
+      const px = x + seededUnit(index + 1) * w;
+      const py = y + seededUnit(index + 101) * h;
       ctx.fillRect(px, py, 1, 1);
     }
     ctx.restore();
@@ -153,134 +360,152 @@
     ctx.fill();
   }
 
-  function drawCouch(ctx, x, y, w, h, tools) {
-    const { fillRoundedRect, strokeRoundedRect } = tools;
-
-    ctx.save();
-    ctx.lineJoin = 'round';
-
-    ctx.fillStyle = 'rgba(0,0,0,0.32)';
+  function drawCouchShadow(ctx, frame, theme) {
+    ctx.fillStyle = theme.shadow;
     ctx.beginPath();
-    ctx.ellipse(x + w / 2, y + h * 1.03, w * 0.49, h * 0.14, 0, 0, Math.PI * 2);
+    ctx.ellipse(frame.x + frame.w / 2, frame.y + frame.h * 1.03, frame.w * 0.49, frame.h * 0.14, 0, 0, Math.PI * 2);
     ctx.fill();
+  }
 
-    const base = ctx.createLinearGradient(x, y + h * 0.46, x, y + h * 0.9);
-    base.addColorStop(0, '#285d86');
-    base.addColorStop(0.58, '#173f65');
-    base.addColorStop(1, '#0b294b');
-    ctx.fillStyle = base;
-    fillRoundedRect(ctx, x + w * 0.067, y + h * 0.5, w * 0.866, h * 0.39, h * 0.07);
+  function drawCouchStructure(ctx, frame, tools, theme, layout) {
+    const { fillRoundedRect, strokeRoundedRect } = tools;
+    const base = ratioRect(frame, layout.base);
+    ctx.fillStyle = makeVerticalGradient(ctx, base.x, base.y, base.h, theme.base);
+    fillRoundedRect(ctx, base.x, base.y, base.w, base.h, base.r);
 
-    const back = ctx.createLinearGradient(x, y + h * 0.08, x, y + h * 0.56);
-    back.addColorStop(0, '#a9e6f5');
-    back.addColorStop(0.48, '#62bfdc');
-    back.addColorStop(1, '#337fae');
-    ctx.fillStyle = back;
-    fillSoftCushion(ctx, x + w * 0.118, y + h * 0.105, w * 0.357, h * 0.455, h * 0.09);
-    fillSoftCushion(ctx, x + w * 0.505, y + h * 0.116, w * 0.382, h * 0.445, h * 0.09);
-
-    const seat = ctx.createLinearGradient(x, y + h * 0.48, x, y + h * 0.8);
-    seat.addColorStop(0, '#c2f1fb');
-    seat.addColorStop(0.48, '#76d0e6');
-    seat.addColorStop(1, '#429bbf');
-    ctx.fillStyle = seat;
-    fillSoftCushion(ctx, x + w * 0.11, y + h * 0.5, w * 0.377, h * 0.29, h * 0.08);
-    fillSoftCushion(ctx, x + w * 0.503, y + h * 0.506, w * 0.385, h * 0.28, h * 0.08);
-
-    const arms = ctx.createLinearGradient(x, y + h * 0.28, x, y + h * 0.88);
-    arms.addColorStop(0, '#215d8a');
-    arms.addColorStop(1, '#071f39');
-    ctx.fillStyle = arms;
-    fillRoundedRect(ctx, x, y + h * 0.31, w * 0.117, h * 0.56, h * 0.08);
-    fillRoundedRect(ctx, x + w * 0.883, y + h * 0.31, w * 0.117, h * 0.56, h * 0.08);
-
-    ctx.strokeStyle = 'rgba(4, 18, 34, 0.48)';
-    ctx.lineWidth = Math.max(1.5, w * 0.01);
-    tools.strokeRoundedRect(ctx, x, y + h * 0.31, w * 0.117, h * 0.56, h * 0.08);
-    tools.strokeRoundedRect(ctx, x + w * 0.883, y + h * 0.31, w * 0.117, h * 0.56, h * 0.08);
-
-    ctx.fillStyle = 'rgba(0,0,0,0.12)';
-    fillRoundedRect(ctx, x + w * 0.12, y + h * 0.74, w * 0.77, h * 0.045, h * 0.02);
-    fillRoundedRect(ctx, x + w * 0.105, y + h * 0.54, w * 0.012, h * 0.27, h * 0.01);
-    fillRoundedRect(ctx, x + w * 0.883, y + h * 0.54, w * 0.012, h * 0.27, h * 0.01);
-
-    ctx.strokeStyle = '#d6b37f';
-    ctx.lineWidth = Math.max(1.1, w * 0.008);
-    strokeSoftCushion(ctx, x + w * 0.118, y + h * 0.105, w * 0.357, h * 0.455, h * 0.09);
-    strokeSoftCushion(ctx, x + w * 0.505, y + h * 0.116, w * 0.382, h * 0.445, h * 0.09);
-    strokeSoftCushion(ctx, x + w * 0.11, y + h * 0.5, w * 0.377, h * 0.29, h * 0.08);
-    strokeSoftCushion(ctx, x + w * 0.503, y + h * 0.506, w * 0.385, h * 0.28, h * 0.08);
-
-    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-    ctx.lineWidth = Math.max(1, w * 0.006);
-    [
-      [0.15, 0.55, 0.32, 0.015],
-      [0.545, 0.555, 0.31, 0.015],
-      [0.16, 0.165, 0.29, 0.015],
-      [0.545, 0.176, 0.31, 0.015],
-    ].forEach(([sx, sy, sw, sh]) => {
-      ctx.beginPath();
-      ctx.moveTo(x + w * sx, y + h * sy);
-      ctx.lineTo(x + w * (sx + sw), y + h * (sy + sh));
-      ctx.stroke();
+    ctx.fillStyle = makeVerticalGradient(ctx, frame.x, frame.y + frame.h * 0.08, frame.h * 0.48, theme.back);
+    layout.backs.forEach((rect) => {
+      const back = ratioRect(frame, rect);
+      fillSoftCushion(ctx, back.x, back.y, back.w, back.h, back.r);
     });
 
+    ctx.fillStyle = makeVerticalGradient(ctx, frame.x, frame.y + frame.h * 0.48, frame.h * 0.32, theme.seat);
+    layout.seats.forEach((rect) => {
+      const seat = ratioRect(frame, rect);
+      fillSoftCushion(ctx, seat.x, seat.y, seat.w, seat.h, seat.r);
+    });
+
+    ctx.fillStyle = makeVerticalGradient(ctx, frame.x, frame.y + frame.h * 0.28, frame.h * 0.6, theme.arms);
+    layout.arms.forEach((rect) => {
+      const arm = ratioRect(frame, rect);
+      fillRoundedRect(ctx, arm.x, arm.y, arm.w, arm.h, arm.r);
+    });
+
+    ctx.strokeStyle = theme.outline;
+    ctx.lineWidth = Math.max(1.5, frame.w * 0.01);
+    layout.arms.forEach((rect) => {
+      const arm = ratioRect(frame, rect);
+      strokeRoundedRect(ctx, arm.x, arm.y, arm.w, arm.h, arm.r);
+    });
+  }
+
+  function drawCouchDepth(ctx, frame, tools, layout) {
+    const { fillRoundedRect } = tools;
+    ctx.fillStyle = 'rgba(0,0,0,0.12)';
+    layout.occlusion.forEach((rect) => {
+      const shadow = ratioRect(frame, rect);
+      fillRoundedRect(ctx, shadow.x, shadow.y, shadow.w, shadow.h, shadow.r);
+    });
+  }
+
+  function drawCouchSeamsAndHighlights(ctx, frame, theme, layout, detail) {
+    ctx.strokeStyle = theme.piping;
+    ctx.lineWidth = Math.max(1.1, frame.w * 0.008);
+    layout.backs.concat(layout.seats).forEach((rect) => {
+      const cushion = ratioRect(frame, rect);
+      strokeSoftCushion(ctx, cushion.x, cushion.y, cushion.w, cushion.h, cushion.r);
+    });
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = Math.max(1, frame.w * 0.006);
+    layout.seams.forEach((line) => drawRatioLine(ctx, frame, line));
+
+    if (detail === DETAIL_LEVELS.LOW) return;
+
     ctx.strokeStyle = 'rgba(255,255,255,0.38)';
-    ctx.lineWidth = Math.max(1.2, w * 0.012);
-    [
-      [0.3, 0.28, 0.13],
-      [0.7, 0.28, 0.13],
-      [0.3, 0.61, 0.13],
-      [0.7, 0.61, 0.13],
-    ].forEach(([cx, cy, r]) => {
+    ctx.lineWidth = Math.max(1.2, frame.w * 0.012);
+    layout.highlights.forEach(({ cx, cy, r }) => {
       ctx.beginPath();
-      ctx.arc(x + w * cx, y + h * cy, w * r, Math.PI, Math.PI * 1.82);
+      ctx.arc(frame.x + frame.w * cx, frame.y + frame.h * cy, frame.w * r, Math.PI, Math.PI * 1.82);
       ctx.stroke();
     });
 
     ctx.strokeStyle = 'rgba(0,0,0,0.22)';
-    ctx.lineWidth = Math.max(1.4, w * 0.012);
+    ctx.lineWidth = Math.max(1.4, frame.w * 0.012);
     ctx.beginPath();
-    ctx.moveTo(x + w * 0.5, y + h * 0.14);
-    ctx.lineTo(x + w * 0.5, y + h * 0.78);
+    ctx.moveTo(frame.x + frame.w * 0.5, frame.y + frame.h * 0.14);
+    ctx.lineTo(frame.x + frame.w * 0.5, frame.y + frame.h * 0.78);
     ctx.stroke();
 
     ctx.strokeStyle = 'rgba(0,0,0,0.13)';
-    ctx.lineWidth = Math.max(1, w * 0.007);
-    drawCouchWrinkles(ctx, x, y, w, h);
+    ctx.lineWidth = Math.max(1, frame.w * 0.007);
+    drawCouchWrinkles(ctx, frame.x, frame.y, frame.w, frame.h);
+  }
 
-    drawCouchPillow(ctx, x + w * 0.36, y + h * 0.47, w * 0.16, h * 0.24, -0.09, '#f4c96b', '#d6a33d', tools);
-    drawCouchPillow(ctx, x + w * 0.64, y + h * 0.46, w * 0.15, h * 0.22, 0.1, '#fff2d8', '#d6b37f', tools);
+  function drawCouchDetails(ctx, frame, tools, theme, layout, detail) {
+    if (detail !== DETAIL_LEVELS.LOW) {
+      layout.pillows.forEach((pillow) => {
+        drawCouchPillow(
+          ctx,
+          frame.x + frame.w * pillow.cx,
+          frame.y + frame.h * pillow.cy,
+          frame.w * pillow.w,
+          frame.h * pillow.h,
+          pillow.angle,
+          pillow.color,
+          pillow.accent,
+          tools
+        );
+      });
+    }
 
     ctx.fillStyle = 'rgba(255,255,255,0.24)';
     ctx.beginPath();
-    ctx.ellipse(x + w * 0.31, y + h * 0.18, w * 0.12, h * 0.035, -0.1, 0, Math.PI * 2);
-    ctx.ellipse(x + w * 0.71, y + h * 0.18, w * 0.12, h * 0.035, -0.1, 0, Math.PI * 2);
+    ctx.ellipse(frame.x + frame.w * 0.31, frame.y + frame.h * 0.18, frame.w * 0.12, frame.h * 0.035, -0.1, 0, Math.PI * 2);
+    ctx.ellipse(frame.x + frame.w * 0.71, frame.y + frame.h * 0.18, frame.w * 0.12, frame.h * 0.035, -0.1, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = '#4a2918';
-    drawAngledLeg(ctx, x + w * 0.072, y + h * 0.83, w * 0.07, h * 0.125, -w * 0.015);
-    drawAngledLeg(ctx, x + w * 0.858, y + h * 0.83, w * 0.07, h * 0.125, w * 0.015);
+    ctx.fillStyle = theme.leg;
+    layout.legs.forEach((leg) => {
+      drawAngledLeg(ctx, frame.x + frame.w * leg.x, frame.y + frame.h * leg.y, frame.w * leg.w, frame.h * leg.h, frame.w * leg.lean);
+    });
     ctx.fillStyle = 'rgba(255,255,255,0.16)';
-    drawAngledLeg(ctx, x + w * 0.086, y + h * 0.84, w * 0.018, h * 0.075, -w * 0.005);
-    drawAngledLeg(ctx, x + w * 0.872, y + h * 0.84, w * 0.018, h * 0.075, w * 0.005);
+    layout.legs.forEach((leg) => {
+      drawAngledLeg(ctx, frame.x + frame.w * leg.shineX, frame.y + frame.h * 0.84, frame.w * 0.018, frame.h * 0.075, frame.w * leg.lean * 0.34);
+    });
 
     ctx.fillStyle = 'rgba(6,21,36,0.42)';
     ctx.beginPath();
-    ctx.ellipse(x + w * 0.31, y + h * 0.94, w * 0.03, h * 0.025, 0, 0, Math.PI * 2);
+    ctx.ellipse(frame.x + frame.w * 0.31, frame.y + frame.h * 0.94, frame.w * 0.03, frame.h * 0.025, 0, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = '#f4c96b';
+    ctx.fillStyle = theme.accent;
     ctx.beginPath();
-    ctx.arc(x + w * 0.72, y + h * 0.86, Math.max(2, w * 0.018), 0, Math.PI * 2);
+    ctx.arc(frame.x + frame.w * 0.72, frame.y + frame.h * 0.86, Math.max(2, frame.w * 0.018), 0, Math.PI * 2);
     ctx.fill();
 
-    drawCouchFabricTexture(ctx, x + w * 0.05, y + h * 0.1, w * 0.9, h * 0.76);
+    if (detail !== DETAIL_LEVELS.LOW) {
+      drawCouchFabricTexture(ctx, frame.x + frame.w * 0.05, frame.y + frame.h * 0.1, frame.w * 0.9, frame.h * 0.76);
+    }
+  }
 
+  function drawCouch(ctx, x, y, w, h, tools) {
+    const frame = { x, y, w, h };
+    const theme = ART_THEMES.couch;
+    const layout = ART_LAYOUTS.couch;
+    const detail = getDetailLevel(w);
+
+    ctx.save();
+    ctx.lineJoin = 'round';
+    drawCouchShadow(ctx, frame, theme);
+    drawCouchStructure(ctx, frame, tools, theme, layout);
+    drawCouchDepth(ctx, frame, tools, layout);
+    drawCouchSeamsAndHighlights(ctx, frame, theme, layout, detail);
+    drawCouchDetails(ctx, frame, tools, theme, layout, detail);
     ctx.restore();
   }
 
-  function drawTruckWheel(ctx, cx, cy, radius) {
-    ctx.fillStyle = '#10151d';
+  function drawTruckWheel(ctx, cx, cy, radius, theme) {
+    ctx.fillStyle = theme ? theme.tire : '#10151d';
     ctx.beginPath();
     ctx.arc(cx, cy, radius, 0, Math.PI * 2);
     ctx.fill();
@@ -291,7 +516,7 @@
     ctx.arc(cx, cy, radius * 0.82, 0, Math.PI * 2);
     ctx.stroke();
 
-    ctx.fillStyle = '#d0d4d8';
+    ctx.fillStyle = theme ? theme.rim : '#d0d4d8';
     ctx.beginPath();
     ctx.arc(cx, cy, radius * 0.56, 0, Math.PI * 2);
     ctx.fill();
@@ -310,136 +535,134 @@
     }
   }
 
-  function drawPickupTruck(ctx, x, y, w, h, tools) {
+  function drawTruckBody(ctx, frame, tools, theme, layout) {
+    const { fillRoundedRect } = tools;
+    ctx.fillStyle = makeDiagonalGradient(ctx, frame.x, frame.y, frame.w, frame.h, theme.paint);
+    layout.bodyRects.forEach((rect) => {
+      const body = ratioRect(frame, rect);
+      ctx.fillRect(body.x, body.y, body.w, body.h);
+    });
+
+    ctx.strokeStyle = theme.outline;
+    ctx.lineWidth = Math.max(1.5, frame.w * 0.01);
+    ctx.strokeRect(frame.x + frame.w * 0.1, frame.y + frame.h * 0.25, frame.w * 0.74, frame.h * 0.4);
+
+    ctx.fillStyle = theme.trim;
+    ctx.fillRect(frame.x + frame.w * 0.1, frame.y + frame.h * 0.58, frame.w * 0.74, frame.h * 0.12);
+
+    const roof = ratioRect(frame, layout.roof);
+    ctx.fillStyle = theme.roof;
+    fillRoundedRect(ctx, roof.x, roof.y, roof.w, roof.h, roof.r);
+  }
+
+  function drawTruckWindows(ctx, frame, tools, theme, layout) {
     const { fillRoundedRect, strokeRoundedRect } = tools;
-
-    ctx.save();
-    ctx.lineJoin = 'round';
-
-    ctx.fillStyle = 'rgba(0,0,0,0.32)';
-    ctx.beginPath();
-    ctx.ellipse(x + w * 0.5, y + h * 0.88, w * 0.48, h * 0.11, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    const paint = ctx.createLinearGradient(x, y, x + w, y + h);
-    paint.addColorStop(0, '#f04836');
-    paint.addColorStop(0.5, '#b71c1c');
-    paint.addColorStop(1, '#651010');
-    ctx.fillStyle = paint;
-    ctx.fillRect(x + w * 0.37, y + h * 0.29, w * 0.47, h * 0.36);
-    ctx.fillRect(x + w * 0.48, y + h * 0.11, w * 0.25, h * 0.48);
-    ctx.fillRect(x + w * 0.1, y + h * 0.25, w * 0.39, h * 0.4);
-
-    ctx.strokeStyle = 'rgba(56, 0, 0, 0.62)';
-    ctx.lineWidth = Math.max(1.5, w * 0.01);
-    ctx.strokeRect(x + w * 0.1, y + h * 0.25, w * 0.74, h * 0.4);
-
-    ctx.fillStyle = '#f4f4f4';
-    ctx.fillRect(x + w * 0.1, y + h * 0.58, w * 0.74, h * 0.12);
-
-    ctx.fillStyle = '#c82020';
-    fillRoundedRect(ctx, x + w * 0.45, y + h * 0.04, w * 0.31, h * 0.17, h * 0.05);
-
-    ctx.fillStyle = '#9ed7f5';
-    fillRoundedRect(ctx, x + w * 0.51, y + h * 0.17, w * 0.1, h * 0.23, h * 0.04);
-    fillRoundedRect(ctx, x + w * 0.63, y + h * 0.17, w * 0.1, h * 0.23, h * 0.04);
+    ctx.fillStyle = theme.glass;
+    layout.windows.forEach((rect) => {
+      const window = ratioRect(frame, rect);
+      fillRoundedRect(ctx, window.x, window.y, window.w, window.h, window.r);
+    });
 
     ctx.fillStyle = 'rgba(255,255,255,0.42)';
     ctx.beginPath();
-    ctx.moveTo(x + w * 0.525, y + h * 0.19);
-    ctx.lineTo(x + w * 0.6, y + h * 0.19);
-    ctx.lineTo(x + w * 0.535, y + h * 0.37);
+    ctx.moveTo(frame.x + frame.w * 0.525, frame.y + frame.h * 0.19);
+    ctx.lineTo(frame.x + frame.w * 0.6, frame.y + frame.h * 0.19);
+    ctx.lineTo(frame.x + frame.w * 0.535, frame.y + frame.h * 0.37);
     ctx.closePath();
     ctx.fill();
 
-    ctx.strokeStyle = '#d6d6d6';
-    ctx.lineWidth = Math.max(1.4, w * 0.012);
-    strokeRoundedRect(ctx, x + w * 0.51, y + h * 0.17, w * 0.1, h * 0.23, h * 0.04);
-    strokeRoundedRect(ctx, x + w * 0.63, y + h * 0.17, w * 0.1, h * 0.23, h * 0.04);
+    ctx.strokeStyle = theme.chrome;
+    ctx.lineWidth = Math.max(1.4, frame.w * 0.012);
+    layout.windows.forEach((rect) => {
+      const window = ratioRect(frame, rect);
+      strokeRoundedRect(ctx, window.x, window.y, window.w, window.h, window.r);
+    });
+  }
 
+  function drawTruckDetails(ctx, frame, tools, theme, layout, detail) {
+    const { fillRoundedRect } = tools;
     ctx.strokeStyle = '#5a0000';
-    ctx.lineWidth = Math.max(1.2, w * 0.01);
-    ctx.strokeRect(x + w * 0.61, y + h * 0.13, w * 0.14, h * 0.43);
-    ctx.beginPath();
-    ctx.moveTo(x + w * 0.37, y + h * 0.29);
-    ctx.lineTo(x + w * 0.84, y + h * 0.29);
-    ctx.stroke();
+    ctx.lineWidth = Math.max(1.2, frame.w * 0.01);
+    ctx.strokeRect(frame.x + frame.w * 0.61, frame.y + frame.h * 0.13, frame.w * 0.14, frame.h * 0.43);
+    drawRatioLine(ctx, frame, { x1: 0.37, y1: 0.29, x2: 0.84, y2: 0.29 });
 
     ctx.fillStyle = '#cfcfcf';
-    ctx.fillRect(x + w * 0.7, y + h * 0.43, w * 0.035, h * 0.02);
+    ctx.fillRect(frame.x + frame.w * 0.7, frame.y + frame.h * 0.43, frame.w * 0.035, frame.h * 0.02);
 
-    ctx.fillStyle = '#bfc4c9';
-    ctx.fillRect(x + w * 0.02, y + h * 0.34, w * 0.09, h * 0.24);
+    ctx.fillStyle = theme.grille;
+    ctx.fillRect(frame.x + frame.w * 0.02, frame.y + frame.h * 0.34, frame.w * 0.09, frame.h * 0.24);
     ctx.strokeStyle = '#747b84';
-    ctx.lineWidth = Math.max(1, w * 0.008);
+    ctx.lineWidth = Math.max(1, frame.w * 0.008);
     for (let index = 0; index < 5; index += 1) {
-      ctx.beginPath();
-      ctx.moveTo(x + w * 0.025, y + h * (0.37 + index * 0.045));
-      ctx.lineTo(x + w * 0.105, y + h * (0.37 + index * 0.045));
-      ctx.stroke();
+      drawRatioLine(ctx, frame, { x1: 0.025, y1: 0.37 + index * 0.045, x2: 0.105, y2: 0.37 + index * 0.045 });
     }
 
     ctx.fillStyle = '#fff6c5';
-    [
-      [0.047, 0.41],
-      [0.047, 0.5],
-      [0.082, 0.41],
-      [0.082, 0.5],
-    ].forEach(([lightX, lightY]) => {
+    layout.headlights.forEach(({ cx, cy }) => {
       ctx.beginPath();
-      ctx.arc(x + w * lightX, y + h * lightY, Math.max(2.5, w * 0.018), 0, Math.PI * 2);
+      ctx.arc(frame.x + frame.w * cx, frame.y + frame.h * cy, Math.max(2.5, frame.w * 0.018), 0, Math.PI * 2);
       ctx.fill();
     });
 
     ctx.fillStyle = '#d8d8d8';
-    fillRoundedRect(ctx, x, y + h * 0.62, w * 0.12, h * 0.08, h * 0.03);
-    fillRoundedRect(ctx, x + w * 0.82, y + h * 0.62, w * 0.1, h * 0.08, h * 0.03);
+    fillRoundedRect(ctx, frame.x, frame.y + frame.h * 0.62, frame.w * 0.12, frame.h * 0.08, frame.h * 0.03);
+    fillRoundedRect(ctx, frame.x + frame.w * 0.82, frame.y + frame.h * 0.62, frame.w * 0.1, frame.h * 0.08, frame.h * 0.03);
 
-    const wheelRadius = Math.min(w * 0.12, h * 0.18);
-    const frontWheelX = x + w * 0.25;
-    const rearWheelX = x + w * 0.72;
-    const wheelY = y + h * 0.73;
-    ctx.fillStyle = '#1f2933';
-    ctx.beginPath();
-    ctx.arc(frontWheelX, wheelY, wheelRadius * 1.25, Math.PI, 0);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(rearWheelX, wheelY, wheelRadius * 1.25, Math.PI, 0);
-    ctx.fill();
-    drawTruckWheel(ctx, frontWheelX, wheelY, wheelRadius);
-    drawTruckWheel(ctx, rearWheelX, wheelY, wheelRadius);
-
-    ctx.fillStyle = '#e6c35c';
-    ctx.fillRect(x + w * 0.16, y + h * 0.48, w * 0.63, h * 0.025);
+    ctx.fillStyle = theme.gold;
+    ctx.fillRect(frame.x + frame.w * 0.16, frame.y + frame.h * 0.48, frame.w * 0.63, frame.h * 0.025);
     ctx.fillStyle = '#d6b447';
-    ctx.fillRect(x + w * 0.035, y + h * 0.47, w * 0.052, h * 0.025);
-    ctx.fillRect(x + w * 0.05, y + h * 0.44, w * 0.024, h * 0.085);
+    ctx.fillRect(frame.x + frame.w * 0.035, frame.y + frame.h * 0.47, frame.w * 0.052, frame.h * 0.025);
+    ctx.fillRect(frame.x + frame.w * 0.05, frame.y + frame.h * 0.44, frame.w * 0.024, frame.h * 0.085);
+
+    if (detail === DETAIL_LEVELS.LOW) return;
 
     ctx.strokeStyle = 'rgba(255,255,255,0.22)';
-    ctx.lineWidth = Math.max(1.2, w * 0.006);
+    ctx.lineWidth = Math.max(1.2, frame.w * 0.006);
     ctx.beginPath();
-    ctx.moveTo(x + w * 0.18, y + h * 0.31);
-    ctx.quadraticCurveTo(x + w * 0.32, y + h * 0.27, x + w * 0.46, y + h * 0.32);
-    ctx.moveTo(x + w * 0.5, y + h * 0.12);
-    ctx.quadraticCurveTo(x + w * 0.62, y + h * 0.08, x + w * 0.73, y + h * 0.13);
+    ctx.moveTo(frame.x + frame.w * 0.18, frame.y + frame.h * 0.31);
+    ctx.quadraticCurveTo(frame.x + frame.w * 0.32, frame.y + frame.h * 0.27, frame.x + frame.w * 0.46, frame.y + frame.h * 0.32);
+    ctx.moveTo(frame.x + frame.w * 0.5, frame.y + frame.h * 0.12);
+    ctx.quadraticCurveTo(frame.x + frame.w * 0.62, frame.y + frame.h * 0.08, frame.x + frame.w * 0.73, frame.y + frame.h * 0.13);
     ctx.stroke();
 
     ctx.strokeStyle = 'rgba(56,0,0,0.34)';
-    ctx.lineWidth = Math.max(1, w * 0.005);
-    [
-      [0.17, 0.38, 0.26, 0.36],
-      [0.4, 0.62, 0.56, 0.6],
-      [0.67, 0.29, 0.8, 0.31],
-    ].forEach(([x1, y1, x2, y2]) => {
+    ctx.lineWidth = Math.max(1, frame.w * 0.005);
+    layout.panelLines.forEach((line) => drawRatioLine(ctx, frame, line));
+
+    drawSticker(ctx, frame.x + frame.w * 0.41, frame.y + frame.h * 0.36, frame.w * 0.09, frame.h * 0.08, '#fff2d8', tools);
+    drawDeterministicSpeckles(ctx, frame.x + frame.w * 0.1, frame.y + frame.h * 0.25, frame.w * 0.74, frame.h * 0.43, 34, 'rgba(255,255,255,0.09)');
+  }
+
+  function drawTruckWheels(ctx, frame, theme, layout) {
+    const wheelRadius = Math.min(frame.w * 0.12, frame.h * 0.18);
+    ctx.fillStyle = '#1f2933';
+    layout.wheels.forEach(({ cx, cy }) => {
+      const wheelX = frame.x + frame.w * cx;
+      const wheelY = frame.y + frame.h * cy;
       ctx.beginPath();
-      ctx.moveTo(x + w * x1, y + h * y1);
-      ctx.lineTo(x + w * x2, y + h * y2);
-      ctx.stroke();
+      ctx.arc(wheelX, wheelY, wheelRadius * 1.25, Math.PI, 0);
+      ctx.fill();
+      drawTruckWheel(ctx, wheelX, wheelY, wheelRadius, theme);
     });
+  }
 
-    drawSticker(ctx, x + w * 0.41, y + h * 0.36, w * 0.09, h * 0.08, '#fff2d8', tools);
-    drawDeterministicSpeckles(ctx, x + w * 0.1, y + h * 0.25, w * 0.74, h * 0.43, 34, 'rgba(255,255,255,0.09)');
+  function drawPickupTruck(ctx, x, y, w, h, tools) {
+    const frame = { x, y, w, h };
+    const theme = ART_THEMES.truck;
+    const layout = ART_LAYOUTS.truck;
+    const detail = getDetailLevel(w);
 
+    ctx.save();
+    ctx.lineJoin = 'round';
+    ctx.fillStyle = theme.shadow;
+    ctx.beginPath();
+    ctx.ellipse(x + w * 0.5, y + h * 0.88, w * 0.48, h * 0.11, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    drawTruckBody(ctx, frame, tools, theme, layout);
+    drawTruckWindows(ctx, frame, tools, theme, layout);
+    drawTruckDetails(ctx, frame, tools, theme, layout, detail);
+    drawTruckWheels(ctx, frame, theme, layout);
     ctx.restore();
   }
 
@@ -475,43 +698,84 @@
     ctx.restore();
   }
 
-  function drawDesk(ctx, x, y, w, h, tools) {
+  function drawDeskStructure(ctx, frame, tools, theme, layout) {
     const { fillRoundedRect } = tools;
-    ctx.save();
-    const body = ctx.createLinearGradient(x, y, x, y + h);
-    body.addColorStop(0, '#d99046');
-    body.addColorStop(1, '#6f3f1f');
-    ctx.fillStyle = body;
-    fillRoundedRect(ctx, x, y + h * 0.28, w, h * 0.62, h * 0.12);
-    ctx.fillStyle = '#f9dfa8';
-    fillRoundedRect(ctx, x + w * 0.08, y + h * 0.09, w * 0.84, h * 0.24, h * 0.1);
-    ctx.fillStyle = 'rgba(6,21,36,0.24)';
-    fillRoundedRect(ctx, x + w * 0.1, y + h * 0.48, w * 0.36, h * 0.22, h * 0.03);
-    fillRoundedRect(ctx, x + w * 0.54, y + h * 0.48, w * 0.36, h * 0.22, h * 0.03);
-    ctx.fillStyle = '#09233f';
-    fillRoundedRect(ctx, x + w * 0.66, y + h * 0.42, w * 0.18, h * 0.36, h * 0.05);
-    ctx.fillStyle = '#ffd166';
-    ctx.beginPath();
-    ctx.arc(x + w * 0.28, y + h * 0.6, Math.max(2, w * 0.018), 0, Math.PI * 2);
-    ctx.arc(x + w * 0.72, y + h * 0.6, Math.max(2, w * 0.018), 0, Math.PI * 2);
-    ctx.fill();
+    const body = ratioRect(frame, layout.body);
+    const top = ratioRect(frame, layout.top);
+
+    ctx.fillStyle = makeVerticalGradient(ctx, frame.x, frame.y, frame.h, theme.body);
+    fillRoundedRect(ctx, body.x, body.y, body.w, body.h, body.r);
+    ctx.fillStyle = theme.top;
+    fillRoundedRect(ctx, top.x, top.y, top.w, top.h, top.r);
+  }
+
+  function drawDeskDrawers(ctx, frame, tools, theme, layout) {
+    const { fillRoundedRect } = tools;
+    ctx.fillStyle = theme.inset;
+    layout.drawers.forEach((drawer) => {
+      const drawerRect = ratioRect(frame, drawer);
+      fillRoundedRect(ctx, drawerRect.x, drawerRect.y, drawerRect.w, drawerRect.h, drawerRect.r);
+    });
+
+    const book = ratioRect(frame, layout.book);
+    ctx.fillStyle = theme.book;
+    fillRoundedRect(ctx, book.x, book.y, book.w, book.h, book.r);
+
+    ctx.fillStyle = theme.knob;
+    layout.drawers.forEach((drawer) => {
+      ctx.beginPath();
+      ctx.arc(frame.x + frame.w * drawer.knob, frame.y + frame.h * 0.6, Math.max(2, frame.w * 0.018), 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    const shadow = ratioRect(frame, layout.shadow);
     ctx.fillStyle = 'rgba(6,21,36,0.16)';
-    fillRoundedRect(ctx, x + w * 0.15, y + h * 0.73, w * 0.7, h * 0.08, h * 0.03);
-    drawWoodGrain(ctx, x + w * 0.08, y + h * 0.09, w * 0.84, h * 0.24, 'rgba(118,60,22,0.28)');
+    fillRoundedRect(ctx, shadow.x, shadow.y, shadow.w, shadow.h, shadow.r);
+  }
+
+  function drawDeskLines(ctx, frame, theme, layout, detail) {
     ctx.strokeStyle = 'rgba(255,255,255,0.16)';
-    ctx.lineWidth = Math.max(1, w * 0.008);
+    ctx.lineWidth = Math.max(1, frame.w * 0.008);
+    layout.seams.filter((line) => !line.highlight).forEach((line) => drawRatioLine(ctx, frame, line));
+
+    ctx.strokeStyle = theme.highlight;
+    ctx.lineWidth = Math.max(1, frame.w * 0.01);
+    layout.seams.filter((line) => line.highlight).forEach((line) => drawRatioLine(ctx, frame, line));
+
+    if (detail === DETAIL_LEVELS.LOW) return;
+    drawWoodGrain(ctx, frame.x + frame.w * 0.08, frame.y + frame.h * 0.09, frame.w * 0.84, frame.h * 0.24, theme.grain);
+  }
+
+  function drawFrontDeskExtras(ctx, frame, tools, theme, detail) {
+    if (!theme.sign || detail === DETAIL_LEVELS.LOW) return;
+    const { fillRoundedRect } = tools;
+    ctx.fillStyle = theme.sign;
+    fillRoundedRect(ctx, frame.x + frame.w * 0.22, frame.y + frame.h * 0.34, frame.w * 0.28, frame.h * 0.11, frame.h * 0.025);
+    ctx.fillStyle = 'rgba(9,35,63,0.3)';
+    ctx.fillRect(frame.x + frame.w * 0.26, frame.y + frame.h * 0.385, frame.w * 0.2, Math.max(2, frame.h * 0.012));
+
+    ctx.fillStyle = theme.bell;
     ctx.beginPath();
-    ctx.moveTo(x + w * 0.14, y + h * 0.42);
-    ctx.lineTo(x + w * 0.86, y + h * 0.42);
-    ctx.moveTo(x + w * 0.5, y + h * 0.45);
-    ctx.lineTo(x + w * 0.5, y + h * 0.77);
-    ctx.stroke();
-    ctx.strokeStyle = 'rgba(255,255,255,0.22)';
-    ctx.lineWidth = Math.max(1, w * 0.01);
+    ctx.ellipse(frame.x + frame.w * 0.76, frame.y + frame.h * 0.34, frame.w * 0.055, frame.h * 0.035, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.36)';
     ctx.beginPath();
-    ctx.moveTo(x + w * 0.1, y + h * 0.19);
-    ctx.lineTo(x + w * 0.9, y + h * 0.19);
-    ctx.stroke();
+    ctx.arc(frame.x + frame.w * 0.74, frame.y + frame.h * 0.325, Math.max(1.5, frame.w * 0.012), 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function drawDesk(ctx, x, y, w, h, tools, spot) {
+    const frame = { x, y, w, h };
+    const isFrontDesk = spot && (spot.id === 'lobby-front-desk' || spot.id === 'front-desk');
+    const theme = isFrontDesk ? ART_THEMES.frontDesk : ART_THEMES.desk;
+    const layout = ART_LAYOUTS.desk;
+    const detail = getDetailLevel(w);
+
+    ctx.save();
+    drawDeskStructure(ctx, frame, tools, theme, layout);
+    drawDeskDrawers(ctx, frame, tools, theme, layout);
+    drawFrontDeskExtras(ctx, frame, tools, theme, detail);
+    drawDeskLines(ctx, frame, theme, layout, detail);
     ctx.restore();
   }
 
@@ -670,39 +934,65 @@
     ctx.restore();
   }
 
-  function drawTreeOrBush(ctx, x, y, w, h, tools, isTree) {
-    const { fillRoundedRect, shadeColor } = tools;
-    ctx.save();
-    if (isTree) {
-      ctx.fillStyle = '#70411f';
-      fillRoundedRect(ctx, x + w * 0.42, y + h * 0.42, w * 0.18, h * 0.58, h * 0.035);
-      ctx.strokeStyle = 'rgba(255,255,255,0.14)';
-      ctx.lineWidth = Math.max(1, w * 0.012);
+  function drawTreeTrunk(ctx, frame, tools, theme, layout) {
+    const { fillRoundedRect } = tools;
+    const trunk = ratioRect(frame, layout.trunk);
+    ctx.fillStyle = theme.trunk;
+    fillRoundedRect(ctx, trunk.x, trunk.y, trunk.w, trunk.h, trunk.r);
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.14)';
+    ctx.lineWidth = Math.max(1, frame.w * 0.012);
+    layout.barkLines.forEach((line) => {
       ctx.beginPath();
-      ctx.moveTo(x + w * 0.49, y + h * 0.48);
-      ctx.quadraticCurveTo(x + w * 0.44, y + h * 0.66, x + w * 0.5, y + h * 0.92);
-      ctx.moveTo(x + w * 0.54, y + h * 0.5);
-      ctx.quadraticCurveTo(x + w * 0.59, y + h * 0.66, x + w * 0.55, y + h * 0.9);
+      ctx.moveTo(frame.x + frame.w * line.x1, frame.y + frame.h * line.y1);
+      ctx.quadraticCurveTo(frame.x + frame.w * line.cx, frame.y + frame.h * line.cy, frame.x + frame.w * line.x2, frame.y + frame.h * line.y2);
       ctx.stroke();
-    }
-    const leafColor = isTree ? '#1f9f68' : '#2fa86f';
-    [[0.5, 0.24, 0.44, 0.26], [0.34, 0.43, 0.34, 0.22], [0.66, 0.43, 0.34, 0.22], [0.5, 0.58, 0.45, 0.24]].forEach((blob, index) => {
-      ctx.fillStyle = shadeColor(leafColor, index === 0 ? 16 : -index * 5);
+    });
+  }
+
+  function drawTreeLeaves(ctx, frame, tools, theme, layout, isTree) {
+    const { shadeColor } = tools;
+    const leafColor = isTree ? theme.leaves : theme.bushLeaves;
+    layout.leafBlobs.forEach((blob) => {
+      ctx.fillStyle = shadeColor(leafColor, blob.shade);
       ctx.beginPath();
-      ctx.ellipse(x + w * blob[0], y + h * blob[1], w * blob[2], h * blob[3], 0, 0, Math.PI * 2);
+      ctx.ellipse(frame.x + frame.w * blob.cx, frame.y + frame.h * blob.cy, frame.w * blob.rx, frame.h * blob.ry, 0, 0, Math.PI * 2);
       ctx.fill();
     });
-    ctx.strokeStyle = 'rgba(255,255,255,0.22)';
-    ctx.lineWidth = Math.max(1, w * 0.012);
+  }
+
+  function drawTreeDetails(ctx, frame, theme, layout, detail, isTree) {
+    if (detail !== DETAIL_LEVELS.LOW) {
+      ctx.strokeStyle = 'rgba(255,255,255,0.22)';
+      ctx.lineWidth = Math.max(1, frame.w * 0.012);
+      ctx.beginPath();
+      ctx.arc(frame.x + frame.w * 0.44, frame.y + frame.h * 0.28, frame.w * 0.16, Math.PI * 1.1, Math.PI * 1.78);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = isTree ? theme.fruit : '#ffd166';
     ctx.beginPath();
-    ctx.arc(x + w * 0.44, y + h * 0.28, w * 0.16, Math.PI * 1.1, Math.PI * 1.78);
-    ctx.stroke();
-    ctx.fillStyle = isTree ? '#f4c96b' : '#ffd166';
-    ctx.beginPath();
-    ctx.arc(x + w * 0.67, y + h * 0.36, Math.max(2, w * 0.022), 0, Math.PI * 2);
-    ctx.arc(x + w * 0.31, y + h * 0.5, Math.max(2, w * 0.018), 0, Math.PI * 2);
+    layout.fruit.forEach((fruit) => {
+      ctx.moveTo(frame.x + frame.w * fruit.cx + Math.max(2, frame.w * fruit.r), frame.y + frame.h * fruit.cy);
+      ctx.arc(frame.x + frame.w * fruit.cx, frame.y + frame.h * fruit.cy, Math.max(2, frame.w * fruit.r), 0, Math.PI * 2);
+    });
     ctx.fill();
-    drawDeterministicSpeckles(ctx, x + w * 0.08, y + h * 0.12, w * 0.84, h * 0.58, 34, 'rgba(6,21,36,0.09)');
+
+    if (detail !== DETAIL_LEVELS.LOW) {
+      drawDeterministicSpeckles(ctx, frame.x + frame.w * 0.08, frame.y + frame.h * 0.12, frame.w * 0.84, frame.h * 0.58, 34, theme.shadow);
+    }
+  }
+
+  function drawTreeOrBush(ctx, x, y, w, h, tools, isTree) {
+    const frame = { x, y, w, h };
+    const theme = ART_THEMES.tree;
+    const layout = ART_LAYOUTS.tree;
+    const detail = getDetailLevel(w);
+
+    ctx.save();
+    if (isTree) drawTreeTrunk(ctx, frame, tools, theme, layout);
+    drawTreeLeaves(ctx, frame, tools, theme, layout, isTree);
+    drawTreeDetails(ctx, frame, theme, layout, detail, isTree);
     ctx.restore();
   }
 
@@ -798,7 +1088,7 @@
     const h = spot.height;
 
     if (spot.kind === 'bench') drawBench(ctx, x, y, w, h, tools);
-    else if (spot.kind === 'desk') drawDesk(ctx, x, y, w, h, tools);
+    else if (spot.kind === 'desk') drawDesk(ctx, x, y, w, h, tools, spot);
     else if (spot.kind === 'shelf') drawShelf(ctx, x, y, w, h, tools);
     else if (spot.kind === 'bed') drawBed(ctx, x, y, w, h, tools);
     else if (spot.kind === 'closet') drawCurtain(ctx, x, y, w, h, tools, true);

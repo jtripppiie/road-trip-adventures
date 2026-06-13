@@ -906,7 +906,8 @@
   let emojiFaceAwarded = false;
   let emojiStream = null;
   let piScore = {};
-  const defaultPongSettings = {
+  const pongData = window.RTA_PONG_DATA || {};
+  const defaultPongSettings = pongData.defaultSettings || {
     opponentMode: 'computer',
     difficulty: 'normal',
   };
@@ -3469,6 +3470,39 @@
 
   function getHideSeekExitTriggerRect(exit) {
     const pad = 38;
+    const reach = 26;
+    if (exit.y <= 62) {
+      return {
+        x: exit.x - pad,
+        y: exit.y - pad,
+        width: exit.width + pad * 2,
+        height: exit.height + pad * 2 + reach,
+      };
+    }
+    if (exit.y >= 360) {
+      return {
+        x: exit.x - pad,
+        y: exit.y - pad - reach,
+        width: exit.width + pad * 2,
+        height: exit.height + pad * 2 + reach,
+      };
+    }
+    if (exit.x <= 62) {
+      return {
+        x: exit.x - pad,
+        y: exit.y - pad,
+        width: exit.width + pad * 2 + reach,
+        height: exit.height + pad * 2,
+      };
+    }
+    if (exit.x >= 700) {
+      return {
+        x: exit.x - pad - reach,
+        y: exit.y - pad,
+        width: exit.width + pad * 2 + reach,
+        height: exit.height + pad * 2,
+      };
+    }
     return {
       x: exit.x - pad,
       y: exit.y - pad,
@@ -4950,6 +4984,7 @@
   }
 
   function normalizePongSettings(settings) {
+    if (pongData.normalizeSettings) return pongData.normalizeSettings(settings);
     const merged = Object.assign({}, defaultPongSettings, settings || {});
     merged.opponentMode = merged.opponentMode === 'local' ? 'local' : 'computer';
     merged.difficulty = ['easy', 'normal', 'hard', 'deathmatch'].includes(merged.difficulty) ? merged.difficulty : 'normal';
@@ -4957,13 +4992,8 @@
   }
 
   function getPongDifficultyConfig() {
-    const configs = {
-      easy: { targetScore: 5, paddleHeight: 100, humanSpeed: 7, aiSpeed: 3.6, aiError: 34, reaction: 0.14, ballSpeed: 4.0, aiPerfect: false },
-      normal: { targetScore: 7, paddleHeight: 92, humanSpeed: 7, aiSpeed: 5.6, aiError: 16, reaction: 0.08, ballSpeed: 4.5, aiPerfect: false },
-      hard: { targetScore: 7, paddleHeight: 84, humanSpeed: 7, aiSpeed: 7.6, aiError: 5, reaction: 0.03, ballSpeed: 5.0, aiPerfect: false },
-      deathmatch: { targetScore: 7, paddleHeight: 112, humanSpeed: 7, aiSpeed: 14, aiError: 0, reaction: 0, ballSpeed: 5.4, aiPerfect: true },
-    };
-    return configs[pongSettings.difficulty] || configs.normal;
+    if (pongData.getDifficultyConfig) return pongData.getDifficultyConfig(pongSettings.difficulty);
+    return { targetScore: 7, paddleHeight: 92, humanSpeed: 7, aiSpeed: 5.6, aiError: 16, reaction: 0.08, ballSpeed: 4.5, aiPerfect: false };
   }
 
   function renderPongSettings() {
@@ -4992,6 +5022,9 @@
 
   function createPongState() {
     const config = getPongDifficultyConfig();
+    if (window.RTA_PONG_ART && window.RTA_PONG_ART.createState) {
+      return window.RTA_PONG_ART.createState(pongCanvas, config);
+    }
     const width = pongCanvas.width;
     const height = pongCanvas.height;
     return {
@@ -5015,6 +5048,10 @@
   function resetPongBall(direction = Math.random() > 0.5 ? 1 : -1) {
     if (!pongState) return;
     const config = getPongDifficultyConfig();
+    if (window.RTA_PONG_ART && window.RTA_PONG_ART.resetBall) {
+      window.RTA_PONG_ART.resetBall(pongState, config, direction);
+      return;
+    }
     pongState.ballX = pongState.width / 2;
     pongState.ballY = pongState.height / 2;
     pongState.ballVX = config.ballSpeed * direction;
@@ -5023,16 +5060,14 @@
 
   function drawPong() {
     if (!pongCanvas || !pongState) return;
+    if (window.RTA_PONG_ART && window.RTA_PONG_ART.draw) {
+      window.RTA_PONG_ART.draw(pongCanvas, pongState);
+      return;
+    }
     const ctx = pongCanvas.getContext('2d');
     ctx.clearRect(0, 0, pongState.width, pongState.height);
     ctx.fillStyle = '#08284a';
     ctx.fillRect(0, 0, pongState.width, pongState.height);
-
-    ctx.fillStyle = 'rgba(255,255,255,0.24)';
-    for (let y = 12; y < pongState.height; y += 28) {
-      ctx.fillRect(pongState.width / 2 - 2, y, 4, 14);
-    }
-
     ctx.fillStyle = '#f58220';
     ctx.fillRect(22, pongState.leftY, pongState.paddleWidth, pongState.paddleHeight);
     ctx.fillStyle = '#7c4dff';
