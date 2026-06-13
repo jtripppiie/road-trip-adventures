@@ -3210,36 +3210,175 @@
     drawHideSeekHud(ctx, room, map);
   }
 
-  function drawHideSeekRoom(ctx, room, palette) {
-    ctx.fillStyle = palette.wall;
-    ctx.fillRect(0, 0, 800, 450);
-    ctx.fillStyle = palette.floor;
-    ctx.fillRect(38, 62, 724, 338);
-    ctx.fillStyle = 'rgba(255,255,255,0.12)';
-    for (let x = 55; x < 750; x += 42) {
-      ctx.fillRect(x, 86, 2, 290);
+  function fillHideSeekRoundedRect(ctx, x, y, width, height, radius) {
+    const r = Math.min(radius, width / 2, height / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + width - r, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+    ctx.lineTo(x + width, y + height - r);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+    ctx.lineTo(x + r, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function strokeHideSeekRoundedRect(ctx, x, y, width, height, radius) {
+    const r = Math.min(radius, width / 2, height / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + width - r, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+    ctx.lineTo(x + width, y + height - r);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+    ctx.lineTo(x + r, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+    ctx.stroke();
+  }
+
+  function shadeHideSeekColor(hex, percent) {
+    const value = hex.replace('#', '');
+    const num = parseInt(value.length === 3 ? value.split('').map(char => char + char).join('') : value, 16);
+    const amount = Math.round(2.55 * percent);
+    const red = Math.max(0, Math.min(255, (num >> 16) + amount));
+    const green = Math.max(0, Math.min(255, ((num >> 8) & 0x00ff) + amount));
+    const blue = Math.max(0, Math.min(255, (num & 0x0000ff) + amount));
+    return `rgb(${red}, ${green}, ${blue})`;
+  }
+
+  function drawHideSeekTexture(ctx, color, alpha, spacing) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    for (let x = -450; x < 900; x += spacing) {
+      ctx.beginPath();
+      ctx.moveTo(x, 64);
+      ctx.lineTo(x + 450, 402);
+      ctx.stroke();
     }
+    ctx.restore();
+  }
+
+  function drawHideSeekRoomBackdrop(ctx, map, room, palette) {
+    const wallGradient = ctx.createLinearGradient(0, 0, 0, 450);
+    wallGradient.addColorStop(0, shadeHideSeekColor(palette.wall, 18));
+    wallGradient.addColorStop(0.58, palette.wall);
+    wallGradient.addColorStop(1, shadeHideSeekColor(palette.wall, -18));
+    ctx.fillStyle = wallGradient;
+    ctx.fillRect(0, 0, 800, 450);
+
+    if (map.id === 'alaska-train') {
+      ctx.fillStyle = '#dff8ff';
+      ctx.fillRect(78, 92, 170, 82);
+      ctx.fillStyle = '#8ac8e8';
+      ctx.fillRect(88, 102, 150, 62);
+      ctx.fillStyle = '#f7fbff';
+      ctx.beginPath();
+      ctx.moveTo(88, 164);
+      ctx.lineTo(150, 118);
+      ctx.lineTo(220, 164);
+      ctx.closePath();
+      ctx.fill();
+    } else if (map.id === 'campground') {
+      ctx.fillStyle = '#123f33';
+      for (let i = 0; i < 7; i += 1) {
+        const x = 65 + i * 95;
+        ctx.beginPath();
+        ctx.moveTo(x, 172);
+        ctx.lineTo(x + 35, 88);
+        ctx.lineTo(x + 70, 172);
+        ctx.closePath();
+        ctx.fill();
+      }
+    } else if (map.id === 'rest-stop') {
+      ctx.fillStyle = '#f7fbff';
+      ctx.fillRect(610, 88, 92, 68);
+      ctx.fillStyle = '#f58220';
+      ctx.fillRect(620, 100, 72, 10);
+      ctx.fillStyle = '#09233f';
+      ctx.fillRect(620, 120, 72, 8);
+    } else {
+      ctx.fillStyle = '#fff2d8';
+      ctx.fillRect(92, 88, 122, 82);
+      ctx.fillStyle = '#f58220';
+      ctx.fillRect(102, 98, 102, 62);
+      ctx.fillStyle = 'rgba(9,35,63,0.2)';
+      ctx.fillRect(102, 128, 102, 8);
+    }
+  }
+
+  function drawHideSeekRoom(ctx, room, palette) {
+    const map = getHideSeekMap();
+    drawHideSeekRoomBackdrop(ctx, map, room, palette);
+
+    const floorGradient = ctx.createLinearGradient(0, 62, 0, 400);
+    floorGradient.addColorStop(0, shadeHideSeekColor(palette.floor, 12));
+    floorGradient.addColorStop(1, shadeHideSeekColor(palette.floor, -12));
+    ctx.fillStyle = floorGradient;
+    fillHideSeekRoundedRect(ctx, 38, 62, 724, 338, 18);
+    drawHideSeekTexture(ctx, 'rgba(6,21,36,0.28)', 0.25, 38);
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.24)';
+    ctx.lineWidth = 1;
+    for (let y = 94; y < 382; y += 36) {
+      ctx.beginPath();
+      ctx.moveTo(58, y);
+      ctx.lineTo(742, y);
+      ctx.stroke();
+    }
+
     ctx.fillStyle = palette.trim;
-    ctx.fillRect(38, 62, 724, 12);
-    ctx.fillRect(38, 388, 724, 12);
-    ctx.fillRect(38, 62, 12, 338);
-    ctx.fillRect(750, 62, 12, 338);
+    fillHideSeekRoundedRect(ctx, 34, 58, 732, 18, 8);
+    fillHideSeekRoundedRect(ctx, 34, 386, 732, 18, 8);
+    fillHideSeekRoundedRect(ctx, 34, 58, 18, 346, 8);
+    fillHideSeekRoundedRect(ctx, 748, 58, 18, 346, 8);
+
     (room.exits || []).forEach(exit => {
-      ctx.fillStyle = palette.accent;
-      ctx.fillRect(exit.x, exit.y, exit.width, exit.height);
+      ctx.fillStyle = 'rgba(0,0,0,0.26)';
+      fillHideSeekRoundedRect(ctx, exit.x + 3, exit.y + 3, exit.width, exit.height, 8);
+      const doorGradient = ctx.createLinearGradient(exit.x, exit.y, exit.x + exit.width, exit.y + exit.height);
+      doorGradient.addColorStop(0, shadeHideSeekColor(palette.accent, 12));
+      doorGradient.addColorStop(1, shadeHideSeekColor(palette.accent, -12));
+      ctx.fillStyle = doorGradient;
+      fillHideSeekRoundedRect(ctx, exit.x, exit.y, exit.width, exit.height, 8);
+      ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+      ctx.lineWidth = 2;
+      strokeHideSeekRoundedRect(ctx, exit.x + 2, exit.y + 2, exit.width - 4, exit.height - 4, 6);
       ctx.fillStyle = '#ffffff';
-      ctx.font = '700 12px Arial';
+      ctx.font = '800 12px Arial';
       ctx.textAlign = 'center';
       ctx.fillText(exit.label, exit.x + exit.width / 2, Math.max(46, exit.y - 8));
     });
+
     (room.obstacles || []).forEach(obstacle => {
-      ctx.fillStyle = obstacle.type === 'slow' ? 'rgba(9, 35, 63, 0.25)' : '#6b4b35';
-      ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+      ctx.fillStyle = 'rgba(0,0,0,0.22)';
+      fillHideSeekRoundedRect(ctx, obstacle.x + 4, obstacle.y + 6, obstacle.width, obstacle.height, 8);
+      ctx.fillStyle = obstacle.type === 'slow' ? 'rgba(9, 35, 63, 0.24)' : '#6b4b35';
+      fillHideSeekRoundedRect(ctx, obstacle.x, obstacle.y, obstacle.width, obstacle.height, 8);
       if (obstacle.type === 'slow') {
-        ctx.fillStyle = 'rgba(255,255,255,0.28)';
-        ctx.fillRect(obstacle.x + 8, obstacle.y + obstacle.height / 2 - 2, obstacle.width - 16, 4);
+        ctx.strokeStyle = 'rgba(255,255,255,0.38)';
+        ctx.lineWidth = 2;
+        for (let x = obstacle.x + 14; x < obstacle.x + obstacle.width - 10; x += 18) {
+          ctx.beginPath();
+          ctx.moveTo(x, obstacle.y + 8);
+          ctx.lineTo(x - 12, obstacle.y + obstacle.height - 8);
+          ctx.stroke();
+        }
       }
     });
+
+    const vignette = ctx.createRadialGradient(400, 230, 80, 400, 230, 430);
+    vignette.addColorStop(0, 'rgba(0,0,0,0)');
+    vignette.addColorStop(1, 'rgba(0,0,0,0.22)');
+    ctx.fillStyle = vignette;
+    ctx.fillRect(0, 0, 800, 450);
   }
 
   function drawHideSeekSpots(ctx, room) {
@@ -3264,38 +3403,75 @@
     ctx.lineWidth = isNearby ? 4 : 2;
     ctx.strokeStyle = highlight;
     ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = 'rgba(0,0,0,0.24)';
+    ctx.beginPath();
+    ctx.ellipse(x + w / 2, y + h - 2, Math.max(20, w * 0.48), Math.max(8, h * 0.1), 0, 0, Math.PI * 2);
+    ctx.fill();
+
     if (spot.kind === 'bed') {
-      ctx.fillStyle = '#7b4ee6';
-      ctx.fillRect(x, y + h * 0.28, w, h * 0.72);
+      const blanket = ctx.createLinearGradient(x, y, x, y + h);
+      blanket.addColorStop(0, '#9b75ff');
+      blanket.addColorStop(1, '#5c34bf');
+      ctx.fillStyle = '#5b3a2e';
+      fillHideSeekRoundedRect(ctx, x, y + h * 0.42, w, h * 0.56, 10);
+      ctx.fillStyle = blanket;
+      fillHideSeekRoundedRect(ctx, x + 8, y + h * 0.26, w - 16, h * 0.62, 12);
       ctx.fillStyle = '#fff2d8';
-      ctx.fillRect(x + 12, y + 8, w * 0.36, h * 0.35);
-    } else if (spot.kind === 'closet' || spot.kind === 'curtain') {
-      ctx.fillStyle = spot.kind === 'closet' ? '#5b3a2e' : '#7b4ee6';
-      ctx.fillRect(x, y, w, h);
+      fillHideSeekRoundedRect(ctx, x + 14, y + 10, w * 0.34, h * 0.35, 8);
       ctx.fillStyle = 'rgba(255,255,255,0.18)';
-      ctx.fillRect(x + w / 2 - 2, y + 8, 4, h - 16);
+      ctx.fillRect(x + 20, y + h * 0.48, w - 40, 5);
+    } else if (spot.kind === 'closet' || spot.kind === 'curtain') {
+      const base = spot.kind === 'closet' ? '#5b3a2e' : '#7b4ee6';
+      const fabric = ctx.createLinearGradient(x, y, x + w, y);
+      fabric.addColorStop(0, shadeHideSeekColor(base, -12));
+      fabric.addColorStop(0.5, shadeHideSeekColor(base, 14));
+      fabric.addColorStop(1, shadeHideSeekColor(base, -16));
+      ctx.fillStyle = fabric;
+      fillHideSeekRoundedRect(ctx, x, y, w, h, 10);
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      for (let fold = x + 14; fold < x + w; fold += 22) {
+        ctx.fillRect(fold, y + 10, 4, h - 20);
+      }
+      ctx.fillStyle = '#f7dca1';
+      ctx.beginPath();
+      ctx.arc(x + w * 0.5 + 8, y + h * 0.52, 4, 0, Math.PI * 2);
+      ctx.fill();
     } else if (spot.kind === 'box' || spot.kind === 'luggage') {
-      ctx.fillStyle = spot.kind === 'box' ? '#c47b32' : '#2ec7d3';
-      ctx.fillRect(x, y, w, h);
-      ctx.fillStyle = 'rgba(9,35,63,0.28)';
-      ctx.fillRect(x + 8, y + 12, w - 16, 8);
+      const color = spot.kind === 'box' ? '#c47b32' : '#2ec7d3';
+      ctx.fillStyle = shadeHideSeekColor(color, -14);
+      fillHideSeekRoundedRect(ctx, x, y + 8, w, h - 8, 8);
+      ctx.fillStyle = color;
+      fillHideSeekRoundedRect(ctx, x + 8, y, w - 16, h - 10, 8);
+      ctx.fillStyle = 'rgba(9,35,63,0.24)';
+      ctx.fillRect(x + 15, y + 12, w - 30, 8);
+      ctx.fillRect(x + w / 2 - 3, y + 8, 6, h - 20);
     } else if (spot.kind === 'tree' || spot.kind === 'bush') {
       ctx.fillStyle = '#6b3f2a';
-      ctx.fillRect(x + w * 0.42, y + h * 0.42, w * 0.18, h * 0.58);
-      ctx.fillStyle = spot.kind === 'tree' ? '#1f9f68' : '#2fa86f';
-      ctx.beginPath();
-      ctx.ellipse(x + w / 2, y + h * 0.38, w * 0.55, h * 0.34, 0, 0, Math.PI * 2);
-      ctx.fill();
+      fillHideSeekRoundedRect(ctx, x + w * 0.42, y + h * 0.42, w * 0.18, h * 0.58, 5);
+      const leafColor = spot.kind === 'tree' ? '#1f9f68' : '#2fa86f';
+      [[0.5, 0.28, 0.46, 0.26], [0.34, 0.44, 0.34, 0.22], [0.66, 0.44, 0.34, 0.22], [0.5, 0.52, 0.42, 0.25]].forEach((blob, index) => {
+        ctx.fillStyle = shadeHideSeekColor(leafColor, index === 0 ? 16 : -index * 5);
+        ctx.beginPath();
+        ctx.ellipse(x + w * blob[0], y + h * blob[1], w * blob[2], h * blob[3], 0, 0, Math.PI * 2);
+        ctx.fill();
+      });
     } else if (spot.kind === 'car') {
-      ctx.fillStyle = '#09233f';
-      ctx.fillRect(x + 15, y + 20, w - 30, h - 28);
-      ctx.fillStyle = '#2ec7d3';
-      ctx.fillRect(x + 45, y + 5, w - 90, 36);
       ctx.fillStyle = '#061524';
-      ctx.fillRect(x + 35, y + h - 18, 28, 22);
-      ctx.fillRect(x + w - 63, y + h - 18, 28, 22);
+      fillHideSeekRoundedRect(ctx, x + 15, y + 28, w - 30, h - 36, 14);
+      const carPaint = ctx.createLinearGradient(x, y, x + w, y + h);
+      carPaint.addColorStop(0, '#16466f');
+      carPaint.addColorStop(1, '#09233f');
+      ctx.fillStyle = carPaint;
+      fillHideSeekRoundedRect(ctx, x + 18, y + 18, w - 36, h - 34, 12);
+      ctx.fillStyle = '#9be7ef';
+      fillHideSeekRoundedRect(ctx, x + 45, y + 7, w - 90, 36, 8);
+      ctx.fillStyle = '#f7fbff';
+      ctx.fillRect(x + 55, y + 14, w - 110, 6);
+      ctx.fillStyle = '#061524';
+      fillHideSeekRoundedRect(ctx, x + 35, y + h - 20, 28, 24, 8);
+      fillHideSeekRoundedRect(ctx, x + w - 63, y + h - 20, 28, 24, 8);
     } else if (spot.kind === 'fountain') {
-      ctx.fillStyle = '#7aa8b8';
+      ctx.fillStyle = '#587c8b';
       ctx.beginPath();
       ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
       ctx.fill();
@@ -3303,20 +3479,36 @@
       ctx.beginPath();
       ctx.ellipse(x + w / 2, y + h / 2, w / 3, h / 4, 0, 0, Math.PI * 2);
       ctx.fill();
+      ctx.strokeStyle = 'rgba(46,199,211,0.7)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(x + w / 2, y + h / 2, w / 5, 0, Math.PI * 1.6);
+      ctx.stroke();
     } else {
-      ctx.fillStyle = '#5d6b7a';
-      ctx.fillRect(x, y, w, h);
+      const utility = ctx.createLinearGradient(x, y, x, y + h);
+      utility.addColorStop(0, '#7a8794');
+      utility.addColorStop(1, '#3f4b58');
+      ctx.fillStyle = utility;
+      fillHideSeekRoundedRect(ctx, x, y, w, h, 8);
     }
-    ctx.strokeRect(x, y, w, h);
-    ctx.fillStyle = '#061524';
-    ctx.font = '700 13px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText(spot.label, x + w / 2, y - 8);
+    ctx.strokeStyle = highlight;
+    strokeHideSeekRoundedRect(ctx, x, y, w, h, 9);
+    if (isNearby) {
+      ctx.fillStyle = 'rgba(6, 21, 36, 0.82)';
+      fillHideSeekRoundedRect(ctx, x + w / 2 - 58, y - 27, 116, 20, 10);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '800 12px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(spot.label, x + w / 2, y - 13);
+    }
     if (isNearby) {
       ctx.fillStyle = '#f58220';
       ctx.beginPath();
       ctx.arc(x + w - 12, y + 12, 7, 0, Math.PI * 2);
       ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
     }
   }
 
@@ -3337,36 +3529,95 @@
   }
 
   function drawHideSeekActor(ctx, actor) {
-    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    const bob = Math.sin(performance.now() / 130) * 1.5;
+    ctx.fillStyle = 'rgba(0,0,0,0.28)';
     ctx.beginPath();
     ctx.ellipse(actor.x + actor.width / 2, actor.y + actor.height + 5, 16, 5, 0, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = actor.color;
-    ctx.fillRect(actor.x, actor.y + 10, actor.width, actor.height - 6);
+
+    const bodyGradient = ctx.createLinearGradient(actor.x, actor.y, actor.x, actor.y + actor.height);
+    bodyGradient.addColorStop(0, shadeHideSeekColor(actor.color, 18));
+    bodyGradient.addColorStop(1, shadeHideSeekColor(actor.color, -16));
+    ctx.fillStyle = bodyGradient;
+    fillHideSeekRoundedRect(ctx, actor.x, actor.y + 12 + bob, actor.width, actor.height - 6, 7);
+
+    ctx.fillStyle = shadeHideSeekColor(actor.color, -20);
+    fillHideSeekRoundedRect(ctx, actor.x - 5, actor.y + 18 + bob, 7, 16, 4);
+    fillHideSeekRoundedRect(ctx, actor.x + actor.width - 2, actor.y + 18 - bob, 7, 16, 4);
+
     ctx.fillStyle = '#fff2d8';
-    ctx.fillRect(actor.x + 3, actor.y, actor.width - 6, 16);
+    fillHideSeekRoundedRect(ctx, actor.x + 2, actor.y + bob, actor.width - 4, 17, 8);
+    ctx.fillStyle = '#5b3a2e';
+    fillHideSeekRoundedRect(ctx, actor.x + 3, actor.y - 2 + bob, actor.width - 6, 7, 5);
     ctx.fillStyle = '#061524';
-    ctx.fillRect(actor.x + 7, actor.y + 6, 4, 4);
-    ctx.fillRect(actor.x + actor.width - 11, actor.y + 6, 4, 4);
+    ctx.fillRect(actor.x + 7, actor.y + 7 + bob, 4, 4);
+    ctx.fillRect(actor.x + actor.width - 11, actor.y + 7 + bob, 4, 4);
+    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.fillRect(actor.x + 5, actor.y + 15 + bob, actor.width - 10, 2);
+
+    ctx.fillStyle = '#061524';
+    fillHideSeekRoundedRect(ctx, actor.x + 2, actor.y + actor.height + 2, 8, 5, 3);
+    fillHideSeekRoundedRect(ctx, actor.x + actor.width - 10, actor.y + actor.height + 2, 8, 5, 3);
   }
 
   function drawHideSeekHud(ctx, room, map) {
     const hiderName = getHideSeekPlayerName(hideSeekState.hiderIndex);
     const seekerName = getHideSeekPlayerName(hideSeekState.seekerIndex);
-    ctx.fillStyle = 'rgba(6, 21, 36, 0.9)';
-    ctx.fillRect(0, 0, 800, 52);
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '700 16px Arial';
-    ctx.textAlign = 'left';
-    ctx.fillText(`${map.name} · ${room.name}`, 18, 22);
-    ctx.font = '700 13px Arial';
-    ctx.fillText(`Hider: ${hiderName} · Seeker: ${seekerName} · Wrong: ${hideSeekState.wrongGuesses}`, 18, 42);
-    ctx.textAlign = 'right';
-    ctx.font = '800 22px Arial';
     const displaySeconds = hideSeekState.phase === HideSeekGameState.HIDER_TURN
       ? hideSeekState.hiderTimeRemaining
       : hideSeekState.timerRemaining;
+    const isUrgent = hideSeekState.phase === HideSeekGameState.SEEKER_TURN && displaySeconds <= 10;
+
+    const hudGradient = ctx.createLinearGradient(0, 0, 0, 58);
+    hudGradient.addColorStop(0, 'rgba(6,21,36,0.96)');
+    hudGradient.addColorStop(1, 'rgba(9,35,63,0.84)');
+    ctx.fillStyle = hudGradient;
+    ctx.fillRect(0, 0, 800, 58);
+    ctx.fillStyle = 'rgba(46,199,211,0.28)';
+    ctx.fillRect(0, 56, 800, 2);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+    fillHideSeekRoundedRect(ctx, 14, 10, 270, 36, 10);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '700 16px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText(`${map.name}`, 26, 25);
+    ctx.fillStyle = '#bdeff4';
+    ctx.font = '800 12px Arial';
+    ctx.fillText(room.name, 26, 42);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+    fillHideSeekRoundedRect(ctx, 305, 10, 286, 36, 10);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '800 12px Arial';
+    ctx.fillText(`Hider: ${hiderName}`, 318, 25);
+    ctx.fillStyle = '#ffdcb5';
+    ctx.fillText(`Seeker: ${seekerName}  Wrong: ${hideSeekState.wrongGuesses}`, 318, 42);
+
+    ctx.textAlign = 'right';
+    ctx.fillStyle = isUrgent ? '#ff4d4d' : '#f58220';
+    fillHideSeekRoundedRect(ctx, 650, 8, 132, 40, 12);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 24px Arial';
     ctx.fillText(`${Math.ceil(displaySeconds)}s`, 778, 31);
+    ctx.fillStyle = isUrgent ? '#fff2d8' : '#09233f';
+    ctx.font = '900 10px Arial';
+    ctx.fillText(hideSeekState.phase === HideSeekGameState.HIDER_TURN ? 'HIDE' : 'SEARCH', 778, 44);
+
+    if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
+      const actor = hideSeekState.actors.seeker;
+      ctx.strokeStyle = 'rgba(245,130,32,0.38)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(actor.x + actor.width / 2, actor.y + actor.height / 2, HIDE_SEEK_SEARCH_TOLERANCE, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(actor.x + actor.width / 2 - 10, actor.y + actor.height / 2);
+      ctx.lineTo(actor.x + actor.width / 2 + 10, actor.y + actor.height / 2);
+      ctx.moveTo(actor.x + actor.width / 2, actor.y + actor.height / 2 - 10);
+      ctx.lineTo(actor.x + actor.width / 2, actor.y + actor.height / 2 + 10);
+      ctx.stroke();
+    }
   }
 
   function setHideSeekInput(direction, active) {
