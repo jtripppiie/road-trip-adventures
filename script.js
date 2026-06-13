@@ -3400,6 +3400,7 @@
 
   function updateHideSeekActor(actor, delta) {
     const input = hideSeekState.input;
+    actor.exitCooldown = Math.max(0, (actor.exitCooldown || 0) - delta);
     const dx = (input.right ? 1 : 0) - (input.left ? 1 : 0);
     const dy = (input.down ? 1 : 0) - (input.up ? 1 : 0);
     if (!dx && !dy) {
@@ -3432,7 +3433,7 @@
     if (!wouldHitHideSeekBlock(nextYActor, room)) {
       actor.y = nextYActor.y;
     }
-    checkHideSeekExits(actor, room);
+    checkHideSeekExits(actor, room, dx, dy);
     hideSeekState.activeRoomId = actor.roomId;
   }
 
@@ -3448,13 +3449,57 @@
     return hitsObstacle || hitsSpot;
   }
 
-  function checkHideSeekExits(actor, room) {
+  function doesHideSeekActorTouchExit(actor, exit, dx, dy) {
+    const collider = getHideSeekActorCollider(actor);
+    const spanPad = 18;
+    if (exit.y <= 62 && dy < 0) {
+      return actor.y <= 76
+        && collider.x + collider.width >= exit.x - spanPad
+        && collider.x <= exit.x + exit.width + spanPad;
+    }
+    if (exit.y >= 360 && dy > 0) {
+      return actor.y + actor.height >= 374
+        && collider.x + collider.width >= exit.x - spanPad
+        && collider.x <= exit.x + exit.width + spanPad;
+    }
+    if (exit.x <= 62 && dx < 0) {
+      return actor.x <= 52
+        && collider.y + collider.height >= exit.y - spanPad
+        && collider.y <= exit.y + exit.height + spanPad;
+    }
+    if (exit.x >= 700 && dx > 0) {
+      return actor.x + actor.width >= 748
+        && collider.y + collider.height >= exit.y - spanPad
+        && collider.y <= exit.y + exit.height + spanPad;
+    }
+    return false;
+  }
+
+  function checkHideSeekExits(actor, room, dx = 0, dy = 0) {
     const actorCenter = getHideSeekActorCenter(actor);
-    const exit = room.exits.find(item => isHideSeekPointInsideRect(actorCenter, getHideSeekExitTriggerRect(item)));
+    const actorCollider = getHideSeekActorCollider(actor);
+    const isInsideExit = item => {
+      const triggerRect = getHideSeekExitTriggerRect(item);
+      return doesHideSeekActorTouchExit(actor, item, dx, dy)
+        || isHideSeekPointInsideRect(actorCenter, triggerRect)
+        || isHideSeekOverlapping(actorCollider, triggerRect);
+    };
+    if (actor.exitIgnoreRoom) {
+      const ignoredExit = room.exits.find(item => item.targetRoom === actor.exitIgnoreRoom);
+      if (!ignoredExit || !isInsideExit(ignoredExit)) actor.exitIgnoreRoom = '';
+    }
+    if ((actor.exitCooldown || 0) > 0) return;
+    const exit = room.exits.find(item => {
+      if (actor.exitIgnoreRoom && item.targetRoom === actor.exitIgnoreRoom) return false;
+      return isInsideExit(item);
+    });
     if (!exit) return;
+    const previousRoomId = actor.roomId;
     actor.roomId = exit.targetRoom;
     actor.x = exit.spawnX;
     actor.y = exit.spawnY;
+    actor.exitCooldown = 0.55;
+    actor.exitIgnoreRoom = previousRoomId;
     hideSeekState.activeRoomId = exit.targetRoom;
     playHideSeekTone('door');
     renderHideSeek();
