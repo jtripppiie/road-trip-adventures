@@ -841,6 +841,7 @@
   let hideSeekAnimationFrame = null;
   let hideSeekLastFrame = 0;
   let hideSeekAudioContext = null;
+  let hideSeekDebugEnabled = getStoredJson('rtaHideSeekDebug', false);
   const HIDE_SEEK_HIDE_SECONDS = 30;
   const HIDE_SEEK_SEARCH_TOLERANCE = 24;
   let hideSeekState = {
@@ -1058,6 +1059,7 @@
   const hideSeekStartButton = document.getElementById('hide-seek-start');
   const hideSeekFoundButton = document.getElementById('hide-seek-found');
   const hideSeekNextButton = document.getElementById('hide-seek-next');
+  const hideSeekDebugButton = document.getElementById('hide-seek-debug');
   const hideSeekResetButton = document.getElementById('hide-seek-reset');
   const hideSeekFinishButton = document.getElementById('hide-seek-finish');
   const calcMiles = document.getElementById('calc-miles');
@@ -2792,6 +2794,9 @@
     hideSeekFoundButton.hidden = ![HideSeekGameState.HIDER_TURN, HideSeekGameState.SEEKER_LOOK_AWAY, HideSeekGameState.SEEKER_TURN].includes(hideSeekState.phase);
     hideSeekNextButton.hidden = ![HideSeekGameState.FOUND, HideSeekGameState.ROUND_RESULTS].includes(hideSeekState.phase);
     hideSeekFoundButton.disabled = false;
+    hideSeekDebugButton.textContent = hideSeekDebugEnabled ? 'Debug: On' : 'Debug: Off';
+    hideSeekDebugButton.setAttribute('aria-pressed', hideSeekDebugEnabled ? 'true' : 'false');
+    hideSeekDebugButton.classList.toggle('is-active', hideSeekDebugEnabled);
     hideSeekNextButton.textContent = hideSeekRound >= maxRounds ? 'See Winner' : 'Next Round';
 
     if (hideSeekState.phase === HideSeekGameState.TITLE || hideSeekState.phase === HideSeekGameState.GAME_OVER) {
@@ -3208,6 +3213,7 @@
     drawHideSeekSpots(ctx, room);
     drawHideSeekActors(ctx, room);
     drawHideSeekHud(ctx, room, map);
+    if (hideSeekDebugEnabled) drawHideSeekDebug(ctx, room, map);
   }
 
   function fillHideSeekRoundedRect(ctx, x, y, width, height, radius) {
@@ -3620,13 +3626,140 @@
     }
   }
 
+  function drawHideSeekDebugRect(ctx, rect, color, label) {
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 4]);
+    ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+    ctx.setLineDash([]);
+    if (label) {
+      ctx.fillStyle = 'rgba(6, 21, 36, 0.86)';
+      fillHideSeekRoundedRect(ctx, rect.x, Math.max(60, rect.y - 18), Math.min(210, Math.max(58, label.length * 7)), 16, 5);
+      ctx.fillStyle = color;
+      ctx.font = '800 10px Arial';
+      ctx.textAlign = 'left';
+      ctx.fillText(label, rect.x + 5, Math.max(72, rect.y - 6));
+    }
+    ctx.restore();
+  }
+
+  function drawHideSeekDebugPoint(ctx, x, y, color, label) {
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x - 8, y);
+    ctx.lineTo(x + 8, y);
+    ctx.moveTo(x, y - 8);
+    ctx.lineTo(x, y + 8);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+    if (label) {
+      ctx.fillStyle = 'rgba(6, 21, 36, 0.86)';
+      fillHideSeekRoundedRect(ctx, x + 8, y - 18, Math.min(240, Math.max(70, label.length * 7)), 18, 5);
+      ctx.fillStyle = color;
+      ctx.font = '800 10px Arial';
+      ctx.textAlign = 'left';
+      ctx.fillText(label, x + 13, y - 6);
+    }
+    ctx.restore();
+  }
+
+  function drawHideSeekDebug(ctx, room, map) {
+    const actor = getHideSeekActiveActor();
+    ctx.save();
+    ctx.font = '800 10px Arial';
+    ctx.textAlign = 'left';
+
+    drawHideSeekDebugRect(ctx, { x: 38, y: 62, width: 724, height: 338 }, '#ffffff', 'playable floor');
+
+    (room.exits || []).forEach(exit => {
+      drawHideSeekDebugRect(ctx, exit, '#2ec7d3', `exit:${exit.label}->${exit.targetRoom}`);
+    });
+
+    (room.obstacles || []).forEach(obstacle => {
+      const color = obstacle.type === 'slow' ? '#ffd166' : '#ff4d4d';
+      drawHideSeekDebugRect(ctx, obstacle, color, `${obstacle.type}:${obstacle.id}`);
+    });
+
+    (room.spots || []).forEach(spot => {
+      const collision = getHideSeekSpotCollisionRect(spot);
+      const centerX = spot.x + spot.width / 2;
+      const centerY = spot.y + spot.height / 2;
+      drawHideSeekDebugRect(ctx, spot, '#f58220', `spot:${spot.id}`);
+      drawHideSeekDebugRect(ctx, collision, '#ff4d4d', `solid:${spot.kind}`);
+      ctx.strokeStyle = 'rgba(46, 199, 211, 0.72)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([3, 5]);
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, spot.interactionRadius || 42, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    });
+
+    [
+      ['hider', hideSeekState.actors.hider, '#2ec7d3'],
+      ['seeker', hideSeekState.actors.seeker, '#f58220'],
+    ].forEach(([name, item, color]) => {
+      if (item.roomId !== room.id) return;
+      drawHideSeekDebugRect(ctx, item, color, `${name} sprite ${Math.round(item.x)},${Math.round(item.y)}`);
+      drawHideSeekDebugRect(ctx, getHideSeekActorCollider(item), '#8cff66', `${name} collider`);
+    });
+
+    if (actor && actor.roomId === room.id) {
+      ctx.strokeStyle = '#f7fbff';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.arc(actor.x + actor.width / 2, actor.y + actor.height / 2, HIDE_SEEK_SEARCH_TOLERANCE, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    if (hideSeekState.hiddenPosition && hideSeekState.hiddenPosition.roomId === room.id) {
+      drawHideSeekDebugPoint(
+        ctx,
+        hideSeekState.hiddenPosition.x + hideSeekState.actors.hider.width / 2,
+        hideSeekState.hiddenPosition.y + hideSeekState.actors.hider.height / 2,
+        '#ff4df0',
+        `hidden:${Math.round(hideSeekState.hiddenPosition.x)},${Math.round(hideSeekState.hiddenPosition.y)}`
+      );
+    }
+
+    ctx.fillStyle = 'rgba(6, 21, 36, 0.9)';
+    fillHideSeekRoundedRect(ctx, 14, 64, 276, 62, 8);
+    ctx.fillStyle = '#f7fbff';
+    ctx.font = '900 12px Arial';
+    ctx.fillText('DEBUG MODE', 26, 82);
+    ctx.font = '800 10px Arial';
+    ctx.fillStyle = '#bdeff4';
+    ctx.fillText(`map=${map.id} room=${room.id} phase=${hideSeekState.phase}`, 26, 99);
+    ctx.fillText(`spots=${room.spots.length} exits=${room.exits.length} obstacles=${(room.obstacles || []).length}`, 26, 114);
+    ctx.restore();
+  }
+
   function setHideSeekInput(direction, active) {
     if (!hideSeekState.input || !direction) return;
     hideSeekState.input[direction] = active;
   }
 
+  function toggleHideSeekDebug() {
+    hideSeekDebugEnabled = !hideSeekDebugEnabled;
+    setStoredJson('rtaHideSeekDebug', hideSeekDebugEnabled);
+    renderHideSeek();
+  }
+
   function handleHideSeekKey(event, active) {
     if (currentSectionKey !== 'hideSeek') return;
+    if (active && event.key === '`') {
+      event.preventDefault();
+      toggleHideSeekDebug();
+      return;
+    }
     const keyMap = {
       ArrowUp: 'up',
       w: 'up',
@@ -5347,6 +5480,7 @@
   hideSeekStartButton.addEventListener('click', startHideSeekRound);
   hideSeekFoundButton.addEventListener('click', markHideSeekFound);
   hideSeekNextButton.addEventListener('click', nextHideSeekRound);
+  hideSeekDebugButton.addEventListener('click', toggleHideSeekDebug);
   hideSeekResetButton.addEventListener('click', resetHideSeek);
   hideSeekFinishButton.addEventListener('click', showHideSeekSummary);
   hideSeekMode.addEventListener('change', () => {

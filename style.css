@@ -1029,6 +1029,13 @@ body.large-text {
   box-shadow: 0 3px 0 rgba(6, 21, 36, 0.25);
 }
 
+#hide-seek-debug.is-active {
+  background: #fff2d8;
+  color: #6b3b00;
+  border-color: #f58220;
+  box-shadow: 0 0 0 3px rgba(245, 130, 32, 0.18);
+}
+
 .hide-seek-pad[data-hide-seek-move="up"] {
   grid-area: up;
 }
