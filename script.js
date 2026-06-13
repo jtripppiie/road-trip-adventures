@@ -4548,20 +4548,13 @@
 
     const filteredCandidates = candidatePool.filter(item => item.difficulty === activeTriviaDifficulty);
     const candidates = filteredCandidates.length ? filteredCandidates : candidatePool;
-    const historyKey = getTriviaHistoryKey(categoryId);
-    const used = new Set(triviaHistory[historyKey] || []);
-    let available = candidates.filter(item => !used.has(item.id));
+    let available = candidates.filter(item => !isTriviaQuestionSeen(item));
 
     if (!available.length) {
-      triviaHistory[historyKey] = [];
-      setStoredJson('rtaTriviaHistory', triviaHistory);
+      clearTriviaHistoryForCandidates(candidates);
       available = candidates.slice();
     }
     return shuffle(available.slice()).slice(0, getTriviaQuestionLimit());
-  }
-
-  function getTriviaHistoryKey(categoryId) {
-    return `${categoryId || 'mixed'}:${activeTriviaDifficulty}`;
   }
 
   function isPopCultureTriviaCategory(categoryId) {
@@ -4588,14 +4581,47 @@
     return !isPopCultureTriviaCategory(item.category);
   }
 
+  function getTriviaTrackingKeys(item, categoryId) {
+    const difficulty = activeTriviaDifficulty || 'easy';
+    const keys = new Set([`mixed:${difficulty}`]);
+    const itemCategory = item && item.category ? item.category : categoryId;
+    if (itemCategory) keys.add(`${itemCategory}:${difficulty}`);
+    if (categoryId && categoryId !== 'mixed') keys.add(`${categoryId}:${difficulty}`);
+    return Array.from(keys);
+  }
+
+  function isTriviaQuestionSeen(item) {
+    return getTriviaTrackingKeys(item, activeTriviaCategory)
+      .some(key => Array.isArray(triviaHistory[key]) && triviaHistory[key].includes(item.id));
+  }
+
+  function clearTriviaHistoryForCandidates(candidates) {
+    if (!Array.isArray(candidates) || !candidates.length) return;
+    const touchedKeys = new Set();
+    candidates.forEach((item) => {
+      getTriviaTrackingKeys(item, activeTriviaCategory).forEach(key => touchedKeys.add(key));
+    });
+    touchedKeys.forEach((key) => {
+      if (!Array.isArray(triviaHistory[key]) || !triviaHistory[key].length) return;
+      const candidateIds = new Set(candidates
+        .filter(item => getTriviaTrackingKeys(item, activeTriviaCategory).includes(key))
+        .map(item => item.id));
+      triviaHistory[key] = triviaHistory[key].filter(id => !candidateIds.has(id));
+    });
+    setStoredJson('rtaTriviaHistory', triviaHistory);
+  }
+
   function markTriviaSeen(item) {
     if (!item || !item.id) return;
-    const categoryKey = getTriviaHistoryKey(activeTriviaCategory || item.category);
-    if (!triviaHistory[categoryKey]) triviaHistory[categoryKey] = [];
-    if (!triviaHistory[categoryKey].includes(item.id)) {
-      triviaHistory[categoryKey].push(item.id);
-      setStoredJson('rtaTriviaHistory', triviaHistory);
-    }
+    let didChange = false;
+    getTriviaTrackingKeys(item, activeTriviaCategory).forEach((key) => {
+      if (!triviaHistory[key]) triviaHistory[key] = [];
+      if (!triviaHistory[key].includes(item.id)) {
+        triviaHistory[key].push(item.id);
+        didChange = true;
+      }
+    });
+    if (didChange) setStoredJson('rtaTriviaHistory', triviaHistory);
   }
 
   function getTriviaChoices(item) {
@@ -5779,7 +5805,7 @@
     if (!adminCounts) return;
     const triviaCount = triviaDatabase.length;
     const scavengerCount = scavengerItems.length;
-    const learnCount = questions.filter(question => question.category === 'learn').length;
+    const learnCount = adventurePromptDatabase.filter(question => question.category === 'learn').length;
     const hideSeekMapCount = Object.keys(hideSeekMaps).length;
     const secretModeCount = Object.keys(secretModeConfigs).length;
     const hideSeekMapLabel = hideSeekMapCount === 1 ? 'hide-and-seek map' : 'hide-and-seek maps';
@@ -6025,7 +6051,7 @@
   }
 
   function startQuickStart() {
-    const quickModes = ['random', 'scavenger', 'trivia', 'jokes', 'learn', 'look', 'laugh', 'compete', 'hideSeek', 'gorillas'];
+    const quickModes = ['random', 'scavenger', 'trivia', 'jokes', 'learn', 'look', 'laugh', 'compete', 'pi', 'pong', 'hideSeek', 'gorillas'];
     const mode = quickModes[Math.floor(Math.random() * quickModes.length)];
     selectedCategory = mode;
     if (mode === 'scavenger') {
