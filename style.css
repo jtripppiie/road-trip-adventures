@@ -921,6 +921,11 @@ body.large-text {
   margin-inline: auto;
 }
 
+#hide-seek-scoreboard {
+  width: min(100%, 900px);
+  margin-inline: auto;
+}
+
 .hide-seek-asset {
   display: grid;
   justify-items: center;
