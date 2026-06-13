@@ -872,6 +872,9 @@
     suspicionLevel: 0,
     inspectedSpotId: null,
     inspectTime: 0,
+    inspectionCount: 0,
+    repeatInspectionCount: 0,
+    peekCount: 0,
     activeRoomId: 'lobby',
     timerRemaining: HIDE_SEEK_DEFAULT_SEARCH_SECONDS,
     hiderTimeRemaining: HIDE_SEEK_HIDE_SECONDS,
@@ -889,6 +892,9 @@
     revealPulse: 0,
     searchPulse: null,
     listenPulse: null,
+    listenHint: null,
+    particles: [],
+    cameraShake: 0,
     coverGlowPulse: 0,
     lastUrgentSecond: null,
   };
@@ -2872,6 +2878,59 @@
     };
   }
 
+  function setHideSeekListenHint(actor, targetSpot) {
+    if (!targetSpot) return;
+    const actorCenter = getHideSeekActorCenter(actor);
+    const targetCenter = getHideSeekSpotCenter(targetSpot);
+    hideSeekState.listenHint = {
+      x: actorCenter.x,
+      y: actorCenter.y,
+      angle: Math.atan2(targetCenter.y - actorCenter.y, targetCenter.x - actorCenter.x),
+      roomId: actor.roomId,
+      time: 1.8,
+      maxTime: 1.8,
+    };
+  }
+
+  function spawnHideSeekParticles(x, y, roomId, options) {
+    const settings = Object.assign({
+      color: 'rgba(255,255,255,0.78)',
+      count: 8,
+      speed: 38,
+      size: 3,
+      life: 0.7,
+      spread: Math.PI * 2,
+      angle: -Math.PI / 2,
+      gravity: 0,
+    }, options || {});
+    for (let index = 0; index < settings.count; index += 1) {
+      const angle = settings.angle + (Math.random() - 0.5) * settings.spread;
+      const speed = settings.speed * (0.45 + Math.random() * 0.75);
+      hideSeekState.particles.push({
+        x,
+        y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        roomId,
+        color: settings.color,
+        size: settings.size * (0.75 + Math.random() * 0.8),
+        life: settings.life,
+        maxLife: settings.life,
+        gravity: settings.gravity,
+      });
+    }
+  }
+
+  function updateHideSeekParticles(delta) {
+    hideSeekState.particles = (hideSeekState.particles || []).filter(particle => {
+      particle.life -= delta;
+      particle.vy += particle.gravity * delta;
+      particle.x += particle.vx * delta;
+      particle.y += particle.vy * delta;
+      return particle.life > 0;
+    });
+  }
+
   function useHideSeekSpecialAction() {
     if (hideSeekState.phase === HideSeekGameState.HIDER_TURN) {
       peekHideSeekHider();
@@ -2891,10 +2950,18 @@
       return;
     }
     addHideSeekNoise(actor, coverQuality.spot.noisy ? 0.38 : 0.22);
+    hideSeekState.peekCount += 1;
     hideSeekState.hiderTimeRemaining = Math.max(0, hideSeekState.hiderTimeRemaining - 2);
     hideSeekState.shakingSpotId = coverQuality.spot.id;
     hideSeekState.shakeTime = 0.45;
     setHideSeekSearchPulse(actor, hideSeekState.noiseLevel >= 0.5 ? 'warm' : 'cold');
+    spawnHideSeekParticles(actor.x + actor.width / 2, actor.y + actor.height / 2, actor.roomId, {
+      color: 'rgba(255, 209, 102, 0.85)',
+      count: 7,
+      speed: 32,
+      size: 3,
+      life: 0.55,
+    });
     setHideSeekMessage(`Peeked near the ${coverQuality.spot.label}. Noise risk is ${Math.round(hideSeekState.noiseLevel * 100)}%.`);
     playHideSeekTone('listen');
     renderHideSeek();
@@ -2920,6 +2987,14 @@
     hideSeekState.suspicionSpotId = hideSeekState.noiseLevel >= 0.5 || sameRoom ? hiddenSpot.id : null;
     if (hideSeekState.suspicionSpotId) setHideSeekSpotState(hideSeekState.suspicionSpotId, 'suspicious');
     setHideSeekListenPulse(actor, sameRoom ? 'warm' : 'cold');
+    setHideSeekListenHint(actor, sameRoom || hideSeekState.noiseLevel >= 0.5 ? hiddenSpot : null);
+    spawnHideSeekParticles(actor.x + actor.width / 2, actor.y + actor.height / 2, actor.roomId, {
+      color: 'rgba(189, 239, 244, 0.8)',
+      count: 10,
+      speed: 52,
+      size: 2,
+      life: 0.9,
+    });
     setHideSeekMessage(`${clue} Listen costs 4 seconds.`);
     playHideSeekTone('listen');
     renderHideSeek();
@@ -2934,6 +3009,13 @@
       setHideSeekSpotState(nearbySpot.id, 'suspicious');
       hideSeekState.shakingSpotId = nearbySpot.id;
       hideSeekState.shakeTime = Math.max(hideSeekState.shakeTime || 0, 0.28);
+      spawnHideSeekParticles(nearbySpot.x + nearbySpot.width / 2, nearbySpot.y + nearbySpot.height / 2, nearbySpot.roomId || actor.roomId, {
+        color: 'rgba(255, 220, 181, 0.7)',
+        count: 4,
+        speed: 22,
+        size: 2,
+        life: 0.45,
+      });
     }
   }
 
@@ -3085,6 +3167,9 @@
     hideSeekState.suspicionLevel = 0;
     hideSeekState.inspectedSpotId = null;
     hideSeekState.inspectTime = 0;
+    hideSeekState.inspectionCount = 0;
+    hideSeekState.repeatInspectionCount = 0;
+    hideSeekState.peekCount = 0;
     hideSeekState.timerRemaining = hideSeekState.countdown;
     hideSeekState.hiderTimeRemaining = HIDE_SEEK_HIDE_SECONDS;
     hideSeekState.wrongGuesses = 0;
@@ -3093,6 +3178,9 @@
     hideSeekState.revealPulse = 0;
     hideSeekState.searchPulse = null;
     hideSeekState.listenPulse = null;
+    hideSeekState.listenHint = null;
+    hideSeekState.particles = [];
+    hideSeekState.cameraShake = 0;
     hideSeekState.coverGlowPulse = 0;
     hideSeekState.lastUrgentSecond = null;
   }
@@ -3301,6 +3389,14 @@
     hideSeekState.hiddenRoomId = actor.roomId;
     setHideSeekSpotState(nearbySpot.id, 'occupied');
     addHideSeekNoise(actor, nearbySpot.noisy ? 0.45 : 0.18);
+    spawnHideSeekParticles(actor.x + actor.width / 2, actor.y + actor.height / 2, actor.roomId, {
+      color: 'rgba(46, 199, 211, 0.82)',
+      count: 14,
+      speed: 44,
+      size: 3,
+      life: 0.7,
+    });
+    hideSeekState.cameraShake = Math.max(hideSeekState.cameraShake, 0.18);
     hideSeekState.hiddenPosition = {
       x: actor.x,
       y: actor.y,
@@ -3329,6 +3425,7 @@
     const inspectedState = getHideSeekSpotState(inspectedSpot.id);
     hideSeekState.inspectedSpotId = inspectedSpot.id;
     hideSeekState.inspectTime = HIDE_SEEK_INSPECT_SECONDS;
+    hideSeekState.inspectionCount += 1;
     const sameRoom = inspectedSpot.roomId ? inspectedSpot.roomId === hiddenPosition.roomId : actor.roomId === hiddenPosition.roomId;
     const inspectedCenter = getHideSeekSpotCenter(inspectedSpot);
     const hiddenCenter = {
@@ -3341,10 +3438,19 @@
     if (inspectedSpot.id !== hideSeekState.hiddenSpotId) {
       hideSeekState.wrongGuesses += 1;
       const repeatPenalty = inspectedState === 'searched' ? HIDE_SEEK_SPAM_INSPECTION_PENALTY : 0;
+      if (repeatPenalty) hideSeekState.repeatInspectionCount += 1;
       hideSeekState.timerRemaining = Math.max(0, hideSeekState.timerRemaining - HIDE_SEEK_WRONG_SEARCH_PENALTY - repeatPenalty);
       setHideSeekSpotState(inspectedSpot.id, distance <= HIDE_SEEK_SEARCH_TOLERANCE * 2.8 ? 'suspicious' : 'searched');
       hideSeekState.shakingSpotId = inspectedSpot.id;
       hideSeekState.shakeTime = 0.55;
+      spawnHideSeekParticles(inspectedCenter.x, inspectedCenter.y, actor.roomId, {
+        color: distance <= HIDE_SEEK_SEARCH_TOLERANCE * 2.8 ? 'rgba(255, 209, 102, 0.85)' : 'rgba(154, 164, 178, 0.75)',
+        count: 9,
+        speed: 34,
+        size: 3,
+        life: 0.62,
+      });
+      hideSeekState.cameraShake = Math.max(hideSeekState.cameraShake, 0.12);
       setHideSeekMessage(`${feedback.text} ${HIDE_SEEK_WRONG_SEARCH_PENALTY + repeatPenalty} seconds lost${repeatPenalty ? ' for re-checking' : ''}.`);
       playHideSeekTone('wrong');
       renderHideSeek();
@@ -3363,15 +3469,18 @@
     };
     const timeUsed = hideSeekState.countdown - hideSeekState.timerRemaining;
     const coverScore = Number(hideSeekState.hiddenCoverQuality) || foundSpot.difficulty || 3;
-    hideSeekState.roundSeekerScore = Math.max(0, Math.round(1200 - timeUsed * 7 - hideSeekState.wrongGuesses * 90 + coverScore * 55));
-    hideSeekState.roundHiderScore = Math.max(0, Math.round(timeUsed * 5 + coverScore * 125 + (HIDE_SEEK_HIDE_SECONDS - hideSeekState.hiderTimeRemaining) * 3));
+    const cleanInspectBonus = Math.max(0, 160 - hideSeekState.inspectionCount * 22 - hideSeekState.repeatInspectionCount * 45);
+    const stealthBonus = Math.max(0, 120 - hideSeekState.peekCount * 35 - Math.round(hideSeekState.noiseLevel * 70));
+    hideSeekState.roundSeekerScore = Math.max(0, Math.round(1200 - timeUsed * 7 - hideSeekState.wrongGuesses * 90 + coverScore * 55 + cleanInspectBonus));
+    hideSeekState.roundHiderScore = Math.max(0, Math.round(timeUsed * 5 + coverScore * 125 + (HIDE_SEEK_HIDE_SECONDS - hideSeekState.hiderTimeRemaining) * 3 + stealthBonus));
     hideSeekState.hideScore[seeker.id] = (hideSeekState.hideScore[seeker.id] || 0) + hideSeekState.roundSeekerScore;
     hideSeekState.hideScore[hider.id] = (hideSeekState.hideScore[hider.id] || 0) + hideSeekState.roundHiderScore;
     hideSeekState.phase = HideSeekGameState.FOUND;
     hideSeekState.revealPulse = 1.4;
+    hideSeekState.cameraShake = Math.max(hideSeekState.cameraShake, 0.45);
     revealHideSeekHider(foundSpot);
     hideSeekRound += 1;
-    hideSeekState.lastRoundText = `${seeker.name} found ${hider.name} ${hideSeekState.hiddenSpotLabel}. Cover: ${hideSeekState.hiddenCoverLabel}. ${seeker.name}: +${hideSeekState.roundSeekerScore}. ${hider.name}: +${hideSeekState.roundHiderScore}. Wrong guesses: ${hideSeekState.wrongGuesses}.`;
+    hideSeekState.lastRoundText = `${seeker.name} found ${hider.name} ${hideSeekState.hiddenSpotLabel}. Cover: ${hideSeekState.hiddenCoverLabel}. ${seeker.name}: +${hideSeekState.roundSeekerScore}. ${hider.name}: +${hideSeekState.roundHiderScore}. Inspections: ${hideSeekState.inspectionCount}. Stealth bonus: ${stealthBonus}.`;
     playHideSeekTone('found');
     renderHideSeek();
   }
@@ -3386,6 +3495,19 @@
     hideSeekState.actors.hider.y = hiddenPosition ? hiddenPosition.y : Math.min(390, spot.y + spot.height / 2);
     hideSeekState.actors.seeker.roomId = roomId;
     hideSeekState.activeRoomId = roomId;
+    spawnHideSeekParticles(
+      hideSeekState.actors.hider.x + hideSeekState.actors.hider.width / 2,
+      hideSeekState.actors.hider.y + hideSeekState.actors.hider.height / 2,
+      roomId,
+      {
+        color: 'rgba(245, 130, 32, 0.92)',
+        count: 22,
+        speed: 82,
+        size: 4,
+        life: 0.95,
+        gravity: 34,
+      }
+    );
   }
 
   function hideSeekSeekerFailed() {
@@ -3393,13 +3515,15 @@
     const hider = getHideSeekPlayer(hideSeekState.hiderIndex);
     const spot = getHideSeekSpotById(hideSeekState.hiddenSpotId);
     const difficulty = Number(hideSeekState.hiddenCoverQuality) || (spot ? spot.difficulty : 3);
+    const stealthBonus = Math.max(0, 180 - hideSeekState.peekCount * 35 - Math.round(hideSeekState.noiseLevel * 90));
     hideSeekState.roundSeekerScore = 0;
-    hideSeekState.roundHiderScore = 1000 + difficulty * 150 + Math.round(hideSeekState.hiderTimeRemaining * 8);
+    hideSeekState.roundHiderScore = 1000 + difficulty * 150 + Math.round(hideSeekState.hiderTimeRemaining * 8) + stealthBonus;
     hideSeekState.hideScore[hider.id] = (hideSeekState.hideScore[hider.id] || 0) + hideSeekState.roundHiderScore;
     hideSeekState.phase = HideSeekGameState.ROUND_RESULTS;
+    hideSeekState.cameraShake = Math.max(hideSeekState.cameraShake, 0.25);
     revealHideSeekHider(spot || { x: 120, y: 305, width: 24, height: 32 });
     hideSeekRound += 1;
-    hideSeekState.lastRoundText = `${hider.name} stayed hidden ${hideSeekState.hiddenSpotLabel}. Cover: ${hideSeekState.hiddenCoverLabel}. ${hider.name}: +${hideSeekState.roundHiderScore}.`;
+    hideSeekState.lastRoundText = `${hider.name} stayed hidden ${hideSeekState.hiddenSpotLabel}. Cover: ${hideSeekState.hiddenCoverLabel}. Peeks: ${hideSeekState.peekCount}. Stealth bonus: ${stealthBonus}. ${hider.name}: +${hideSeekState.roundHiderScore}.`;
     playHideSeekTone('wrong');
     renderHideSeek();
   }
@@ -3440,6 +3564,9 @@
       suspicionLevel: 0,
       inspectedSpotId: null,
       inspectTime: 0,
+      inspectionCount: 0,
+      repeatInspectionCount: 0,
+      peekCount: 0,
       hiddenRoomId: null,
       activeRoomId: (hideSeekMaps[hideSeekMode.value] || hideSeekMaps['roadside-lodge']).startRoom,
       timerRemaining: Number(hideSeekCountdown.value) || HIDE_SEEK_DEFAULT_SEARCH_SECONDS,
@@ -3458,6 +3585,9 @@
       revealPulse: 0,
       searchPulse: null,
       listenPulse: null,
+      listenHint: null,
+      particles: [],
+      cameraShake: 0,
       coverGlowPulse: 0,
       lastUrgentSecond: null,
       shakeTime: 0,
@@ -3500,6 +3630,12 @@
       hideSeekState.listenPulse.time = Math.max(0, hideSeekState.listenPulse.time - delta);
       if (hideSeekState.listenPulse.time <= 0) hideSeekState.listenPulse = null;
     }
+    if (hideSeekState.listenHint) {
+      hideSeekState.listenHint.time = Math.max(0, hideSeekState.listenHint.time - delta);
+      if (hideSeekState.listenHint.time <= 0) hideSeekState.listenHint = null;
+    }
+    if (hideSeekState.cameraShake > 0) hideSeekState.cameraShake = Math.max(0, hideSeekState.cameraShake - delta * 1.8);
+    updateHideSeekParticles(delta);
     if (hideSeekState.inspectTime > 0) hideSeekState.inspectTime = Math.max(0, hideSeekState.inspectTime - delta);
     if (hideSeekState.noiseLevel > 0) hideSeekState.noiseLevel = Math.max(0, hideSeekState.noiseLevel - delta * 0.025);
     updateHideSeekSuspicion(delta);
@@ -3629,10 +3765,19 @@
     const room = getHideSeekRoom(hideSeekState.activeRoomId);
     const palette = map.palette;
     ctx.clearRect(0, 0, hideSeekCanvas.width, hideSeekCanvas.height);
+    ctx.save();
+    if (hideSeekState.cameraShake > 0) {
+      const shake = hideSeekState.cameraShake * 8;
+      ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
+    }
     drawHideSeekRoom(ctx, room, palette);
     drawHideSeekSpots(ctx, room);
     drawHideSeekActors(ctx, room);
     drawHideSeekActionEffects(ctx, room);
+    drawHideSeekParticles(ctx, room);
+    drawHideSeekAtmosphere(ctx, room, map);
+    drawHideSeekListenHint(ctx, room);
+    ctx.restore();
     drawHideSeekHud(ctx, room, map);
     if (hideSeekDebugEnabled) drawHideSeekDebug(ctx, room, map);
   }
@@ -3887,6 +4032,87 @@
       ctx.setLineDash([]);
       ctx.restore();
     }
+  }
+
+  function drawHideSeekParticles(ctx, room) {
+    (hideSeekState.particles || []).forEach(particle => {
+      if (particle.roomId !== room.id) return;
+      const alpha = Math.max(0, particle.life / particle.maxLife);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = particle.color;
+      ctx.beginPath();
+      ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    });
+  }
+
+  function drawHideSeekAtmosphere(ctx, room, map) {
+    if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
+      const actor = hideSeekState.actors.seeker;
+      if (actor.roomId === room.id) {
+        ctx.save();
+        ctx.fillStyle = map.id === 'school-night' ? 'rgba(6, 21, 36, 0.34)' : 'rgba(6, 21, 36, 0.22)';
+        ctx.fillRect(38, 62, 724, 338);
+        const light = ctx.createRadialGradient(
+          actor.x + actor.width / 2,
+          actor.y + actor.height / 2,
+          24,
+          actor.x + actor.width / 2,
+          actor.y + actor.height / 2,
+          170
+        );
+        light.addColorStop(0, 'rgba(255,255,255,0.28)');
+        light.addColorStop(0.48, 'rgba(255,255,255,0.12)');
+        light.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.fillStyle = light;
+        ctx.beginPath();
+        ctx.arc(actor.x + actor.width / 2, actor.y + actor.height / 2, 170, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    if (map.id === 'alaska-train') {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 9; i += 1) {
+        const x = (performance.now() / 28 + i * 92) % 850 - 40;
+        ctx.beginPath();
+        ctx.moveTo(x, 86);
+        ctx.lineTo(x + 28, 63);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+  }
+
+  function drawHideSeekListenHint(ctx, room) {
+    const hint = hideSeekState.listenHint;
+    if (!hint || hint.roomId !== room.id) return;
+    const progress = 1 - hint.time / hint.maxTime;
+    const alpha = Math.max(0, 0.9 - progress * 0.65);
+    ctx.save();
+    ctx.translate(hint.x, hint.y);
+    ctx.rotate(hint.angle);
+    ctx.fillStyle = `rgba(255, 209, 102, ${alpha})`;
+    ctx.strokeStyle = `rgba(6, 21, 36, ${alpha})`;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(52 + progress * 14, 0);
+    ctx.lineTo(24, -13);
+    ctx.lineTo(29, -4);
+    ctx.lineTo(4, -4);
+    ctx.lineTo(4, 4);
+    ctx.lineTo(29, 4);
+    ctx.lineTo(24, 13);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
   }
 
   function drawHideSeekObject(ctx, spot, isNearby, state) {
