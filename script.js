@@ -842,11 +842,13 @@
   let hideSeekLastFrame = 0;
   let hideSeekAudioContext = null;
   let hideSeekDebugEnabled = getStoredJson('rtaHideSeekDebug', false);
-  const HIDE_SEEK_HIDE_SECONDS = 30;
-  const HIDE_SEEK_SEARCH_TOLERANCE = 24;
+  const HIDE_SEEK_HIDE_SECONDS = 60;
+  const HIDE_SEEK_DEFAULT_SEARCH_SECONDS = 120;
+  const HIDE_SEEK_SEARCH_TOLERANCE = 34;
+  const HIDE_SEEK_WRONG_SEARCH_PENALTY = 10;
   let hideSeekState = {
     mode: 'roadside-lodge',
-    countdown: 60,
+    countdown: HIDE_SEEK_DEFAULT_SEARCH_SECONDS,
     winnerGoal: '6',
     hiderIndex: 0,
     seekerIndex: 1,
@@ -854,8 +856,10 @@
     hiddenSpotId: null,
     hiddenSpotLabel: '',
     hiddenPosition: null,
+    hiddenCoverQuality: 1,
+    hiddenCoverLabel: 'Risky',
     activeRoomId: 'lobby',
-    timerRemaining: 60,
+    timerRemaining: HIDE_SEEK_DEFAULT_SEARCH_SECONDS,
     hiderTimeRemaining: HIDE_SEEK_HIDE_SECONDS,
     wrongGuesses: 0,
     roundHiderScore: 0,
@@ -869,6 +873,8 @@
     },
     input: { up: false, down: false, left: false, right: false },
     revealPulse: 0,
+    searchPulse: null,
+    coverGlowPulse: 0,
     lastUrgentSecond: null,
   };
   let huntDeck = [];
@@ -2427,6 +2433,7 @@
           ],
           spots: [
             { id: 'lobby-front-desk', label: 'front desk', kind: 'desk', x: 300, y: 245, width: 185, height: 72, difficulty: 2 },
+            { id: 'lobby-sofa', label: 'blue lobby sofa', kind: 'bench', x: 500, y: 110, width: 168, height: 68, difficulty: 3 },
             { id: 'lobby-curtains', label: 'sunset curtains', kind: 'curtain', x: 92, y: 90, width: 90, height: 190, difficulty: 3 },
             { id: 'lobby-luggage-cart', label: 'luggage cart', kind: 'luggage', x: 570, y: 270, width: 110, height: 75, difficulty: 4 },
           ],
@@ -2438,6 +2445,7 @@
           exits: [{ label: 'Lobby', targetRoom: 'lobby', x: 24, y: 180, width: 28, height: 92, spawnX: 706, spawnY: 232 }],
           spots: [
             { id: 'bedroom-bed', label: 'under the bed', kind: 'bed', x: 270, y: 285, width: 220, height: 70, difficulty: 3 },
+            { id: 'bedroom-window-drapes', label: 'window drapes', kind: 'curtain', x: 145, y: 92, width: 85, height: 170, difficulty: 4 },
             { id: 'bedroom-closet', label: 'closet', kind: 'closet', x: 610, y: 95, width: 100, height: 175, difficulty: 4 },
             { id: 'bedroom-laundry', label: 'laundry pile', kind: 'box', x: 92, y: 288, width: 112, height: 76, difficulty: 2 },
           ],
@@ -2449,6 +2457,7 @@
           exits: [{ label: 'Lobby', targetRoom: 'lobby', x: 365, y: 24, width: 110, height: 28, spawnX: 400, spawnY: 350 }],
           spots: [
             { id: 'garage-toolbox', label: 'tool wall', kind: 'shelf', x: 92, y: 95, width: 145, height: 92, difficulty: 2 },
+            { id: 'garage-spare-tires', label: 'spare tires', kind: 'box', x: 455, y: 100, width: 86, height: 78, difficulty: 3 },
             { id: 'garage-cardboard', label: 'cardboard stack', kind: 'box', x: 292, y: 265, width: 155, height: 95, difficulty: 3 },
             { id: 'garage-van', label: 'behind the van', kind: 'car', x: 535, y: 200, width: 180, height: 105, difficulty: 5 },
           ],
@@ -2460,6 +2469,7 @@
           exits: [{ label: 'Lobby', targetRoom: 'lobby', x: 748, y: 180, width: 28, height: 92, spawnX: 72, spawnY: 232 }],
           spots: [
             { id: 'courtyard-bushes', label: 'desert bushes', kind: 'bush', x: 120, y: 250, width: 160, height: 95, difficulty: 3 },
+            { id: 'courtyard-patio-bench', label: 'patio bench', kind: 'bench', x: 292, y: 108, width: 155, height: 62, difficulty: 2 },
             { id: 'courtyard-fountain', label: 'dry fountain', kind: 'fountain', x: 350, y: 185, width: 130, height: 100, difficulty: 4 },
             { id: 'courtyard-tree', label: 'shade tree', kind: 'tree', x: 610, y: 130, width: 95, height: 200, difficulty: 5 },
           ],
@@ -2480,6 +2490,7 @@
           spots: [
             { id: 'observation-window-seat', label: 'window seat', kind: 'bench', x: 92, y: 265, width: 150, height: 70, difficulty: 2 },
             { id: 'observation-coat-hooks', label: 'coat hooks', kind: 'curtain', x: 320, y: 90, width: 110, height: 170, difficulty: 3 },
+            { id: 'observation-overhead-bags', label: 'overhead bags', kind: 'shelf', x: 455, y: 105, width: 100, height: 82, difficulty: 3 },
             { id: 'observation-snack-cart', label: 'snack cart', kind: 'luggage', x: 575, y: 275, width: 120, height: 74, difficulty: 4 },
           ],
           obstacles: [{ id: 'observation-aisle', type: 'slow', x: 250, y: 335, width: 320, height: 40, speedMultiplier: 0.75 }],
@@ -2493,6 +2504,7 @@
           ],
           spots: [
             { id: 'sleeper-bunk', label: 'upper bunk', kind: 'bed', x: 210, y: 110, width: 210, height: 68, difficulty: 4 },
+            { id: 'sleeper-folding-table', label: 'folding table', kind: 'desk', x: 330, y: 270, width: 120, height: 64, difficulty: 2 },
             { id: 'sleeper-curtain', label: 'privacy curtain', kind: 'curtain', x: 535, y: 90, width: 95, height: 190, difficulty: 3 },
             { id: 'sleeper-duffel', label: 'duffel pile', kind: 'box', x: 85, y: 292, width: 130, height: 70, difficulty: 2 },
           ],
@@ -2504,6 +2516,7 @@
           exits: [{ label: 'Sleeper', targetRoom: 'sleeper', x: 24, y: 180, width: 28, height: 92, spawnX: 706, spawnY: 232 }],
           spots: [
             { id: 'baggage-crates', label: 'supply crates', kind: 'box', x: 105, y: 250, width: 170, height: 95, difficulty: 3 },
+            { id: 'baggage-coat-rack', label: 'coat rack', kind: 'curtain', x: 280, y: 95, width: 82, height: 160, difficulty: 3 },
             { id: 'baggage-ski-bag', label: 'ski bags', kind: 'luggage', x: 365, y: 105, width: 150, height: 88, difficulty: 4 },
             { id: 'baggage-door-shadow', label: 'door shadow', kind: 'closet', x: 600, y: 96, width: 98, height: 185, difficulty: 5 },
           ],
@@ -2526,6 +2539,7 @@
           ],
           spots: [
             { id: 'picnic-table', label: 'picnic table', kind: 'bench', x: 280, y: 255, width: 180, height: 76, difficulty: 2 },
+            { id: 'picnic-trail-sign', label: 'trail sign', kind: 'desk', x: 210, y: 105, width: 95, height: 78, difficulty: 3 },
             { id: 'picnic-cooler', label: 'cooler stack', kind: 'box', x: 88, y: 295, width: 112, height: 70, difficulty: 2 },
             { id: 'picnic-tall-grass', label: 'tall grass', kind: 'bush', x: 565, y: 260, width: 150, height: 90, difficulty: 4 },
           ],
@@ -2537,6 +2551,7 @@
           exits: [{ label: 'Picnic Loop', targetRoom: 'picnic', x: 24, y: 180, width: 28, height: 92, spawnX: 706, spawnY: 232 }],
           spots: [
             { id: 'cabin-blankets', label: 'blanket pile', kind: 'bed', x: 260, y: 288, width: 205, height: 68, difficulty: 3 },
+            { id: 'cabin-window-curtain', label: 'cabin curtain', kind: 'curtain', x: 445, y: 95, width: 82, height: 158, difficulty: 3 },
             { id: 'cabin-woodbox', label: 'wood box', kind: 'box', x: 572, y: 292, width: 130, height: 72, difficulty: 3 },
             { id: 'cabin-pantry', label: 'pantry', kind: 'closet', x: 100, y: 92, width: 110, height: 188, difficulty: 5 },
           ],
@@ -2548,6 +2563,7 @@
           exits: [{ label: 'Picnic Loop', targetRoom: 'picnic', x: 365, y: 392, width: 110, height: 28, spawnX: 400, spawnY: 78 }],
           spots: [
             { id: 'trail-log', label: 'fallen log', kind: 'tree', x: 135, y: 250, width: 160, height: 80, difficulty: 3 },
+            { id: 'trail-signpost', label: 'trail signpost', kind: 'desk', x: 235, y: 102, width: 85, height: 92, difficulty: 2 },
             { id: 'trail-rocks', label: 'rock cluster', kind: 'fountain', x: 360, y: 250, width: 130, height: 95, difficulty: 4 },
             { id: 'trail-pines', label: 'pine trees', kind: 'tree', x: 590, y: 110, width: 110, height: 220, difficulty: 5 },
           ],
@@ -2570,6 +2586,7 @@
           ],
           spots: [
             { id: 'plaza-bench', label: 'bench', kind: 'bench', x: 285, y: 285, width: 180, height: 65, difficulty: 2 },
+            { id: 'plaza-planter', label: 'indoor planter', kind: 'bush', x: 250, y: 108, width: 115, height: 72, difficulty: 3 },
             { id: 'plaza-vending', label: 'vending machines', kind: 'shelf', x: 580, y: 96, width: 125, height: 178, difficulty: 3 },
             { id: 'plaza-map-kiosk', label: 'map kiosk', kind: 'desk', x: 100, y: 100, width: 125, height: 105, difficulty: 4 },
           ],
@@ -2581,6 +2598,7 @@
           exits: [{ label: 'Main Plaza', targetRoom: 'plaza', x: 24, y: 180, width: 28, height: 92, spawnX: 706, spawnY: 232 }],
           spots: [
             { id: 'arcade-cabinet', label: 'game cabinet', kind: 'closet', x: 120, y: 95, width: 105, height: 190, difficulty: 4 },
+            { id: 'arcade-token-counter', label: 'token counter', kind: 'desk', x: 365, y: 105, width: 120, height: 80, difficulty: 2 },
             { id: 'arcade-prize-bin', label: 'prize bin', kind: 'box', x: 320, y: 285, width: 160, height: 72, difficulty: 3 },
             { id: 'arcade-photo-booth', label: 'photo booth', kind: 'curtain', x: 580, y: 92, width: 110, height: 190, difficulty: 5 },
           ],
@@ -2592,6 +2610,7 @@
           exits: [{ label: 'Main Plaza', targetRoom: 'plaza', x: 748, y: 180, width: 28, height: 92, spawnX: 72, spawnY: 232 }],
           spots: [
             { id: 'picnic-trash-wall', label: 'recycling wall', kind: 'shelf', x: 95, y: 90, width: 145, height: 120, difficulty: 2 },
+            { id: 'picnic-pavilion-bench', label: 'pavilion bench', kind: 'bench', x: 455, y: 285, width: 95, height: 62, difficulty: 2 },
             { id: 'picnic-shade-tree', label: 'shade tree', kind: 'tree', x: 345, y: 105, width: 105, height: 220, difficulty: 5 },
             { id: 'picnic-sign', label: 'information sign', kind: 'desk', x: 570, y: 245, width: 130, height: 95, difficulty: 3 },
           ],
@@ -2647,10 +2666,70 @@
   function getNearbyHideSeekSpot(actor) {
     if (!actor) return null;
     const room = getHideSeekRoom(actor.roomId);
-    return room.spots.find(spot => {
+    return room.spots.reduce((closest, spot) => {
       const radius = spot.interactionRadius || 42;
-      return getHideSeekDistanceToRect(actor, spot) <= radius;
-    }) || null;
+      const distance = getHideSeekDistanceToRect(actor, spot);
+      if (distance > radius) return closest;
+      if (!closest || distance < closest.distance) return Object.assign({ distance }, spot);
+      return closest;
+    }, null);
+  }
+
+  function getHideSeekActorCenter(actor) {
+    return {
+      x: actor.x + actor.width / 2,
+      y: actor.y + actor.height / 2,
+    };
+  }
+
+  function getHideSeekCoverQuality(actor) {
+    const nearbySpot = getNearbyHideSeekSpot(actor);
+    if (!nearbySpot) {
+      return {
+        spot: null,
+        score: 1,
+        label: 'Risky',
+        detail: 'Open floor. Bold choice, but easier to find.',
+      };
+    }
+    const radius = nearbySpot.interactionRadius || 42;
+    const closeness = Math.max(0, 1 - (nearbySpot.distance || 0) / radius);
+    const score = Math.max(1, Math.min(5, Math.round((nearbySpot.difficulty || 3) * 0.72 + closeness * 2.1)));
+    const label = score >= 5 ? 'Legendary cover' : score >= 4 ? 'Great cover' : score >= 3 ? 'Solid cover' : 'Risky cover';
+    return {
+      spot: nearbySpot,
+      score,
+      label,
+      detail: `${label} near the ${nearbySpot.label}.`,
+    };
+  }
+
+  function getHideSeekSearchFeedback(sameRoom, distance) {
+    if (!sameRoom) {
+      return { text: 'Wrong room. Keep moving.', tone: 'cold' };
+    }
+    if (distance <= HIDE_SEEK_SEARCH_TOLERANCE) {
+      return { text: 'Found!', tone: 'found' };
+    }
+    if (distance <= HIDE_SEEK_SEARCH_TOLERANCE * 1.65) {
+      return { text: 'Very close. Search the exact spot.', tone: 'hot' };
+    }
+    if (distance <= HIDE_SEEK_SEARCH_TOLERANCE * 2.8) {
+      return { text: 'Warm. You are in the neighborhood.', tone: 'warm' };
+    }
+    return { text: 'Cold. Try another piece of cover.', tone: 'cold' };
+  }
+
+  function setHideSeekSearchPulse(actor, tone) {
+    const center = getHideSeekActorCenter(actor);
+    hideSeekState.searchPulse = {
+      x: center.x,
+      y: center.y,
+      roomId: actor.roomId,
+      time: 0.9,
+      maxTime: 0.9,
+      tone,
+    };
   }
 
   function setHideSeekMessage(message) {
@@ -2754,12 +2833,16 @@
     hideSeekState.hiddenSpotId = null;
     hideSeekState.hiddenSpotLabel = '';
     hideSeekState.hiddenPosition = null;
+    hideSeekState.hiddenCoverQuality = 1;
+    hideSeekState.hiddenCoverLabel = 'Risky';
     hideSeekState.timerRemaining = hideSeekState.countdown;
     hideSeekState.hiderTimeRemaining = HIDE_SEEK_HIDE_SECONDS;
     hideSeekState.wrongGuesses = 0;
     hideSeekState.roundHiderScore = 0;
     hideSeekState.roundSeekerScore = 0;
     hideSeekState.revealPulse = 0;
+    hideSeekState.searchPulse = null;
+    hideSeekState.coverGlowPulse = 0;
     hideSeekState.lastUrgentSecond = null;
   }
 
@@ -2809,16 +2892,17 @@
       hideSeekFoundButton.textContent = 'Hide Here';
       hideSeekFoundButton.setAttribute('aria-label', 'Hide at this exact position');
       hideSeekFoundButton.disabled = false;
+      const coverQuality = getHideSeekCoverQuality(hideSeekState.actors.hider);
       hideSeekRoundTitle.textContent = `${hiderName}, you have ${Math.ceil(hideSeekState.hiderTimeRemaining)} seconds to hide.`;
-      hideSeekRoundText.textContent = nearbySpot
-        ? `Good cover near the ${nearbySpot.label}. Tap Hide Here when you like this exact spot.`
-        : `Move anywhere reachable. Tap Hide Here to lock your exact position before the timer expires.`;
-      setHideSeekMessage(nearbySpot ? `Good cover near the ${nearbySpot.label}.` : `${hiderName} is scrambling for a hiding place.`);
+      hideSeekRoundText.textContent = coverQuality.spot
+        ? `${coverQuality.detail} Tap Hide Here when this exact position feels right.`
+        : `Move near cover or risk the open floor. Tap Hide Here to lock your exact position before the timer expires.`;
+      setHideSeekMessage(coverQuality.spot ? coverQuality.detail : `${hiderName} is looking for cover.`);
     } else if (hideSeekState.phase === HideSeekGameState.SEEKER_LOOK_AWAY) {
       hideSeekFoundButton.textContent = `${seekerName} Starts Searching`;
       hideSeekFoundButton.setAttribute('aria-label', `${seekerName} starts searching`);
       hideSeekRoundTitle.textContent = `${hiderName} is hidden.`;
-      hideSeekRoundText.textContent = `Pass the phone to ${seekerName}. The map resets to the start room, and wrong inspections cost time.`;
+      hideSeekRoundText.textContent = `Pass the phone to ${seekerName}. The map resets to the start room, and wrong inspections cost ${HIDE_SEEK_WRONG_SEARCH_PENALTY} seconds.`;
       setHideSeekMessage(`${seekerName}, no peeking until you tap start searching.`);
     } else if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
       hideSeekFoundButton.textContent = 'Search Here';
@@ -2826,8 +2910,8 @@
       hideSeekFoundButton.disabled = false;
       hideSeekRoundTitle.textContent = `${seekerName}, find the hider.`;
       hideSeekRoundText.textContent = nearbySpot
-        ? `You are near the ${nearbySpot.label}. Search here if you think this is the exact hiding place.`
-        : `Walk around the room, use cover as clues, then tap Search Here when you think you found the exact spot.`;
+        ? `You are near the ${nearbySpot.label}. Search here if this exact place feels right.`
+        : `Walk around, inspect cover, and tap Search Here. Misses give hot/warm/cold feedback but cost time.`;
       setHideSeekMessage(`${seekerName} is searching ${room.name}. Wrong guesses: ${hideSeekState.wrongGuesses}.`);
     } else if (hideSeekState.phase === HideSeekGameState.FOUND || hideSeekState.phase === HideSeekGameState.ROUND_RESULTS) {
       hideSeekRoundTitle.textContent = hideSeekState.phase === HideSeekGameState.FOUND ? 'Found!' : 'Round over.';
@@ -2896,7 +2980,7 @@
       resetHideSeek();
     }
     hideSeekState.mode = hideSeekMode.value || 'roadside-lodge';
-    hideSeekState.countdown = Number(hideSeekCountdown.value) || 60;
+    hideSeekState.countdown = Number(hideSeekCountdown.value) || HIDE_SEEK_DEFAULT_SEARCH_SECONDS;
     hideSeekState.winnerGoal = hideSeekWinner.value || '6';
     resetHideSeekRoundState(HideSeekGameState.HIDER_TURN);
     startHideSeekLoop();
@@ -2932,9 +3016,12 @@
   function lockHideSeekHiderPosition(source) {
     if (hideSeekState.phase !== HideSeekGameState.HIDER_TURN) return;
     const actor = hideSeekState.actors.hider;
-    const nearbySpot = getNearbyHideSeekSpot(actor);
+    const coverQuality = getHideSeekCoverQuality(actor);
+    const nearbySpot = coverQuality.spot;
     hideSeekState.hiddenSpotId = nearbySpot ? nearbySpot.id : null;
     hideSeekState.hiddenSpotLabel = nearbySpot ? `near the ${nearbySpot.label}` : 'somewhere sneaky';
+    hideSeekState.hiddenCoverQuality = coverQuality.score;
+    hideSeekState.hiddenCoverLabel = coverQuality.label;
     hideSeekState.hiddenRoomId = actor.roomId;
     hideSeekState.hiddenPosition = {
       x: actor.x,
@@ -2945,6 +3032,7 @@
     hideSeekState.phase = HideSeekGameState.SEEKER_LOOK_AWAY;
     hideSeekState.hiderTimeRemaining = source === 'timer' ? 0 : hideSeekState.hiderTimeRemaining;
     playHideSeekTone('hide');
+    setHideSeekMessage(`${coverQuality.label}. Phone pass time.`);
     renderHideSeek();
   }
 
@@ -2955,14 +3043,21 @@
     const hiddenPosition = hideSeekState.hiddenPosition;
     if (!hiddenPosition) return;
     const sameRoom = actor.roomId === hiddenPosition.roomId;
-    const distance = Math.hypot(actor.x - hiddenPosition.x, actor.y - hiddenPosition.y);
+    const seekerCenter = getHideSeekActorCenter(actor);
+    const hiddenCenter = {
+      x: hiddenPosition.x + hideSeekState.actors.hider.width / 2,
+      y: hiddenPosition.y + hideSeekState.actors.hider.height / 2,
+    };
+    const distance = Math.hypot(seekerCenter.x - hiddenCenter.x, seekerCenter.y - hiddenCenter.y);
+    const feedback = getHideSeekSearchFeedback(sameRoom, distance);
+    setHideSeekSearchPulse(actor, feedback.tone);
     if (!sameRoom || distance > HIDE_SEEK_SEARCH_TOLERANCE) {
-      const missText = sameRoom && distance <= HIDE_SEEK_SEARCH_TOLERANCE * 2 ? 'Close, but not exact.' : 'Nope, not here.';
       hideSeekState.wrongGuesses += 1;
-      hideSeekState.timerRemaining = Math.max(0, hideSeekState.timerRemaining - 8);
-      hideSeekState.shakingSpotId = null;
+      hideSeekState.timerRemaining = Math.max(0, hideSeekState.timerRemaining - HIDE_SEEK_WRONG_SEARCH_PENALTY);
+      const nearbySpot = getNearbyHideSeekSpot(actor);
+      hideSeekState.shakingSpotId = nearbySpot ? nearbySpot.id : null;
       hideSeekState.shakeTime = 0.55;
-      setHideSeekMessage(`${missText} Eight seconds lost.`);
+      setHideSeekMessage(`${feedback.text} ${HIDE_SEEK_WRONG_SEARCH_PENALTY} seconds lost.`);
       playHideSeekTone('wrong');
       renderHideSeek();
       if (hideSeekState.timerRemaining <= 0) hideSeekSeekerFailed();
@@ -2978,15 +3073,16 @@
       height: 32,
     };
     const timeUsed = hideSeekState.countdown - hideSeekState.timerRemaining;
-    hideSeekState.roundSeekerScore = Math.max(0, Math.round(1000 - timeUsed * 8 - hideSeekState.wrongGuesses * 80 + foundSpot.difficulty * 50));
-    hideSeekState.roundHiderScore = Math.max(0, Math.round(timeUsed * 6 + foundSpot.difficulty * 90 + (HIDE_SEEK_HIDE_SECONDS - hideSeekState.hiderTimeRemaining) * 4));
+    const coverScore = Number(hideSeekState.hiddenCoverQuality) || foundSpot.difficulty || 3;
+    hideSeekState.roundSeekerScore = Math.max(0, Math.round(1200 - timeUsed * 7 - hideSeekState.wrongGuesses * 90 + coverScore * 55));
+    hideSeekState.roundHiderScore = Math.max(0, Math.round(timeUsed * 5 + coverScore * 125 + (HIDE_SEEK_HIDE_SECONDS - hideSeekState.hiderTimeRemaining) * 3));
     hideSeekState.hideScore[seeker.id] = (hideSeekState.hideScore[seeker.id] || 0) + hideSeekState.roundSeekerScore;
     hideSeekState.hideScore[hider.id] = (hideSeekState.hideScore[hider.id] || 0) + hideSeekState.roundHiderScore;
     hideSeekState.phase = HideSeekGameState.FOUND;
     hideSeekState.revealPulse = 1.4;
     revealHideSeekHider(foundSpot);
     hideSeekRound += 1;
-    hideSeekState.lastRoundText = `${seeker.name} found ${hider.name} ${hideSeekState.hiddenSpotLabel}. ${seeker.name}: +${hideSeekState.roundSeekerScore}. ${hider.name}: +${hideSeekState.roundHiderScore}. Wrong guesses: ${hideSeekState.wrongGuesses}.`;
+    hideSeekState.lastRoundText = `${seeker.name} found ${hider.name} ${hideSeekState.hiddenSpotLabel}. Cover: ${hideSeekState.hiddenCoverLabel}. ${seeker.name}: +${hideSeekState.roundSeekerScore}. ${hider.name}: +${hideSeekState.roundHiderScore}. Wrong guesses: ${hideSeekState.wrongGuesses}.`;
     playHideSeekTone('found');
     renderHideSeek();
   }
@@ -3006,14 +3102,14 @@
     if (hideSeekState.phase !== HideSeekGameState.SEEKER_TURN) return;
     const hider = getHideSeekPlayer(hideSeekState.hiderIndex);
     const spot = getHideSeekSpotById(hideSeekState.hiddenSpotId);
-    const difficulty = spot ? spot.difficulty : 3;
+    const difficulty = Number(hideSeekState.hiddenCoverQuality) || (spot ? spot.difficulty : 3);
     hideSeekState.roundSeekerScore = 0;
     hideSeekState.roundHiderScore = 1000 + difficulty * 150 + Math.round(hideSeekState.hiderTimeRemaining * 8);
     hideSeekState.hideScore[hider.id] = (hideSeekState.hideScore[hider.id] || 0) + hideSeekState.roundHiderScore;
     hideSeekState.phase = HideSeekGameState.ROUND_RESULTS;
     revealHideSeekHider(spot || { x: 120, y: 305, width: 24, height: 32 });
     hideSeekRound += 1;
-    hideSeekState.lastRoundText = `${hider.name} stayed hidden ${hideSeekState.hiddenSpotLabel}. ${hider.name}: +${hideSeekState.roundHiderScore}.`;
+    hideSeekState.lastRoundText = `${hider.name} stayed hidden ${hideSeekState.hiddenSpotLabel}. Cover: ${hideSeekState.hiddenCoverLabel}. ${hider.name}: +${hideSeekState.roundHiderScore}.`;
     playHideSeekTone('wrong');
     renderHideSeek();
   }
@@ -3036,7 +3132,7 @@
     hideSeekRound = 0;
     hideSeekState = {
       mode: hideSeekMode.value || 'roadside-lodge',
-      countdown: Number(hideSeekCountdown.value) || 60,
+      countdown: Number(hideSeekCountdown.value) || HIDE_SEEK_DEFAULT_SEARCH_SECONDS,
       winnerGoal: hideSeekWinner.value || '6',
       hiderIndex: 0,
       seekerIndex: 1,
@@ -3044,9 +3140,11 @@
       hiddenSpotId: null,
       hiddenSpotLabel: '',
       hiddenPosition: null,
+      hiddenCoverQuality: 1,
+      hiddenCoverLabel: 'Risky',
       hiddenRoomId: null,
       activeRoomId: (hideSeekMaps[hideSeekMode.value] || hideSeekMaps['roadside-lodge']).startRoom,
-      timerRemaining: Number(hideSeekCountdown.value) || 60,
+      timerRemaining: Number(hideSeekCountdown.value) || HIDE_SEEK_DEFAULT_SEARCH_SECONDS,
       hiderTimeRemaining: HIDE_SEEK_HIDE_SECONDS,
       wrongGuesses: 0,
       roundHiderScore: 0,
@@ -3060,6 +3158,8 @@
       },
       input: { up: false, down: false, left: false, right: false },
       revealPulse: 0,
+      searchPulse: null,
+      coverGlowPulse: 0,
       lastUrgentSecond: null,
       shakeTime: 0,
       shakingSpotId: null,
@@ -3093,6 +3193,11 @@
       if (hideSeekState.timerRemaining <= 0) hideSeekSeekerFailed();
     }
     if (hideSeekState.revealPulse > 0) hideSeekState.revealPulse = Math.max(0, hideSeekState.revealPulse - delta);
+    if (hideSeekState.searchPulse) {
+      hideSeekState.searchPulse.time = Math.max(0, hideSeekState.searchPulse.time - delta);
+      if (hideSeekState.searchPulse.time <= 0) hideSeekState.searchPulse = null;
+    }
+    hideSeekState.coverGlowPulse = (hideSeekState.coverGlowPulse + delta * 2.2) % (Math.PI * 2);
     if (hideSeekState.shakeTime > 0) hideSeekState.shakeTime = Math.max(0, hideSeekState.shakeTime - delta);
     updateHideSeekTimerText();
   }
@@ -3212,6 +3317,7 @@
     drawHideSeekRoom(ctx, room, palette);
     drawHideSeekSpots(ctx, room);
     drawHideSeekActors(ctx, room);
+    drawHideSeekActionEffects(ctx, room);
     drawHideSeekHud(ctx, room, map);
     if (hideSeekDebugEnabled) drawHideSeekDebug(ctx, room, map);
   }
@@ -3400,6 +3506,46 @@
     });
   }
 
+  function drawHideSeekActionEffects(ctx, room) {
+    const pulse = hideSeekState.searchPulse;
+    if (pulse && pulse.roomId === room.id) {
+      const progress = 1 - (pulse.time / pulse.maxTime);
+      const colors = {
+        found: '46, 199, 211',
+        hot: '245, 130, 32',
+        warm: '255, 209, 102',
+        cold: '123, 78, 230',
+      };
+      const color = colors[pulse.tone] || colors.cold;
+      ctx.save();
+      ctx.strokeStyle = `rgba(${color}, ${Math.max(0, 0.86 - progress * 0.72)})`;
+      ctx.lineWidth = Math.max(2, 8 - progress * 5);
+      ctx.beginPath();
+      ctx.arc(pulse.x, pulse.y, HIDE_SEEK_SEARCH_TOLERANCE + progress * 46, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = `rgba(${color}, ${Math.max(0, 0.16 - progress * 0.12)})`;
+      ctx.beginPath();
+      ctx.arc(pulse.x, pulse.y, 18 + progress * 18, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    if (hideSeekState.phase === HideSeekGameState.HIDER_TURN) {
+      const actor = hideSeekState.actors.hider;
+      const quality = getHideSeekCoverQuality(actor);
+      const glow = 0.45 + Math.sin(hideSeekState.coverGlowPulse) * 0.12;
+      ctx.save();
+      ctx.strokeStyle = quality.spot ? `rgba(46, 199, 211, ${glow})` : `rgba(245, 130, 32, ${glow})`;
+      ctx.lineWidth = 3;
+      ctx.setLineDash([8, 8]);
+      ctx.beginPath();
+      ctx.arc(actor.x + actor.width / 2, actor.y + actor.height / 2, HIDE_SEEK_SEARCH_TOLERANCE + 7, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
+  }
+
   function drawHideSeekObject(ctx, spot, isNearby) {
     const x = spot.x;
     const y = spot.y;
@@ -3414,7 +3560,44 @@
     ctx.ellipse(x + w / 2, y + h - 2, Math.max(20, w * 0.48), Math.max(8, h * 0.1), 0, 0, Math.PI * 2);
     ctx.fill();
 
-    if (spot.kind === 'bed') {
+    if (spot.kind === 'bench') {
+      ctx.fillStyle = '#6b3f2a';
+      fillHideSeekRoundedRect(ctx, x + 8, y + h * 0.4, w - 16, h * 0.2, 8);
+      ctx.fillStyle = '#8f5a36';
+      fillHideSeekRoundedRect(ctx, x + 16, y + h * 0.18, w - 32, h * 0.22, 8);
+      ctx.fillStyle = '#4a2b1d';
+      fillHideSeekRoundedRect(ctx, x + 28, y + h * 0.58, 12, h * 0.34, 4);
+      fillHideSeekRoundedRect(ctx, x + w - 40, y + h * 0.58, 12, h * 0.34, 4);
+      ctx.fillStyle = 'rgba(255,255,255,0.22)';
+      ctx.fillRect(x + 24, y + h * 0.26, w - 48, 4);
+    } else if (spot.kind === 'desk') {
+      const deskTop = ctx.createLinearGradient(x, y, x, y + h);
+      deskTop.addColorStop(0, '#c47b32');
+      deskTop.addColorStop(1, '#744523');
+      ctx.fillStyle = deskTop;
+      fillHideSeekRoundedRect(ctx, x, y + h * 0.28, w, h * 0.62, 9);
+      ctx.fillStyle = '#f7dca1';
+      fillHideSeekRoundedRect(ctx, x + 14, y + h * 0.12, w - 28, h * 0.24, 8);
+      ctx.fillStyle = 'rgba(9,35,63,0.3)';
+      ctx.fillRect(x + 18, y + h * 0.48, w - 36, 6);
+      ctx.fillStyle = '#09233f';
+      fillHideSeekRoundedRect(ctx, x + w * 0.68, y + h * 0.42, w * 0.18, h * 0.34, 5);
+    } else if (spot.kind === 'shelf') {
+      const shelf = ctx.createLinearGradient(x, y, x, y + h);
+      shelf.addColorStop(0, '#7a8794');
+      shelf.addColorStop(1, '#3f4b58');
+      ctx.fillStyle = shelf;
+      fillHideSeekRoundedRect(ctx, x, y, w, h, 8);
+      ctx.fillStyle = '#09233f';
+      for (let row = 0; row < 3; row += 1) {
+        const rowY = y + 18 + row * ((h - 28) / 3);
+        ctx.fillRect(x + 10, rowY, w - 20, 5);
+      }
+      ['#f58220', '#2ec7d3', '#fff2d8', '#7b4ee6'].forEach((color, index) => {
+        ctx.fillStyle = color;
+        fillHideSeekRoundedRect(ctx, x + 18 + index * Math.max(20, w / 5), y + 18 + (index % 2) * 26, 18, 22, 4);
+      });
+    } else if (spot.kind === 'bed') {
       const blanket = ctx.createLinearGradient(x, y, x, y + h);
       blanket.addColorStop(0, '#9b75ff');
       blanket.addColorStop(1, '#5c34bf');
@@ -3506,6 +3689,14 @@
       ctx.font = '800 12px Arial';
       ctx.textAlign = 'center';
       ctx.fillText(spot.label, x + w / 2, y - 13);
+      const quality = getHideSeekCoverQuality(getHideSeekActiveActor());
+      if (hideSeekState.phase === HideSeekGameState.HIDER_TURN && quality.spot && quality.spot.id === spot.id) {
+        ctx.fillStyle = 'rgba(6, 21, 36, 0.82)';
+        fillHideSeekRoundedRect(ctx, x + w / 2 - 64, y + h + 8, 128, 22, 11);
+        ctx.fillStyle = '#fff2d8';
+        ctx.font = '900 11px Arial';
+        ctx.fillText(`${quality.label} ${'*'.repeat(quality.score)}`, x + w / 2, y + h + 23);
+      }
     }
     if (isNearby) {
       ctx.fillStyle = '#f58220';
@@ -3599,6 +3790,17 @@
     ctx.fillText(`Hider: ${hiderName}`, 318, 25);
     ctx.fillStyle = '#ffdcb5';
     ctx.fillText(`Seeker: ${seekerName}  Wrong: ${hideSeekState.wrongGuesses}`, 318, 42);
+
+    if (hideSeekState.phase === HideSeekGameState.HIDER_TURN) {
+      const quality = getHideSeekCoverQuality(hideSeekState.actors.hider);
+      ctx.fillStyle = quality.score >= 4 ? '#bdeff4' : '#fff2d8';
+      ctx.font = '900 10px Arial';
+      ctx.fillText(`Cover: ${quality.label}`, 472, 25);
+    } else if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
+      ctx.fillStyle = '#fff2d8';
+      ctx.font = '900 10px Arial';
+      ctx.fillText(`Miss: -${HIDE_SEEK_WRONG_SEARCH_PENALTY}s`, 472, 25);
+    }
 
     ctx.textAlign = 'right';
     ctx.fillStyle = isUrgent ? '#ff4d4d' : '#f58220';
@@ -5547,7 +5749,7 @@
     resetHideSeek();
   });
   hideSeekCountdown.addEventListener('change', () => {
-    hideSeekState.countdown = Number(hideSeekCountdown.value) || 60;
+    hideSeekState.countdown = Number(hideSeekCountdown.value) || HIDE_SEEK_DEFAULT_SEARCH_SECONDS;
     hideSeekState.timerRemaining = hideSeekState.countdown;
     renderHideSeek();
   });

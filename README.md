@@ -17,7 +17,7 @@ This project was built with **no backend**, **no user accounts** and **no data c
 - **Joke Vote:** Let each player tell clean jokes and award Dad Joke or Mom Joke honors.
 - **Emoji Face-Off:** Copy emoji expressions with an optional local camera snap, then vote for the closest match. Photos are not uploaded or saved by the app.
 - **Pi Digits:** See who can recite the most digits of pi and track scores for every player.
-- **Hide & Seek:** Play a local pass-and-play canvas game with a 30-second hiding scramble, exact-position searching, obstacles, room transitions and role swaps.
+- **Hide & Seek:** Play a local pass-and-play canvas game with a 1-minute hiding scramble, 2-minute default search timer, cover quality, obstacles, room transitions and role swaps.
 - **Dynamic adventures:** The app builds an adventure from a pool of questions and prompts.  Timed challenges show a 15 second countdown.
 - **Progress bar:** See how far along your adventure you are.
 - **Summary:** At the end, get a breakdown of how many discoveries, laughs, facts and wins you achieved.
@@ -63,7 +63,7 @@ To support additional regions, add manual region buttons in `index.html` and mat
 
 ### Adding Hide & Seek maps
 
-Hide & Seek maps live in the `hideSeekMaps` object in `script.js`. Each map defines a start room, palette, room exits, cover objects and optional obstacles. Cover objects can be used as hiding ideas, but the hider is actually stored at their exact canvas position when they tap **Hide Here** or the 30-second hide timer expires.
+Hide & Seek maps live in the `hideSeekMaps` object in `script.js`. Each map defines a start room, palette, room exits, cover objects and optional obstacles. Cover objects can be used as hiding ideas, but the hider is actually stored at their exact canvas position when they tap **Hide Here** or the 1-minute hide timer expires.
 
 ```js
 const hideSeekMaps = {
