@@ -2,16 +2,16 @@
 
 **Tiny adventures for passengers.**
 
-Road Trip Adventures is a lightweight, static web application designed to make road trips more fun for passengers.  Scan a QR code and get a set of challenges tailored to the length of your ride, your age group and your mood.  The activities encourage you to look out the window, laugh together, learn something new, explore local trivia and engage in gentle competition.
+Road Trip Adventures is a lightweight, static web application designed to make road trips more fun for passengers. Scan a QR code, add player initials, pick a mode, and play quick games that encourage people to look outside, laugh together, learn something new, explore local trivia, and compete gently.
 
 This project was built with **no backend**, **no user accounts** and **no data collection**.  It is intended to run on [GitHub Pages](https://www.wikiwand.com/en/GitHub_Pages) or any static web host.  All game state lives only in the browser’s memory.  When you close the tab, the adventure disappears and nothing is saved on a server.
 
 ## Features
 
 - **Passenger only:** The app explicitly tells drivers not to play while driving.
-- **Age groups:** Choose from Kids (9–12), Teens, Adults or Everyone.
-- **Players:** Add 2 to 8 player names and track scores across competitive modes.
-- **Adventure types:** Pick categories like **Look Outside**, **Laugh Together**, **Learn Something**, **Competition**, **Local Explorer** or **Mystery Mix**.
+- **Players:** Add 2 to 8 player initials and optionally choose a car judge for games that need a human call.
+- **Organized modes:** Pick from **Look Outside**, **Trivia & Brain**, **Party Games**, and **Bonus** sections.
+- **Adventure types:** Play categories like **Look Outside**, **Learn Something**, **Quick Challenges**, **Local Explorer**, **Trip Calculator**, **Road Pong**, **Banana Towers**, or **Hide & Seek Adventure**.
 - **Scavenger Hunt:** Play an any-route hunt where 2 to 8 players tap real-world sightings to claim points.
 - **Trivia Run:** Play broad road-trip trivia across all 50 state capitals, state nicknames, license plates, rivers, remote places, math, science, biology, random facts, food facts, sports, music, TV, K-pop, Taylor Swift and decade trivia.
 - **Joke Vote:** Let each player tell clean jokes and award Dad Joke or Mom Joke honors.
@@ -23,6 +23,32 @@ This project was built with **no backend**, **no user accounts** and **no data c
 - **Summary:** At the end, get a breakdown of how many discoveries, laughs, facts and wins you achieved.
 - **Accessibility options:** Toggle large text, high contrast and reduced motion.  All interactive elements have clear focus styles, ARIA labels and live region announcements.
 - **Privacy friendly:** No tracking, analytics, data collection, or location sensors. Local trivia is selected manually by region.
+
+## Project Layout
+
+The app is intentionally vanilla JavaScript and static-host friendly. The main file still owns the overall app state machine, while large content and game-specific art/data are moving into smaller files:
+
+```text
+index.html
+style.css
+script.js
+js/
+  data/
+    questions.js          # learn prompts and extra adventure prompts
+    scavenger.js          # scavenger, lightning, alphabet, and mini-bet data
+    trivia.js             # curated offline trivia packs
+    community-trivia.js   # larger imported/community trivia pack
+  games/
+    hide-seek-art.js      # canvas renderers for Hide & Seek objects and rooms
+    hide-seek-data.js     # Hide & Seek maps, rooms, exits, objects, obstacles
+    pong-art.js           # Road Pong canvas renderer/state helpers
+    pong-data.js          # Road Pong settings and difficulty data
+scripts/
+  audit-all.js            # runs every local content/game audit
+  audit-content.js        # prompt/scavenger required-field checks
+  audit-trivia.js         # trivia required-field and answer-choice checks
+  audit-game-quality.js   # broader mobile, category, and map quality checks
+```
 
 ## Running Locally
 
@@ -45,15 +71,15 @@ This project was built with **no backend**, **no user accounts** and **no data c
 
 ## Customisation
 
-### Adding more questions
+### Adding more adventure prompts
 
-Open `script.js` and extend the `questions` array.  Each question has:
+Prefer adding new adventure and learning prompts in `js/data/questions.js`. The small `questions` array in `script.js` is now only the seed deck. Each prompt has:
 
 | Field | Description |
 |------|-------------|
 | `id` | A unique identifier. |
 | `category` | One of `look`, `laugh`, `learn`, `compete` or `local`. |
-| `ageGroups` | Array of age tags (`kids`, `teens`, `adults`, `mixed`) or `['*']` for all ages. |
+| `ageGroups` | Keep `['*']` unless you are intentionally preserving older compatibility tags. |
 | `regions` | Array of manual region codes (e.g. `CA`, `AZ`, `NV`, `UT`, `CO`, `NM`, `TX`, `AR`) or `['*']` for global.  Used by the **Local Explorer** category. |
 | `requiresTimer` | If `true`, a 15 second countdown is shown. |
 | `text` | The prompt/question displayed to the user. |
@@ -61,9 +87,21 @@ Open `script.js` and extend the `questions` array.  Each question has:
 
 To support additional regions, add manual region buttons in `index.html` and matching region codes in the local trivia data. Do not add browser geolocation or location sensor logic.
 
+### Adding trivia and scavenger content
+
+Add curated trivia to `js/data/trivia.js` or larger/community packs to `js/data/community-trivia.js`. Every trivia item should include `id`, `category`, `question`, `answer`, and `choices`, and the exact `answer` string must appear in `choices`.
+
+Add scavenger content to `js/data/scavenger.js`. Keep labels short enough for mobile cards, and make every target verifiable by the group. Avoid prompts that ask players to silently count something no one else can confirm.
+
+Run the audits before pushing content:
+
+```bash
+node scripts/audit-all.js
+```
+
 ### Adding Hide & Seek maps
 
-Hide & Seek Adventure maps live in the `hideSeekMaps` object in `script.js`. Each map defines a start room, palette, room exits, cover objects and optional obstacles. Cover objects are real hiding spots with round states such as empty, suspicious, searched and found. The hider enters one valid spot when they tap **Hide Here** or the 1-minute hide timer expires.
+Hide & Seek Adventure maps live in `js/games/hide-seek-data.js`. Each map defines a start room, palette, room exits, cover objects and optional obstacles. Cover objects are real hiding spots with round states such as empty, suspicious, searched and found. The hider enters one valid spot when they tap **Hide Here** or the 1-minute hide timer expires.
 
 ```js
 const hideSeekMaps = {
@@ -91,7 +129,7 @@ const hideSeekMaps = {
 };
 ```
 
-Every cover object needs a unique `id`, a short `label`, a `kind`, position, size and `difficulty` from 1 to 5. Supported visual kinds include `bed`, `closet`, `curtain`, `box`, `luggage`, `tree`, `bush`, `car`, `fountain`, `bench`, `desk` and `shelf`. Objects are solid by default so players must walk around them; set `solid: false` for decorative-only objects. Add a matching `<option>` in `index.html` so players can select the new map.
+Every cover object needs a unique `id`, a short `label`, a `kind`, position, size and `difficulty` from 1 to 5. Supported visual kinds include `bed`, `closet`, `curtain`, `box`, `luggage`, `tree`, `bush`, `car`, `fountain`, `bench`, `desk`, `locker` and `shelf`. Objects are solid by default so players must walk around them; set `solid: false` for decorative-only objects. Add a matching `<option>` in `index.html` so players can select the new map.
 
 Future bitmap assets should follow the folder and naming guidelines in [docs/asset-pipeline.md](docs/asset-pipeline.md).
 

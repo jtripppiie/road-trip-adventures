@@ -67,8 +67,8 @@
       .slice(0, 72);
   }
 
-  // Sample data set.  Extend this array in questions.json or by modifying
-  // this script.  Each entry has:
+  // Seed prompt set. Most new prompts should live in js/data/questions.js so
+  // this app shell stays easier to reason about. Each entry has:
   // - id: unique identifier
   // - category: look | laugh | learn | compete | local
   // - ageGroups: array of strings (kids, teens, adults, mixed) or
@@ -120,7 +120,7 @@
       ageGroups: ['*'],
       regions: ['*'],
       requiresTimer: false,
-      text: 'Everyone quietly looks outside for 20 seconds, then shares the smallest detail they noticed.',
+      text: 'Window detective: one passenger picks a tiny visible detail outside. Everyone else asks yes-or-no questions until they find it.',
       points: 1,
     },
     {
@@ -5735,9 +5735,11 @@
     const triviaCount = triviaDatabase.length;
     const scavengerCount = scavengerItems.length;
     const learnCount = questions.filter(question => question.category === 'learn').length;
+    const hideSeekMapCount = Object.keys(hideSeekMaps).length;
     const secretModeCount = Object.keys(secretModeConfigs).length;
+    const hideSeekMapLabel = hideSeekMapCount === 1 ? 'hide-and-seek map' : 'hide-and-seek maps';
     const secretModeLabel = secretModeCount === 1 ? 'secret mode' : 'secret modes';
-    adminCounts.textContent = `${triviaCount} trivia questions, ${scavengerCount} scavenger items, ${learnCount} learn prompts, ${secretModeCount} ${secretModeLabel}.`;
+    adminCounts.textContent = `${triviaCount} trivia questions, ${scavengerCount} scavenger items, ${learnCount} learn prompts, ${hideSeekMapCount} ${hideSeekMapLabel}, ${secretModeCount} ${secretModeLabel}.`;
   }
 
   function useAdminTestPlayers() {

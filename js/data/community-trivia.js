@@ -1836,9 +1836,9 @@
       "id": "hockey-what-is-icing-in-hockey",
       "category": "hockey",
       "question": "What is icing in hockey?",
-      "answer": "Shooting the puck across both the center red line and goal line without it being touched.",
+      "answer": "Clearing the puck past both red and goal lines untouched.",
       "choices": [
-        "Shooting the puck across both the center red line and goal line without it being touched.",
+        "Clearing the puck past both red and goal lines untouched.",
         "Freezing the puck against the boards.",
         "Spraying snow on the goalie.",
         "Covering the puck with the glove."
