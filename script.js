@@ -2439,276 +2439,15 @@
     GAME_OVER: 'GAME_OVER',
   };
 
-  const hideSeekMaps = {
-    'roadside-lodge': {
-      id: 'roadside-lodge',
-      name: 'Roadside Lodge',
-      startRoom: 'lobby',
-      palette: { wall: '#28405c', floor: '#d8a85d', trim: '#09233f', accent: '#f58220' },
-      rooms: {
-        lobby: {
-          id: 'lobby',
-          name: 'Lobby',
-          exits: [
-            { label: 'Bedroom', targetRoom: 'bedroom', x: 748, y: 180, width: 28, height: 92, spawnX: 60, spawnY: 232 },
-            { label: 'Garage', targetRoom: 'garage', x: 365, y: 392, width: 110, height: 28, spawnX: 400, spawnY: 74 },
-            { label: 'Courtyard', targetRoom: 'courtyard', x: 24, y: 180, width: 28, height: 92, spawnX: 708, spawnY: 232 },
-          ],
-          spots: [
-            { id: 'lobby-front-desk', label: 'front desk', kind: 'desk', x: 300, y: 245, width: 185, height: 72, difficulty: 2 },
-            { id: 'lobby-sofa', label: 'blue lobby sofa', kind: 'couch', x: 500, y: 110, width: 168, height: 68, difficulty: 3 },
-            { id: 'lobby-curtains', label: 'sunset curtains', kind: 'curtain', x: 92, y: 90, width: 90, height: 190, difficulty: 3 },
-            { id: 'lobby-luggage-cart', label: 'luggage cart', kind: 'luggage', x: 570, y: 270, width: 110, height: 75, difficulty: 4 },
-          ],
-          obstacles: [{ id: 'lobby-rug', type: 'slow', x: 250, y: 328, width: 300, height: 52, speedMultiplier: 0.65 }],
-        },
-        bedroom: {
-          id: 'bedroom',
-          name: 'Guest Room',
-          exits: [{ label: 'Lobby', targetRoom: 'lobby', x: 24, y: 180, width: 28, height: 92, spawnX: 706, spawnY: 232 }],
-          spots: [
-            { id: 'bedroom-bed', label: 'under the bed', kind: 'bed', x: 270, y: 285, width: 220, height: 70, difficulty: 3 },
-            { id: 'bedroom-window-drapes', label: 'window drapes', kind: 'curtain', x: 145, y: 92, width: 85, height: 170, difficulty: 4 },
-            { id: 'bedroom-closet', label: 'closet', kind: 'closet', x: 610, y: 95, width: 100, height: 175, difficulty: 4 },
-            { id: 'bedroom-laundry', label: 'laundry pile', kind: 'box', x: 92, y: 288, width: 112, height: 76, difficulty: 2 },
-          ],
-          obstacles: [{ id: 'bedroom-table', type: 'block', x: 500, y: 305, width: 70, height: 50 }],
-        },
-        garage: {
-          id: 'garage',
-          name: 'Garage',
-          exits: [{ label: 'Lobby', targetRoom: 'lobby', x: 365, y: 24, width: 110, height: 28, spawnX: 400, spawnY: 350 }],
-          spots: [
-            { id: 'garage-toolbox', label: 'tool wall', kind: 'shelf', x: 92, y: 95, width: 145, height: 92, difficulty: 2 },
-            { id: 'garage-spare-tires', label: 'spare tires', kind: 'box', x: 455, y: 100, width: 86, height: 78, difficulty: 3 },
-            { id: 'garage-cardboard', label: 'cardboard stack', kind: 'box', x: 292, y: 265, width: 155, height: 95, difficulty: 3 },
-            { id: 'garage-van', label: 'behind the pickup truck', kind: 'car', x: 535, y: 200, width: 180, height: 105, difficulty: 5 },
-          ],
-          obstacles: [{ id: 'garage-oil', type: 'slow', x: 260, y: 355, width: 170, height: 34, speedMultiplier: 0.55 }],
-        },
-        courtyard: {
-          id: 'courtyard',
-          name: 'Courtyard',
-          exits: [{ label: 'Lobby', targetRoom: 'lobby', x: 748, y: 180, width: 28, height: 92, spawnX: 72, spawnY: 232 }],
-          spots: [
-            { id: 'courtyard-bushes', label: 'desert bushes', kind: 'bush', x: 120, y: 250, width: 160, height: 95, difficulty: 3 },
-            { id: 'courtyard-patio-bench', label: 'patio bench', kind: 'bench', x: 292, y: 108, width: 155, height: 62, difficulty: 2 },
-            { id: 'courtyard-fountain', label: 'dry fountain', kind: 'fountain', x: 350, y: 185, width: 130, height: 100, difficulty: 4 },
-            { id: 'courtyard-tree', label: 'shade tree', kind: 'tree', x: 610, y: 130, width: 95, height: 200, difficulty: 5 },
-          ],
-          obstacles: [{ id: 'courtyard-planter', type: 'block', x: 315, y: 320, width: 185, height: 42 }],
-        },
-      },
-    },
-    'alaska-train': {
-      id: 'alaska-train',
-      name: 'Alaska Train',
-      startRoom: 'observation',
-      palette: { wall: '#21394f', floor: '#b8d8ea', trim: '#061524', accent: '#2ec7d3' },
-      rooms: {
-        observation: {
-          id: 'observation',
-          name: 'Observation Car',
-          exits: [{ label: 'Sleeper', targetRoom: 'sleeper', x: 748, y: 180, width: 28, height: 92, spawnX: 60, spawnY: 232 }],
-          spots: [
-            { id: 'observation-window-seat', label: 'window seat', kind: 'bench', x: 92, y: 265, width: 150, height: 70, difficulty: 2 },
-            { id: 'observation-coat-hooks', label: 'coat hooks', kind: 'curtain', x: 320, y: 90, width: 110, height: 170, difficulty: 3 },
-            { id: 'observation-overhead-bags', label: 'overhead bags', kind: 'shelf', x: 455, y: 105, width: 100, height: 82, difficulty: 3 },
-            { id: 'observation-snack-cart', label: 'snack cart', kind: 'luggage', x: 575, y: 275, width: 120, height: 74, difficulty: 4 },
-          ],
-          obstacles: [{ id: 'observation-aisle', type: 'slow', x: 250, y: 335, width: 320, height: 40, speedMultiplier: 0.75 }],
-        },
-        sleeper: {
-          id: 'sleeper',
-          name: 'Sleeper Car',
-          exits: [
-            { label: 'Observation', targetRoom: 'observation', x: 24, y: 180, width: 28, height: 92, spawnX: 706, spawnY: 232 },
-            { label: 'Baggage', targetRoom: 'baggage', x: 748, y: 180, width: 28, height: 92, spawnX: 60, spawnY: 232 },
-          ],
-          spots: [
-            { id: 'sleeper-bunk', label: 'upper bunk', kind: 'bed', x: 210, y: 110, width: 210, height: 68, difficulty: 4 },
-            { id: 'sleeper-folding-table', label: 'folding table', kind: 'desk', x: 330, y: 270, width: 120, height: 64, difficulty: 2 },
-            { id: 'sleeper-curtain', label: 'privacy curtain', kind: 'curtain', x: 535, y: 90, width: 95, height: 190, difficulty: 3 },
-            { id: 'sleeper-duffel', label: 'duffel pile', kind: 'box', x: 85, y: 292, width: 130, height: 70, difficulty: 2 },
-          ],
-          obstacles: [],
-        },
-        baggage: {
-          id: 'baggage',
-          name: 'Baggage Car',
-          exits: [{ label: 'Sleeper', targetRoom: 'sleeper', x: 24, y: 180, width: 28, height: 92, spawnX: 706, spawnY: 232 }],
-          spots: [
-            { id: 'baggage-crates', label: 'supply crates', kind: 'box', x: 105, y: 250, width: 170, height: 95, difficulty: 3 },
-            { id: 'baggage-coat-rack', label: 'coat rack', kind: 'curtain', x: 280, y: 95, width: 82, height: 160, difficulty: 3 },
-            { id: 'baggage-ski-bag', label: 'ski bags', kind: 'luggage', x: 365, y: 105, width: 150, height: 88, difficulty: 4 },
-            { id: 'baggage-door-shadow', label: 'door shadow', kind: 'closet', x: 600, y: 96, width: 98, height: 185, difficulty: 5 },
-          ],
-          obstacles: [{ id: 'baggage-stack', type: 'block', x: 305, y: 275, width: 105, height: 80 }],
-        },
-      },
-    },
-    campground: {
-      id: 'campground',
-      name: 'Campground',
-      startRoom: 'picnic',
-      palette: { wall: '#1d4939', floor: '#75b36a', trim: '#09233f', accent: '#f58220' },
-      rooms: {
-        picnic: {
-          id: 'picnic',
-          name: 'Picnic Loop',
-          exits: [
-            { label: 'Cabin', targetRoom: 'cabin', x: 748, y: 180, width: 28, height: 92, spawnX: 60, spawnY: 232 },
-            { label: 'Trail', targetRoom: 'trail', x: 365, y: 24, width: 110, height: 28, spawnX: 400, spawnY: 358 },
-          ],
-          spots: [
-            { id: 'picnic-table', label: 'picnic table', kind: 'bench', x: 280, y: 255, width: 180, height: 76, difficulty: 2 },
-            { id: 'picnic-trail-sign', label: 'trail sign', kind: 'desk', x: 210, y: 105, width: 95, height: 78, difficulty: 3 },
-            { id: 'picnic-cooler', label: 'cooler stack', kind: 'box', x: 88, y: 295, width: 112, height: 70, difficulty: 2 },
-            { id: 'picnic-tall-grass', label: 'tall grass', kind: 'bush', x: 565, y: 260, width: 150, height: 90, difficulty: 4 },
-          ],
-          obstacles: [],
-        },
-        cabin: {
-          id: 'cabin',
-          name: 'Cabin',
-          exits: [{ label: 'Picnic Loop', targetRoom: 'picnic', x: 24, y: 180, width: 28, height: 92, spawnX: 706, spawnY: 232 }],
-          spots: [
-            { id: 'cabin-blankets', label: 'blanket pile', kind: 'bed', x: 260, y: 288, width: 205, height: 68, difficulty: 3 },
-            { id: 'cabin-window-curtain', label: 'cabin curtain', kind: 'curtain', x: 445, y: 95, width: 82, height: 158, difficulty: 3 },
-            { id: 'cabin-woodbox', label: 'wood box', kind: 'box', x: 572, y: 292, width: 130, height: 72, difficulty: 3 },
-            { id: 'cabin-pantry', label: 'pantry', kind: 'closet', x: 100, y: 92, width: 110, height: 188, difficulty: 5 },
-          ],
-          obstacles: [],
-        },
-        trail: {
-          id: 'trail',
-          name: 'Forest Trail',
-          exits: [{ label: 'Picnic Loop', targetRoom: 'picnic', x: 365, y: 392, width: 110, height: 28, spawnX: 400, spawnY: 78 }],
-          spots: [
-            { id: 'trail-log', label: 'fallen log', kind: 'tree', x: 135, y: 250, width: 160, height: 80, difficulty: 3 },
-            { id: 'trail-signpost', label: 'trail signpost', kind: 'desk', x: 235, y: 102, width: 85, height: 92, difficulty: 2 },
-            { id: 'trail-rocks', label: 'rock cluster', kind: 'fountain', x: 360, y: 250, width: 130, height: 95, difficulty: 4 },
-            { id: 'trail-pines', label: 'pine trees', kind: 'tree', x: 590, y: 110, width: 110, height: 220, difficulty: 5 },
-          ],
-          obstacles: [{ id: 'trail-mud', type: 'slow', x: 315, y: 335, width: 190, height: 34, speedMultiplier: 0.55 }],
-        },
-      },
-    },
-    'rest-stop': {
-      id: 'rest-stop',
-      name: 'Rest Stop',
-      startRoom: 'plaza',
-      palette: { wall: '#4b5563', floor: '#d7dce4', trim: '#09233f', accent: '#7b4ee6' },
-      rooms: {
-        plaza: {
-          id: 'plaza',
-          name: 'Main Plaza',
-          exits: [
-            { label: 'Arcade', targetRoom: 'arcade', x: 748, y: 180, width: 28, height: 92, spawnX: 60, spawnY: 232 },
-            { label: 'Picnic Area', targetRoom: 'picnic_area', x: 24, y: 180, width: 28, height: 92, spawnX: 706, spawnY: 232 },
-          ],
-          spots: [
-            { id: 'plaza-bench', label: 'bench', kind: 'bench', x: 285, y: 285, width: 180, height: 65, difficulty: 2 },
-            { id: 'plaza-planter', label: 'indoor planter', kind: 'bush', x: 250, y: 108, width: 115, height: 72, difficulty: 3 },
-            { id: 'plaza-vending', label: 'vending machines', kind: 'shelf', x: 580, y: 96, width: 125, height: 178, difficulty: 3 },
-            { id: 'plaza-map-kiosk', label: 'map kiosk', kind: 'desk', x: 100, y: 100, width: 125, height: 105, difficulty: 4 },
-          ],
-          obstacles: [],
-        },
-        arcade: {
-          id: 'arcade',
-          name: 'Tiny Arcade',
-          exits: [{ label: 'Main Plaza', targetRoom: 'plaza', x: 24, y: 180, width: 28, height: 92, spawnX: 706, spawnY: 232 }],
-          spots: [
-            { id: 'arcade-cabinet', label: 'game cabinet', kind: 'closet', x: 120, y: 95, width: 105, height: 190, difficulty: 4 },
-            { id: 'arcade-token-counter', label: 'token counter', kind: 'desk', x: 365, y: 105, width: 120, height: 80, difficulty: 2 },
-            { id: 'arcade-prize-bin', label: 'prize bin', kind: 'box', x: 320, y: 285, width: 160, height: 72, difficulty: 3 },
-            { id: 'arcade-photo-booth', label: 'photo booth', kind: 'curtain', x: 580, y: 92, width: 110, height: 190, difficulty: 5 },
-          ],
-          obstacles: [],
-        },
-        picnic_area: {
-          id: 'picnic_area',
-          name: 'Picnic Area',
-          exits: [{ label: 'Main Plaza', targetRoom: 'plaza', x: 748, y: 180, width: 28, height: 92, spawnX: 72, spawnY: 232 }],
-          spots: [
-            { id: 'picnic-trash-wall', label: 'recycling wall', kind: 'shelf', x: 95, y: 90, width: 145, height: 120, difficulty: 2 },
-            { id: 'picnic-pavilion-bench', label: 'pavilion bench', kind: 'bench', x: 455, y: 285, width: 95, height: 62, difficulty: 2 },
-            { id: 'picnic-shade-tree', label: 'shade tree', kind: 'tree', x: 345, y: 105, width: 105, height: 220, difficulty: 5 },
-            { id: 'picnic-sign', label: 'information sign', kind: 'desk', x: 570, y: 245, width: 130, height: 95, difficulty: 3 },
-          ],
-          obstacles: [{ id: 'picnic-puddle', type: 'slow', x: 290, y: 350, width: 230, height: 30, speedMultiplier: 0.65 }],
-        },
-      },
-    },
-    'school-night': {
-      id: 'school-night',
-      name: 'School at Night',
-      startRoom: 'hallway',
-      palette: { wall: '#27324a', floor: '#7f8fa6', trim: '#061524', accent: '#ffd166' },
-      rooms: {
-        hallway: {
-          id: 'hallway',
-          name: 'Main Hall',
-          exits: [
-            { label: 'Library', targetRoom: 'library', x: 748, y: 180, width: 28, height: 92, spawnX: 60, spawnY: 232 },
-            { label: 'Gym', targetRoom: 'gym', x: 365, y: 392, width: 110, height: 28, spawnX: 400, spawnY: 74 },
-            { label: 'Cafeteria', targetRoom: 'cafeteria', x: 24, y: 180, width: 28, height: 92, spawnX: 708, spawnY: 232 },
-          ],
-          spots: [
-            { id: 'hallway-lockers', label: 'locker bank', kind: 'locker', x: 108, y: 92, width: 145, height: 178, difficulty: 4, noisy: true },
-            { id: 'hallway-trophy-case', label: 'trophy case', kind: 'shelf', x: 315, y: 98, width: 125, height: 130, difficulty: 3 },
-            { id: 'hallway-cleaning-cart', label: 'cleaning cart', kind: 'luggage', x: 580, y: 278, width: 116, height: 76, difficulty: 2, noisy: true },
-            { id: 'hallway-stage-curtain', label: 'stage curtain', kind: 'curtain', x: 518, y: 82, width: 86, height: 180, difficulty: 5 },
-          ],
-          obstacles: [{ id: 'hallway-wet-floor', type: 'slow', x: 280, y: 326, width: 230, height: 36, speedMultiplier: 0.55 }],
-        },
-        library: {
-          id: 'library',
-          name: 'Library',
-          exits: [{ label: 'Main Hall', targetRoom: 'hallway', x: 24, y: 180, width: 28, height: 92, spawnX: 706, spawnY: 232 }],
-          spots: [
-            { id: 'library-bookcase-gap', label: 'bookcase gap', kind: 'shelf', x: 100, y: 92, width: 128, height: 185, difficulty: 5 },
-            { id: 'library-reading-chair', label: 'reading chair', kind: 'bench', x: 300, y: 282, width: 138, height: 68, difficulty: 2 },
-            { id: 'library-desk', label: 'checkout desk', kind: 'desk', x: 490, y: 238, width: 175, height: 78, difficulty: 3 },
-            { id: 'library-curtain', label: 'quiet corner curtain', kind: 'curtain', x: 630, y: 92, width: 75, height: 160, difficulty: 4 },
-          ],
-          obstacles: [{ id: 'library-table', type: 'block', x: 265, y: 175, width: 210, height: 52 }],
-        },
-        gym: {
-          id: 'gym',
-          name: 'Gym',
-          exits: [{ label: 'Main Hall', targetRoom: 'hallway', x: 365, y: 24, width: 110, height: 28, spawnX: 400, spawnY: 350 }],
-          spots: [
-            { id: 'gym-equipment-bin', label: 'equipment bin', kind: 'box', x: 105, y: 272, width: 145, height: 82, difficulty: 3, noisy: true },
-            { id: 'gym-bleachers', label: 'folded bleachers', kind: 'bench', x: 300, y: 118, width: 210, height: 72, difficulty: 4 },
-            { id: 'gym-score-table', label: 'score table', kind: 'desk', x: 332, y: 278, width: 150, height: 66, difficulty: 2 },
-            { id: 'gym-mat-stack', label: 'mat stack', kind: 'box', x: 592, y: 260, width: 118, height: 92, difficulty: 4 },
-          ],
-          obstacles: [{ id: 'gym-center-court', type: 'slow', x: 265, y: 210, width: 275, height: 42, speedMultiplier: 0.72 }],
-        },
-        cafeteria: {
-          id: 'cafeteria',
-          name: 'Cafeteria',
-          exits: [{ label: 'Main Hall', targetRoom: 'hallway', x: 748, y: 180, width: 28, height: 92, spawnX: 72, spawnY: 232 }],
-          spots: [
-            { id: 'cafeteria-serving-line', label: 'serving line', kind: 'shelf', x: 108, y: 92, width: 150, height: 145, difficulty: 3 },
-            { id: 'cafeteria-table-row', label: 'table row', kind: 'bench', x: 322, y: 282, width: 182, height: 66, difficulty: 2 },
-            { id: 'cafeteria-trash-cans', label: 'trash cans', kind: 'box', x: 600, y: 278, width: 112, height: 76, difficulty: 3, noisy: true },
-            { id: 'cafeteria-freezer-door', label: 'freezer door', kind: 'closet', x: 610, y: 90, width: 98, height: 174, difficulty: 5 },
-          ],
-          obstacles: [{ id: 'cafeteria-spill', type: 'slow', x: 260, y: 350, width: 230, height: 30, speedMultiplier: 0.6 }],
-        },
-      },
-    },
-  };
+  const hideSeekMaps = window.RTA_HIDE_SEEK_MAPS || {};
 
   function getHideSeekMap() {
-    return hideSeekMaps[hideSeekState.mode] || hideSeekMaps['roadside-lodge'];
+    return hideSeekMaps[hideSeekState.mode] || hideSeekMaps['roadside-lodge'] || Object.values(hideSeekMaps)[0] || null;
   }
 
   function getHideSeekRoom(roomId) {
     const map = getHideSeekMap();
+    if (!map || !map.rooms) return null;
     return map.rooms[roomId] || map.rooms[map.startRoom];
   }
 
@@ -3709,7 +3448,8 @@
   }
 
   function checkHideSeekExits(actor, room) {
-    const exit = room.exits.find(item => isHideSeekOverlapping(actor, item));
+    const actorCenter = getHideSeekActorCenter(actor);
+    const exit = room.exits.find(item => isHideSeekPointInsideRect(actorCenter, getHideSeekExitTriggerRect(item)));
     if (!exit) return;
     actor.roomId = exit.targetRoom;
     actor.x = exit.spawnX;
@@ -3721,6 +3461,20 @@
 
   function isHideSeekOverlapping(a, b) {
     return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+  }
+
+  function isHideSeekPointInsideRect(point, rect) {
+    return point.x >= rect.x && point.x <= rect.x + rect.width && point.y >= rect.y && point.y <= rect.y + rect.height;
+  }
+
+  function getHideSeekExitTriggerRect(exit) {
+    const pad = 38;
+    return {
+      x: exit.x - pad,
+      y: exit.y - pad,
+      width: exit.width + pad * 2,
+      height: exit.height + pad * 2,
+    };
   }
 
   function getHideSeekActorCollider(actor) {
@@ -3839,255 +3593,78 @@
     ctx.restore();
   }
 
-  function drawHideSeekCouch(ctx, x, y, w, h) {
-    ctx.save();
-
-    ctx.fillStyle = 'rgba(0,0,0,0.28)';
-    ctx.beginPath();
-    ctx.ellipse(x + w / 2, y + h * 1.03, w * 0.48, h * 0.14, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    const base = ctx.createLinearGradient(x, y + h * 0.46, x, y + h * 0.9);
-    base.addColorStop(0, '#27618f');
-    base.addColorStop(1, '#123a62');
-    ctx.fillStyle = base;
-    fillHideSeekRoundedRect(ctx, x + w * 0.067, y + h * 0.5, w * 0.866, h * 0.39, h * 0.07);
-
-    const back = ctx.createLinearGradient(x, y + h * 0.08, x, y + h * 0.56);
-    back.addColorStop(0, '#8ad8ef');
-    back.addColorStop(1, '#4ba5ce');
-    ctx.fillStyle = back;
-    fillHideSeekRoundedRect(ctx, x + w * 0.117, y + h * 0.11, w * 0.367, h * 0.44, h * 0.09);
-    fillHideSeekRoundedRect(ctx, x + w * 0.517, y + h * 0.11, w * 0.367, h * 0.44, h * 0.09);
-
-    const seat = ctx.createLinearGradient(x, y + h * 0.48, x, y + h * 0.8);
-    seat.addColorStop(0, '#9ce5f4');
-    seat.addColorStop(1, '#60b9d8');
-    ctx.fillStyle = seat;
-    fillHideSeekRoundedRect(ctx, x + w * 0.117, y + h * 0.5, w * 0.367, h * 0.28, h * 0.08);
-    fillHideSeekRoundedRect(ctx, x + w * 0.517, y + h * 0.5, w * 0.367, h * 0.28, h * 0.08);
-
-    const arms = ctx.createLinearGradient(x, y + h * 0.28, x, y + h * 0.88);
-    arms.addColorStop(0, '#1d527c');
-    arms.addColorStop(1, '#09233f');
-    ctx.fillStyle = arms;
-    fillHideSeekRoundedRect(ctx, x, y + h * 0.31, w * 0.117, h * 0.56, h * 0.08);
-    fillHideSeekRoundedRect(ctx, x + w * 0.883, y + h * 0.31, w * 0.117, h * 0.56, h * 0.08);
-
-    ctx.fillStyle = '#071b30';
-    fillHideSeekRoundedRect(ctx, x + w * 0.067, y + h * 0.83, w * 0.06, h * 0.1, h * 0.02);
-    fillHideSeekRoundedRect(ctx, x + w * 0.873, y + h * 0.83, w * 0.06, h * 0.1, h * 0.02);
-
-    ctx.strokeStyle = 'rgba(255,255,255,0.32)';
-    ctx.lineWidth = Math.max(1.2, w * 0.012);
-    [
-      [0.3, 0.28, 0.13],
-      [0.7, 0.28, 0.13],
-      [0.3, 0.61, 0.13],
-      [0.7, 0.61, 0.13],
-    ].forEach(([cx, cy, r]) => {
-      ctx.beginPath();
-      ctx.arc(x + w * cx, y + h * cy, w * r, Math.PI, Math.PI * 1.8);
-      ctx.stroke();
-    });
-
-    ctx.strokeStyle = 'rgba(0,0,0,0.18)';
-    ctx.lineWidth = Math.max(1.4, w * 0.012);
-    ctx.beginPath();
-    ctx.moveTo(x + w * 0.5, y + h * 0.14);
-    ctx.lineTo(x + w * 0.5, y + h * 0.55);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(x + w * 0.5, y + h * 0.51);
-    ctx.lineTo(x + w * 0.5, y + h * 0.78);
-    ctx.stroke();
-
-    ctx.restore();
+  function getHideSeekArtTools() {
+    return {
+      fillRoundedRect: fillHideSeekRoundedRect,
+      strokeRoundedRect: strokeHideSeekRoundedRect,
+      shadeColor: shadeHideSeekColor,
+    };
   }
 
-  function drawHideSeekTruckWheel(ctx, cx, cy, radius) {
-    ctx.fillStyle = '#111827';
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.strokeStyle = 'rgba(255,255,255,0.72)';
-    ctx.lineWidth = Math.max(1, radius * 0.08);
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius * 0.82, 0, Math.PI * 2);
-    ctx.stroke();
-
-    ctx.fillStyle = '#c8ccd1';
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius * 0.56, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = '#727b86';
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius * 0.24, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = '#4b5563';
-    for (let index = 0; index < 6; index += 1) {
-      const angle = (Math.PI * 2 / 6) * index;
-      ctx.beginPath();
-      ctx.arc(cx + Math.cos(angle) * radius * 0.36, cy + Math.sin(angle) * radius * 0.36, Math.max(1.2, radius * 0.055), 0, Math.PI * 2);
-      ctx.fill();
+  function drawHideSeekCouch(ctx, x, y, w, h) {
+    if (window.RTA_HIDE_SEEK_ART && window.RTA_HIDE_SEEK_ART.drawCouch) {
+      window.RTA_HIDE_SEEK_ART.drawCouch(ctx, x, y, w, h, getHideSeekArtTools());
     }
   }
 
   function drawHideSeekPickupTruck(ctx, x, y, w, h) {
-    ctx.save();
-
-    ctx.fillStyle = 'rgba(0,0,0,0.28)';
-    ctx.beginPath();
-    ctx.ellipse(x + w * 0.5, y + h * 0.88, w * 0.48, h * 0.11, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    const paint = ctx.createLinearGradient(x, y, x + w, y + h);
-    paint.addColorStop(0, '#d12727');
-    paint.addColorStop(0.54, '#a91818');
-    paint.addColorStop(1, '#681010');
-    ctx.fillStyle = paint;
-    ctx.fillRect(x + w * 0.37, y + h * 0.29, w * 0.47, h * 0.36);
-    ctx.fillRect(x + w * 0.48, y + h * 0.11, w * 0.25, h * 0.48);
-    ctx.fillRect(x + w * 0.1, y + h * 0.25, w * 0.39, h * 0.4);
-
-    ctx.fillStyle = '#f4f4f4';
-    ctx.fillRect(x + w * 0.1, y + h * 0.58, w * 0.74, h * 0.12);
-
-    ctx.fillStyle = '#b71c1c';
-    fillHideSeekRoundedRect(ctx, x + w * 0.45, y + h * 0.04, w * 0.31, h * 0.17, h * 0.05);
-
-    ctx.fillStyle = '#9ed7f5';
-    fillHideSeekRoundedRect(ctx, x + w * 0.51, y + h * 0.17, w * 0.1, h * 0.23, h * 0.04);
-    fillHideSeekRoundedRect(ctx, x + w * 0.63, y + h * 0.17, w * 0.1, h * 0.23, h * 0.04);
-
-    ctx.strokeStyle = '#d6d6d6';
-    ctx.lineWidth = Math.max(1.4, w * 0.012);
-    strokeHideSeekRoundedRect(ctx, x + w * 0.51, y + h * 0.17, w * 0.1, h * 0.23, h * 0.04);
-    strokeHideSeekRoundedRect(ctx, x + w * 0.63, y + h * 0.17, w * 0.1, h * 0.23, h * 0.04);
-
-    ctx.strokeStyle = '#5a0000';
-    ctx.lineWidth = Math.max(1.2, w * 0.01);
-    ctx.strokeRect(x + w * 0.61, y + h * 0.13, w * 0.14, h * 0.43);
-    ctx.beginPath();
-    ctx.moveTo(x + w * 0.37, y + h * 0.29);
-    ctx.lineTo(x + w * 0.84, y + h * 0.29);
-    ctx.stroke();
-
-    ctx.fillStyle = '#cfcfcf';
-    ctx.fillRect(x + w * 0.7, y + h * 0.43, w * 0.035, h * 0.02);
-
-    ctx.fillStyle = '#bfc4c9';
-    ctx.fillRect(x + w * 0.02, y + h * 0.34, w * 0.09, h * 0.24);
-    ctx.strokeStyle = '#747b84';
-    ctx.lineWidth = Math.max(1, w * 0.008);
-    for (let index = 0; index < 5; index += 1) {
-      ctx.beginPath();
-      ctx.moveTo(x + w * 0.025, y + h * (0.37 + index * 0.045));
-      ctx.lineTo(x + w * 0.105, y + h * (0.37 + index * 0.045));
-      ctx.stroke();
+    if (window.RTA_HIDE_SEEK_ART && window.RTA_HIDE_SEEK_ART.drawPickupTruck) {
+      window.RTA_HIDE_SEEK_ART.drawPickupTruck(ctx, x, y, w, h, getHideSeekArtTools());
     }
+  }
 
-    ctx.fillStyle = '#fff6c5';
-    [
-      [0.047, 0.41],
-      [0.047, 0.5],
-      [0.082, 0.41],
-      [0.082, 0.5],
-    ].forEach(([lightX, lightY]) => {
-      ctx.beginPath();
-      ctx.arc(x + w * lightX, y + h * lightY, Math.max(2.5, w * 0.018), 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    ctx.fillStyle = '#d8d8d8';
-    fillHideSeekRoundedRect(ctx, x, y + h * 0.62, w * 0.12, h * 0.08, h * 0.03);
-    fillHideSeekRoundedRect(ctx, x + w * 0.82, y + h * 0.62, w * 0.1, h * 0.08, h * 0.03);
-
-    const wheelRadius = Math.min(w * 0.12, h * 0.18);
-    const frontWheelX = x + w * 0.25;
-    const rearWheelX = x + w * 0.72;
-    const wheelY = y + h * 0.73;
-    ctx.fillStyle = '#1f2933';
-    ctx.beginPath();
-    ctx.arc(frontWheelX, wheelY, wheelRadius * 1.25, Math.PI, 0);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(rearWheelX, wheelY, wheelRadius * 1.25, Math.PI, 0);
-    ctx.fill();
-    drawHideSeekTruckWheel(ctx, frontWheelX, wheelY, wheelRadius);
-    drawHideSeekTruckWheel(ctx, rearWheelX, wheelY, wheelRadius);
-
-    ctx.fillStyle = '#e6c35c';
-    ctx.fillRect(x + w * 0.16, y + h * 0.48, w * 0.63, h * 0.025);
-    ctx.fillStyle = '#d6b447';
-    ctx.fillRect(x + w * 0.035, y + h * 0.47, w * 0.052, h * 0.025);
-    ctx.fillRect(x + w * 0.05, y + h * 0.44, w * 0.024, h * 0.085);
-
-    ctx.restore();
+  function drawHideSeekRichObject(ctx, spot) {
+    if (!window.RTA_HIDE_SEEK_ART || !window.RTA_HIDE_SEEK_ART.drawObject) return false;
+    return window.RTA_HIDE_SEEK_ART.drawObject(ctx, spot, getHideSeekArtTools());
   }
 
   function drawHideSeekRoomBackdrop(ctx, map, room, palette) {
-    const wallGradient = ctx.createLinearGradient(0, 0, 0, 450);
-    wallGradient.addColorStop(0, shadeHideSeekColor(palette.wall, 18));
-    wallGradient.addColorStop(0.58, palette.wall);
-    wallGradient.addColorStop(1, shadeHideSeekColor(palette.wall, -18));
-    ctx.fillStyle = wallGradient;
-    ctx.fillRect(0, 0, 800, 450);
-
-    if (map.id === 'alaska-train') {
-      ctx.fillStyle = '#dff8ff';
-      ctx.fillRect(78, 92, 170, 82);
-      ctx.fillStyle = '#8ac8e8';
-      ctx.fillRect(88, 102, 150, 62);
-      ctx.fillStyle = '#f7fbff';
-      ctx.beginPath();
-      ctx.moveTo(88, 164);
-      ctx.lineTo(150, 118);
-      ctx.lineTo(220, 164);
-      ctx.closePath();
-      ctx.fill();
-    } else if (map.id === 'campground') {
-      ctx.fillStyle = '#123f33';
-      for (let i = 0; i < 7; i += 1) {
-        const x = 65 + i * 95;
-        ctx.beginPath();
-        ctx.moveTo(x, 172);
-        ctx.lineTo(x + 35, 88);
-        ctx.lineTo(x + 70, 172);
-        ctx.closePath();
-        ctx.fill();
-      }
-    } else if (map.id === 'rest-stop') {
-      ctx.fillStyle = '#f7fbff';
-      ctx.fillRect(610, 88, 92, 68);
-      ctx.fillStyle = '#f58220';
-      ctx.fillRect(620, 100, 72, 10);
-      ctx.fillStyle = '#09233f';
-      ctx.fillRect(620, 120, 72, 8);
-    } else if (map.id === 'school-night') {
-      ctx.fillStyle = '#d7dce4';
-      for (let i = 0; i < 4; i += 1) {
-        const x = 95 + i * 135;
-        ctx.fillRect(x, 92, 86, 70);
-        ctx.fillStyle = i % 2 ? '#9aa4b2' : '#ffd166';
-        ctx.fillRect(x + 10, 104, 66, 46);
-        ctx.fillStyle = '#d7dce4';
-      }
-      ctx.fillStyle = 'rgba(255, 209, 102, 0.18)';
-      ctx.beginPath();
-      ctx.ellipse(410, 210, 275, 70, 0, 0, Math.PI * 2);
-      ctx.fill();
-    } else {
-      ctx.fillStyle = '#fff2d8';
-      ctx.fillRect(92, 88, 122, 82);
-      ctx.fillStyle = '#f58220';
-      ctx.fillRect(102, 98, 102, 62);
-      ctx.fillStyle = 'rgba(9,35,63,0.2)';
-      ctx.fillRect(102, 128, 102, 8);
+    if (window.RTA_HIDE_SEEK_ART && window.RTA_HIDE_SEEK_ART.drawRoomBackdrop) {
+      window.RTA_HIDE_SEEK_ART.drawRoomBackdrop(ctx, map, room, palette, getHideSeekArtTools());
+      return;
     }
+    ctx.fillStyle = palette.wall;
+    ctx.fillRect(0, 0, 800, 450);
+  }
+
+  function drawHideSeekExitArrow(ctx, exit, isActive) {
+    const centerX = exit.x + exit.width / 2;
+    const centerY = exit.y + exit.height / 2;
+    const size = isActive ? 14 : 10;
+    const direction = exit.y <= 62
+      ? 'up'
+      : exit.y >= 360
+        ? 'down'
+        : exit.x <= 62
+          ? 'left'
+          : 'right';
+
+    ctx.save();
+    ctx.fillStyle = isActive ? '#fff2d8' : 'rgba(255,255,255,0.86)';
+    ctx.strokeStyle = 'rgba(6,21,36,0.36)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    if (direction === 'up') {
+      ctx.moveTo(centerX, centerY - size);
+      ctx.lineTo(centerX - size * 0.72, centerY + size * 0.42);
+      ctx.lineTo(centerX + size * 0.72, centerY + size * 0.42);
+    } else if (direction === 'down') {
+      ctx.moveTo(centerX, centerY + size);
+      ctx.lineTo(centerX - size * 0.72, centerY - size * 0.42);
+      ctx.lineTo(centerX + size * 0.72, centerY - size * 0.42);
+    } else if (direction === 'left') {
+      ctx.moveTo(centerX - size, centerY);
+      ctx.lineTo(centerX + size * 0.42, centerY - size * 0.72);
+      ctx.lineTo(centerX + size * 0.42, centerY + size * 0.72);
+    } else {
+      ctx.moveTo(centerX + size, centerY);
+      ctx.lineTo(centerX - size * 0.42, centerY - size * 0.72);
+      ctx.lineTo(centerX - size * 0.42, centerY + size * 0.72);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
   }
 
   function drawHideSeekRoom(ctx, room, palette) {
@@ -4100,6 +3677,10 @@
     ctx.fillStyle = floorGradient;
     fillHideSeekRoundedRect(ctx, 38, 62, 724, 338, 18);
     drawHideSeekTexture(ctx, 'rgba(6,21,36,0.28)', 0.25, 38);
+
+    if (window.RTA_HIDE_SEEK_ART && window.RTA_HIDE_SEEK_ART.drawFloorDetail) {
+      window.RTA_HIDE_SEEK_ART.drawFloorDetail(ctx, map, room, getHideSeekArtTools());
+    }
 
     ctx.strokeStyle = 'rgba(255,255,255,0.24)';
     ctx.lineWidth = 1;
@@ -4116,7 +3697,10 @@
     fillHideSeekRoundedRect(ctx, 34, 58, 18, 346, 8);
     fillHideSeekRoundedRect(ctx, 748, 58, 18, 346, 8);
 
+    const activeActor = getHideSeekActiveActor();
+    const activeActorCenter = activeActor && activeActor.roomId === room.id ? getHideSeekActorCenter(activeActor) : null;
     (room.exits || []).forEach(exit => {
+      const nearExit = activeActorCenter && isHideSeekPointInsideRect(activeActorCenter, getHideSeekExitTriggerRect(exit));
       ctx.fillStyle = 'rgba(0,0,0,0.26)';
       fillHideSeekRoundedRect(ctx, exit.x + 3, exit.y + 3, exit.width, exit.height, 8);
       const doorGradient = ctx.createLinearGradient(exit.x, exit.y, exit.x + exit.width, exit.y + exit.height);
@@ -4124,9 +3708,10 @@
       doorGradient.addColorStop(1, shadeHideSeekColor(palette.accent, -12));
       ctx.fillStyle = doorGradient;
       fillHideSeekRoundedRect(ctx, exit.x, exit.y, exit.width, exit.height, 8);
-      ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = nearExit ? '#ffd166' : 'rgba(255,255,255,0.5)';
+      ctx.lineWidth = nearExit ? 4 : 2;
       strokeHideSeekRoundedRect(ctx, exit.x + 2, exit.y + 2, exit.width - 4, exit.height - 4, 6);
+      drawHideSeekExitArrow(ctx, exit, nearExit);
       ctx.fillStyle = '#ffffff';
       ctx.font = '800 12px Arial';
       ctx.textAlign = 'center';
@@ -4331,7 +3916,9 @@
     ctx.ellipse(x + w / 2, y + h - 2, Math.max(20, w * 0.48), Math.max(8, h * 0.1), 0, 0, Math.PI * 2);
     ctx.fill();
 
-    if (spot.kind === 'locker') {
+    if (drawHideSeekRichObject(ctx, spot)) {
+      // Detailed object art is drawn by js/games/hide-seek-art.js.
+    } else if (spot.kind === 'locker') {
       const locker = ctx.createLinearGradient(x, y, x, y + h);
       locker.addColorStop(0, '#46627f');
       locker.addColorStop(1, '#1f3146');
@@ -4721,6 +4308,7 @@
     drawHideSeekDebugRect(ctx, { x: 38, y: 62, width: 724, height: 338 }, '#ffffff', 'playable floor');
 
     (room.exits || []).forEach(exit => {
+      drawHideSeekDebugRect(ctx, getHideSeekExitTriggerRect(exit), 'rgba(46, 199, 211, 0.48)', `trigger:${exit.label}`);
       drawHideSeekDebugRect(ctx, exit, '#2ec7d3', `exit:${exit.label}->${exit.targetRoom}`);
     });
 
