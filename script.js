@@ -2456,7 +2456,7 @@
           ],
           spots: [
             { id: 'lobby-front-desk', label: 'front desk', kind: 'desk', x: 300, y: 245, width: 185, height: 72, difficulty: 2 },
-            { id: 'lobby-sofa', label: 'blue lobby sofa', kind: 'bench', x: 500, y: 110, width: 168, height: 68, difficulty: 3 },
+            { id: 'lobby-sofa', label: 'blue lobby sofa', kind: 'couch', x: 500, y: 110, width: 168, height: 68, difficulty: 3 },
             { id: 'lobby-curtains', label: 'sunset curtains', kind: 'curtain', x: 92, y: 90, width: 90, height: 190, difficulty: 3 },
             { id: 'lobby-luggage-cart', label: 'luggage cart', kind: 'luggage', x: 570, y: 270, width: 110, height: 75, difficulty: 4 },
           ],
@@ -2482,7 +2482,7 @@
             { id: 'garage-toolbox', label: 'tool wall', kind: 'shelf', x: 92, y: 95, width: 145, height: 92, difficulty: 2 },
             { id: 'garage-spare-tires', label: 'spare tires', kind: 'box', x: 455, y: 100, width: 86, height: 78, difficulty: 3 },
             { id: 'garage-cardboard', label: 'cardboard stack', kind: 'box', x: 292, y: 265, width: 155, height: 95, difficulty: 3 },
-            { id: 'garage-van', label: 'behind the van', kind: 'car', x: 535, y: 200, width: 180, height: 105, difficulty: 5 },
+            { id: 'garage-van', label: 'behind the pickup truck', kind: 'car', x: 535, y: 200, width: 180, height: 105, difficulty: 5 },
           ],
           obstacles: [{ id: 'garage-oil', type: 'slow', x: 260, y: 355, width: 170, height: 34, speedMultiplier: 0.55 }],
         },
@@ -3738,6 +3738,7 @@
       bench: { x: 8, y: 18, width: -16, height: -24 },
       bush: { x: 10, y: 20, width: -20, height: -26 },
       car: { x: 16, y: 20, width: -32, height: -24 },
+      couch: { x: 8, y: 14, width: -16, height: -18 },
       curtain: { x: 8, y: 12, width: -16, height: -18 },
       fountain: { x: 12, y: 14, width: -24, height: -22 },
       tree: { x: 12, y: 24, width: -24, height: -28 },
@@ -3835,6 +3836,196 @@
       ctx.lineTo(x + 450, 402);
       ctx.stroke();
     }
+    ctx.restore();
+  }
+
+  function drawHideSeekCouch(ctx, x, y, w, h) {
+    ctx.save();
+
+    ctx.fillStyle = 'rgba(0,0,0,0.28)';
+    ctx.beginPath();
+    ctx.ellipse(x + w / 2, y + h * 1.03, w * 0.48, h * 0.14, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    const base = ctx.createLinearGradient(x, y + h * 0.46, x, y + h * 0.9);
+    base.addColorStop(0, '#27618f');
+    base.addColorStop(1, '#123a62');
+    ctx.fillStyle = base;
+    fillHideSeekRoundedRect(ctx, x + w * 0.067, y + h * 0.5, w * 0.866, h * 0.39, h * 0.07);
+
+    const back = ctx.createLinearGradient(x, y + h * 0.08, x, y + h * 0.56);
+    back.addColorStop(0, '#8ad8ef');
+    back.addColorStop(1, '#4ba5ce');
+    ctx.fillStyle = back;
+    fillHideSeekRoundedRect(ctx, x + w * 0.117, y + h * 0.11, w * 0.367, h * 0.44, h * 0.09);
+    fillHideSeekRoundedRect(ctx, x + w * 0.517, y + h * 0.11, w * 0.367, h * 0.44, h * 0.09);
+
+    const seat = ctx.createLinearGradient(x, y + h * 0.48, x, y + h * 0.8);
+    seat.addColorStop(0, '#9ce5f4');
+    seat.addColorStop(1, '#60b9d8');
+    ctx.fillStyle = seat;
+    fillHideSeekRoundedRect(ctx, x + w * 0.117, y + h * 0.5, w * 0.367, h * 0.28, h * 0.08);
+    fillHideSeekRoundedRect(ctx, x + w * 0.517, y + h * 0.5, w * 0.367, h * 0.28, h * 0.08);
+
+    const arms = ctx.createLinearGradient(x, y + h * 0.28, x, y + h * 0.88);
+    arms.addColorStop(0, '#1d527c');
+    arms.addColorStop(1, '#09233f');
+    ctx.fillStyle = arms;
+    fillHideSeekRoundedRect(ctx, x, y + h * 0.31, w * 0.117, h * 0.56, h * 0.08);
+    fillHideSeekRoundedRect(ctx, x + w * 0.883, y + h * 0.31, w * 0.117, h * 0.56, h * 0.08);
+
+    ctx.fillStyle = '#071b30';
+    fillHideSeekRoundedRect(ctx, x + w * 0.067, y + h * 0.83, w * 0.06, h * 0.1, h * 0.02);
+    fillHideSeekRoundedRect(ctx, x + w * 0.873, y + h * 0.83, w * 0.06, h * 0.1, h * 0.02);
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.32)';
+    ctx.lineWidth = Math.max(1.2, w * 0.012);
+    [
+      [0.3, 0.28, 0.13],
+      [0.7, 0.28, 0.13],
+      [0.3, 0.61, 0.13],
+      [0.7, 0.61, 0.13],
+    ].forEach(([cx, cy, r]) => {
+      ctx.beginPath();
+      ctx.arc(x + w * cx, y + h * cy, w * r, Math.PI, Math.PI * 1.8);
+      ctx.stroke();
+    });
+
+    ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+    ctx.lineWidth = Math.max(1.4, w * 0.012);
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.5, y + h * 0.14);
+    ctx.lineTo(x + w * 0.5, y + h * 0.55);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.5, y + h * 0.51);
+    ctx.lineTo(x + w * 0.5, y + h * 0.78);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function drawHideSeekTruckWheel(ctx, cx, cy, radius) {
+    ctx.fillStyle = '#111827';
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.72)';
+    ctx.lineWidth = Math.max(1, radius * 0.08);
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius * 0.82, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.fillStyle = '#c8ccd1';
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius * 0.56, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#727b86';
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius * 0.24, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#4b5563';
+    for (let index = 0; index < 6; index += 1) {
+      const angle = (Math.PI * 2 / 6) * index;
+      ctx.beginPath();
+      ctx.arc(cx + Math.cos(angle) * radius * 0.36, cy + Math.sin(angle) * radius * 0.36, Math.max(1.2, radius * 0.055), 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function drawHideSeekPickupTruck(ctx, x, y, w, h) {
+    ctx.save();
+
+    ctx.fillStyle = 'rgba(0,0,0,0.28)';
+    ctx.beginPath();
+    ctx.ellipse(x + w * 0.5, y + h * 0.88, w * 0.48, h * 0.11, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    const paint = ctx.createLinearGradient(x, y, x + w, y + h);
+    paint.addColorStop(0, '#d12727');
+    paint.addColorStop(0.54, '#a91818');
+    paint.addColorStop(1, '#681010');
+    ctx.fillStyle = paint;
+    ctx.fillRect(x + w * 0.37, y + h * 0.29, w * 0.47, h * 0.36);
+    ctx.fillRect(x + w * 0.48, y + h * 0.11, w * 0.25, h * 0.48);
+    ctx.fillRect(x + w * 0.1, y + h * 0.25, w * 0.39, h * 0.4);
+
+    ctx.fillStyle = '#f4f4f4';
+    ctx.fillRect(x + w * 0.1, y + h * 0.58, w * 0.74, h * 0.12);
+
+    ctx.fillStyle = '#b71c1c';
+    fillHideSeekRoundedRect(ctx, x + w * 0.45, y + h * 0.04, w * 0.31, h * 0.17, h * 0.05);
+
+    ctx.fillStyle = '#9ed7f5';
+    fillHideSeekRoundedRect(ctx, x + w * 0.51, y + h * 0.17, w * 0.1, h * 0.23, h * 0.04);
+    fillHideSeekRoundedRect(ctx, x + w * 0.63, y + h * 0.17, w * 0.1, h * 0.23, h * 0.04);
+
+    ctx.strokeStyle = '#d6d6d6';
+    ctx.lineWidth = Math.max(1.4, w * 0.012);
+    strokeHideSeekRoundedRect(ctx, x + w * 0.51, y + h * 0.17, w * 0.1, h * 0.23, h * 0.04);
+    strokeHideSeekRoundedRect(ctx, x + w * 0.63, y + h * 0.17, w * 0.1, h * 0.23, h * 0.04);
+
+    ctx.strokeStyle = '#5a0000';
+    ctx.lineWidth = Math.max(1.2, w * 0.01);
+    ctx.strokeRect(x + w * 0.61, y + h * 0.13, w * 0.14, h * 0.43);
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.37, y + h * 0.29);
+    ctx.lineTo(x + w * 0.84, y + h * 0.29);
+    ctx.stroke();
+
+    ctx.fillStyle = '#cfcfcf';
+    ctx.fillRect(x + w * 0.7, y + h * 0.43, w * 0.035, h * 0.02);
+
+    ctx.fillStyle = '#bfc4c9';
+    ctx.fillRect(x + w * 0.02, y + h * 0.34, w * 0.09, h * 0.24);
+    ctx.strokeStyle = '#747b84';
+    ctx.lineWidth = Math.max(1, w * 0.008);
+    for (let index = 0; index < 5; index += 1) {
+      ctx.beginPath();
+      ctx.moveTo(x + w * 0.025, y + h * (0.37 + index * 0.045));
+      ctx.lineTo(x + w * 0.105, y + h * (0.37 + index * 0.045));
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = '#fff6c5';
+    [
+      [0.047, 0.41],
+      [0.047, 0.5],
+      [0.082, 0.41],
+      [0.082, 0.5],
+    ].forEach(([lightX, lightY]) => {
+      ctx.beginPath();
+      ctx.arc(x + w * lightX, y + h * lightY, Math.max(2.5, w * 0.018), 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    ctx.fillStyle = '#d8d8d8';
+    fillHideSeekRoundedRect(ctx, x, y + h * 0.62, w * 0.12, h * 0.08, h * 0.03);
+    fillHideSeekRoundedRect(ctx, x + w * 0.82, y + h * 0.62, w * 0.1, h * 0.08, h * 0.03);
+
+    const wheelRadius = Math.min(w * 0.12, h * 0.18);
+    const frontWheelX = x + w * 0.25;
+    const rearWheelX = x + w * 0.72;
+    const wheelY = y + h * 0.73;
+    ctx.fillStyle = '#1f2933';
+    ctx.beginPath();
+    ctx.arc(frontWheelX, wheelY, wheelRadius * 1.25, Math.PI, 0);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(rearWheelX, wheelY, wheelRadius * 1.25, Math.PI, 0);
+    ctx.fill();
+    drawHideSeekTruckWheel(ctx, frontWheelX, wheelY, wheelRadius);
+    drawHideSeekTruckWheel(ctx, rearWheelX, wheelY, wheelRadius);
+
+    ctx.fillStyle = '#e6c35c';
+    ctx.fillRect(x + w * 0.16, y + h * 0.48, w * 0.63, h * 0.025);
+    ctx.fillStyle = '#d6b447';
+    ctx.fillRect(x + w * 0.035, y + h * 0.47, w * 0.052, h * 0.025);
+    ctx.fillRect(x + w * 0.05, y + h * 0.44, w * 0.024, h * 0.085);
+
     ctx.restore();
   }
 
@@ -4158,6 +4349,8 @@
       for (let handle = x + 18; handle < x + w - 8; handle += w / 3) {
         ctx.fillRect(handle, y + h * 0.45, 5, 18);
       }
+    } else if (spot.kind === 'couch') {
+      drawHideSeekCouch(ctx, x, y, w, h);
     } else if (spot.kind === 'bench') {
       ctx.fillStyle = '#6b3f2a';
       fillHideSeekRoundedRect(ctx, x + 8, y + h * 0.4, w - 16, h * 0.2, 8);
@@ -4243,20 +4436,7 @@
         ctx.fill();
       });
     } else if (spot.kind === 'car') {
-      ctx.fillStyle = '#061524';
-      fillHideSeekRoundedRect(ctx, x + 15, y + 28, w - 30, h - 36, 14);
-      const carPaint = ctx.createLinearGradient(x, y, x + w, y + h);
-      carPaint.addColorStop(0, '#16466f');
-      carPaint.addColorStop(1, '#09233f');
-      ctx.fillStyle = carPaint;
-      fillHideSeekRoundedRect(ctx, x + 18, y + 18, w - 36, h - 34, 12);
-      ctx.fillStyle = '#9be7ef';
-      fillHideSeekRoundedRect(ctx, x + 45, y + 7, w - 90, 36, 8);
-      ctx.fillStyle = '#f7fbff';
-      ctx.fillRect(x + 55, y + 14, w - 110, 6);
-      ctx.fillStyle = '#061524';
-      fillHideSeekRoundedRect(ctx, x + 35, y + h - 20, 28, 24, 8);
-      fillHideSeekRoundedRect(ctx, x + w - 63, y + h - 20, 28, 24, 8);
+      drawHideSeekPickupTruck(ctx, x, y, w, h);
     } else if (spot.kind === 'fountain') {
       ctx.fillStyle = '#587c8b';
       ctx.beginPath();
