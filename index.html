@@ -477,8 +477,8 @@
     <section id="hide-seek-game" hidden>
       <div class="mode-header">
         <div>
-          <h2 id="hide-seek-heading">Hide &amp; Seek</h2>
-          <p id="hide-seek-intro">A local two-player room search game. One passenger hides on the map, then hands the phone over so the seeker can inspect spots before time runs out.</p>
+          <h2 id="hide-seek-heading">Hide &amp; Seek Adventure</h2>
+          <p id="hide-seek-intro">A local two-player room search game. One passenger hides inside a real spot, then hands the phone over so the seeker can inspect cover before time runs out.</p>
         </div>
         <div class="hunt-route" aria-label="Hide and seek route">Pass &amp; Play</div>
       </div>
@@ -494,6 +494,7 @@
               <option value="alaska-train">Alaska Train</option>
               <option value="campground">Campground</option>
               <option value="rest-stop">Rest Stop</option>
+              <option value="school-night">School at Night</option>
             </select>
           </label>
           <label class="team-name-field" for="hide-seek-countdown">
@@ -519,7 +520,7 @@
       <article id="hide-seek-round-card" class="trivia-card" aria-live="polite">
         <span id="hide-seek-phase" class="challenge-badge">Ready</span>
         <h3 id="hide-seek-round-title">Start the match.</h3>
-        <p id="hide-seek-round-text">Use the arrow keys, WASD, or the on-screen pad. Hiders get 1 minute to choose cover. Seekers get timed search feedback when they inspect a spot.</p>
+        <p id="hide-seek-round-text">Use the arrow keys, WASD, or the on-screen pad. Hiders get 1 minute to enter a hiding spot. Seekers inspect objects, listen for clues, and race the timer.</p>
         <p id="hide-seek-countdown-text" class="timer" hidden></p>
       </article>
       <div class="hide-seek-stage">
@@ -538,6 +539,7 @@
       <div class="adventure-actions">
         <button id="hide-seek-start" class="primary-button">Start Match</button>
         <button id="hide-seek-found" class="primary-button" hidden>Hide / Inspect</button>
+        <button id="hide-seek-special" class="secondary-button" hidden>Listen</button>
         <button id="hide-seek-next" class="secondary-button" hidden>Next Round</button>
         <button id="hide-seek-debug" class="secondary-button" aria-pressed="false">Debug: Off</button>
         <button id="hide-seek-reset" class="secondary-button">Reset Game</button>
