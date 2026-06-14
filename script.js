@@ -3516,14 +3516,15 @@
     } else {
       hideSeekState.stamina = Math.min(HIDE_SEEK_MAX_STAMINA, hideSeekState.stamina + delta * 18);
     }
+    const roomBounds = getHideSeekRoomBounds(actor);
     const nextXActor = Object.assign({}, actor, {
-      x: Math.max(38, Math.min(738, actor.x + moveX)),
+      x: Math.max(roomBounds.minX, Math.min(roomBounds.maxX, actor.x + moveX)),
     });
     if (!wouldHitHideSeekBlock(nextXActor, room)) {
       actor.x = nextXActor.x;
     }
     const nextYActor = Object.assign({}, actor, {
-      y: Math.max(62, Math.min(382, actor.y + moveY)),
+      y: Math.max(roomBounds.minY, Math.min(roomBounds.maxY, actor.y + moveY)),
     });
     if (!wouldHitHideSeekBlock(nextYActor, room)) {
       actor.y = nextYActor.y;
@@ -3537,12 +3538,33 @@
     return zone ? zone.speedMultiplier || 0.65 : 1;
   }
 
+  function getHideSeekRoomBounds(actor) {
+    const canvasWidth = hideSeekCanvas ? hideSeekCanvas.width : 800;
+    const canvasHeight = hideSeekCanvas ? hideSeekCanvas.height : 450;
+    const edgePaddingX = 18;
+    const edgePaddingY = 22;
+    return {
+      minX: edgePaddingX,
+      maxX: canvasWidth - actor.width - edgePaddingX,
+      minY: edgePaddingY,
+      maxY: canvasHeight - actor.height - edgePaddingY,
+    };
+  }
+
   function wouldHitHideSeekBlock(actor, room) {
     const collider = getHideSeekActorCollider(actor);
-    const hitsObstacle = (room.obstacles || []).some(obstacle => obstacle.type === 'block' && isHideSeekOverlapping(collider, obstacle));
+    const activeExitTrigger = (room.exits || [])
+      .map(exit => getHideSeekExitTriggerRect(exit))
+      .find(trigger => isHideSeekOverlapping(collider, trigger));
+    const isDoorwayOverlap = rect => activeExitTrigger && isHideSeekOverlapping(rect, activeExitTrigger);
+    const hitsObstacle = (room.obstacles || []).some((obstacle) => {
+      if (obstacle.type !== 'block') return false;
+      if (!isHideSeekOverlapping(collider, obstacle)) return false;
+      return !isDoorwayOverlap(obstacle);
+    });
     const hitsSpot = (room.spots || []).some((spot) => {
       const collisionRect = getHideSeekSpotCollisionRect(spot);
-      return collisionRect && isHideSeekOverlapping(collider, collisionRect);
+      return collisionRect && isHideSeekOverlapping(collider, collisionRect) && !isDoorwayOverlap(collisionRect);
     });
     return hitsObstacle || hitsSpot;
   }
@@ -3668,17 +3690,22 @@
   }
 
   function getHideSeekSpotCollisionRect(spot) {
-    const blockingKinds = new Set(['car', 'fountain', 'tree', 'bush', 'locker']);
+    const blockingKinds = new Set(['bed', 'bench', 'box', 'bush', 'car', 'closet', 'couch', 'curtain', 'desk', 'fountain', 'locker', 'luggage', 'shelf', 'tree']);
     if (spot.solid === false) return null;
     if (spot.solid !== true && !blockingKinds.has(spot.kind)) return null;
     const insets = {
       bed: { x: 6, y: 16, width: -12, height: -18 },
       bench: { x: 8, y: 18, width: -16, height: -24 },
+      box: { x: 8, y: 10, width: -16, height: -14 },
       bush: { x: 10, y: 20, width: -20, height: -26 },
       car: { x: 16, y: 20, width: -32, height: -24 },
+      closet: { x: 8, y: 10, width: -16, height: -14 },
       couch: { x: 8, y: 14, width: -16, height: -18 },
       curtain: { x: 8, y: 12, width: -16, height: -18 },
+      desk: { x: 10, y: 18, width: -20, height: -24 },
       fountain: { x: 12, y: 14, width: -24, height: -22 },
+      luggage: { x: 8, y: 12, width: -16, height: -16 },
+      shelf: { x: 10, y: 12, width: -20, height: -18 },
       tree: { x: 12, y: 24, width: -24, height: -28 },
     }[spot.kind] || { x: 6, y: 8, width: -12, height: -12 };
     return {
