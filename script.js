@@ -3485,7 +3485,10 @@
   function wouldHitHideSeekBlock(actor, room) {
     const collider = getHideSeekActorCollider(actor);
     const hitsObstacle = (room.obstacles || []).some(obstacle => obstacle.type === 'block' && isHideSeekOverlapping(collider, obstacle));
-    const hitsSpot = (room.spots || []).some(spot => spot.solid !== false && isHideSeekOverlapping(collider, getHideSeekSpotCollisionRect(spot)));
+    const hitsSpot = (room.spots || []).some((spot) => {
+      const collisionRect = getHideSeekSpotCollisionRect(spot);
+      return collisionRect && isHideSeekOverlapping(collider, collisionRect);
+    });
     return hitsObstacle || hitsSpot;
   }
 
@@ -3610,6 +3613,9 @@
   }
 
   function getHideSeekSpotCollisionRect(spot) {
+    const blockingKinds = new Set(['car', 'fountain', 'tree', 'bush', 'locker']);
+    if (spot.solid === false) return null;
+    if (spot.solid !== true && !blockingKinds.has(spot.kind)) return null;
     const insets = {
       bed: { x: 6, y: 16, width: -12, height: -18 },
       bench: { x: 8, y: 18, width: -16, height: -24 },

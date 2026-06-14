@@ -508,6 +508,7 @@ body.large-text {
 #trivia,
 #jokes,
 #emoji-game,
+#hide-seek-game,
 #pi-game,
 #pong-game,
 #gorillas-game,
@@ -526,6 +527,7 @@ body.large-text {
 #trivia h2,
 #jokes h2,
 #emoji-game h2,
+#hide-seek-game h2,
 #pi-game h2,
 #pong-game h2,
 #gorillas-game h2,
@@ -916,6 +918,12 @@ body.large-text {
   margin: 1rem auto;
 }
 
+#hide-seek-game {
+  width: 100%;
+  max-width: 980px;
+  padding-inline: 1rem;
+}
+
 #hide-seek-game .mode-header {
   width: min(100%, 900px);
   margin-inline: auto;
@@ -924,6 +932,23 @@ body.large-text {
 #hide-seek-scoreboard {
   width: min(100%, 900px);
   margin-inline: auto;
+}
+
+#hide-seek-game .trivia-card,
+#hide-seek-game .adventure-actions,
+#hide-seek-game .hide-seek-controls,
+#hide-seek-game .hide-seek-assets {
+  width: min(100%, 900px);
+  margin-inline: auto;
+}
+
+.hide-seek-setup {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 0.75rem;
+  text-align: left;
 }
 
 .hide-seek-asset {
@@ -1032,6 +1057,24 @@ body.large-text {
   margin: 0.75rem auto 1rem;
 }
 
+#hide-seek-round-card {
+  text-align: left;
+}
+
+#hide-seek-round-card h3,
+#hide-seek-round-card p,
+#hide-seek-round-card .timer {
+  text-align: left;
+}
+
+#hide-seek-status {
+  margin-bottom: 0.75rem;
+}
+
+#hide-seek-countdown-text {
+  margin-top: 0.75rem;
+}
+
 @media (orientation: landscape) and (max-height: 700px) {
   .hide-seek-assets {
     display: none;
@@ -1051,6 +1094,10 @@ body.large-text {
   .hide-seek-pad {
     width: 3.5rem;
     height: 3.5rem;
+  }
+
+  #hide-seek-game .adventure-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -1699,6 +1746,7 @@ body.reduce-motion .stamp.earned {
   #admin-mode,
   #secret-mode,
   #summary,
+  #hide-seek-game,
   .setup-section {
     padding: 0.75rem;
   }
@@ -1843,6 +1891,121 @@ body.reduce-motion .stamp.earned {
   body.large-text .option-grid {
     grid-template-columns: 1fr;
   }
+
+  #hide-seek-game {
+    padding-inline: 0.75rem;
+  }
+
+  #hide-seek-game .mode-header,
+  #hide-seek-scoreboard,
+  #hide-seek-game .trivia-card,
+  #hide-seek-game .adventure-actions,
+  #hide-seek-game .hide-seek-controls,
+  #hide-seek-game .hide-seek-assets {
+    width: 100%;
+  }
+
+  .hide-seek-setup {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+
+  .hide-seek-assets {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+    margin-top: 0.75rem;
+  }
+
+  .hide-seek-asset {
+    min-height: 5.6rem;
+    align-content: start;
+    justify-items: start;
+    padding: 0.65rem;
+    text-align: left;
+  }
+
+  .hide-seek-asset strong,
+  .hide-seek-asset span {
+    text-align: left;
+  }
+
+  .hide-seek-stage {
+    width: 100%;
+    margin: 0.65rem auto;
+    border-width: 3px;
+    border-radius: 8px;
+    box-shadow: 0 12px 28px rgba(9, 35, 63, 0.2), 0 0 0 1px rgba(255,255,255,0.28) inset;
+  }
+
+  .hide-seek-overlay {
+    padding: 0.9rem;
+  }
+
+  .hide-seek-overlay strong {
+    font-size: clamp(1.1rem, 5vw, 1.6rem);
+  }
+
+  .hide-seek-overlay span {
+    font-size: 0.95rem;
+    line-height: 1.35;
+  }
+
+  .hide-seek-controls {
+    grid-template-columns: repeat(3, minmax(0, 4.25rem));
+    gap: 0.35rem;
+    margin: 0.65rem auto 0.85rem;
+  }
+
+  .hide-seek-pad {
+    width: 4.25rem;
+    height: 4.25rem;
+    font-size: 1.25rem;
+  }
+
+  #hide-seek-game .adventure-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+  }
+
+  #hide-seek-game .adventure-actions .primary-button,
+  #hide-seek-game .adventure-actions .secondary-button {
+    min-height: 3rem;
+    padding-inline: 0.7rem;
+    font-size: 0.98rem;
+  }
+
+  #hide-seek-round-card {
+    padding: 0.85rem;
+  }
+
+  #hide-seek-round-card h3 {
+    font-size: 1.02rem;
+    line-height: 1.2;
+  }
+
+  #hide-seek-round-card p,
+  #hide-seek-intro,
+  #hide-seek-status {
+    font-size: 0.96rem;
+    line-height: 1.35;
+  }
+
+  #hide-seek-countdown-text {
+    font-size: 1.2rem;
+  }
+
+  #hide-seek-scoreboard.team-scoreboard {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #hide-seek-scoreboard .team-score {
+    min-width: 0;
+    padding: 0.65rem 0.6rem;
+  }
+
+  #hide-seek-scoreboard .team-score strong {
+    font-size: 1.5rem;
+  }
 }
 
 @media (max-width: 360px) {
@@ -1861,6 +2024,22 @@ body.reduce-motion .stamp.earned {
   .loading-logo {
     width: 5rem;
     height: 5rem;
+  }
+
+  .hide-seek-assets,
+  #hide-seek-scoreboard.team-scoreboard,
+  #hide-seek-game .adventure-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .hide-seek-controls {
+    grid-template-columns: repeat(3, minmax(0, 3.7rem));
+  }
+
+  .hide-seek-pad {
+    width: 3.7rem;
+    height: 3.7rem;
+    font-size: 1.1rem;
   }
 }
 
