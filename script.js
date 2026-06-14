@@ -461,9 +461,16 @@
     };
   }
 
+  const adventurePromptDenylist = new Set([
+    'look-cloud-creature',
+    'learn-birds',
+    'compete-countdown',
+  ]);
+
   const adventurePromptDatabase = questions
     .concat(window.RTA_ADVENTURE_PROMPTS || [])
-    .map(normalizeAdventurePrompt);
+    .map(normalizeAdventurePrompt)
+    .filter(prompt => !adventurePromptDenylist.has(prompt.id));
   const learnTopics = window.RTA_LEARN_TOPICS || [
     { id: 'all', label: 'All Topics', emoji: '🎲' },
   ];
@@ -505,6 +512,14 @@
       scavengerItems.push(item);
     }
   });
+
+  const scavengerItemDenylist = new Set([
+    'cool-cloud',
+    'mountain-shadow',
+    'road-runner',
+  ]);
+
+  const activeScavengerItems = scavengerItems.filter(item => !scavengerItemDenylist.has(item.id));
 
   const stateFacts = [
     ['Alabama', 'Montgomery', 'Yellowhammer State'], ['Alaska', 'Juneau', 'The Last Frontier'],
@@ -1920,12 +1935,12 @@
   }
 
   function getHuntClaims() {
-    return scavengerItems.filter(item => item.claimedBy);
+    return activeScavengerItems.filter(item => item.claimedBy);
   }
 
   function getActiveHuntItems() {
     return activeHuntIds
-      .map(itemId => scavengerItems.find(item => item.id === itemId))
+      .map(itemId => activeScavengerItems.find(item => item.id === itemId))
       .filter(Boolean);
   }
 
@@ -1987,7 +2002,7 @@
   }
 
   function buildHuntDeck() {
-    const unclaimedItems = scavengerItems.filter(item => !item.claimedBy);
+    const unclaimedItems = activeScavengerItems.filter(item => !item.claimedBy);
     const themedItems = activeHuntTheme === 'mixed'
       ? unclaimedItems.filter(huntItemMatchesTripPreset)
       : unclaimedItems.filter(item => huntItemMatchesTheme(item, activeHuntTheme) && huntItemMatchesTripPreset(item));
@@ -2002,7 +2017,7 @@
   function drawHuntTargets(count = getHuntBatchSize()) {
     if (!huntDeck.length) buildHuntDeck();
     activeHuntIds.forEach(itemId => {
-      const item = scavengerItems.find(entry => entry.id === itemId);
+      const item = activeScavengerItems.find(entry => entry.id === itemId);
       if (item && !item.claimedBy && !huntDeck.includes(itemId)) {
         huntDeck.unshift(itemId);
       }
@@ -2010,7 +2025,7 @@
     activeHuntIds = [];
     while (activeHuntIds.length < count && huntDeck.length) {
       const nextId = huntDeck.pop();
-      const item = scavengerItems.find(entry => entry.id === nextId);
+      const item = activeScavengerItems.find(entry => entry.id === nextId);
       if (item && !item.claimedBy && !activeHuntIds.includes(nextId)) {
         activeHuntIds.push(nextId);
       }
@@ -2094,7 +2109,7 @@
   }
 
   function claimHuntItem(itemId, playerId) {
-    const item = scavengerItems.find(entry => entry.id === itemId);
+    const item = activeScavengerItems.find(entry => entry.id === itemId);
     if (!item || item.claimedBy) return;
     item.claimedBy = playerId;
     activeHuntIds = activeHuntIds.filter(id => id !== itemId);
@@ -2102,7 +2117,7 @@
   }
 
   function resetHunt() {
-    scavengerItems.forEach(item => {
+    activeScavengerItems.forEach(item => {
       delete item.claimedBy;
     });
     buildHuntDeck();
@@ -5913,7 +5928,7 @@
   function renderAdminCounts() {
     if (!adminCounts) return;
     const triviaCount = triviaDatabase.length;
-    const scavengerCount = scavengerItems.length;
+    const scavengerCount = activeScavengerItems.length;
     const learnCount = adventurePromptDatabase.filter(question => question.category === 'learn').length;
     const hideSeekMapCount = Object.keys(hideSeekMaps).length;
     const secretModeCount = Object.keys(secretModeConfigs).length;

@@ -1891,7 +1891,7 @@
   // Chaos Challenges
   window.RTA_CHAOS_CHALLENGES = [
     'On three, everyone points left or right. Players who point with the majority stay in; repeat until one winner remains.',
-    'One passenger runs a 10-second timer. Everyone points to the nearest visible sign when time is up; closest clear sign wins.',
+    'One passenger runs a 10-second timer. When time is up, everyone points to a different visible sign. Funniest or strangest sign wins the vote.',
     'First player to point out something beginning with the first letter of their initials wins.',
     'Everyone predicts the next billboard category: lawyer, food, tourism, car, or other. The next readable billboard decides.',
     'No one may say "car" for the next 5 minutes. One passenger watches the clock; anyone who says it is out.',
@@ -1902,8 +1902,8 @@
     'First player to spot something that would confuse someone from 100 years ago wins after explaining why.',
     'When the next town name appears, each player invents a three-word tourism slogan for it. The car votes for the best one.',
     'Everyone makes up a slogan for the next business you pass. After everyone shares, the car votes for the winner.',
-    'Alaska train scene: everyone invents a dramatic name for the current view. The car votes for the name that sounds most like a travel poster.',
-    'Everyone picks a train job: conductor, engineer, snack boss, wildlife scout, or map expert. Defend your job in one sentence.',
+    'Alaska train scene: everyone invents a dramatic name for the current view. The car votes for the best travel-poster title.',
+    'Everyone picks a train job: conductor, engineer, snack boss, wildlife scout, or map expert. Best one-sentence pitch wins.',
     'The group creates a fake Alaska train announcement for the next thing outside. Most believable announcement wins.',
   ];
 
@@ -1916,9 +1916,9 @@
     'Before the next pickup truck passes, predict whether it is carrying something in the bed. The truck decides.',
     'Before the next gas station sign is readable, predict whether it is a national chain or local brand. The sign decides.',
     'Before the next fast-food sign is readable, predict burgers, pizza, tacos, chicken, or other. The sign decides.',
-    'Before the next unusual vehicle appears, predict whether the group will call it practical or ridiculous. Majority vote decides.',
-    'Before the next town slogan is readable, predict whether it will sound serious, funny, or confusing. The car votes after reading it.',
-    'Before the next mascot, logo, or statue appears, predict animal, person, object, or other. The first clear mascot-like thing decides.',
+    'Before the next unusual vehicle appears, predict truck, sports car, RV, motorcycle, or other. The vehicle decides.',
+    'Before the next town slogan is readable, predict whether it mentions history, nature, pride, or fun. The slogan decides.',
+    'Before the next mascot, logo, or statue appears, predict animal, person, object, or other. The first clear example decides.',
     'Before the next water crossing, predict creek, river, lake, canal, or drainage ditch. The first clear crossing decides.',
     'Before the next mountain or hill view, predict snowy, rocky, forested, bare, or hidden by clouds. The view decides.',
     'Before the next train-related find, predict crossing, station, rail car, track, bridge, or sign.',
