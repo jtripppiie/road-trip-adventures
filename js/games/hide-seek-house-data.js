@@ -73,15 +73,23 @@
     MATCH_END: 'match-end',
   };
 
+  const SEARCH_COUNTS = {
+    easy: 10,
+    normal: 8,
+    hard: 6,
+  };
+
   function createInitialState() {
     return {
       players: ['Hider', 'Seeker'],
       scores: [0, 0],
       round: 0,
       totalRounds: 5,
+      difficulty: 'normal',
       hideSeconds: 30,
-      seekSeconds: 60,
       timer: 0,
+      searchesRemaining: SEARCH_COUNTS.normal,
+      totalSearchesUsed: 0,
       phase: PHASES.IDLE,
       hiderIndex: 0,
       seekerIndex: 1,
@@ -90,6 +98,7 @@
       hiddenSpotId: null,
       foundSpotId: null,
       inspectedSpots: [],
+      lastRoundResult: null,
       log: ['Welcome to Hide & Seek House.'],
     };
   }
@@ -111,6 +120,7 @@
     HOUSE,
     ROOM_ORDER,
     PHASES,
+    SEARCH_COUNTS,
     createInitialState,
     getSpotById,
     getSpotLabel,

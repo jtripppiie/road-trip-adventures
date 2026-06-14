@@ -3,7 +3,7 @@
   const renderer = window.HideSeekHouseRender;
   if (!data || !renderer) return;
 
-  const { HOUSE, PHASES, createInitialState, getSpotById } = data;
+  const { HOUSE, PHASES, SEARCH_COUNTS, createInitialState, getSpotById, getSpotLabel } = data;
 
   const canvas = document.getElementById('house-canvas');
   const ctx = canvas ? canvas.getContext('2d') : null;
@@ -14,7 +14,7 @@
     playerTwoInput: document.getElementById('house-player-2'),
     roundsInput: document.getElementById('house-rounds'),
     hideTimeInput: document.getElementById('house-hide-time'),
-    seekTimeInput: document.getElementById('house-seek-time'),
+    difficultyInput: document.getElementById('house-difficulty'),
     startButton: document.getElementById('house-start'),
     resetButton: document.getElementById('house-reset'),
     passButton: document.getElementById('house-pass'),
@@ -23,6 +23,7 @@
     phaseText: document.getElementById('house-phase-text'),
     roundChip: document.getElementById('house-round-chip'),
     timerChip: document.getElementById('house-timer-chip'),
+    searchesChip: document.getElementById('house-searches-chip'),
     roomBadge: document.getElementById('house-room-badge'),
     status: document.getElementById('house-status'),
     navigation: document.getElementById('house-navigation'),
@@ -54,7 +55,7 @@
     ];
     state.totalRounds = Number(elements.roundsInput.value) || 5;
     state.hideSeconds = Number(elements.hideTimeInput.value) || 30;
-    state.seekSeconds = Number(elements.seekTimeInput.value) || 60;
+    state.difficulty = elements.difficultyInput.value || 'normal';
   }
 
   function stopTimer() {
@@ -86,6 +87,9 @@
     state.hiddenSpotId = null;
     state.foundSpotId = null;
     state.inspectedSpots = [];
+    state.totalSearchesUsed = 0;
+    state.searchesRemaining = SEARCH_COUNTS[state.difficulty] || SEARCH_COUNTS.normal;
+    state.lastRoundResult = null;
     state.timer = state.hideSeconds;
     state.phase = PHASES.HIDER;
     appendLog(`${getHiderName()} is hiding. ${state.hideSeconds} seconds on the clock.`);
@@ -104,8 +108,41 @@
     if (!state.hiddenSpotId) return;
     stopTimer();
     state.phase = PHASES.PASS;
-    state.timer = state.seekSeconds;
+    state.timer = 0;
     appendLog(`Pass the device to ${getSeekerName()}.`);
+    render();
+  }
+
+  function finalizeRound(outcome) {
+    const hiddenLabel = getSpotLabel(state.hiddenSpotId);
+    if (outcome === 'seeker-found') {
+      const seekerPoints = Math.max(100, 300 - (state.totalSearchesUsed - 1) * 20);
+      state.scores[state.seekerIndex] += seekerPoints;
+      state.lastRoundResult = {
+        outcome,
+        hiddenRoom: state.hiddenRoom,
+        hiddenSpotId: state.hiddenSpotId,
+        searchesUsed: state.totalSearchesUsed,
+        searchesRemaining: state.searchesRemaining,
+        winner: 'seeker',
+        summary: `${getSeekerName()} found ${getHiderName()} in the ${hiddenLabel} after ${state.totalSearchesUsed} search${state.totalSearchesUsed === 1 ? '' : 'es'}.`,
+      };
+      appendLog(`${getSeekerName()} found the hiding spot and earns ${seekerPoints} points.`);
+    } else if (outcome === 'hider-survived') {
+      const hiderPoints = 180 + state.searchesRemaining * 10;
+      state.scores[state.hiderIndex] += hiderPoints;
+      state.lastRoundResult = {
+        outcome,
+        hiddenRoom: state.hiddenRoom,
+        hiddenSpotId: state.hiddenSpotId,
+        searchesUsed: state.totalSearchesUsed,
+        searchesRemaining: state.searchesRemaining,
+        winner: 'hider',
+        summary: `${getHiderName()} stayed hidden in the ${hiddenLabel}. ${getSeekerName()} used ${state.totalSearchesUsed} search${state.totalSearchesUsed === 1 ? '' : 'es'}.`,
+      };
+      appendLog(`${getHiderName()} stayed hidden and earns ${hiderPoints} points.`);
+    }
+    state.phase = state.round >= state.totalRounds ? PHASES.MATCH_END : PHASES.ROUND_END;
     render();
   }
 
@@ -124,13 +161,7 @@
     }
 
     if (state.phase === PHASES.SEEKER) {
-      const spot = getSpotById(state.hiddenRoom, state.hiddenSpotId);
-      const difficulty = spot ? spot.difficulty : 1;
-      const hiderPoints = 120 + state.hideSeconds * 2 + difficulty * 40;
-      state.scores[state.hiderIndex] += hiderPoints;
-      state.phase = state.round >= state.totalRounds ? PHASES.MATCH_END : PHASES.ROUND_END;
-      appendLog(`${getHiderName()} stayed hidden and earns ${hiderPoints} points.`);
-      render();
+      finalizeRound('hider-survived');
     }
   }
 
@@ -169,7 +200,6 @@
     state.phase = PHASES.SEEKER;
     state.currentRoom = 'foyer';
     appendLog(`${getSeekerName()} begins in the foyer.`);
-    startTimerTick();
     render();
   }
 
@@ -189,25 +219,30 @@
 
   function inspectSpot(spotId) {
     if (state.phase !== PHASES.SEEKER) return;
-    if (state.inspectedSpots.includes(spotId)) return;
-
-    state.inspectedSpots.push(spotId);
-
-    if (spotId === state.hiddenSpotId && state.currentRoom === state.hiddenRoom) {
-      const seekerPoints = Math.max(80, 220 + state.timer * 3 - (state.inspectedSpots.length - 1) * 18);
-      state.scores[state.seekerIndex] += seekerPoints;
-      state.foundSpotId = spotId;
-      state.phase = state.round >= state.totalRounds ? PHASES.MATCH_END : PHASES.ROUND_END;
-      stopTimer();
-      appendLog(`${getSeekerName()} found the hiding spot and earns ${seekerPoints} points.`);
+    if (state.inspectedSpots.includes(spotId)) {
+      appendLog('You already checked there.');
       render();
       return;
     }
 
-    state.timer = Math.max(0, state.timer - 8);
+    state.inspectedSpots.push(spotId);
+    state.totalSearchesUsed += 1;
+
+    if (spotId === state.hiddenSpotId && state.currentRoom === state.hiddenRoom) {
+      state.foundSpotId = spotId;
+      stopTimer();
+      finalizeRound('seeker-found');
+      return;
+    }
+
     const spot = getSpotById(state.currentRoom, spotId);
-    appendLog(`${getSeekerName()} checked the ${spot ? spot.label : 'spot'}. Wrong spot, minus 8 seconds.`);
-    if (state.timer === 0) handleTimerExpired();
+    state.searchesRemaining = Math.max(0, state.searchesRemaining - 1);
+    appendLog(`${getSeekerName()} checked the ${spot ? spot.label : 'spot'}. Wrong spot, ${state.searchesRemaining} searches left.`);
+    if (state.searchesRemaining === 0) {
+      stopTimer();
+      finalizeRound('hider-survived');
+      return;
+    }
     render();
   }
 

@@ -241,7 +241,10 @@
     renderLog(elements.log, state);
 
     elements.roundChip.textContent = `${state.round} / ${state.totalRounds}`;
-    elements.timerChip.textContent = state.phase === PHASES.IDLE ? '--' : `${state.timer}s`;
+    elements.timerChip.textContent = state.phase === PHASES.HIDER ? `${state.timer}s` : '--';
+    elements.searchesChip.textContent = state.phase === PHASES.SEEKER || state.phase === PHASES.ROUND_END || state.phase === PHASES.MATCH_END
+      ? String(state.searchesRemaining)
+      : '--';
     elements.roomBadge.textContent = HOUSE[state.currentRoom].label;
 
     if (state.phase === PHASES.IDLE) {
@@ -254,19 +257,23 @@
       elements.phaseText.textContent = `${helpers.getHiderName()} is hidden. Hand the device to ${helpers.getSeekerName()} and start the search.`;
       elements.status.textContent = 'The seeker should not peek.';
     } else if (state.phase === PHASES.SEEKER) {
-      elements.phaseText.textContent = `${helpers.getSeekerName()} is searching. Wrong inspections cost 8 seconds.`;
-      elements.status.textContent = 'Move room to room and inspect the best-looking spot.';
+      elements.phaseText.textContent = `${helpers.getSeekerName()} is searching. Each wrong unique inspection uses one search.`;
+      elements.status.textContent = `${state.searchesRemaining} searches left. Move room to room and inspect carefully.`;
     } else if (state.phase === PHASES.ROUND_END) {
       elements.phaseText.textContent = 'Round complete. Check the score, then start the next round.';
-      elements.status.textContent = state.foundSpotId
-        ? `${helpers.getSeekerName()} found ${helpers.getHiderName()} in the ${getSpotLabel(state.hiddenSpotId)}.`
-        : `${helpers.getHiderName()} stayed hidden in the ${getSpotLabel(state.hiddenSpotId)}.`;
+      elements.status.textContent = state.lastRoundResult
+        ? state.lastRoundResult.summary
+        : state.foundSpotId
+          ? `${helpers.getSeekerName()} found ${helpers.getHiderName()} in the ${getSpotLabel(state.hiddenSpotId)}.`
+          : `${helpers.getHiderName()} stayed hidden in the ${getSpotLabel(state.hiddenSpotId)}.`;
     } else if (state.phase === PHASES.MATCH_END) {
       const winner = state.scores[0] === state.scores[1]
         ? 'The match ends in a tie.'
         : `${state.scores[0] > state.scores[1] ? state.players[0] : state.players[1]} wins the match.`;
       elements.phaseText.textContent = 'Match complete.';
-      elements.status.textContent = winner;
+      elements.status.textContent = state.lastRoundResult
+        ? `${state.lastRoundResult.summary} ${winner}`
+        : winner;
     }
 
     elements.passButton.disabled = state.phase !== PHASES.PASS;

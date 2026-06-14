@@ -50,12 +50,12 @@
               <option value="45">45 seconds</option>
             </select>
           </label>
-          <label class="team-name-field" for="house-seek-time">
-            <span>Seek time</span>
-            <select id="house-seek-time">
-              <option value="45">45 seconds</option>
-              <option value="60" selected>60 seconds</option>
-              <option value="90">90 seconds</option>
+          <label class="team-name-field" for="house-difficulty">
+            <span>Difficulty</span>
+            <select id="house-difficulty">
+              <option value="easy">Easy · 10 searches</option>
+              <option value="normal" selected>Normal · 8 searches</option>
+              <option value="hard">Hard · 6 searches</option>
             </select>
           </label>
         </div>
@@ -67,8 +67,8 @@
           <h3>How it works</h3>
           <ul>
             <li>The hider gets a short private turn to pick a room and a hiding spot.</li>
-            <li>Pass the device. The seeker moves room to room and inspects spots before time runs out.</li>
-            <li>Fast finds score seeker points. Staying hidden scores hider points.</li>
+            <li>Pass the device. The seeker moves room to room and inspects spots before searches run out.</li>
+            <li>Each wrong unique search uses one search. Checking the same place again should not cost another one.</li>
           </ul>
         </article>
       </section>
@@ -87,6 +87,10 @@
             <div class="house-timer-chip">
               <span>Clock</span>
               <strong id="house-timer-chip">--</strong>
+            </div>
+            <div class="house-timer-chip">
+              <span>Searches</span>
+              <strong id="house-searches-chip">--</strong>
             </div>
           </div>
         </div>
