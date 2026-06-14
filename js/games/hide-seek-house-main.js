@@ -109,6 +109,7 @@
     stopTimer();
     state.phase = PHASES.PASS;
     state.timer = 0;
+    state.currentRoom = 'foyer';
     appendLog(`Pass the device to ${getSeekerName()}.`);
     render();
   }

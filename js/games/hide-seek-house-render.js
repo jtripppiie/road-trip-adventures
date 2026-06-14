@@ -248,14 +248,14 @@
     elements.roomBadge.textContent = HOUSE[state.currentRoom].label;
 
     if (state.phase === PHASES.IDLE) {
-      elements.phaseText.textContent = 'Pick your players, set the clocks, and start a new match.';
+      elements.phaseText.textContent = 'Pick your players, choose the round settings, and start a new match.';
       elements.status.textContent = 'Waiting to begin.';
     } else if (state.phase === PHASES.HIDER) {
       elements.phaseText.textContent = `${helpers.getHiderName()} is hiding. Move through the house and choose one spot before time runs out.`;
       elements.status.textContent = 'Choose a room, then tap a hiding spot.';
     } else if (state.phase === PHASES.PASS) {
       elements.phaseText.textContent = `${helpers.getHiderName()} is hidden. Hand the device to ${helpers.getSeekerName()} and start the search.`;
-      elements.status.textContent = 'The seeker should not peek.';
+      elements.status.textContent = `${helpers.getSeekerName()} will begin in the foyer. The seeker should not peek.`;
     } else if (state.phase === PHASES.SEEKER) {
       elements.phaseText.textContent = `${helpers.getSeekerName()} is searching. Each wrong unique inspection uses one search.`;
       elements.status.textContent = `${state.searchesRemaining} searches left. Move room to room and inspect carefully.`;
