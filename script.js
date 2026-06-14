@@ -746,13 +746,17 @@
     'weirdlaws-in-wyoming-what-animal-is-often-cited-in-a-law-about-photographing-wil',
     'weirdlaws-in-california-what-animal-is-often-cited-as-being-prohibited-from-lick',
     'general-cloned-animal',
+    'general-cynophobia',
     'general-roulette-sum',
     'general-funambulist',
+    'food-avocado-varieties',
+    'food-dos-equis',
     'food-guinness-origin',
     'food-pina-colada',
     'food-bond-drink',
     'food-mageirocophobia',
     'food-fancy-sauce',
+    'food-tim-tam-slam',
   ]);
 
   const hiddenTriviaCategories = new Set([
