@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hide &amp; Seek House</title>
+  <!-- Local styles only. This page does not depend on external image, audio, or font assets. -->
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="hide-seek-house.css" />
+</head>
+<body class="house-game-body">
+  <main class="house-game-shell">
+    <header class="house-game-header">
+      <div>
+        <p class="house-kicker">Original local browser game</p>
+        <h1>Hide &amp; Seek House</h1>
+        <p class="house-subtitle">A fresh pass-and-play hiding game built for the browser. No copied assets, no retro ROM borrowing, just a creaky house and two sneaky players.</p>
+      </div>
+      <div class="house-header-actions">
+        <a class="secondary-button" href="index.html">Back to Road Trip Adventures</a>
+        <button id="house-fullscreen" class="primary-button" type="button">Fullscreen</button>
+      </div>
+    </header>
+
+    <section class="house-game-grid">
+      <section class="house-panel house-setup-panel" aria-labelledby="house-setup-heading">
+        <h2 id="house-setup-heading">Setup</h2>
+        <div class="house-setup-fields">
+          <label class="team-name-field" for="house-player-1">
+            <span>Player 1</span>
+            <input id="house-player-1" type="text" maxlength="16" value="Hider" autocomplete="off" />
+          </label>
+          <label class="team-name-field" for="house-player-2">
+            <span>Player 2</span>
+            <input id="house-player-2" type="text" maxlength="16" value="Seeker" autocomplete="off" />
+          </label>
+          <label class="team-name-field" for="house-rounds">
+            <span>Rounds</span>
+            <select id="house-rounds">
+              <option value="3">3</option>
+              <option value="5" selected>5</option>
+              <option value="7">7</option>
+            </select>
+          </label>
+          <label class="team-name-field" for="house-hide-time">
+            <span>Hide time</span>
+            <select id="house-hide-time">
+              <option value="20">20 seconds</option>
+              <option value="30" selected>30 seconds</option>
+              <option value="45">45 seconds</option>
+            </select>
+          </label>
+          <label class="team-name-field" for="house-seek-time">
+            <span>Seek time</span>
+            <select id="house-seek-time">
+              <option value="45">45 seconds</option>
+              <option value="60" selected>60 seconds</option>
+              <option value="90">90 seconds</option>
+            </select>
+          </label>
+        </div>
+        <div class="house-setup-actions">
+          <button id="house-start" class="primary-button" type="button">Start New Match</button>
+          <button id="house-reset" class="secondary-button" type="button">Reset Match</button>
+        </div>
+        <article class="house-rules-card">
+          <h3>How it works</h3>
+          <ul>
+            <li>The hider gets a short private turn to pick a room and a hiding spot.</li>
+            <li>Pass the device. The seeker moves room to room and inspects spots before time runs out.</li>
+            <li>Fast finds score seeker points. Staying hidden scores hider points.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="house-panel house-stage-panel" aria-labelledby="house-stage-heading">
+        <div class="house-stage-header">
+          <div>
+            <h2 id="house-stage-heading">The House</h2>
+            <p id="house-phase-text" class="house-phase-text">Choose your players and start the match.</p>
+          </div>
+          <div class="house-timers">
+            <div class="house-timer-chip">
+              <span>Round</span>
+              <strong id="house-round-chip">0 / 0</strong>
+            </div>
+            <div class="house-timer-chip">
+              <span>Clock</span>
+              <strong id="house-timer-chip">--</strong>
+            </div>
+          </div>
+        </div>
+        <canvas id="house-canvas" width="1080" height="720" aria-label="Hide and seek house map"></canvas>
+        <div class="house-stage-footer">
+          <div id="house-room-badge" class="hunt-route">Foyer</div>
+          <p id="house-status" class="hunt-status">Waiting to begin.</p>
+        </div>
+      </section>
+
+      <section class="house-panel house-sidebar-panel">
+        <div id="house-scoreboard" class="team-scoreboard" aria-live="polite"></div>
+
+        <section class="house-control-section" aria-labelledby="house-navigation-heading">
+          <div class="house-control-header">
+            <h2 id="house-navigation-heading">Doors</h2>
+            <span class="mode-pill">Move rooms</span>
+          </div>
+          <div id="house-navigation" class="house-button-grid"></div>
+        </section>
+
+        <section class="house-control-section" aria-labelledby="house-spots-heading">
+          <div class="house-control-header">
+            <h2 id="house-spots-heading">Spots</h2>
+            <span class="mode-pill scored">Inspect or hide</span>
+          </div>
+          <div id="house-spots" class="house-button-grid"></div>
+        </section>
+
+        <section class="house-control-section" aria-labelledby="house-actions-heading">
+          <div class="house-control-header">
+            <h2 id="house-actions-heading">Actions</h2>
+            <span class="mode-pill">Round flow</span>
+          </div>
+          <div class="house-action-stack">
+            <button id="house-pass" class="primary-button" type="button" disabled>Pass To Seeker</button>
+            <button id="house-next-round" class="secondary-button" type="button" disabled>Next Round</button>
+          </div>
+        </section>
+
+        <section class="house-control-section" aria-labelledby="house-log-heading">
+          <div class="house-control-header">
+            <h2 id="house-log-heading">House Log</h2>
+            <span class="mode-pill">Latest events</span>
+          </div>
+          <ol id="house-log" class="house-log" aria-live="polite"></ol>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <script src="js/games/hide-seek-house.js"></script>
+</body>
+</html>
