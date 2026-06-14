@@ -214,11 +214,6 @@
               <span class="option-title">Banana Towers</span>
               <span class="mode-pill scored">Scored</span>
             </button>
-            <a class="option-card" href="hide-seek-house.html">
-              <span class="option-emoji" aria-hidden="true">🏠</span>
-              <span class="option-title">Hide &amp; Seek House</span>
-              <span class="mode-pill">Original</span>
-            </a>
           </div>
         </section>
       </div>
@@ -490,7 +485,7 @@
       <div id="hide-seek-scoreboard" class="team-scoreboard" aria-live="polite"></div>
       <article class="trivia-card">
         <span id="hide-seek-badge" class="challenge-badge">Setup</span>
-        <p id="hide-seek-status" class="hunt-status">Pick a map, find timer, and match length. The hider gets 1 minute to hide, then the seeker gets 2 minutes by default to search the rooms.</p>
+        <p id="hide-seek-status" class="hunt-status">Pick a map, difficulty, and match length. The hider gets 1 minute to hide, then the seeker gets a limited number of searches.</p>
         <div class="hide-seek-setup">
           <label class="team-name-field" for="hide-seek-mode">
             <span>Map</span>
@@ -503,12 +498,11 @@
             </select>
           </label>
           <label class="team-name-field" for="hide-seek-countdown">
-            <span>Find time</span>
+            <span>Difficulty</span>
             <select id="hide-seek-countdown">
-              <option value="60">1 minute</option>
-              <option value="90">90 seconds</option>
-              <option value="120" selected>2 minutes</option>
-              <option value="180">3 minutes</option>
+              <option value="easy">Easy · 10 searches</option>
+              <option value="normal" selected>Normal · 8 searches</option>
+              <option value="hard">Hard · 6 searches</option>
             </select>
           </label>
           <label class="team-name-field" for="hide-seek-winner">
@@ -526,7 +520,7 @@
       <article id="hide-seek-round-card" class="trivia-card" aria-live="polite">
         <span id="hide-seek-phase" class="challenge-badge">Ready</span>
         <h3 id="hide-seek-round-title">Start the match.</h3>
-        <p id="hide-seek-round-text">Use the arrow keys, WASD, or the on-screen pad. Sprint has stamina. Hiders get 1 minute to enter a hiding spot. Seekers inspect objects, listen for clues, and race the timer.</p>
+        <p id="hide-seek-round-text">Use the arrow keys, WASD, or the on-screen pad. Sprint has stamina. Hiders get 1 minute to enter a hiding spot. Seekers inspect objects, listen for clues, and work through a limited number of searches.</p>
         <p id="hide-seek-countdown-text" class="timer" hidden></p>
       </article>
       <div class="hide-seek-stage">

@@ -887,19 +887,27 @@
   let hideSeekAudioContext = null;
   let hideSeekDebugEnabled = getStoredJson('rtaHideSeekDebug', false);
   const HIDE_SEEK_HIDE_SECONDS = 60;
-  const HIDE_SEEK_DEFAULT_SEARCH_SECONDS = 120;
+  const HIDE_SEEK_SEARCH_COUNTS = {
+    easy: 10,
+    normal: 8,
+    hard: 6,
+  };
+  const HIDE_SEEK_DEFAULT_DIFFICULTY = 'normal';
   const HIDE_SEEK_SEARCH_TOLERANCE = 34;
-  const HIDE_SEEK_WRONG_SEARCH_PENALTY = 10;
   const HIDE_SEEK_INSPECT_SECONDS = 1.1;
   const HIDE_SEEK_MAX_HINTS = 3;
   const HIDE_SEEK_MAX_STAMINA = 100;
   const HIDE_SEEK_SPRINT_SPEED_MULTIPLIER = 1.45;
-  const HIDE_SEEK_SPAM_INSPECTION_PENALTY = 6;
   const HIDE_SEEK_SUSPICION_DISTANCE = 135;
   const HIDE_SEEK_TRAIL_NOISE_THRESHOLD = 0.28;
+
+  function getHideSeekSearchCount(difficulty) {
+    return HIDE_SEEK_SEARCH_COUNTS[difficulty] || HIDE_SEEK_SEARCH_COUNTS[HIDE_SEEK_DEFAULT_DIFFICULTY];
+  }
+
   let hideSeekState = {
     mode: 'roadside-lodge',
-    countdown: HIDE_SEEK_DEFAULT_SEARCH_SECONDS,
+    difficulty: HIDE_SEEK_DEFAULT_DIFFICULTY,
     winnerGoal: '5',
     hiderIndex: 0,
     seekerIndex: 1,
@@ -921,7 +929,7 @@
     repeatInspectionCount: 0,
     peekCount: 0,
     activeRoomId: 'lobby',
-    timerRemaining: HIDE_SEEK_DEFAULT_SEARCH_SECONDS,
+    searchesRemaining: getHideSeekSearchCount(HIDE_SEEK_DEFAULT_DIFFICULTY),
     hiderTimeRemaining: HIDE_SEEK_HIDE_SECONDS,
     wrongGuesses: 0,
     roundHiderScore: 0,
@@ -2782,11 +2790,16 @@
       playHideSeekTone('wrong');
       return;
     }
+    if (hideSeekState.searchesRemaining <= 0) {
+      setHideSeekMessage('No searches left this round.');
+      playHideSeekTone('wrong');
+      return;
+    }
     const actor = hideSeekState.actors.seeker;
     const hiddenSpot = getHideSeekSpotById(hideSeekState.hiddenSpotId);
     if (!hiddenSpot) return;
     hideSeekState.hintsRemaining -= 1;
-    hideSeekState.timerRemaining = Math.max(0, hideSeekState.timerRemaining - 4);
+    hideSeekState.searchesRemaining = Math.max(0, hideSeekState.searchesRemaining - 1);
     const sameRoom = actor.roomId === hiddenSpot.roomId;
     const trailClue = getHideSeekTrailClue();
     const clue = hideSeekState.noiseLevel >= 0.5
@@ -2810,9 +2823,10 @@
       size: 2,
       life: 0.9,
     });
-    setHideSeekMessage(`${clue} Listen costs 4 seconds.`);
+    setHideSeekMessage(`${clue} Listen costs 1 search. ${hideSeekState.searchesRemaining} searches left.`);
     playHideSeekTone('listen');
     renderHideSeek();
+    if (hideSeekState.searchesRemaining <= 0) hideSeekSeekerFailed();
   }
 
   function addHideSeekNoise(actor, amount) {
@@ -2990,7 +3004,7 @@
     hideSeekState.inspectionCount = 0;
     hideSeekState.repeatInspectionCount = 0;
     hideSeekState.peekCount = 0;
-    hideSeekState.timerRemaining = hideSeekState.countdown;
+    hideSeekState.searchesRemaining = getHideSeekSearchCount(hideSeekState.difficulty);
     hideSeekState.hiderTimeRemaining = HIDE_SEEK_HIDE_SECONDS;
     hideSeekState.wrongGuesses = 0;
     hideSeekState.roundHiderScore = 0;
@@ -3027,7 +3041,7 @@
     renderHideSeekScoreboard();
     renderHideSeekAssets();
     hideSeekMode.value = hideSeekState.mode;
-    hideSeekCountdown.value = String(hideSeekState.countdown);
+    hideSeekCountdown.value = String(hideSeekState.difficulty);
     hideSeekWinner.value = String(hideSeekState.winnerGoal);
     hideSeekBadge.textContent = phaseLabel;
     hideSeekPhase.textContent = phaseLabel;
@@ -3070,7 +3084,7 @@
       hideSeekFoundButton.textContent = `${seekerName} Starts Searching`;
       hideSeekFoundButton.setAttribute('aria-label', `${seekerName} starts searching`);
       hideSeekRoundTitle.textContent = `${hiderName} is hidden.`;
-      hideSeekRoundText.textContent = `Pass the phone to ${seekerName}. The map resets to the start room, and wrong inspections cost ${HIDE_SEEK_WRONG_SEARCH_PENALTY} seconds.`;
+      hideSeekRoundText.textContent = `Pass the phone to ${seekerName}. The map resets to the start room, and each wrong unique inspection uses one search.`;
       setHideSeekMessage(`${seekerName}, no peeking until you tap start searching.`);
     } else if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
       hideSeekFoundButton.textContent = 'Inspect Spot';
@@ -3082,8 +3096,8 @@
       hideSeekRoundTitle.textContent = `${seekerName}, find the hider.`;
       hideSeekRoundText.textContent = nearbySpot
         ? `You are near the ${nearbySpot.label}. Inspect it, or listen for a limited clue.`
-        : `Walk next to cover, inspect objects, and use Listen sparingly. Random inspections cost time.`;
-      setHideSeekMessage(hideSeekState.lastTrailClue || `${seekerName} is searching ${room.name}. Wrong guesses: ${hideSeekState.wrongGuesses}.`);
+        : `Walk next to cover, inspect objects, and use Listen sparingly. Wrong unique inspections use one search.`;
+      setHideSeekMessage(hideSeekState.lastTrailClue || `${seekerName} is searching ${room.name}. Searches left: ${hideSeekState.searchesRemaining}.`);
     } else if (hideSeekState.phase === HideSeekGameState.FOUND || hideSeekState.phase === HideSeekGameState.ROUND_RESULTS) {
       hideSeekRoundTitle.textContent = hideSeekState.phase === HideSeekGameState.FOUND ? 'Found!' : 'Round over.';
       hideSeekRoundText.textContent = hideSeekState.lastRoundText || `${hiderName} was hidden ${hideSeekState.hiddenSpotLabel}.`;
@@ -3151,7 +3165,7 @@
       resetHideSeek();
     }
     hideSeekState.mode = hideSeekMode.value || 'roadside-lodge';
-    hideSeekState.countdown = Number(hideSeekCountdown.value) || HIDE_SEEK_DEFAULT_SEARCH_SECONDS;
+    hideSeekState.difficulty = hideSeekCountdown.value || HIDE_SEEK_DEFAULT_DIFFICULTY;
     hideSeekState.winnerGoal = hideSeekWinner.value || '5';
     resetHideSeekRoundState(HideSeekGameState.HIDER_TURN);
     startHideSeekLoop();
@@ -3162,7 +3176,7 @@
   function beginHideSeekSeekerTurn() {
     const map = getHideSeekMap();
     hideSeekState.phase = HideSeekGameState.SEEKER_TURN;
-    hideSeekState.timerRemaining = hideSeekState.countdown;
+    hideSeekState.searchesRemaining = getHideSeekSearchCount(hideSeekState.difficulty);
     hideSeekState.lastUrgentSecond = null;
     hideSeekState.actors.seeker = { x: 120, y: 305, width: 24, height: 32, speed: 150, roomId: map.startRoom, visible: true, color: '#f58220' };
     hideSeekState.activeRoomId = map.startRoom;
@@ -3245,6 +3259,13 @@
       return;
     }
     const inspectedState = getHideSeekSpotState(inspectedSpot.id);
+    const isDuplicateWrongSearch = inspectedSpot.id !== hideSeekState.hiddenSpotId && (inspectedState === 'searched' || inspectedState === 'suspicious');
+    if (isDuplicateWrongSearch) {
+      setHideSeekMessage('You already checked there.');
+      playHideSeekTone('wrong');
+      renderHideSeek();
+      return;
+    }
     hideSeekState.inspectedSpotId = inspectedSpot.id;
     hideSeekState.inspectTime = HIDE_SEEK_INSPECT_SECONDS;
     hideSeekState.inspectionCount += 1;
@@ -3259,9 +3280,7 @@
     setHideSeekSearchPulse(actor, feedback.tone);
     if (inspectedSpot.id !== hideSeekState.hiddenSpotId) {
       hideSeekState.wrongGuesses += 1;
-      const repeatPenalty = inspectedState === 'searched' ? HIDE_SEEK_SPAM_INSPECTION_PENALTY : 0;
-      if (repeatPenalty) hideSeekState.repeatInspectionCount += 1;
-      hideSeekState.timerRemaining = Math.max(0, hideSeekState.timerRemaining - HIDE_SEEK_WRONG_SEARCH_PENALTY - repeatPenalty);
+      hideSeekState.searchesRemaining = Math.max(0, hideSeekState.searchesRemaining - 1);
       setHideSeekSpotState(inspectedSpot.id, distance <= HIDE_SEEK_SEARCH_TOLERANCE * 2.8 ? 'suspicious' : 'searched');
       hideSeekState.shakingSpotId = inspectedSpot.id;
       hideSeekState.shakeTime = 0.55;
@@ -3273,10 +3292,10 @@
         life: 0.62,
       });
       hideSeekState.cameraShake = Math.max(hideSeekState.cameraShake, 0.12);
-      setHideSeekMessage(`${feedback.text} ${HIDE_SEEK_WRONG_SEARCH_PENALTY + repeatPenalty} seconds lost${repeatPenalty ? ' for re-checking' : ''}.`);
+      setHideSeekMessage(`${feedback.text} ${hideSeekState.searchesRemaining} searches left.`);
       playHideSeekTone('wrong');
       renderHideSeek();
-      if (hideSeekState.timerRemaining <= 0) hideSeekSeekerFailed();
+      if (hideSeekState.searchesRemaining <= 0) hideSeekSeekerFailed();
       return;
     }
 
@@ -3289,12 +3308,12 @@
       width: 24,
       height: 32,
     };
-    const timeUsed = hideSeekState.countdown - hideSeekState.timerRemaining;
+    const searchesUsed = hideSeekState.inspectionCount;
     const coverScore = Number(hideSeekState.hiddenCoverQuality) || foundSpot.difficulty || 3;
-    const cleanInspectBonus = Math.max(0, 160 - hideSeekState.inspectionCount * 22 - hideSeekState.repeatInspectionCount * 45);
+    const cleanInspectBonus = Math.max(0, 160 - hideSeekState.inspectionCount * 22);
     const stealthBonus = Math.max(0, 120 - hideSeekState.peekCount * 35 - Math.round(hideSeekState.noiseLevel * 70));
-    hideSeekState.roundSeekerScore = Math.max(0, Math.round(1200 - timeUsed * 7 - hideSeekState.wrongGuesses * 90 + coverScore * 55 + cleanInspectBonus));
-    hideSeekState.roundHiderScore = Math.max(0, Math.round(timeUsed * 5 + coverScore * 125 + (HIDE_SEEK_HIDE_SECONDS - hideSeekState.hiderTimeRemaining) * 3 + stealthBonus));
+    hideSeekState.roundSeekerScore = Math.max(0, Math.round(1200 - searchesUsed * 70 - hideSeekState.wrongGuesses * 90 + coverScore * 55 + cleanInspectBonus));
+    hideSeekState.roundHiderScore = Math.max(0, Math.round((searchesUsed - 1) * 35 + coverScore * 125 + (HIDE_SEEK_HIDE_SECONDS - hideSeekState.hiderTimeRemaining) * 3 + stealthBonus));
     hideSeekState.hideScore[seeker.id] = (hideSeekState.hideScore[seeker.id] || 0) + hideSeekState.roundSeekerScore;
     hideSeekState.hideScore[hider.id] = (hideSeekState.hideScore[hider.id] || 0) + hideSeekState.roundHiderScore;
     hideSeekState.phase = HideSeekGameState.FOUND;
@@ -3302,7 +3321,7 @@
     hideSeekState.cameraShake = Math.max(hideSeekState.cameraShake, 0.45);
     revealHideSeekHider(foundSpot);
     hideSeekRound += 1;
-    hideSeekState.lastRoundText = `${seeker.name} found ${hider.name} ${hideSeekState.hiddenSpotLabel}. Cover: ${hideSeekState.hiddenCoverLabel}. ${seeker.name}: +${hideSeekState.roundSeekerScore}. ${hider.name}: +${hideSeekState.roundHiderScore}. Inspections: ${hideSeekState.inspectionCount}. Stealth bonus: ${stealthBonus}.`;
+    hideSeekState.lastRoundText = `${seeker.name} found ${hider.name} ${hideSeekState.hiddenSpotLabel}. Cover: ${hideSeekState.hiddenCoverLabel}. ${seeker.name}: +${hideSeekState.roundSeekerScore}. ${hider.name}: +${hideSeekState.roundHiderScore}. Searches used: ${hideSeekState.inspectionCount}. Stealth bonus: ${stealthBonus}.`;
     playHideSeekTone('found');
     renderHideSeek();
   }
@@ -3368,7 +3387,7 @@
     hideSeekRound = 0;
     hideSeekState = {
       mode: hideSeekMode.value || 'roadside-lodge',
-      countdown: Number(hideSeekCountdown.value) || HIDE_SEEK_DEFAULT_SEARCH_SECONDS,
+      difficulty: hideSeekCountdown.value || HIDE_SEEK_DEFAULT_DIFFICULTY,
       winnerGoal: hideSeekWinner.value || '5',
       hiderIndex: 0,
       seekerIndex: 1,
@@ -3391,7 +3410,7 @@
       peekCount: 0,
       hiddenRoomId: null,
       activeRoomId: (hideSeekMaps[hideSeekMode.value] || hideSeekMaps['roadside-lodge']).startRoom,
-      timerRemaining: Number(hideSeekCountdown.value) || HIDE_SEEK_DEFAULT_SEARCH_SECONDS,
+      searchesRemaining: getHideSeekSearchCount(hideSeekCountdown.value || HIDE_SEEK_DEFAULT_DIFFICULTY),
       hiderTimeRemaining: HIDE_SEEK_HIDE_SECONDS,
       wrongGuesses: 0,
       roundHiderScore: 0,
@@ -3435,15 +3454,7 @@
       if (hideSeekState.hiderTimeRemaining <= 0) lockHideSeekHiderPosition('timer');
     } else if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
       if (hideSeekState.inspectTime <= 0) updateHideSeekActor(hideSeekState.actors.seeker, delta);
-      hideSeekState.timerRemaining = Math.max(0, hideSeekState.timerRemaining - delta);
-      if (hideSeekState.timerRemaining <= 10 && hideSeekState.timerRemaining > 0) {
-        const urgentSecond = Math.ceil(hideSeekState.timerRemaining);
-        if (urgentSecond !== hideSeekState.lastUrgentSecond) {
-          hideSeekState.lastUrgentSecond = urgentSecond;
-          playHideSeekTone('tick');
-        }
-      }
-      if (hideSeekState.timerRemaining <= 0) hideSeekSeekerFailed();
+      // Searches are discrete; seeker phase no longer drains continuously over time.
     }
     if (hideSeekState.revealPulse > 0) hideSeekState.revealPulse = Math.max(0, hideSeekState.revealPulse - delta);
     if (hideSeekState.searchPulse) {
@@ -3479,7 +3490,7 @@
     if (hideSeekState.phase === HideSeekGameState.HIDER_TURN) {
       return `${roundText} · Hide: ${Math.ceil(hideSeekState.hiderTimeRemaining)}s · ${room.name}`;
     }
-    return `${roundText} · Search: ${Math.ceil(hideSeekState.timerRemaining)}s · ${room.name}`;
+    return `${roundText} · Searches: ${hideSeekState.searchesRemaining} · ${room.name}`;
   }
 
   function updateHideSeekActor(actor, delta) {
@@ -4386,10 +4397,10 @@
   function drawHideSeekHud(ctx, room, map) {
     const hiderName = getHideSeekPlayerName(hideSeekState.hiderIndex);
     const seekerName = getHideSeekPlayerName(hideSeekState.seekerIndex);
-    const displaySeconds = hideSeekState.phase === HideSeekGameState.HIDER_TURN
+    const displayValue = hideSeekState.phase === HideSeekGameState.HIDER_TURN
       ? hideSeekState.hiderTimeRemaining
-      : hideSeekState.timerRemaining;
-    const isUrgent = hideSeekState.phase === HideSeekGameState.SEEKER_TURN && displaySeconds <= 10;
+      : hideSeekState.searchesRemaining;
+    const isUrgent = hideSeekState.phase === HideSeekGameState.SEEKER_TURN && displayValue <= 2;
 
     const hudGradient = ctx.createLinearGradient(0, 0, 0, 58);
     hudGradient.addColorStop(0, 'rgba(6,21,36,0.96)');
@@ -4427,7 +4438,7 @@
     } else if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
       ctx.fillStyle = '#fff2d8';
       ctx.font = '900 10px Arial';
-      ctx.fillText(`Miss: -${HIDE_SEEK_WRONG_SEARCH_PENALTY}s`, 472, 25);
+      ctx.fillText(`Miss: -1 search`, 472, 25);
       ctx.fillText(`Listen: ${hideSeekState.hintsRemaining}`, 472, 42);
       drawHideSeekMeter(ctx, 544, 31, 38, hideSeekState.stamina, '#2ec7d3', '');
       drawHideSeekMeter(ctx, 544, 47, 38, hideSeekState.suspicionLevel, '#ffd166', '');
@@ -4438,10 +4449,10 @@
     fillHideSeekRoundedRect(ctx, 650, 8, 132, 40, 12);
     ctx.fillStyle = '#ffffff';
     ctx.font = '900 24px Arial';
-    ctx.fillText(`${Math.ceil(displaySeconds)}s`, 778, 31);
+    ctx.fillText(hideSeekState.phase === HideSeekGameState.HIDER_TURN ? `${Math.ceil(displayValue)}s` : `${displayValue}`, 778, 31);
     ctx.fillStyle = isUrgent ? '#fff2d8' : '#09233f';
     ctx.font = '900 10px Arial';
-    ctx.fillText(hideSeekState.phase === HideSeekGameState.HIDER_TURN ? 'HIDE' : 'SEARCH', 778, 44);
+    ctx.fillText(hideSeekState.phase === HideSeekGameState.HIDER_TURN ? 'HIDE' : 'SEARCHES', 778, 44);
 
     if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
       const actor = hideSeekState.actors.seeker;
@@ -6432,8 +6443,8 @@
     resetHideSeek();
   });
   hideSeekCountdown.addEventListener('change', () => {
-    hideSeekState.countdown = Number(hideSeekCountdown.value) || HIDE_SEEK_DEFAULT_SEARCH_SECONDS;
-    hideSeekState.timerRemaining = hideSeekState.countdown;
+    hideSeekState.difficulty = hideSeekCountdown.value || HIDE_SEEK_DEFAULT_DIFFICULTY;
+    hideSeekState.searchesRemaining = getHideSeekSearchCount(hideSeekState.difficulty);
     renderHideSeek();
   });
   hideSeekWinner.addEventListener('change', () => {
