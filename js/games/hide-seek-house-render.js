@@ -4,6 +4,10 @@
 
   const { HOUSE, ROOM_ORDER, PHASES, getSpotLabel } = data;
 
+  function setText(element, value) {
+    if (element) element.textContent = value;
+  }
+
   function drawHouse(ctx, canvas, state) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const bg = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -165,6 +169,7 @@
   }
 
   function renderNavigation(root, state, onRoomChange) {
+    if (!root) return;
     root.innerHTML = '';
     const room = HOUSE[state.currentRoom];
     room.doors.forEach((targetId) => {
@@ -179,6 +184,7 @@
   }
 
   function renderSpots(root, state, onHideSelect, onInspect) {
+    if (!root) return;
     root.innerHTML = '';
     const room = HOUSE[state.currentRoom];
     room.spots.forEach((spot) => {
@@ -201,6 +207,7 @@
   }
 
   function renderScoreboard(root, state) {
+    if (!root) return;
     root.innerHTML = '';
     state.players.forEach((name, index) => {
       const card = document.createElement('div');
@@ -217,6 +224,7 @@
   }
 
   function renderLog(root, state) {
+    if (!root) return;
     root.innerHTML = '';
     state.log.forEach((entry) => {
       const item = document.createElement('li');
@@ -240,45 +248,58 @@
     renderScoreboard(elements.scoreboard, state);
     renderLog(elements.log, state);
 
-    elements.roundChip.textContent = `${state.round} / ${state.totalRounds}`;
-    elements.timerChip.textContent = state.phase === PHASES.HIDER ? `${state.timer}s` : '--';
-    elements.searchesChip.textContent = state.phase === PHASES.SEEKER || state.phase === PHASES.ROUND_END || state.phase === PHASES.MATCH_END
-      ? String(state.searchesRemaining)
-      : '--';
-    elements.roomBadge.textContent = HOUSE[state.currentRoom].label;
+    setText(elements.roundChip, `${state.round} / ${state.totalRounds}`);
+    setText(elements.timerChip, state.phase === PHASES.HIDER ? `${state.timer}s` : '--');
+    setText(
+      elements.searchesChip,
+      state.phase === PHASES.SEEKER || state.phase === PHASES.ROUND_END || state.phase === PHASES.MATCH_END
+        ? String(state.searchesRemaining)
+        : '--'
+    );
+    setText(elements.roomBadge, HOUSE[state.currentRoom].label);
 
     if (state.phase === PHASES.IDLE) {
-      elements.phaseText.textContent = 'Pick your players, choose the round settings, and start a new match.';
-      elements.status.textContent = 'Waiting to begin.';
+      setText(elements.phaseText, 'Pick your players, choose the round settings, and start a new match.');
+      setText(elements.status, 'Waiting to begin.');
     } else if (state.phase === PHASES.HIDER) {
-      elements.phaseText.textContent = `${helpers.getHiderName()} is hiding. Move through the house and choose one spot before time runs out.`;
-      elements.status.textContent = 'Choose a room, then tap a hiding spot.';
+      setText(elements.phaseText, `${helpers.getHiderName()} is hiding. Move through the house and choose one spot before time runs out.`);
+      setText(elements.status, 'Choose a room, then tap a hiding spot.');
     } else if (state.phase === PHASES.PASS) {
-      elements.phaseText.textContent = `${helpers.getHiderName()} is hidden. Hand the device to ${helpers.getSeekerName()} and start the search.`;
-      elements.status.textContent = `${helpers.getSeekerName()} will begin in the foyer. The seeker should not peek.`;
+      setText(elements.phaseText, `${helpers.getHiderName()} is hidden. Hand the device to ${helpers.getSeekerName()} and start the search.`);
+      setText(elements.status, `${helpers.getSeekerName()} will begin in the foyer. The seeker should not peek.`);
     } else if (state.phase === PHASES.SEEKER) {
-      elements.phaseText.textContent = `${helpers.getSeekerName()} is searching. Each wrong unique inspection uses one search.`;
-      elements.status.textContent = `${state.searchesRemaining} searches left. Move room to room and inspect carefully.`;
+      setText(elements.phaseText, `${helpers.getSeekerName()} is searching. Each wrong unique inspection uses one search.`);
+      setText(elements.status, `${state.searchesRemaining} searches left. Move room to room and inspect carefully.`);
     } else if (state.phase === PHASES.ROUND_END) {
-      elements.phaseText.textContent = 'Round complete. Check the score, then start the next round.';
-      elements.status.textContent = state.lastRoundResult
-        ? state.lastRoundResult.summary
-        : state.foundSpotId
-          ? `${helpers.getSeekerName()} found ${helpers.getHiderName()} in the ${getSpotLabel(state.hiddenSpotId)}.`
-          : `${helpers.getHiderName()} stayed hidden in the ${getSpotLabel(state.hiddenSpotId)}.`;
+      setText(elements.phaseText, 'Round complete. Check the score, then start the next round.');
+      setText(
+        elements.status,
+        state.lastRoundResult
+          ? state.lastRoundResult.summary
+          : state.foundSpotId
+            ? `${helpers.getSeekerName()} found ${helpers.getHiderName()} in the ${getSpotLabel(state.hiddenSpotId)}.`
+            : `${helpers.getHiderName()} stayed hidden in the ${getSpotLabel(state.hiddenSpotId)}.`
+      );
     } else if (state.phase === PHASES.MATCH_END) {
       const winner = state.scores[0] === state.scores[1]
         ? 'The match ends in a tie.'
         : `${state.scores[0] > state.scores[1] ? state.players[0] : state.players[1]} wins the match.`;
-      elements.phaseText.textContent = 'Match complete.';
-      elements.status.textContent = state.lastRoundResult
-        ? `${state.lastRoundResult.summary} ${winner}`
-        : winner;
+      setText(elements.phaseText, 'Match complete.');
+      setText(
+        elements.status,
+        state.lastRoundResult
+          ? `${state.lastRoundResult.summary} ${winner}`
+          : winner
+      );
     }
 
-    elements.passButton.disabled = state.phase !== PHASES.PASS;
-    elements.nextRoundButton.disabled = !(state.phase === PHASES.ROUND_END || state.phase === PHASES.MATCH_END);
-    elements.nextRoundButton.textContent = state.phase === PHASES.MATCH_END ? 'Play Another Match' : 'Next Round';
+    if (elements.passButton) {
+      elements.passButton.disabled = state.phase !== PHASES.PASS;
+    }
+    if (elements.nextRoundButton) {
+      elements.nextRoundButton.disabled = !(state.phase === PHASES.ROUND_END || state.phase === PHASES.MATCH_END);
+      elements.nextRoundButton.textContent = state.phase === PHASES.MATCH_END ? 'Play Another Match' : 'Next Round';
+    }
   }
 
   window.HideSeekHouseRender = {
