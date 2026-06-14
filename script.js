@@ -2552,11 +2552,7 @@
   }
 
   function shouldDisableHideSeekSpot(room, spot) {
-    const spots = room.spots || [];
-    if (spots.length < 4) return false;
-    const spotIndex = spots.findIndex(item => item.id === spot.id);
-    const roundSeed = hideSeekRound + hideSeekState.hiderIndex + hideSeekState.seekerIndex + room.id.length;
-    return spotIndex === roundSeed % spots.length;
+    return false;
   }
 
   function setHideSeekSpotState(spotId, state) {
@@ -3698,7 +3694,7 @@
       bench: { x: 8, y: 18, width: -16, height: -24 },
       box: { x: 8, y: 10, width: -16, height: -14 },
       bush: { x: 10, y: 20, width: -20, height: -26 },
-      car: { x: 16, y: 20, width: -32, height: -24 },
+      car: { x: 26, y: 40, width: -52, height: -46 },
       closet: { x: 8, y: 10, width: -16, height: -14 },
       couch: { x: 8, y: 14, width: -16, height: -18 },
       curtain: { x: 8, y: 12, width: -16, height: -18 },
