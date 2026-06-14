@@ -26,6 +26,7 @@ const allTrivia = baseTrivia.concat(window.RTA_TRIVIA_QUESTIONS || []);
 const allPrompts = basePrompts.concat(window.RTA_ADVENTURE_PROMPTS || []);
 const allScavenger = window.RTA_SCAVENGER_ITEMS || [];
 const hideSeekMaps = window.RTA_HIDE_SEEK_MAPS || {};
+const hiddenTriviaCategories = new Set(['weirdlaws']);
 const triviaCategories = new Set([
   'mixed',
   'states',
@@ -105,6 +106,7 @@ function checkTrivia() {
     if (item.category && !triviaCategories.has(item.category)) {
       warnings.push(`trivia ${label}: category "${item.category}" is not listed in trivia categories`);
     }
+    if (hiddenTriviaCategories.has(item.category)) return;
     if (!item.question) errors.push(`trivia ${label}: missing question`);
     if (!item.answer) errors.push(`trivia ${label}: missing answer`);
     if (!Array.isArray(item.choices) || item.choices.length < 2) {
@@ -118,6 +120,12 @@ function checkTrivia() {
     item.choices.forEach(choice => {
       if (String(choice || '').length > 84) warnings.push(`trivia ${label}: long choice "${choice}" may be hard to scan`);
     });
+    if (/often cited|technically|famous weird law|usually one of which two colors|what is often cited as illegal/i.test(item.question || '')) {
+      warnings.push(`trivia ${label}: question wording sounds fuzzy or folklore-based`);
+    }
+    if (/far from any road|thanks to the mpemba effect|according to legend/i.test(item.answer || '')) {
+      warnings.push(`trivia ${label}: answer wording may be too explanatory or hard to verify quickly`);
+    }
   });
 }
 
