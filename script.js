@@ -2573,8 +2573,9 @@
 
   function placeHideSeekActorAtSpot(actor, spot) {
     actor.roomId = spot.roomId || actor.roomId;
-    actor.x = Math.max(38, Math.min(738, spot.x + spot.width / 2 - actor.width / 2));
-    actor.y = Math.max(62, Math.min(382, spot.y + spot.height / 2 - actor.height / 2));
+    const bounds = getHideSeekRoomBounds(actor);
+    actor.x = Math.max(bounds.minX, Math.min(bounds.maxX, spot.x + spot.width / 2 - actor.width / 2));
+    actor.y = Math.max(bounds.minY, Math.min(bounds.maxY, spot.y + spot.height / 2 - actor.height / 2));
   }
 
   function getFallbackHideSeekSpot(actor) {
@@ -2592,7 +2593,7 @@
     const room = getHideSeekRoom(actor.roomId);
     return room.spots.reduce((closest, spot) => {
       if (getHideSeekSpotState(spot.id) === 'disabled') return closest;
-      const radius = spot.interactionRadius || 42;
+      const radius = spot.interactionRadius || 56;
       const distance = getHideSeekDistanceToRect(actor, spot);
       if (distance > radius) return closest;
       if (!closest || distance < closest.distance) return Object.assign({ distance, roomId: room.id }, spot);
@@ -2621,11 +2622,18 @@
     const closeness = Math.max(0, 1 - (nearbySpot.distance || 0) / radius);
     const score = Math.max(1, Math.min(5, Math.round((nearbySpot.difficulty || 3) * 0.72 + closeness * 2.1)));
     const label = score >= 5 ? 'Legendary cover' : score >= 4 ? 'Great cover' : score >= 3 ? 'Solid cover' : 'Risky cover';
+    const qualityNote = score >= 5
+      ? 'Hard to clear fast.'
+      : score >= 4
+        ? 'Strong line-of-sight break.'
+        : score >= 3
+          ? 'Decent, but not airtight.'
+          : 'Easy to check if the seeker gets close.';
     return {
       spot: nearbySpot,
       score,
       label,
-      detail: `${label} near the ${nearbySpot.label}.`,
+      detail: `${label} near the ${nearbySpot.label}. ${qualityNote}`,
     };
   }
 
@@ -2940,10 +2948,8 @@
     const map = getHideSeekMap();
     hideSeekAssets.innerHTML = '';
     Object.values(map.rooms).forEach(room => {
-      const card = document.createElement('button');
-      card.type = 'button';
+      const card = document.createElement('div');
       card.className = 'hide-seek-asset';
-      card.disabled = true;
       if (room.id === hideSeekState.activeRoomId) card.classList.add('active');
 
       const title = document.createElement('strong');
@@ -2951,18 +2957,18 @@
       const detail = document.createElement('span');
       const searched = room.spots.filter(spot => getHideSeekSpotState(spot.id) === 'searched').length;
       const suspicious = room.spots.filter(spot => getHideSeekSpotState(spot.id) === 'suspicious').length;
-      const disabled = room.spots.filter(spot => getHideSeekSpotState(spot.id) === 'disabled').length;
       const trailClue = getHideSeekTrailClue();
       const roomHasTrail = hideSeekState.phase === HideSeekGameState.SEEKER_TURN && trailClue && trailClue.room && trailClue.room.id === room.id;
+      const exits = (room.exits || []).map(exit => exit.label).join(' / ');
       detail.textContent = roomHasTrail
-        ? `${room.spots.length} spots · something feels disturbed`
+        ? `${room.spots.length} cover spots · trail feels warm`
         : suspicious
-        ? `${room.spots.length} spots · ${suspicious} suspicious`
+        ? `${room.spots.length} cover spots · ${suspicious} suspicious`
         : searched
-          ? `${room.spots.length} spots · ${searched} searched`
-          : disabled
-            ? `${room.spots.length - disabled} open · ${disabled} closed`
-            : `${room.spots.length} hiding spots`;
+          ? `${room.spots.length} cover spots · ${searched} cleared`
+          : exits
+            ? `${room.spots.length} cover spots · exits to ${exits}`
+            : `${room.spots.length} cover spots`;
 
       card.appendChild(title);
       card.appendChild(detail);
@@ -3073,8 +3079,8 @@
       const coverQuality = getHideSeekCoverQuality(hideSeekState.actors.hider);
       hideSeekRoundTitle.textContent = `${hiderName}, you have ${Math.ceil(hideSeekState.hiderTimeRemaining)} seconds to hide.`;
       hideSeekRoundText.textContent = coverQuality.spot
-        ? `${coverQuality.detail} Tap Hide Here to enter that object. Peek gives a better look, but can make noise.`
-        : `Move next to a glowing hiding spot. You must enter real cover before the timer expires.`;
+        ? `${coverQuality.detail} Hide Here locks it in. Peek helps you scout, but it raises your noise.`
+        : `Move into a room, step close to a highlighted cover spot, and hide before the timer runs out.`;
       setHideSeekMessage(coverQuality.spot ? coverQuality.detail : `${hiderName} is looking for cover.`);
     } else if (hideSeekState.phase === HideSeekGameState.SEEKER_LOOK_AWAY) {
       hideSeekFoundButton.textContent = `${seekerName} Starts Searching`;
@@ -3091,8 +3097,8 @@
       hideSeekSpecialButton.disabled = hideSeekState.hintsRemaining <= 0;
       hideSeekRoundTitle.textContent = `${seekerName}, find the hider.`;
       hideSeekRoundText.textContent = nearbySpot
-        ? `You are near the ${nearbySpot.label}. Inspect it, or listen for a limited clue.`
-        : `Walk next to cover, inspect objects, and use Listen sparingly. Wrong unique inspections use one search.`;
+        ? `You are close to the ${nearbySpot.label}. Inspect it now, or spend a search on Listen for a clue.`
+        : `Walk room to room, stop beside cover, and inspect carefully. Every wrong new check costs one search.`;
       setHideSeekMessage(hideSeekState.lastTrailClue || `${seekerName} is searching ${room.name}. Searches left: ${hideSeekState.searchesRemaining}.`);
     } else if (hideSeekState.phase === HideSeekGameState.FOUND || hideSeekState.phase === HideSeekGameState.ROUND_RESULTS) {
       hideSeekRoundTitle.textContent = hideSeekState.phase === HideSeekGameState.FOUND ? 'Found!' : 'Round over.';
@@ -3612,8 +3618,9 @@
     if (!exit) return;
     const previousRoomId = actor.roomId;
     actor.roomId = exit.targetRoom;
-    actor.x = exit.spawnX;
-    actor.y = exit.spawnY;
+    const spawn = resolveHideSeekExitSpawn(actor, exit);
+    actor.x = spawn.x;
+    actor.y = spawn.y;
     actor.exitCooldown = 0.55;
     actor.exitIgnoreRoom = previousRoomId;
     hideSeekState.activeRoomId = exit.targetRoom;
@@ -3673,6 +3680,44 @@
       y: exit.y - pad,
       width: exit.width + pad * 2,
       height: exit.height + pad * 2,
+    };
+  }
+
+  function resolveHideSeekExitSpawn(actor, exit) {
+    const targetRoom = getHideSeekRoom(exit.targetRoom);
+    const spawnActor = Object.assign({}, actor, { roomId: exit.targetRoom });
+    const bounds = getHideSeekRoomBounds(spawnActor);
+    const base = {
+      x: typeof exit.spawnX === 'number' ? exit.spawnX : 400,
+      y: typeof exit.spawnY === 'number' ? exit.spawnY : 225,
+    };
+    const nudges = [];
+    if (exit.y <= 62) {
+      for (let step = 0; step < 7; step += 1) nudges.push({ x: 0, y: step * 18 });
+    } else if (exit.y >= 360) {
+      for (let step = 0; step < 7; step += 1) nudges.push({ x: 0, y: -step * 18 });
+    } else if (exit.x <= 62) {
+      for (let step = 0; step < 7; step += 1) nudges.push({ x: step * 18, y: 0 });
+    } else if (exit.x >= 700) {
+      for (let step = 0; step < 7; step += 1) nudges.push({ x: -step * 18, y: 0 });
+    } else {
+      nudges.push({ x: 0, y: 0 });
+    }
+    const candidates = nudges.flatMap(offset => ([
+      { x: base.x + offset.x, y: base.y + offset.y },
+      { x: base.x + offset.x + 24, y: base.y + offset.y },
+      { x: base.x + offset.x - 24, y: base.y + offset.y },
+    ]));
+    const safe = candidates.find(candidate => {
+      const positioned = Object.assign({}, spawnActor, {
+        x: Math.max(bounds.minX, Math.min(bounds.maxX, candidate.x)),
+        y: Math.max(bounds.minY, Math.min(bounds.maxY, candidate.y)),
+      });
+      return !wouldHitHideSeekBlock(positioned, targetRoom);
+    });
+    return {
+      x: Math.max(bounds.minX, Math.min(bounds.maxX, safe ? safe.x : base.x)),
+      y: Math.max(bounds.minY, Math.min(bounds.maxY, safe ? safe.y : base.y)),
     };
   }
 
