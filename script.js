@@ -749,14 +749,19 @@
     'general-cynophobia',
     'general-roulette-sum',
     'general-funambulist',
+    'general-saffron',
     'food-avocado-varieties',
+    'food-carne-asada',
     'food-dos-equis',
     'food-guinness-origin',
+    'food-kosher-meaning',
+    'food-new-york-fruit',
     'food-pina-colada',
     'food-bond-drink',
     'food-mageirocophobia',
     'food-fancy-sauce',
     'food-tim-tam-slam',
+    'nationalparks-which-park-is-often-called-the-american-alps',
   ]);
 
   const hiddenTriviaCategories = new Set([
