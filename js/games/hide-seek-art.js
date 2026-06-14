@@ -1105,6 +1105,109 @@
     return true;
   }
 
+  function drawBackdropWindow(ctx, x, y, w, h, frameColor, skyTop, skyBottom) {
+    ctx.save();
+    ctx.fillStyle = frameColor;
+    ctx.fillRect(x, y, w, h);
+    const sky = ctx.createLinearGradient(x, y, x, y + h);
+    sky.addColorStop(0, skyTop);
+    sky.addColorStop(1, skyBottom);
+    ctx.fillStyle = sky;
+    ctx.fillRect(x + 10, y + 10, w - 20, h - 20);
+    ctx.strokeStyle = 'rgba(255,255,255,0.26)';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(x + w / 2, y + 10);
+    ctx.lineTo(x + w / 2, y + h - 10);
+    ctx.moveTo(x + 10, y + h / 2);
+    ctx.lineTo(x + w - 10, y + h / 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawBackdropFrames(ctx, frames) {
+    frames.forEach((frame) => {
+      ctx.fillStyle = frame.outer;
+      ctx.fillRect(frame.x, frame.y, frame.w, frame.h);
+      ctx.fillStyle = frame.inner;
+      ctx.fillRect(frame.x + 8, frame.y + 8, frame.w - 16, frame.h - 16);
+      ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(frame.x + 12, frame.y + 12, frame.w - 24, frame.h - 24);
+    });
+  }
+
+  function drawMountainRange(ctx, baseY, peaks, color, highlight) {
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(0, baseY);
+    peaks.forEach((peak, index) => {
+      const prevX = index === 0 ? 0 : peaks[index - 1].x;
+      ctx.lineTo(prevX, baseY);
+      ctx.lineTo(peak.x, peak.y);
+    });
+    ctx.lineTo(800, baseY);
+    ctx.lineTo(800, 450);
+    ctx.lineTo(0, 450);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = highlight;
+    peaks.forEach((peak) => {
+      ctx.beginPath();
+      ctx.moveTo(peak.x - 16, peak.y + 18);
+      ctx.lineTo(peak.x, peak.y);
+      ctx.lineTo(peak.x + 18, peak.y + 20);
+      ctx.closePath();
+      ctx.fill();
+    });
+    ctx.restore();
+  }
+
+  function drawStringLights(ctx, x1, x2, y, droop, count, wireColor) {
+    ctx.save();
+    ctx.strokeStyle = wireColor;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x1, y);
+    ctx.quadraticCurveTo((x1 + x2) / 2, y + droop, x2, y);
+    ctx.stroke();
+    const bulbs = ['#ffd166', '#f58220', '#2ec7d3', '#fff2d8'];
+    for (let index = 0; index < count; index += 1) {
+      const t = index / Math.max(1, count - 1);
+      const bx = x1 + (x2 - x1) * t;
+      const by = y + droop * Math.sin(Math.PI * t) * 0.8;
+      ctx.strokeStyle = wireColor;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(bx, by);
+      ctx.lineTo(bx, by + 12);
+      ctx.stroke();
+      ctx.fillStyle = bulbs[index % bulbs.length];
+      ctx.beginPath();
+      ctx.arc(bx, by + 17, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawAurora(ctx, bands) {
+    ctx.save();
+    bands.forEach((band) => {
+      const gradient = ctx.createLinearGradient(band.x1, band.y1, band.x2, band.y2);
+      gradient.addColorStop(0, band.start);
+      gradient.addColorStop(0.5, band.mid);
+      gradient.addColorStop(1, band.end);
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = band.width;
+      ctx.beginPath();
+      ctx.moveTo(band.x1, band.y1);
+      ctx.quadraticCurveTo(band.cx, band.cy, band.x2, band.y2);
+      ctx.stroke();
+    });
+    ctx.restore();
+  }
+
   function drawRoomBackdrop(ctx, map, room, palette, tools) {
     const { fillRoundedRect, shadeColor } = tools;
     const wallGradient = ctx.createLinearGradient(0, 0, 0, 450);
@@ -1115,6 +1218,10 @@
     ctx.fillRect(0, 0, 800, 450);
 
     if (map.id === 'roadside-lodge' && room.id === 'garage') {
+      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      for (let beam = 72; beam < 740; beam += 72) {
+        ctx.fillRect(beam, 64, 8, 154);
+      }
       ctx.fillStyle = 'rgba(6, 21, 36, 0.32)';
       ctx.fillRect(72, 78, 246, 132);
       ctx.fillStyle = '#8f6a46';
@@ -1149,7 +1256,15 @@
         ctx.lineTo(x + 42, 144);
         ctx.stroke();
       }
+      ctx.fillStyle = 'rgba(255,255,255,0.16)';
+      ctx.fillRect(616, 88, 58, 8);
+      ctx.fillRect(624, 106, 42, 8);
+      ctx.fillStyle = '#f58220';
+      ctx.beginPath();
+      ctx.arc(670, 118, 11, 0, Math.PI * 2);
+      ctx.fill();
     } else if (map.id === 'roadside-lodge' && room.id === 'lobby') {
+      drawBackdropWindow(ctx, 86, 84, 146, 102, '#fff2d8', '#7ec7ef', '#f7c36b');
       ctx.fillStyle = '#fff2d8';
       fillRoundedRect(ctx, 92, 84, 134, 92, 8);
       ctx.fillStyle = '#f58220';
@@ -1167,7 +1282,19 @@
       ctx.beginPath();
       ctx.ellipse(598, 104, 190, 34, 0, 0, Math.PI * 2);
       ctx.fill();
+      drawBackdropFrames(ctx, [
+        { x: 520, y: 74, w: 78, h: 56, outer: '#85502a', inner: '#ffe1a8' },
+        { x: 614, y: 78, w: 84, h: 48, outer: '#6f3f1f', inner: '#f58220' },
+      ]);
+      drawStringLights(ctx, 288, 710, 66, 18, 8, 'rgba(255,255,255,0.2)');
+      ctx.fillStyle = '#2fa86f';
+      ctx.beginPath();
+      ctx.ellipse(730, 160, 18, 26, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#70411f';
+      ctx.fillRect(726, 176, 8, 22);
     } else if (map.id === 'alaska-train') {
+      drawBackdropWindow(ctx, 72, 82, 210, 96, '#d7eef8', '#6dc9f0', '#f7fbff');
       ctx.fillStyle = '#dff8ff';
       fillRoundedRect(ctx, 78, 92, 170, 82, 10);
       ctx.fillStyle = '#8ac8e8';
@@ -1189,7 +1316,24 @@
       ctx.moveTo(58, 208);
       ctx.lineTo(742, 208);
       ctx.stroke();
+      drawAurora(ctx, [
+        { x1: 310, y1: 74, cx: 460, cy: 24, x2: 676, y2: 96, width: 20, start: 'rgba(46,199,211,0.06)', mid: 'rgba(125,244,184,0.28)', end: 'rgba(255,255,255,0.02)' },
+        { x1: 348, y1: 110, cx: 510, cy: 54, x2: 732, y2: 122, width: 14, start: 'rgba(123,78,230,0.04)', mid: 'rgba(46,199,211,0.18)', end: 'rgba(255,255,255,0.01)' },
+      ]);
+      ctx.fillStyle = 'rgba(255,255,255,0.88)';
+      [332, 396, 452, 540, 612, 708].forEach((starX, index) => {
+        ctx.beginPath();
+        ctx.arc(starX, 72 + (index % 3) * 12, index % 2 ? 1.4 : 2, 0, Math.PI * 2);
+        ctx.fill();
+      });
     } else if (map.id === 'campground') {
+      drawMountainRange(ctx, 198, [
+        { x: 96, y: 112 },
+        { x: 208, y: 86 },
+        { x: 356, y: 126 },
+        { x: 520, y: 78 },
+        { x: 708, y: 118 },
+      ], 'rgba(8,28,34,0.32)', 'rgba(255,255,255,0.18)');
       ctx.fillStyle = '#123f33';
       for (let i = 0; i < 7; i += 1) {
         const treeX = 65 + i * 95;
@@ -1204,7 +1348,16 @@
       ctx.beginPath();
       ctx.arc(674, 86, 38, 0, Math.PI * 2);
       ctx.fill();
+      drawStringLights(ctx, 120, 674, 84, 14, 7, 'rgba(255,255,255,0.12)');
+      ctx.fillStyle = 'rgba(245,130,32,0.36)';
+      ctx.beginPath();
+      ctx.arc(404, 338, 26, 0, Math.PI * 2);
+      ctx.fill();
     } else if (map.id === 'rest-stop') {
+      ctx.fillStyle = 'rgba(255,255,255,0.12)';
+      for (let tileX = 78; tileX < 736; tileX += 48) {
+        ctx.fillRect(tileX, 78, 2, 126);
+      }
       ctx.fillStyle = '#f7fbff';
       fillRoundedRect(ctx, 610, 88, 92, 68, 6);
       ctx.fillStyle = '#f58220';
@@ -1216,6 +1369,10 @@
       ctx.fillStyle = 'rgba(9,35,63,0.18)';
       ctx.fillRect(110, 102, 106, 12);
       ctx.fillRect(110, 126, 76, 12);
+      drawBackdropFrames(ctx, [
+        { x: 260, y: 86, w: 92, h: 58, outer: '#7b4ee6', inner: '#fff2d8' },
+        { x: 370, y: 90, w: 106, h: 54, outer: '#09233f', inner: '#2ec7d3' },
+      ]);
     } else if (map.id === 'school-night') {
       ctx.fillStyle = '#d7dce4';
       for (let i = 0; i < 4; i += 1) {
@@ -1231,6 +1388,14 @@
       ctx.fill();
       ctx.fillStyle = 'rgba(6,21,36,0.22)';
       ctx.fillRect(0, 0, 800, 34);
+      ctx.fillStyle = '#ffd166';
+      ctx.fillRect(328, 20, 144, 8);
+      ctx.fillStyle = 'rgba(255,255,255,0.12)';
+      for (let lamp = 104; lamp < 748; lamp += 160) {
+        ctx.beginPath();
+        ctx.arc(lamp, 46, 18, 0, Math.PI * 2);
+        ctx.fill();
+      }
     } else {
       ctx.fillStyle = '#fff2d8';
       ctx.fillRect(92, 88, 122, 82);

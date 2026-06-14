@@ -852,6 +852,7 @@
   const HIDE_SEEK_SPRINT_SPEED_MULTIPLIER = 1.45;
   const HIDE_SEEK_SPAM_INSPECTION_PENALTY = 6;
   const HIDE_SEEK_SUSPICION_DISTANCE = 135;
+  const HIDE_SEEK_TRAIL_NOISE_THRESHOLD = 0.28;
   let hideSeekState = {
     mode: 'roadside-lodge',
     countdown: HIDE_SEEK_DEFAULT_SEARCH_SECONDS,
@@ -893,6 +894,8 @@
     searchPulse: null,
     listenPulse: null,
     listenHint: null,
+    roomTrail: [],
+    lastTrailClue: '',
     particles: [],
     cameraShake: 0,
     coverGlowPulse: 0,
@@ -2578,6 +2581,28 @@
     };
   }
 
+  function noteHideSeekRoomVisit(roomId) {
+    if (!roomId) return;
+    const trail = Array.isArray(hideSeekState.roomTrail) ? hideSeekState.roomTrail.slice(-5) : [];
+    if (trail[trail.length - 1] !== roomId) trail.push(roomId);
+    hideSeekState.roomTrail = trail.slice(-5);
+  }
+
+  function getHideSeekTrailClue() {
+    const trail = hideSeekState.roomTrail || [];
+    if (trail.length <= 1 || hideSeekState.noiseLevel < HIDE_SEEK_TRAIL_NOISE_THRESHOLD) return null;
+    const lastRoomId = trail[trail.length - 1];
+    const previousRoomId = trail[trail.length - 2];
+    if (!lastRoomId) return null;
+    return {
+      lastRoomId,
+      previousRoomId,
+      room: getHideSeekRoom(lastRoomId),
+      previousRoom: previousRoomId ? getHideSeekRoom(previousRoomId) : null,
+      movedRooms: new Set(trail).size,
+    };
+  }
+
   function getHideSeekSearchFeedback(sameRoom, distance) {
     if (!sameRoom) {
       return { text: 'Wrong room. Keep moving.', tone: 'cold' };
@@ -2719,15 +2744,21 @@
     hideSeekState.hintsRemaining -= 1;
     hideSeekState.timerRemaining = Math.max(0, hideSeekState.timerRemaining - 4);
     const sameRoom = actor.roomId === hiddenSpot.roomId;
+    const trailClue = getHideSeekTrailClue();
     const clue = hideSeekState.noiseLevel >= 0.5
       ? `You hear a rustle near the ${hiddenSpot.label}.`
       : sameRoom
         ? `The sound is in this room. Check cover carefully.`
-        : `The sound seems to come from ${getHideSeekRoom(hiddenSpot.roomId).name}.`;
+        : trailClue && trailClue.room
+          ? trailClue.movedRooms >= 3
+            ? `You catch a trail through ${trailClue.previousRoom ? `${trailClue.previousRoom.name} into ` : ''}${trailClue.room.name}.`
+            : `You catch a clue near the way to ${trailClue.room.name}.`
+          : `The sound seems to come from ${getHideSeekRoom(hiddenSpot.roomId).name}.`;
     hideSeekState.suspicionSpotId = hideSeekState.noiseLevel >= 0.5 || sameRoom ? hiddenSpot.id : null;
     if (hideSeekState.suspicionSpotId) setHideSeekSpotState(hideSeekState.suspicionSpotId, 'suspicious');
     setHideSeekListenPulse(actor, sameRoom ? 'warm' : 'cold');
     setHideSeekListenHint(actor, sameRoom || hideSeekState.noiseLevel >= 0.5 ? hiddenSpot : null);
+    hideSeekState.lastTrailClue = clue;
     spawnHideSeekParticles(actor.x + actor.width / 2, actor.y + actor.height / 2, actor.roomId, {
       color: 'rgba(189, 239, 244, 0.8)',
       count: 10,
@@ -2867,7 +2898,11 @@
       const searched = room.spots.filter(spot => getHideSeekSpotState(spot.id) === 'searched').length;
       const suspicious = room.spots.filter(spot => getHideSeekSpotState(spot.id) === 'suspicious').length;
       const disabled = room.spots.filter(spot => getHideSeekSpotState(spot.id) === 'disabled').length;
-      detail.textContent = suspicious
+      const trailClue = getHideSeekTrailClue();
+      const roomHasTrail = hideSeekState.phase === HideSeekGameState.SEEKER_TURN && trailClue && trailClue.room && trailClue.room.id === room.id;
+      detail.textContent = roomHasTrail
+        ? `${room.spots.length} spots · something feels disturbed`
+        : suspicious
         ? `${room.spots.length} spots · ${suspicious} suspicious`
         : searched
           ? `${room.spots.length} spots · ${searched} searched`
@@ -2889,6 +2924,7 @@
       seeker: { x: 120, y: 305, width: 24, height: 32, speed: 150, roomId: startRoom, visible: false, color: '#f58220' },
     };
     hideSeekState.activeRoomId = startRoom;
+    hideSeekState.roomTrail = [startRoom];
   }
 
   function resetHideSeekRoundState(phase) {
@@ -2919,6 +2955,8 @@
     hideSeekState.searchPulse = null;
     hideSeekState.listenPulse = null;
     hideSeekState.listenHint = null;
+    hideSeekState.roomTrail = [hideSeekState.activeRoomId];
+    hideSeekState.lastTrailClue = '';
     hideSeekState.particles = [];
     hideSeekState.cameraShake = 0;
     hideSeekState.coverGlowPulse = 0;
@@ -3001,7 +3039,7 @@
       hideSeekRoundText.textContent = nearbySpot
         ? `You are near the ${nearbySpot.label}. Inspect it, or listen for a limited clue.`
         : `Walk next to cover, inspect objects, and use Listen sparingly. Random inspections cost time.`;
-      setHideSeekMessage(`${seekerName} is searching ${room.name}. Wrong guesses: ${hideSeekState.wrongGuesses}.`);
+      setHideSeekMessage(hideSeekState.lastTrailClue || `${seekerName} is searching ${room.name}. Wrong guesses: ${hideSeekState.wrongGuesses}.`);
     } else if (hideSeekState.phase === HideSeekGameState.FOUND || hideSeekState.phase === HideSeekGameState.ROUND_RESULTS) {
       hideSeekRoundTitle.textContent = hideSeekState.phase === HideSeekGameState.FOUND ? 'Found!' : 'Round over.';
       hideSeekRoundText.textContent = hideSeekState.lastRoundText || `${hiderName} was hidden ${hideSeekState.hiddenSpotLabel}.`;
@@ -3326,6 +3364,8 @@
       searchPulse: null,
       listenPulse: null,
       listenHint: null,
+      roomTrail: [((hideSeekMaps[hideSeekMode.value] || hideSeekMaps['roadside-lodge']).startRoom)],
+      lastTrailClue: '',
       particles: [],
       cameraShake: 0,
       coverGlowPulse: 0,
@@ -3501,6 +3541,10 @@
     actor.exitCooldown = 0.55;
     actor.exitIgnoreRoom = previousRoomId;
     hideSeekState.activeRoomId = exit.targetRoom;
+    if (hideSeekState.phase === HideSeekGameState.HIDER_TURN && actor === hideSeekState.actors.hider) {
+      noteHideSeekRoomVisit(exit.targetRoom);
+      addHideSeekNoise(actor, 0.08);
+    }
     playHideSeekTone('door');
     renderHideSeek();
   }
@@ -3942,6 +3986,27 @@
         ctx.stroke();
       }
       ctx.restore();
+    } else if (map.id === 'campground') {
+      ctx.save();
+      for (let i = 0; i < 9; i += 1) {
+        const offset = (performance.now() / 42 + i * 61) % 760;
+        const fx = 40 + offset;
+        const fy = 88 + (i % 4) * 56 + Math.sin((performance.now() / 480) + i) * 10;
+        ctx.fillStyle = 'rgba(255, 241, 170, 0.52)';
+        ctx.beginPath();
+        ctx.arc(fx, fy, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    } else if (map.id === 'roadside-lodge' && room.id === 'courtyard') {
+      ctx.save();
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.18)';
+      for (let i = 0; i < 8; i += 1) {
+        ctx.beginPath();
+        ctx.arc(84 + i * 86, 80 + (i % 3) * 10, i % 2 ? 1.2 : 1.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
     }
   }
 
@@ -4217,6 +4282,7 @@
 
   function drawHideSeekActor(ctx, actor) {
     const bob = Math.sin(performance.now() / 130) * 1.5;
+    const isSeeker = actor === hideSeekState.actors.seeker;
     ctx.fillStyle = 'rgba(0,0,0,0.28)';
     ctx.beginPath();
     ctx.ellipse(actor.x + actor.width / 2, actor.y + actor.height + 5, 16, 5, 0, 0, Math.PI * 2);
@@ -4236,11 +4302,19 @@
     fillHideSeekRoundedRect(ctx, actor.x + 2, actor.y + bob, actor.width - 4, 17, 8);
     ctx.fillStyle = '#5b3a2e';
     fillHideSeekRoundedRect(ctx, actor.x + 3, actor.y - 2 + bob, actor.width - 6, 7, 5);
+    ctx.fillStyle = isSeeker ? '#ffd166' : '#2ec7d3';
+    ctx.fillRect(actor.x + 5, actor.y - 4 + bob, actor.width - 10, 4);
     ctx.fillStyle = '#061524';
     ctx.fillRect(actor.x + 7, actor.y + 7 + bob, 4, 4);
     ctx.fillRect(actor.x + actor.width - 11, actor.y + 7 + bob, 4, 4);
     ctx.fillStyle = 'rgba(255,255,255,0.45)';
     ctx.fillRect(actor.x + 5, actor.y + 15 + bob, actor.width - 10, 2);
+    ctx.fillStyle = isSeeker ? 'rgba(255, 209, 102, 0.8)' : 'rgba(189, 239, 244, 0.7)';
+    ctx.fillRect(actor.x + actor.width - 4, actor.y + 16 + bob, 6, 8);
+    ctx.fillStyle = isSeeker ? '#fff2d8' : '#ffd166';
+    ctx.beginPath();
+    ctx.arc(actor.x + actor.width / 2, actor.y + 4 + bob, 2.5, 0, Math.PI * 2);
+    ctx.fill();
 
     ctx.fillStyle = '#061524';
     fillHideSeekRoundedRect(ctx, actor.x + 2, actor.y + actor.height + 2, 8, 5, 3);
