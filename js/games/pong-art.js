@@ -114,11 +114,47 @@
     ctx.stroke();
   }
 
+  function drawScoreHud(ctx, state) {
+    const hudWidth = Math.min(240, state.width * 0.34);
+    const hudHeight = Math.max(52, state.height * 0.12);
+    const hudX = state.width / 2 - hudWidth / 2;
+    const hudY = 20;
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(3, 12, 24, 0.72)';
+    ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+    ctx.lineWidth = 1.5;
+    drawRoundedRect(ctx, hudX, hudY, hudWidth, hudHeight, 18);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = 'rgba(255,255,255,0.28)';
+    ctx.fillRect(state.width / 2 - 1.5, hudY + 10, 3, hudHeight - 20);
+
+    const scoreFontSize = Math.max(24, Math.min(44, state.width * 0.042));
+    const labelFontSize = Math.max(10, Math.min(13, state.width * 0.015));
+
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+
+    ctx.font = `700 ${labelFontSize}px system-ui, sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,0.76)';
+    ctx.fillText('LEFT', hudX + hudWidth * 0.25, hudY + hudHeight * 0.28);
+    ctx.fillText('RIGHT', hudX + hudWidth * 0.75, hudY + hudHeight * 0.28);
+
+    ctx.font = `800 ${scoreFontSize}px system-ui, sans-serif`;
+    ctx.fillStyle = '#f7fafc';
+    ctx.fillText(String(state.leftScore), hudX + hudWidth * 0.25, hudY + hudHeight * 0.68);
+    ctx.fillText(String(state.rightScore), hudX + hudWidth * 0.75, hudY + hudHeight * 0.68);
+    ctx.restore();
+  }
+
   function draw(canvas, state) {
     if (!canvas || !state) return;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, state.width, state.height);
     drawCourt(ctx, state);
+    drawScoreHud(ctx, state);
     drawPaddle(ctx, 22, state.leftY, state.paddleWidth, state.paddleHeight, '#f58220', 'rgba(245,130,32,0.85)');
     drawPaddle(ctx, state.width - 36, state.rightY, state.paddleWidth, state.paddleHeight, '#7c4dff', 'rgba(124,77,255,0.85)');
     drawBall(ctx, state);
