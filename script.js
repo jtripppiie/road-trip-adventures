@@ -517,6 +517,11 @@
     'cool-cloud',
     'mountain-shadow',
     'road-runner',
+    'plate-delaware',
+    'joshua-tree',
+    'meese',
+    'orange-vw',
+    'solar-farm',
   ]);
 
   const activeScavengerItems = scavengerItems.filter(item => !scavengerItemDenylist.has(item.id));
@@ -1254,10 +1259,11 @@
       title: 'Scavenger Hunt',
       type: 'Scored Game',
       scored: true,
-      summary: 'Keep a small target list active and race to spot things outside.',
+      summary: 'Keep a tight target list active and call real finds before someone else does.',
       rules: [
         'The app shows 4 or 5 targets at a time.',
         'First player to clearly spot a target gets 1 point.',
+        'Call only things the whole car can verify quickly.',
         'A judge can settle close calls. First to the milestone unlocks karaoke power.',
       ],
     },
@@ -1276,10 +1282,11 @@
       title: 'Trivia Run',
       type: 'Scored Game',
       scored: true,
-      summary: 'Turn-based multiple choice trivia with automatic scoring.',
+      summary: 'Turn-based multiple choice trivia with a cleaner category lane and automatic scoring.',
       rules: [
         'The app names whose turn it is.',
-        'That player chooses an answer. Correct choice gives 1 point automatically.',
+        'That player chooses an answer. Correct picks score automatically.',
+        'Use difficulty to control how deep the deck gets, not just how obscure the topic sounds.',
         'Use override points only when the car judge needs to fix a mistake.',
       ],
     },
@@ -1376,11 +1383,11 @@
       title: 'Road Pong',
       type: 'Scored Game',
       scored: true,
-      summary: 'Choose a local match or a computer opponent, then pick how mean the AI should be.',
+      summary: 'Quick arcade break with touch controls on the canvas and optional keyboard backup.',
       rules: [
         'Choose local player or computer before starting.',
         'Pick a difficulty from easy to death match.',
-        'Drag your paddle with a finger or pointer.',
+        'Move paddles by dragging on the canvas. Keyboard backup works too.',
         'First side to the target score wins.',
         'Death Match AI is meant to be nearly impossible to beat.',
       ],
@@ -1389,7 +1396,7 @@
       title: 'Banana Towers',
       type: 'Scored Game',
       scored: true,
-      summary: 'A simple turn-based banana toss game with city buildings and friendly chaos.',
+      summary: 'A turn-based banana toss duel where angle, wind, and skyline all matter.',
       rules: [
         'Each player chooses an angle and power on their turn.',
         'The banana arcs over the buildings and can hit the opponent.',
@@ -4921,7 +4928,7 @@
     renderScoreboard(triviaScoreboard, triviaScore);
     triviaPlay.hidden = true;
     finishTriviaButton.hidden = true;
-    triviaIntro.textContent = `Pick a lane. Each question names the player whose turn it is. A correct choice gives that player 1 point. This run has up to ${getTriviaQuestionLimit()} questions.`;
+    triviaIntro.textContent = `Pick a category and a difficulty. The app names whose turn it is, scores correct answers automatically, and runs up to ${getTriviaQuestionLimit()} questions.`;
     renderTriviaCategories();
     renderTriviaDifficultyButtons();
     showSection('trivia');
@@ -5063,7 +5070,7 @@
     emojiCanvas.hidden = true;
     emojiVideo.hidden = true;
     captureEmojiButton.disabled = true;
-    emojiCameraMessage.textContent = 'Start the camera when everyone is ready.';
+    emojiCameraMessage.textContent = 'Start the camera when everyone is ready, or just act the face out and vote live.';
     renderEmojiGame();
     showSection('emoji');
   }
@@ -5981,6 +5988,7 @@
     resetGame();
     resetPongGame();
     renderPongSettings();
+    pongStatus.textContent = 'Drag on the left side to move the left paddle. In local mode, drag on the right side for player two. W/S and Arrow keys also work.';
     showSection('pong');
   }
 
