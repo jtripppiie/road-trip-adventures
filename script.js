@@ -2953,7 +2953,11 @@
 
   function renderHideSeekMeta() {
     if (!hideSeekMeta) return;
-    const room = getHideSeekActiveRoom();
+    const room = getHideSeekRoom(hideSeekState.activeRoomId);
+    if (!room) {
+      hideSeekMeta.innerHTML = '';
+      return;
+    }
     const map = getHideSeekMap();
     const hiderName = getHideSeekPlayerName(hideSeekState.hiderIndex);
     const seekerName = getHideSeekPlayerName(hideSeekState.seekerIndex);
