@@ -1140,6 +1140,7 @@
   const hideSeekRoundTitle = document.getElementById('hide-seek-round-title');
   const hideSeekRoundText = document.getElementById('hide-seek-round-text');
   const hideSeekCountdownText = document.getElementById('hide-seek-countdown-text');
+  const hideSeekMeta = document.getElementById('hide-seek-meta');
   const hideSeekAssets = document.getElementById('hide-seek-assets');
   const hideSeekCanvas = document.getElementById('hide-seek-canvas');
   const hideSeekCanvasContext = hideSeekCanvas ? hideSeekCanvas.getContext('2d') : null;
@@ -2950,6 +2951,56 @@
     renderScoreboard(hideSeekScoreboard, getHideSeekScoreMap());
   }
 
+  function renderHideSeekMeta() {
+    if (!hideSeekMeta) return;
+    const room = getHideSeekActiveRoom();
+    const map = getHideSeekMap();
+    const hiderName = getHideSeekPlayerName(hideSeekState.hiderIndex);
+    const seekerName = getHideSeekPlayerName(hideSeekState.seekerIndex);
+    const coverQuality = getHideSeekCoverQuality(hideSeekState.actors.hider);
+    const isHiderTurn = hideSeekState.phase === HideSeekGameState.HIDER_TURN;
+    const isSeekerTurn = hideSeekState.phase === HideSeekGameState.SEEKER_TURN;
+    const counterValue = isHiderTurn
+      ? `${Math.ceil(hideSeekState.hiderTimeRemaining)}s`
+      : `${hideSeekState.searchesRemaining}`;
+    const counterLabel = isHiderTurn ? 'Hide Timer' : 'Searches Left';
+    const counterUrgent = (isHiderTurn && hideSeekState.hiderTimeRemaining <= 10)
+      || (isSeekerTurn && hideSeekState.searchesRemaining <= 2);
+
+    const cards = [
+      ['Map', map.name],
+      ['Room', room.name],
+      ['Roles', `${hiderName} hides · ${seekerName} seeks`],
+      [counterLabel, counterValue, counterUrgent],
+    ];
+
+    if (isHiderTurn) {
+      cards.push(['Cover', coverQuality.label]);
+      cards.push(['Noise', `${Math.round(hideSeekState.noiseLevel * 100)}%`]);
+      cards.push(['Sprint', `${Math.round(hideSeekState.stamina)}%`]);
+    } else if (isSeekerTurn) {
+      cards.push(['Listen Uses', String(hideSeekState.hintsRemaining)]);
+      cards.push(['Wrong Checks', String(hideSeekState.wrongGuesses)]);
+      cards.push(['Suspicion', `${Math.round(hideSeekState.suspicionLevel)}%`]);
+    }
+
+    hideSeekMeta.innerHTML = '';
+    cards.forEach(([label, value, urgent]) => {
+      const card = document.createElement('div');
+      card.className = 'hide-seek-meta-card';
+      if (urgent) card.classList.add('is-urgent');
+
+      const title = document.createElement('strong');
+      title.textContent = label;
+      const detail = document.createElement('span');
+      detail.textContent = value;
+
+      card.appendChild(title);
+      card.appendChild(detail);
+      hideSeekMeta.appendChild(card);
+    });
+  }
+
   function renderHideSeekAssets() {
     if (!hideSeekAssets) return;
     const map = getHideSeekMap();
@@ -3049,6 +3100,7 @@
 
     renderHideSeekScoreboard();
     renderHideSeekAssets();
+    renderHideSeekMeta();
     hideSeekMode.value = hideSeekState.mode;
     hideSeekCountdown.value = String(hideSeekState.difficulty);
     hideSeekWinner.value = String(hideSeekState.winnerGoal);
@@ -3792,7 +3844,6 @@
     drawHideSeekAtmosphere(ctx, room, map);
     drawHideSeekListenHint(ctx, room);
     ctx.restore();
-    drawHideSeekHud(ctx, room, map);
     if (hideSeekDebugEnabled) drawHideSeekDebug(ctx, room, map);
   }
 
