@@ -1141,7 +1141,6 @@
   const hideSeekRoundText = document.getElementById('hide-seek-round-text');
   const hideSeekCountdownText = document.getElementById('hide-seek-countdown-text');
   const hideSeekMeta = document.getElementById('hide-seek-meta');
-  const hideSeekAssets = document.getElementById('hide-seek-assets');
   const hideSeekCanvas = document.getElementById('hide-seek-canvas');
   const hideSeekCanvasContext = hideSeekCanvas ? hideSeekCanvas.getContext('2d') : null;
   const hideSeekOverlay = document.getElementById('hide-seek-overlay');
@@ -3005,39 +3004,6 @@
     });
   }
 
-  function renderHideSeekAssets() {
-    if (!hideSeekAssets) return;
-    const map = getHideSeekMap();
-    hideSeekAssets.innerHTML = '';
-    Object.values(map.rooms).forEach(room => {
-      const card = document.createElement('div');
-      card.className = 'hide-seek-asset';
-      if (room.id === hideSeekState.activeRoomId) card.classList.add('active');
-
-      const title = document.createElement('strong');
-      title.textContent = room.name;
-      const detail = document.createElement('span');
-      const searched = room.spots.filter(spot => getHideSeekSpotState(spot.id) === 'searched').length;
-      const suspicious = room.spots.filter(spot => getHideSeekSpotState(spot.id) === 'suspicious').length;
-      const trailClue = getHideSeekTrailClue();
-      const roomHasTrail = hideSeekState.phase === HideSeekGameState.SEEKER_TURN && trailClue && trailClue.room && trailClue.room.id === room.id;
-      const exits = (room.exits || []).map(exit => exit.label).join(' / ');
-      detail.textContent = roomHasTrail
-        ? `${room.spots.length} cover spots · trail feels warm`
-        : suspicious
-        ? `${room.spots.length} cover spots · ${suspicious} suspicious`
-        : searched
-          ? `${room.spots.length} cover spots · ${searched} cleared`
-          : exits
-            ? `${room.spots.length} cover spots · exits to ${exits}`
-            : `${room.spots.length} cover spots`;
-
-      card.appendChild(title);
-      card.appendChild(detail);
-      hideSeekAssets.appendChild(card);
-    });
-  }
-
   function resetHideSeekActors() {
     const map = getHideSeekMap();
     const startRoom = map.startRoom;
@@ -3103,7 +3069,6 @@
     }[hideSeekState.phase] || 'Ready';
 
     renderHideSeekScoreboard();
-    renderHideSeekAssets();
     renderHideSeekMeta();
     hideSeekMode.value = hideSeekState.mode;
     hideSeekCountdown.value = String(hideSeekState.difficulty);
