@@ -3,6 +3,21 @@
  *
  * This file is intentionally data-only so rooms, exits, obstacles, and hide
  * spots can grow without making the main application script harder to work in.
+ *
+ * Hide spot art can optionally be tuned without changing the renderer:
+ * {
+ *   art: {
+ *     scale: 1.08,
+ *     scaleX: 1.12,
+ *     scaleY: 0.94,
+ *     width: 210,
+ *     height: 96,
+ *     offsetX: -6,
+ *     offsetY: 8,
+ *     anchorX: 'center', // left | center | right
+ *     anchorY: 'center', // top | center | bottom
+ *   }
+ * }
  */
 (function () {
   window.RTA_HIDE_SEEK_MAPS = {
@@ -21,8 +36,8 @@
             { label: 'Courtyard', targetRoom: 'courtyard', x: 24, y: 180, width: 28, height: 92, spawnX: 708, spawnY: 232 },
           ],
           spots: [
-            { id: 'lobby-front-desk', label: 'front desk', kind: 'desk', x: 300, y: 245, width: 185, height: 72, difficulty: 2 },
-            { id: 'lobby-sofa', label: 'blue lobby sofa', kind: 'couch', x: 492, y: 100, width: 198, height: 84, difficulty: 3 },
+            { id: 'lobby-front-desk', label: 'front desk', kind: 'desk', x: 300, y: 245, width: 185, height: 72, difficulty: 2, art: { scaleY: 1.05 } },
+            { id: 'lobby-sofa', label: 'blue lobby sofa', kind: 'couch', x: 492, y: 100, width: 198, height: 84, difficulty: 3, art: { scaleX: 1.04, scaleY: 1.06 } },
             { id: 'lobby-curtains', label: 'sunset curtains', kind: 'curtain', x: 92, y: 90, width: 90, height: 190, difficulty: 3 },
             { id: 'lobby-luggage-cart', label: 'luggage cart', kind: 'luggage', x: 570, y: 270, width: 110, height: 75, difficulty: 4 },
           ],
@@ -48,7 +63,7 @@
             { id: 'garage-toolbox', label: 'tool wall', kind: 'shelf', x: 92, y: 95, width: 145, height: 92, difficulty: 2 },
             { id: 'garage-spare-tires', label: 'spare tires', kind: 'box', x: 570, y: 105, width: 76, height: 70, difficulty: 3 },
             { id: 'garage-cardboard', label: 'cardboard stack', kind: 'box', x: 218, y: 268, width: 120, height: 84, difficulty: 3 },
-            { id: 'garage-van', label: 'behind the pickup truck', kind: 'car', x: 505, y: 190, width: 198, height: 114, difficulty: 5, interactionRadius: 68 },
+            { id: 'garage-van', label: 'behind the pickup truck', kind: 'car', x: 505, y: 190, width: 198, height: 114, difficulty: 5, interactionRadius: 68, art: { scaleX: 1.03, scaleY: 1.02 } },
           ],
           obstacles: [{ id: 'garage-oil', type: 'slow', x: 260, y: 355, width: 170, height: 34, speedMultiplier: 0.55 }],
         },
@@ -60,7 +75,7 @@
             { id: 'courtyard-bushes', label: 'desert bushes', kind: 'bush', x: 120, y: 250, width: 160, height: 95, difficulty: 3 },
             { id: 'courtyard-patio-bench', label: 'patio bench', kind: 'bench', x: 292, y: 108, width: 155, height: 62, difficulty: 2 },
             { id: 'courtyard-fountain', label: 'dry fountain', kind: 'fountain', x: 350, y: 185, width: 130, height: 100, difficulty: 4 },
-            { id: 'courtyard-tree', label: 'shade tree', kind: 'tree', x: 610, y: 130, width: 95, height: 200, difficulty: 5 },
+            { id: 'courtyard-tree', label: 'shade tree', kind: 'tree', x: 610, y: 130, width: 95, height: 200, difficulty: 5, art: { scaleX: 1.08, scaleY: 1.04 } },
           ],
           obstacles: [{ id: 'courtyard-planter', type: 'block', x: 315, y: 320, width: 185, height: 42 }],
         },

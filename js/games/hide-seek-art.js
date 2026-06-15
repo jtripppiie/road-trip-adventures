@@ -1081,11 +1081,27 @@
     ctx.restore();
   }
 
+  function getObjectFrame(spot) {
+    const art = spot.art || {};
+    const scaleX = Number.isFinite(art.scaleX) ? art.scaleX : (Number.isFinite(art.scale) ? art.scale : 1);
+    const scaleY = Number.isFinite(art.scaleY) ? art.scaleY : (Number.isFinite(art.scale) ? art.scale : 1);
+    const width = Number.isFinite(art.width) ? art.width : spot.width * scaleX;
+    const height = Number.isFinite(art.height) ? art.height : spot.height * scaleY;
+    const offsetX = Number.isFinite(art.offsetX) ? art.offsetX : 0;
+    const offsetY = Number.isFinite(art.offsetY) ? art.offsetY : 0;
+    const anchorX = art.anchorX === 'left' ? 0 : art.anchorX === 'right' ? 1 : 0.5;
+    const anchorY = art.anchorY === 'top' ? 0 : art.anchorY === 'bottom' ? 1 : 0.5;
+    const x = spot.x + spot.width * anchorX - width * anchorX + offsetX;
+    const y = spot.y + spot.height * anchorY - height * anchorY + offsetY;
+    return { x, y, width, height };
+  }
+
   function drawObject(ctx, spot, tools) {
-    const x = spot.x;
-    const y = spot.y;
-    const w = spot.width;
-    const h = spot.height;
+    const frame = getObjectFrame(spot);
+    const x = frame.x;
+    const y = frame.y;
+    const w = frame.width;
+    const h = frame.height;
 
     if (spot.kind === 'bench') drawBench(ctx, x, y, w, h, tools);
     else if (spot.kind === 'desk') drawDesk(ctx, x, y, w, h, tools, spot);
