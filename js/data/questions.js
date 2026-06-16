@@ -852,9 +852,9 @@
 
 { id: 'learn-animals-lyrebird', learnTopic: 'animals', text: 'Animal fact: Lyrebirds can mimic chainsaws, camera shutters, and many other sounds they hear.' }, 
 // More History
-    { id: 'learn-history-printing-press', learnTopic: 'history', text: 'History fact: Johannes Gutenberg helped popularize movable-type printing in Europe in the 1400s.' },
-    { id: 'learn-history-magna-carta', learnTopic: 'history', text: 'History fact: Magna Carta was sealed in England in 1215.' },
-    { id: 'learn-history-declaration', learnTopic: 'history', text: 'History fact: The Declaration of Independence was adopted on July 4, 1776.' },
+{ id: 'learn-history-printing-press', learnTopic: 'history', text: 'History fact: Johannes Gutenberg helped popularize movable-type printing in Europe in the 1400s.' },
+{ id: 'learn-history-magna-carta', learnTopic: 'history', text: 'History fact: Magna Carta was sealed in England in 1215.' },
+{ id: 'learn-history-declaration', learnTopic: 'history', text: 'History fact: The Declaration of Independence was adopted on July 4, 1776.' },
     { id: 'learn-history-constitution-convention', learnTopic: 'history', text: 'History fact: The Constitutional Convention met in Philadelphia in 1787.' },
     { id: 'learn-history-louisiana-purchase', learnTopic: 'history', text: 'History fact: The Louisiana Purchase nearly doubled the size of the United States in 1803.' },
     { id: 'learn-history-civil-war', learnTopic: 'history', text: 'History fact: The U.S. Civil War lasted from 1861 to 1865.' },

@@ -1,79 +1,123 @@
 /*
  * Road Pong settings and difficulty data.
  *
- * Kept outside script.js so levels can be tuned without digging through the
- * main application flow.
+ * Centralized game tuning so difficulty can be adjusted without touching
+ * the core game logic.
  */
-(function () {
-  const defaultSettings = {
+(() => {
+  const defaultSettings = Object.freeze({
     opponentMode: 'computer',
     difficulty: 'normal',
-  };
+  });
 
-  const difficulties = {
-    easy: {
+  const difficulties = Object.freeze({
+    easy: Object.freeze({
       label: 'Easy',
+      description: 'Relaxed play for beginners.',
+
       targetScore: 5,
-      paddleHeight: 100,
+
+      paddleHeight: 108,
       humanSpeed: 7,
-      aiSpeed: 3.6,
-      aiError: 34,
-      reaction: 0.14,
+
       ballSpeed: 4.0,
+
+      aiSpeed: 3.8,
+      aiError: 36,
+      reactionDelay: 180, // ms
+      trackingChance: 0.75,
       aiPerfect: false,
-    },
-    normal: {
+    }),
+
+    normal: Object.freeze({
       label: 'Normal',
+      description: 'Balanced challenge.',
+
       targetScore: 7,
-      paddleHeight: 92,
+
+      paddleHeight: 96,
       humanSpeed: 7,
-      aiSpeed: 5.6,
-      aiError: 16,
-      reaction: 0.08,
+
       ballSpeed: 4.5,
+
+      aiSpeed: 5.8,
+      aiError: 16,
+      reactionDelay: 90,
+      trackingChance: 0.9,
       aiPerfect: false,
-    },
-    hard: {
+    }),
+
+    hard: Object.freeze({
       label: 'Hard',
+      description: 'Little room for mistakes.',
+
       targetScore: 7,
-      paddleHeight: 84,
+
+      paddleHeight: 86,
       humanSpeed: 7,
-      aiSpeed: 7.6,
-      aiError: 5,
-      reaction: 0.03,
+
       ballSpeed: 5.0,
+
+      aiSpeed: 7.4,
+      aiError: 6,
+      reactionDelay: 40,
+      trackingChance: 0.97,
       aiPerfect: false,
-    },
-    deathmatch: {
+    }),
+
+    deathmatch: Object.freeze({
       label: 'Death Match',
+      description: 'The AI never blinks.',
+
       targetScore: 7,
-      paddleHeight: 112,
+
+      paddleHeight: 112, // slight handicap for player
       humanSpeed: 7,
+
+      ballSpeed: 5.4,
+
       aiSpeed: 14,
       aiError: 0,
-      reaction: 0,
-      ballSpeed: 5.4,
+      reactionDelay: 0,
+      trackingChance: 1,
       aiPerfect: true,
-    },
-  };
+    }),
+  });
 
-  function normalizeSettings(settings) {
-    const merged = Object.assign({}, defaultSettings, settings || {});
-    merged.opponentMode = merged.opponentMode === 'local' ? 'local' : 'computer';
-    merged.difficulty = Object.prototype.hasOwnProperty.call(difficulties, merged.difficulty)
-      ? merged.difficulty
-      : defaultSettings.difficulty;
-    return merged;
+  function normalizeSettings(settings = {}) {
+    const opponentMode =
+      settings.opponentMode === 'local'
+        ? 'local'
+        : defaultSettings.opponentMode;
+
+    const difficulty =
+      difficulties[settings.difficulty]
+        ? settings.difficulty
+        : defaultSettings.difficulty;
+
+    return {
+      opponentMode,
+      difficulty,
+    };
   }
 
-  function getDifficultyConfig(difficulty) {
-    return difficulties[difficulty] || difficulties[defaultSettings.difficulty];
+  function getDifficultyConfig(difficulty = defaultSettings.difficulty) {
+    return difficulties[difficulty] || difficulties.normal;
   }
 
-  window.RTA_PONG_DATA = {
+  function getDifficultyList() {
+    return Object.entries(difficulties).map(([id, config]) => ({
+      id,
+      label: config.label,
+      description: config.description,
+    }));
+  }
+
+  window.RTA_PONG_DATA = Object.freeze({
     defaultSettings,
     difficulties,
-    getDifficultyConfig,
     normalizeSettings,
-  };
+    getDifficultyConfig,
+    getDifficultyList,
+  });
 })();

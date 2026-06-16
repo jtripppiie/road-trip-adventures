@@ -58,14 +58,14 @@
 { id: 'parks-death-valley-lowest-elevation', category: 'nationalparks', question: 'Death Valley contains the lowest point in North America at approximately how many feet below sea level?', answer: 'About 282 feet below sea level.', choices: ['About 282 feet below sea level.', 'About 100 feet below sea level.', 'About 500 feet below sea level.', 'About 1,000 feet below sea level.'] },
 { id: 'parks-everglades-manatee', category: 'nationalparks', question: 'Which gentle marine mammal can sometimes be found in Everglades National Park?', answer: 'Manatee.', choices: ['Manatee.', 'Seal.', 'Walrus.', 'Sea otter.'] },
 { id: 'parks-glacier-name', category: 'nationalparks', question: 'Glacier National Park is often called the "Crown of what?"', answer: 'The Continent.', choices: ['The Continent.', 'The Rockies.', 'The West.', 'The Wilderness.'] },
-{ id: 'parks-yellowstone-old-faithful', category: 'nationalparks', question: 'What famous Yellowstone geyser erupts on a fairly predictable schedule?', answer: 'Old Faithful.', choices: ['Old Faithful.', 'Steamboat Geyser.', 'Castle Geyser.', 'Beehive Geyser.'] }
+{ id: 'parks-yellowstone-old-faithful', category: 'nationalparks', question: 'What famous Yellowstone geyser erupts on a fairly predictable schedule?', answer: 'Old Faithful.', choices: ['Old Faithful.', 'Steamboat Geyser.', 'Castle Geyser.', 'Beehive Geyser.'] },
      
-    { id: 'alaska-keyboard', category: 'alaska', question: 'Which U.S. state can be typed using one row of a standard QWERTY keyboard?', answer: 'Alaska.', choices: ['Alaska.', 'Texas.', 'Maine.', 'Ohio.'] },
-    { id: 'alaska-capital', category: 'alaska', question: 'What is the capital of Alaska?', answer: 'Juneau.', choices: ['Juneau.', 'Anchorage.', 'Fairbanks.', 'Sitka.'] },
-    { id: 'alaska-nickname', category: 'alaska', question: 'What is Alaska\'s state nickname?', answer: 'The Last Frontier.', choices: ['The Last Frontier.', 'The Evergreen State.', 'The Treasure State.', 'The North Star State.'] },
-    { id: 'alaska-largest-state', category: 'alaska', question: 'By land area, Alaska is the largest U.S. state. True or false?', answer: 'True.', choices: ['True.', 'False.'] },
-    { id: 'alaska-denali-height', category: 'alaska', question: 'Denali is best known for being what?', answer: 'The tallest mountain in North America.', choices: ['The tallest mountain in North America.', 'The deepest lake in the U.S.', 'The longest U.S. river.', 'The largest island in Hawaii.'] },
-    { id: 'alaska-aurora', category: 'alaska', question: 'The colorful lights often seen in Alaska night skies are called what?', answer: 'The aurora borealis.', choices: ['The aurora borealis.', 'The trade winds.', 'The equinox shadow.', 'The solar tide.'] },
+{ id: 'alaska-keyboard', category: 'alaska', question: 'Which U.S. state can be typed using one row of a standard QWERTY keyboard?', answer: 'Alaska.', choices: ['Alaska.', 'Texas.', 'Maine.', 'Ohio.'] },
+{ id: 'alaska-capital', category: 'alaska', question: 'What is the capital of Alaska?', answer: 'Juneau.', choices: ['Juneau.', 'Anchorage.', 'Fairbanks.', 'Sitka.'] },
+{ id: 'alaska-nickname', category: 'alaska', question: 'What is Alaska\'s state nickname?', answer: 'The Last Frontier.', choices: ['The Last Frontier.', 'The Evergreen State.', 'The Treasure State.', 'The North Star State.'] },
+{ id: 'alaska-largest-state', category: 'alaska', question: 'By land area, Alaska is the largest U.S. state. True or false?', answer: 'True.', choices: ['True.', 'False.'] },
+{ id: 'alaska-denali-height', category: 'alaska', question: 'Denali is best known for being what?', answer: 'The tallest mountain in North America.', choices: ['The tallest mountain in North America.', 'The deepest lake in the U.S.', 'The longest U.S. river.', 'The largest island in Hawaii.'] },
+{ id: 'alaska-aurora', category: 'alaska', question: 'The colorful lights often seen in Alaska night skies are called what?', answer: 'The aurora borealis.', choices: ['The aurora borealis.', 'The trade winds.', 'The equinox shadow.', 'The solar tide.'] },
 { id: 'alaska-purchase-year', category: 'alaska', question: 'In what year did the United States purchase Alaska from Russia?', answer: '1867.', choices: ['1867.', '1776.', '1901.', '1945.'] },
 { id: 'alaska-purchase-price', category: 'alaska', question: 'Approximately how much did the United States pay Russia for Alaska?', answer: '$7.2 million.', choices: ['$7.2 million.', '$72 million.', '$700,000.', '$27 million.'] },
 { id: 'alaska-largest-city', category: 'alaska', question: 'What is the largest city in Alaska by population?', answer: 'Anchorage.', choices: ['Anchorage.', 'Juneau.', 'Fairbanks.', 'Sitka.'] },
@@ -96,11 +96,11 @@
 { id: 'alaska-largest-national-park', category: 'alaska', question: 'What is the largest national park in Alaska?', answer: 'Wrangell–St. Elias National Park and Preserve.', choices: ['Wrangell–St. Elias National Park and Preserve.', 'Denali National Park.', 'Katmai National Park.', 'Kenai Fjords National Park.'] },
 { id: 'alaska-fat-bear-week', category: 'alaska', question: 'What annual online competition celebrates Alaska bears preparing for winter?', answer: 'Fat Bear Week.', choices: ['Fat Bear Week.', 'Bear Olympics.', 'Salmon Season Showdown.', 'Grizzly Games.'] },
 { id: 'alaska-northernmost-city', category: 'alaska', question: 'Utqiaġvik is famous for being what?', answer: 'The northernmost city in the United States.', choices: ['The northernmost city in the United States.', 'The oldest city in Alaska.', 'The largest city in Alaska.', 'The state capital.'] },
-    { id: 'alaskarail-main-cities', category: 'alaskarail', question: 'The Alaska Railroad is known for connecting which major Alaska cities?', answer: 'Seward, Anchorage, and Fairbanks.', choices: ['Seward, Anchorage, and Fairbanks.', 'Juneau, Nome, and Kodiak.', 'Sitka, Ketchikan, and Barrow.', 'Homer, Valdez, and Unalaska.'] },
-    { id: 'alaskarail-denali-park', category: 'alaskarail', question: 'Which famous national park can passengers reach by Alaska Railroad service?', answer: 'Denali National Park and Preserve.', choices: ['Denali National Park and Preserve.', 'Everglades National Park.', 'Acadia National Park.', 'Big Bend National Park.'] },
-    { id: 'alaskarail-viewing-cars', category: 'alaskarail', question: 'Why are dome cars popular on scenic train routes?', answer: 'They offer wide views of the landscape.', choices: ['They offer wide views of the landscape.', 'They make the train fly.', 'They store extra snow.', 'They replace the locomotive.'] },
-    { id: 'alaskarail-wildlife-watch', category: 'alaskarail', question: 'Which animal would be a realistic wildlife sighting on an Alaska rail trip?', answer: 'Moose.', choices: ['Moose.', 'Kangaroo.', 'Lemur.', 'Camel.'] },
-    { id: 'alaskarail-railroad-crossing', category: 'alaskarail', question: 'At railroad crossings, what should passengers look for as a train-safety clue?', answer: 'Lights, gates, and crossing signs.', choices: ['Lights, gates, and crossing signs.', 'Palm trees.', 'Basketball hoops.', 'Movie posters.'] },
+{ id: 'alaskarail-main-cities', category: 'alaskarail', question: 'The Alaska Railroad is known for connecting which major Alaska cities?', answer: 'Seward, Anchorage, and Fairbanks.', choices: ['Seward, Anchorage, and Fairbanks.', 'Juneau, Nome, and Kodiak.', 'Sitka, Ketchikan, and Barrow.', 'Homer, Valdez, and Unalaska.'] },
+{ id: 'alaskarail-denali-park', category: 'alaskarail', question: 'Which famous national park can passengers reach by Alaska Railroad service?', answer: 'Denali National Park and Preserve.', choices: ['Denali National Park and Preserve.', 'Everglades National Park.', 'Acadia National Park.', 'Big Bend National Park.'] },
+{ id: 'alaskarail-viewing-cars', category: 'alaskarail', question: 'Why are dome cars popular on scenic train routes?', answer: 'They offer wide views of the landscape.', choices: ['They offer wide views of the landscape.', 'They make the train fly.', 'They store extra snow.', 'They replace the locomotive.'] },
+{ id: 'alaskarail-wildlife-watch', category: 'alaskarail', question: 'Which animal would be a realistic wildlife sighting on an Alaska rail trip?', answer: 'Moose.', choices: ['Moose.', 'Kangaroo.', 'Lemur.', 'Camel.'] },
+{ id: 'alaskarail-railroad-crossing', category: 'alaskarail', question: 'At railroad crossings, what should passengers look for as a train-safety clue?', answer: 'Lights, gates, and crossing signs.', choices: ['Lights, gates, and crossing signs.', 'Palm trees.', 'Basketball hoops.', 'Movie posters.'] },
     { id: 'alaskarail-glacier-word', category: 'alaskarail', question: 'A glacier is best described as what?', answer: 'A large, slow-moving mass of ice.', choices: ['A large, slow-moving mass of ice.', 'A desert cactus.', 'A type of train ticket.', 'A warm ocean current.'] },
     { id: 'alaskarail-aurora-name', category: 'alaskarail', question: 'What is another name for the northern lights seen in Alaska?', answer: 'Aurora borealis.', choices: ['Aurora borealis.', 'Solar eclipse.', 'Trade winds.', 'Sea breeze.'] },
     { id: 'alaskarail-engineer-role', category: 'alaskarail', question: 'On a train, what does the engineer usually do?', answer: 'Operates the locomotive.', choices: ['Operates the locomotive.', 'Serves as the town mayor.', 'Builds the mountains.', 'Counts license plates.'] },
@@ -164,7 +164,6 @@
 
     { id: 'general-area-51', category: 'general', question: 'Area 51 is located in which U.S. state?', answer: 'Nevada.', choices: ['Nevada.', 'New Mexico.', 'Arizona.', 'Utah.'] },
     { id: 'general-stop-sign-shape', category: 'general', question: 'What shape is a standard stop sign?', answer: 'Octagon.', choices: ['Octagon.', 'Hexagon.', 'Diamond.', 'Circle.'] },
-    { id: 'general-rainbow-colors', category: 'general', question: 'How many colors are commonly named in a rainbow?', answer: 'Seven.', choices: ['Seven.', 'Five.', 'Six.', 'Eight.'] },
     { id: 'general-lego-founded', category: 'general', question: 'The LEGO Group was founded in 1932. True or false?', answer: 'True.', choices: ['True.', 'False.'] },
     { id: 'general-cynophobia', category: 'general', question: 'Cynophobia is the fear of what?', answer: 'Dogs.', choices: ['Dogs.', 'Heights.', 'Crowds.', 'Thunder.'] },
     { id: 'general-jurassic-park-author', category: 'general', question: 'Who wrote Jurassic Park?', answer: 'Michael Crichton.', choices: ['Michael Crichton.', 'Stephen King.', 'John Grisham.', 'Ray Bradbury.'] },
@@ -508,5 +507,245 @@
     { id: 'general-emerald-color', category: 'general', question: 'What color are emeralds?', answer: 'Green.', choices: ['Green.', 'Blue.', 'Red.', 'Purple.'] },
     { id: 'general-continents-count', category: 'general', question: 'How many continents are there?', answer: '7.', choices: ['7.', '5.', '6.', '8.'] },
     { id: 'general-tallest-animal-bonus', category: 'general', question: 'What is the tallest animal in the world?', answer: 'Giraffe.', choices: ['Giraffe.', 'Elephant.', 'Camel.', 'Moose.'] },
-  ];
+    { id: 'technology-html-stands-for', category: 'technology', question: 'What does HTML stand for?', answer: 'HyperText Markup Language.', choices: ['HyperText Markup Language.', 'HighText Machine Language.', 'Hyperlink Text Management Language.', 'Home Tool Markup Language.'] },
+{ id: 'technology-www-stands-for', category: 'technology', question: 'What does WWW stand for?', answer: 'World Wide Web.', choices: ['World Wide Web.', 'World Web Window.', 'Wide World Web.', 'Web World Wide.'] },
+{ id: 'technology-microsoft-founder', category: 'technology', question: 'Which person co-founded Microsoft?', answer: 'Bill Gates.', choices: ['Bill Gates.', 'Steve Jobs.', 'Mark Zuckerberg.', 'Elon Musk.'] },
+{ id: 'technology-google-browser', category: 'technology', question: 'What is the name of Google\'s web browser?', answer: 'Chrome.', choices: ['Chrome.', 'Safari.', 'Firefox.', 'Edge.'] },
+{ id: 'technology-computer-brain', category: 'technology', question: 'What part of a computer is often called its "brain"?', answer: 'CPU.', choices: ['CPU.', 'Monitor.', 'Keyboard.', 'Mouse.'] },
+{ id: 'technology-usb-stands-for', category: 'technology', question: 'What does USB stand for?', answer: 'Universal Serial Bus.', choices: ['Universal Serial Bus.', 'United System Board.', 'Universal Service Band.', 'User System Bridge.'] },
+{ id: 'technology-video-site', category: 'technology', question: 'Which website is best known for sharing videos?', answer: 'YouTube.', choices: ['YouTube.', 'LinkedIn.', 'Reddit.', 'Pinterest.'] },
+{ id: 'technology-playstation-maker', category: 'technology', question: 'Which company makes the PlayStation?', answer: 'Sony.', choices: ['Sony.', 'Nintendo.', 'Microsoft.', 'Sega.'] },
+{ id: 'technology-nintendo-mascot', category: 'technology', question: 'Who is Nintendo\'s famous plumber mascot?', answer: 'Mario.', choices: ['Mario.', 'Link.', 'Sonic.', 'Kirby.'] },
+{ id: 'technology-email-symbol', category: 'technology', question: 'Which symbol is commonly used in email addresses?', answer: '@.', choices: ['@.', '#.', '&.', '% .'] },
+
+{ id: 'general-largest-ocean', category: 'general', question: 'What is the largest ocean on Earth?', answer: 'Pacific Ocean.', choices: ['Pacific Ocean.', 'Atlantic Ocean.', 'Indian Ocean.', 'Arctic Ocean.'] },
+{ id: 'general-spider-legs', category: 'general', question: 'How many legs does a spider have?', answer: '8.', choices: ['8.', '6.', '10.', '12.'] },
+{ id: 'general-rainbow-colors', category: 'general', question: 'How many colors are traditionally listed in a rainbow?', answer: '7.', choices: ['7.', '5.', '6.', '8.'] },
+{ id: 'general-baby-frog', category: 'general', question: 'What is a baby frog called?', answer: 'Tadpole.', choices: ['Tadpole.', 'Pup.', 'Calf.', 'Cub.'] },
+{ id: 'general-penguin-bird', category: 'general', question: 'What type of animal is a penguin?', answer: 'Bird.', choices: ['Bird.', 'Fish.', 'Mammal.', 'Reptile.'] },
+{ id: 'general-bee-honey', category: 'general', question: 'Which insect makes honey?', answer: 'Bee.', choices: ['Bee.', 'Butterfly.', 'Ant.', 'Beetle.'] },
+{ id: 'general-freezing-point', category: 'general', question: 'At what temperature does water freeze in Celsius?', answer: '0 degrees.', choices: ['0 degrees.', '10 degrees.', '32 degrees.', '100 degrees.'] },
+{ id: 'general-largest-planet', category: 'general', question: 'Which planet is the largest in our solar system?', answer: 'Jupiter.', choices: ['Jupiter.', 'Saturn.', 'Earth.', 'Mars.'] },
+{ id: 'general-cheetah-fastest', category: 'general', question: 'What is the fastest land animal?', answer: 'Cheetah.', choices: ['Cheetah.', 'Lion.', 'Horse.', 'Leopard.'] },
+{ id: 'general-human-teeth', category: 'general', question: 'How many teeth does a typical adult human have?', answer: '32.', choices: ['32.', '28.', '30.', '36.'] },
+{ id: 'technology-gps-stands-for', category: 'technology', question: 'What does GPS stand for?', answer: 'Global Positioning System.', choices: ['Global Positioning System.', 'General Positioning Service.', 'Global Path System.', 'General Path Service.'] },
+{ id: 'technology-amazon-assistant', category: 'technology', question: 'What is the name of Amazon\'s voice assistant?', answer: 'Alexa.', choices: ['Alexa.', 'Siri.', 'Cortana.', 'Bixby.'] },
+{ id: 'technology-bluetooth-origin', category: 'technology', question: 'Bluetooth technology is named after a king from which country?', answer: 'Denmark.', choices: ['Denmark.', 'Sweden.', 'Norway.', 'Germany.'] },
+{ id: 'technology-wifi-meaning', category: 'technology', question: 'True or False: Wi-Fi officially stands for "Wireless Fidelity."', answer: 'False.', choices: ['True.', 'False.', 'Only in Europe.', 'Only in the U.S.'] },
+{ id: 'technology-linux-mascot', category: 'technology', question: 'What is the name of the Linux mascot?', answer: 'Tux.', choices: ['Tux.', 'Pingu.', 'Nibbles.', 'Kernel.'] },
+{ id: 'technology-iphone-first-year', category: 'technology', question: 'In what year was the first iPhone released?', answer: '2007.', choices: ['2007.', '2005.', '2008.', '2010.'] },
+{ id: 'technology-xbox-maker', category: 'technology', question: 'Which company makes the Xbox?', answer: 'Microsoft.', choices: ['Microsoft.', 'Sony.', 'Nintendo.', 'Sega.'] },
+{ id: 'technology-file-extension-jpeg', category: 'technology', question: 'JPEG files are primarily used for what?', answer: 'Images.', choices: ['Images.', 'Music.', 'Spreadsheets.', 'Videos.'] },
+{ id: 'technology-cloud-computing', category: 'technology', question: 'What does "the cloud" generally refer to?', answer: 'Remote servers accessed over the internet.', choices: ['Remote servers accessed over the internet.', 'Weather satellites.', 'Computer fans.', 'Local hard drives.'] },
+{ id: 'technology-spam-origin', category: 'technology', question: 'What does the term "spam" usually refer to in technology?', answer: 'Unwanted messages.', choices: ['Unwanted messages.', 'Computer memory.', 'Video games.', 'Search engines.'] },
+
+{ id: 'general-largest-desert', category: 'general', question: 'What is the largest desert in the world?', answer: 'Antarctica.', choices: ['Antarctica.', 'Sahara Desert.', 'Gobi Desert.', 'Arabian Desert.'] },
+{ id: 'general-octopus-hearts', category: 'general', question: 'How many hearts does an octopus have?', answer: '3.', choices: ['3.', '2.', '1.', '4.'] },
+{ id: 'general-banana-berry', category: 'general', question: 'True or False: Bananas are classified as berries.', answer: 'True.', choices: ['True.', 'False.', 'Only wild bananas.', 'Only ripe bananas.'] },
+{ id: 'general-koala-country', category: 'general', question: 'Koalas are native to which country?', answer: 'Australia.', choices: ['Australia.', 'New Zealand.', 'South Africa.', 'Brazil.'] },
+{ id: 'general-venus-rotation', category: 'general', question: 'Which planet rotates in the opposite direction of most planets in our solar system?', answer: 'Venus.', choices: ['Venus.', 'Mars.', 'Neptune.', 'Mercury.'] },
+{ id: 'general-shark-skeleton', category: 'general', question: 'What are shark skeletons primarily made of?', answer: 'Cartilage.', choices: ['Cartilage.', 'Bone.', 'Calcium.', 'Shell.'] },
+{ id: 'general-blue-whale-heart', category: 'general', question: 'Which animal has a heart that can weigh over 400 pounds?', answer: 'Blue whale.', choices: ['Blue whale.', 'Elephant.', 'Giraffe.', 'Hippopotamus.'] },
+{ id: 'general-venus-hottest', category: 'general', question: 'Which planet is the hottest in our solar system?', answer: 'Venus.', choices: ['Venus.', 'Mercury.', 'Mars.', 'Jupiter.'] },
+{ id: 'general-human-bones', category: 'general', question: 'How many bones does the average adult human body have?', answer: '206.', choices: ['206.', '212.', '198.', '224.'] },
+{ id: 'general-sloth-speed', category: 'general', question: 'What is considered one of the slowest mammals in the world?', answer: 'Sloth.', choices: ['Sloth.', 'Koala.', 'Panda.', 'Armadillo.'] },
+{ id: 'technology-email-inventor', category: 'technology', question: 'Who is credited with inventing modern email?', answer: 'Ray Tomlinson.', choices: ['Ray Tomlinson.', 'Bill Gates.', 'Steve Jobs.', 'Tim Berners-Lee.'] },
+{ id: 'technology-first-web-browser', category: 'technology', question: 'What was the name of the first web browser?', answer: 'WorldWideWeb.', choices: ['WorldWideWeb.', 'Netscape.', 'Internet Explorer.', 'Mosaic.'] },
+{ id: 'technology-internet-creator', category: 'technology', question: 'Who is known as the inventor of the World Wide Web?', answer: 'Tim Berners-Lee.', choices: ['Tim Berners-Lee.', 'Bill Gates.', 'Steve Wozniak.', 'Larry Page.'] },
+{ id: 'technology-mozilla-browser', category: 'technology', question: 'Which browser is developed by Mozilla?', answer: 'Firefox.', choices: ['Firefox.', 'Edge.', 'Opera.', 'Safari.'] },
+{ id: 'technology-png-stands-for', category: 'technology', question: 'What does PNG stand for?', answer: 'Portable Network Graphics.', choices: ['Portable Network Graphics.', 'Personal Network Graphics.', 'Public Network Graphics.', 'Program Network Graphics.'] },
+{ id: 'technology-qwerty-layout', category: 'technology', question: 'What is the most common keyboard layout called?', answer: 'QWERTY.', choices: ['QWERTY.', 'DVORAK.', 'AZERTY.', 'QWERZ.'] },
+{ id: 'technology-mac-operating-system', category: 'technology', question: 'What operating system runs on Apple Mac computers?', answer: 'macOS.', choices: ['macOS.', 'iOS.', 'Windows.', 'Linux.'] },
+{ id: 'technology-screenshot-purpose', category: 'technology', question: 'What is a screenshot?', answer: 'A picture of what is displayed on a screen.', choices: ['A picture of what is displayed on a screen.', 'A printed webpage.', 'A scanned document.', 'A video recording.'] },
+{ id: 'technology-router-purpose', category: 'technology', question: 'What device directs internet traffic between networks in many homes?', answer: 'Router.', choices: ['Router.', 'Monitor.', 'Printer.', 'Scanner.'] },
+{ id: 'technology-qr-code-use', category: 'technology', question: 'What can a QR code typically be scanned with?', answer: 'A smartphone camera.', choices: ['A smartphone camera.', 'A television remote.', 'A game controller.', 'A calculator.'] },
+
+{ id: 'general-animal-king', category: 'general', question: 'Which animal is often called the "King of the Jungle"?', answer: 'Lion.', choices: ['Lion.', 'Tiger.', 'Elephant.', 'Bear.'] },
+{ id: 'general-mount-everest-location', category: 'general', question: 'Mount Everest lies on the border of Nepal and which country?', answer: 'China.', choices: ['China.', 'India.', 'Pakistan.', 'Bhutan.'] },
+{ id: 'general-polar-bear-region', category: 'general', question: 'Polar bears naturally live in which region?', answer: 'The Arctic.', choices: ['The Arctic.', 'Antarctica.', 'The Amazon.', 'Siberia.'] },
+{ id: 'general-largest-bird', category: 'general', question: 'What is the largest living bird?', answer: 'Ostrich.', choices: ['Ostrich.', 'Emu.', 'Eagle.', 'Penguin.'] },
+{ id: 'general-longest-river', category: 'general', question: 'Which river is traditionally taught as the longest in the world?', answer: 'The Nile.', choices: ['The Nile.', 'The Amazon.', 'The Mississippi.', 'The Yangtze.'] },
+{ id: 'general-blood-color', category: 'general', question: 'What color is human blood inside the body?', answer: 'Red.', choices: ['Red.', 'Blue.', 'Purple.', 'Green.'] },
+{ id: 'general-elephant-trunk', category: 'general', question: 'What body part do elephants use like a nose and an arm?', answer: 'Their trunk.', choices: ['Their trunk.', 'Their tusks.', 'Their tail.', 'Their ears.'] },
+{ id: 'general-fastest-bird', category: 'general', question: 'What is the fastest animal on Earth during a dive?', answer: 'Peregrine falcon.', choices: ['Peregrine falcon.', 'Cheetah.', 'Golden eagle.', 'Sailfish.'] },
+{ id: 'general-honey-never-spoils', category: 'general', question: 'True or False: Honey can last for thousands of years without spoiling.', answer: 'True.', choices: ['True.', 'False.', 'Only if refrigerated.', 'Only if unopened.'] },
+{ id: 'general-human-brain-weight', category: 'general', question: 'About how much does the average adult human brain weigh?', answer: 'About 3 pounds.', choices: ['About 3 pounds.', 'About 1 pound.', 'About 5 pounds.', 'About 8 pounds.'] },
+{ id: 'civil-alaska-permafrost', category: 'civil-engineering', question: 'What is the primary concern when constructing foundations on permafrost?', answer: 'Preventing the frozen ground from thawing.', choices: ['Preventing the frozen ground from thawing.', 'Increasing groundwater flow.', 'Reducing earthquake shaking.', 'Improving soil color.'] },
+
+{ id: 'civil-alaska-richardson-highway', category: 'civil-engineering', question: 'What was Alaska’s first major road connecting Valdez and Fairbanks?', answer: 'The Richardson Highway.', choices: ['The Richardson Highway.', 'The Dalton Highway.', 'The Seward Highway.', 'The Parks Highway.'] },
+
+{ id: 'civil-alaska-frost-heave', category: 'civil-engineering', question: 'What phenomenon causes roads to buckle and shift due to freezing and thawing soils?', answer: 'Frost heave.', choices: ['Liquefaction.', 'Subsidence.', 'Frost heave.', 'Scouring.'] },
+
+{ id: 'civil-alaska-trans-alaska-pipeline', category: 'civil-engineering', question: 'Approximately how long is the Trans-Alaska Pipeline System?', answer: 'About 800 miles.', choices: ['About 800 miles.', 'About 250 miles.', 'About 1,500 miles.', 'About 3,000 miles.'] },
+
+{ id: 'civil-alaska-pipeline-elevated', category: 'civil-engineering', question: 'Why are large sections of the Trans-Alaska Pipeline elevated above the ground?', answer: 'To avoid thawing permafrost.', choices: ['To avoid thawing permafrost.', 'To improve aesthetics.', 'To reduce wind resistance.', 'To allow larger trucks underneath.'] },
+
+{ id: 'civil-alaska-earthquake-design', category: 'civil-engineering', question: 'Which natural hazard heavily influences structural design standards in Alaska?', answer: 'Earthquakes.', choices: ['Tornadoes.', 'Earthquakes.', 'Hurricanes.', 'Wildfires.'] },
+
+{ id: 'civil-alaska-1964', category: 'civil-engineering', question: 'What major event transformed seismic engineering practices in Alaska?', answer: 'The 1964 Great Alaska Earthquake.', choices: ['The 1964 Great Alaska Earthquake.', 'The 1912 Novarupta eruption.', 'The 1989 Exxon Valdez spill.', 'The 2002 Denali wildfire.'] },
+
+{ id: 'civil-alaska-liquefaction', category: 'civil-engineering', question: 'During earthquakes, what process causes saturated soils to temporarily lose strength?', answer: 'Liquefaction.', choices: ['Erosion.', 'Liquefaction.', 'Sedimentation.', 'Compaction.'] },
+
+{ id: 'civil-alaska-dalton', category: 'civil-engineering', question: 'Which highway was originally built to support construction of the Trans-Alaska Pipeline?', answer: 'The Dalton Highway.', choices: ['The Dalton Highway.', 'The Glenn Highway.', 'The Alaska Highway.', 'The Sterling Highway.'] },
+
+{ id: 'civil-alaska-ice-roads', category: 'civil-engineering', question: 'What temporary transportation routes are sometimes used in remote Alaskan regions during winter?', answer: 'Ice roads.', choices: ['Ice roads.', 'Floating roads.', 'Magnetic roads.', 'Solar roads.'] },
+
+{ id: 'civil-alaska-scour', category: 'civil-engineering', question: 'What term describes erosion around bridge foundations caused by flowing water?', answer: 'Scour.', choices: ['Scour.', 'Settlement.', 'Heave.', 'Deflection.'] },
+
+{ id: 'civil-alaska-denali-fault', category: 'civil-engineering', question: 'Which major fault system crosses central Alaska?', answer: 'The Denali Fault.', choices: ['The Denali Fault.', 'The San Andreas Fault.', 'The New Madrid Fault.', 'The Hayward Fault.'] },
+
+{ id: 'civil-alaska-thermal-piles', category: 'civil-engineering', question: 'What devices are used to help keep permafrost frozen beneath structures?', answer: 'Thermosyphons.', choices: ['Thermosyphons.', 'Caissons.', 'Sheet piles.', 'Riprap.'] },
+
+{ id: 'civil-alaska-riprap', category: 'civil-engineering', question: 'What material is commonly placed along shorelines and embankments to reduce erosion?', answer: 'Riprap.', choices: ['Riprap.', 'Asphalt.', 'Rebar.', 'Plywood.'] },
+
+{ id: 'civil-alaska-bearing-capacity', category: 'civil-engineering', question: 'What geotechnical term describes the maximum load soil can safely support?', answer: 'Bearing capacity.', choices: ['Bearing capacity.', 'Elastic modulus.', 'Hydraulic gradient.', 'Flow rate.'] },
+
+{ id: 'civil-alaska-freeze-thaw', category: 'civil-engineering', question: 'Repeated cycles of freezing and thawing primarily affect what aspect of infrastructure?', answer: 'Pavement durability.', choices: ['Pavement durability.', 'Electrical voltage.', 'Bridge paint color.', 'Traffic signals.'] },
+
+{ id: 'civil-alaska-culvert', category: 'civil-engineering', question: 'What structure allows water to pass beneath a roadway?', answer: 'A culvert.', choices: ['A culvert.', 'A retaining wall.', 'A parapet.', 'A pier cap.'] },
+
+{ id: 'civil-alaska-seismic-joints', category: 'civil-engineering', question: 'Expansion joints in bridges help accommodate what movement?', answer: 'Thermal expansion and seismic movement.', choices: ['Thermal expansion and seismic movement.', 'Only vehicle loads.', 'Only snow accumulation.', 'Wind noise.'] },
+
+{ id: 'civil-alaska-remote-construction', category: 'civil-engineering', question: 'One of the biggest challenges of construction in rural Alaska is:', answer: 'Transporting materials to remote sites.', choices: ['Transporting materials to remote sites.', 'Finding limestone.', 'Lack of daylight year-round.', 'Too many toll roads.'] },
+
+{ id: 'civil-alaska-snow-load', category: 'civil-engineering', question: 'Roofs in many parts of Alaska must be designed for high levels of what?', answer: 'Snow load.', choices: ['Snow load.', 'Hail load.', 'Ash load.', 'Sand load.'] },
+
+{ id: 'civil-alaska-glacial-silt', category: 'civil-engineering', question: 'Fine sediment produced by glaciers is commonly called:', answer: 'Glacial silt.', choices: ['Glacial silt.', 'Peat.', 'Loess.', 'Tillite.'] },
+
+{ id: 'civil-alaska-sheet-pile', category: 'civil-engineering', question: 'What type of retaining system uses interlocking steel sections driven into the ground?', answer: 'Sheet piling.', choices: ['Sheet piling.', 'Gabions.', 'Trusses.', 'Tie beams.'] },
+
+{ id: 'civil-alaska-active-layer', category: 'civil-engineering', question: 'What is the name of the top layer of soil above permafrost that thaws each summer?', answer: 'The active layer.', choices: ['The active layer.', 'The caprock.', 'The aquifer.', 'The overburden.'] },
+
+{ id: 'civil-alaska-bridge-inspection', category: 'civil-engineering', question: 'What is a primary purpose of routine bridge inspections?', answer: 'Identifying structural deterioration.', choices: ['Identifying structural deterioration.', 'Increasing speed limits.', 'Changing paint colors.', 'Reducing toll costs.'] },
+
+{ id: 'civil-alaska-embankment', category: 'civil-engineering', question: 'Raised sections of earth supporting a roadway are called:', answer: 'Embankments.', choices: ['Embankments.', 'Abutments.', 'Lintels.', 'Aprons.'] },
+
+{ id: 'civil-alaska-denali-pipeline', category: 'civil-engineering', question: 'The Trans-Alaska Pipeline crosses approximately how many mountain ranges?', answer: 'Three major mountain ranges.', choices: ['Three major mountain ranges.', 'One mountain range.', 'Five mountain ranges.', 'Seven mountain ranges.'] },
+
+{ id: 'civil-alaska-abutment', category: 'civil-engineering', question: 'What bridge component supports the ends of the bridge span?', answer: 'The abutment.', choices: ['The abutment.', 'The girder.', 'The deck.', 'The parapet.'] },
+
+{ id: 'civil-alaska-runoff', category: 'civil-engineering', question: 'Spring snowmelt most significantly increases what concern for engineers?', answer: 'Stormwater runoff.', choices: ['Stormwater runoff.', 'Traffic congestion.', 'Air pollution.', 'Noise complaints.'] },
+
+{ id: 'civil-alaska-geotech', category: 'civil-engineering', question: 'Which branch of civil engineering focuses on soil and foundation behavior?', answer: 'Geotechnical engineering.', choices: ['Geotechnical engineering.', 'Environmental engineering.', 'Transportation engineering.', 'Structural drafting.'] },
+
+{ id: 'civil-alaska-surveying', category: 'civil-engineering', question: 'What profession is responsible for establishing precise property boundaries and site measurements?', answer: 'Land surveying.', choices: ['Land surveying.', 'Architecture.', 'Urban forestry.', 'Meteorology.'] },
+{ id: 'civil-kenai-sterling-highway', category: 'civil-engineering', question: 'Which major highway serves as the primary transportation corridor through much of the Kenai Peninsula?', answer: 'The Sterling Highway.', choices: ['The Sterling Highway.', 'The Dalton Highway.', 'The Richardson Highway.', 'The Glenn Highway.'] },
+
+{ id: 'civil-kenai-seward-highway', category: 'civil-engineering', question: 'What highway connects Anchorage to the Kenai Peninsula via the Turnagain Arm?', answer: 'The Seward Highway.', choices: ['The Seward Highway.', 'The Parks Highway.', 'The Elliott Highway.', 'The Alaska Highway.'] },
+
+{ id: 'civil-kenai-moose-river', category: 'civil-engineering', question: 'The Sterling Highway crosses the Kenai River near Soldotna using what type of infrastructure?', answer: 'A bridge.', choices: ['A bridge.', 'A tunnel.', 'A ferry.', 'A causeway.'] },
+
+{ id: 'civil-kenai-earthquake', category: 'civil-engineering', question: 'What major natural hazard must engineers account for on the Kenai Peninsula?', answer: 'Earthquakes.', choices: ['Earthquakes.', 'Hurricanes.', 'Tornadoes.', 'Dust storms.'] },
+
+{ id: 'civil-kenai-tsunami', category: 'civil-engineering', question: 'Coastal communities such as Seward must consider what additional hazard in infrastructure planning?', answer: 'Tsunamis.', choices: ['Tsunamis.', 'Wildfires.', 'Sinkholes.', 'Volcanic lava flows.'] },
+
+{ id: 'civil-kenai-seward-1964', category: 'civil-engineering', question: 'Which Kenai Peninsula community suffered major damage from the 1964 Great Alaska Earthquake and tsunami?', answer: 'Seward.', choices: ['Seward.', 'Soldotna.', 'Cooper Landing.', 'Ninilchik.'] },
+
+{ id: 'civil-kenai-turnagain', category: 'civil-engineering', question: 'The highway route into the Kenai Peninsula follows which body of water known for extreme tides?', answer: 'Turnagain Arm.', choices: ['Turnagain Arm.', 'Cook Inlet.', 'Prince William Sound.', 'Kachemak Bay.'] },
+
+{ id: 'civil-kenai-cook-inlet', category: 'civil-engineering', question: 'What body of water separates much of the Kenai Peninsula from mainland Alaska?', answer: 'Cook Inlet.', choices: ['Cook Inlet.', 'Bristol Bay.', 'Norton Sound.', 'Yakutat Bay.'] },
+
+{ id: 'civil-kenai-frost-heave', category: 'civil-engineering', question: 'What cold-weather process commonly damages roads on the Kenai Peninsula?', answer: 'Frost heave.', choices: ['Frost heave.', 'Desertification.', 'Salt intrusion.', 'Karst collapse.'] },
+
+{ id: 'civil-kenai-drainage', category: 'civil-engineering', question: 'Proper drainage along Kenai Peninsula roads primarily helps reduce:', answer: 'Freeze-thaw pavement damage.', choices: ['Freeze-thaw pavement damage.', 'Hail damage.', 'Traffic congestion.', 'Noise pollution.'] },
+
+{ id: 'civil-kenai-russian-river', category: 'civil-engineering', question: 'Near which famous salmon fishing destination do engineers maintain transportation infrastructure on the Sterling Highway?', answer: 'The Russian River.', choices: ['The Russian River.', 'The Yukon River.', 'The Chena River.', 'The Kuskokwim River.'] },
+
+{ id: 'civil-kenai-cooper-landing', category: 'civil-engineering', question: 'Which Kenai Peninsula community has been the focus of major Sterling Highway improvement projects?', answer: 'Cooper Landing.', choices: ['Cooper Landing.', 'Hope.', 'Homer.', 'Seldovia.'] },
+
+{ id: 'civil-kenai-soldotna', category: 'civil-engineering', question: 'Which city is often considered the transportation hub of the central Kenai Peninsula?', answer: 'Soldotna.', choices: ['Soldotna.', 'Seward.', 'Whittier.', 'Valdez.'] },
+
+{ id: 'civil-kenai-homer-spit', category: 'civil-engineering', question: 'What narrow landform extending into Kachemak Bay presents unique engineering challenges in Homer?', answer: 'The Homer Spit.', choices: ['The Homer Spit.', 'The Kenai Flats.', 'The Harding Moraine.', 'The Anchor Delta.'] },
+
+{ id: 'civil-kenai-spit-hazard', category: 'civil-engineering', question: 'Infrastructure on the Homer Spit is especially vulnerable to:', answer: 'Storm surge and tsunami impacts.', choices: ['Storm surge and tsunami impacts.', 'Landslides from volcanoes.', 'Dust storms.', 'Avalanches.'] },
+
+{ id: 'civil-kenai-airport', category: 'civil-engineering', question: 'Which Kenai Peninsula city has a commercial airport that supports regional transportation needs?', answer: 'Kenai.', choices: ['Kenai.', 'Moose Pass.', 'Anchor Point.', 'Nikolaevsk.'] },
+
+{ id: 'civil-kenai-bridge-inspection', category: 'civil-engineering', question: 'Regular inspections of Kenai Peninsula bridges primarily help identify:', answer: 'Structural deterioration.', choices: ['Structural deterioration.', 'Wildlife migration.', 'Tourism trends.', 'Weather forecasts.'] },
+
+{ id: 'civil-kenai-snow-load', category: 'civil-engineering', question: 'Buildings on the Kenai Peninsula must often be designed to withstand significant:', answer: 'Snow loads.', choices: ['Snow loads.', 'Sand loads.', 'Ash loads.', 'Hurricane loads.'] },
+
+{ id: 'civil-kenai-seldovia', category: 'civil-engineering', question: 'Which Kenai Peninsula community is inaccessible by road from the main highway system?', answer: 'Seldovia.', choices: ['Seldovia.', 'Soldotna.', 'Kenai.', 'Nikiski.'] },
+
+{ id: 'civil-kenai-logistics', category: 'civil-engineering', question: 'Supplying construction materials to communities like Seldovia often requires:', answer: 'Marine or air transportation.', choices: ['Marine or air transportation.', 'Subway systems.', 'Interstate trucking only.', 'Pipeline delivery.'] },
+
+{ id: 'civil-kenai-avalanche', category: 'civil-engineering', question: 'Mountain corridors near Seward require engineers to account for what seasonal hazard?', answer: 'Avalanches.', choices: ['Avalanches.', 'Dust devils.', 'Tornadoes.', 'Locust swarms.'] },
+
+{ id: 'civil-kenai-kenai-river', category: 'civil-engineering', question: 'The Kenai River is particularly important to engineers because transportation infrastructure must balance access with:', answer: 'Protection of salmon habitat.', choices: ['Protection of salmon habitat.', 'Oil refining.', 'Military operations.', 'Mining access.'] },
+
+{ id: 'civil-kenai-culvert-fish', category: 'civil-engineering', question: 'Modern culvert designs on the Kenai Peninsula often incorporate what environmental consideration?', answer: 'Fish passage.', choices: ['Fish passage.', 'Solar panels.', 'Bicycle lanes.', 'Snow fences.'] },
+
+{ id: 'civil-kenai-erosion', category: 'civil-engineering', question: 'Along the Kenai River, engineers frequently address problems related to:', answer: 'Bank erosion.', choices: ['Bank erosion.', 'Desert erosion.', 'Glacier calving.', 'Volcanic ash.'] },
+
+{ id: 'civil-kenai-kachemak', category: 'civil-engineering', question: 'Homer sits along which bay on the southern Kenai Peninsula?', answer: 'Kachemak Bay.', choices: ['Kachemak Bay.', 'Resurrection Bay.', 'Bristol Bay.', 'Yakutat Bay.'] },
+
+{ id: 'civil-kenai-resurrection', category: 'civil-engineering', question: 'Seward is located at the head of which bay?', answer: 'Resurrection Bay.', choices: ['Resurrection Bay.', 'Kachemak Bay.', 'Prince William Sound.', 'Cook Inlet.'] },
+
+{ id: 'civil-kenai-wetlands', category: 'civil-engineering', question: 'Projects on the Kenai Peninsula often require additional permitting due to the presence of:', answer: 'Wetlands.', choices: ['Wetlands.', 'Deserts.', 'Coral reefs.', 'Prairies.'] },
+
+{ id: 'civil-kenai-nikiski', category: 'civil-engineering', question: 'Nikiski is historically associated with which type of industrial infrastructure?', answer: 'Oil and gas facilities.', choices: ['Oil and gas facilities.', 'Steel mills.', 'Automobile factories.', 'Nuclear power plants.'] },
+
+{ id: 'civil-kenai-habitat', category: 'civil-engineering', question: 'Civil engineers working near salmon streams frequently coordinate with agencies focused on:', answer: 'Habitat protection.', choices: ['Habitat protection.', 'Space exploration.', 'Railroad privatization.', 'Currency exchange.'] },
+
+{ id: 'civil-kenai-tourism', category: 'civil-engineering', question: 'During summer, transportation infrastructure on the Kenai Peninsula experiences increased demand due largely to:', answer: 'Tourism and fishing activity.', choices: ['Tourism and fishing activity.', 'College football games.', 'Manufacturing exports.', 'International shipping traffic.'] },
+{ id: 'frankenstein-player-character', category: 'video-games', question: 'In Mary Shelley\'s original story, who creates Frankenstein\'s monster?', answer: 'Victor Frankenstein.', choices: ['Victor Frankenstein.', 'Henry Jekyll.', 'Dracula.', 'Dr. Moreau.'] },
+
+{ id: 'frankenstein-boris-karloff', category: 'video-games', question: 'Which actor famously portrayed Frankenstein\'s monster in the 1931 film?', answer: 'Boris Karloff.', choices: ['Boris Karloff.', 'Bela Lugosi.', 'Lon Chaney Jr.', 'Vincent Price.'] },
+
+{ id: 'frankenstein-author', category: 'video-games', question: 'Who wrote the novel Frankenstein?', answer: 'Mary Shelley.', choices: ['Mary Shelley.', 'Jane Austen.', 'Emily Brontë.', 'Bram Stoker.'] },
+
+{ id: 'frankenstein-subtitle', category: 'video-games', question: 'What is the subtitle of Mary Shelley\'s Frankenstein?', answer: 'The Modern Prometheus.', choices: ['The Modern Prometheus.', 'The Living Dead.', 'The Electric Man.', 'The Last Alchemist.'] },
+
+{ id: 'frankenstein-setting', category: 'video-games', question: 'Victor Frankenstein was a student of what field?', answer: 'Natural philosophy and science.', choices: ['Natural philosophy and science.', 'Law.', 'Astronomy.', 'Architecture.'] },
+
+{ id: 'frankenstein-switzerland', category: 'video-games', question: 'In the novel, Victor Frankenstein is originally from which country?', answer: 'Switzerland.', choices: ['Switzerland.', 'Germany.', 'England.', 'France.'] },
+
+{ id: 'frankenstein-igor', category: 'video-games', question: 'True or False: Igor appears in Mary Shelley\'s original novel.', answer: 'False.', choices: ['True.', 'False.', 'Only in the sequel.', 'Only in the stage play.'] },
+
+{ id: 'frankenstein-monster-name', category: 'video-games', question: 'What is the monster\'s actual name in the original novel?', answer: 'He has no name.', choices: ['He has no name.', 'Adam.', 'Igor.', 'Henry.'] },
+
+{ id: 'frankenstein-arctic', category: 'video-games', question: 'The novel begins and ends in what icy region?', answer: 'The Arctic.', choices: ['The Arctic.', 'Antarctica.', 'Siberia.', 'Greenland.'] },
+
+{ id: 'frankenstein-lightning', category: 'video-games', question: 'What force is commonly associated with bringing Frankenstein\'s monster to life in popular culture?', answer: 'Lightning.', choices: ['Lightning.', 'Moonlight.', 'Fire.', 'Steam.'] },
+
+{ id: 'frankenstein-castlevania', category: 'video-games', question: 'Frankenstein\'s monster appears as an enemy in which famous Konami series?', answer: 'Castlevania.', choices: ['Castlevania.', 'Metal Gear.', 'Contra.', 'Silent Hill.'] },
+
+{ id: 'frankenstein-darkstalkers', category: 'video-games', question: 'Which Darkstalkers character is inspired by Frankenstein\'s monster?', answer: 'Victor.', choices: ['Victor.', 'Demitri.', 'Felicia.', 'Morrigan.'] },
+
+{ id: 'frankenstein-monster-strength', category: 'video-games', question: 'Frankenstein\'s monster is typically depicted as having extraordinary:', answer: 'Strength.', choices: ['Strength.', 'Speed.', 'Telepathy.', 'Invisibility.'] },
+
+{ id: 'frankenstein-revenge', category: 'video-games', question: 'What motivates the monster after Victor rejects him?', answer: 'Revenge and loneliness.', choices: ['Revenge and loneliness.', 'Greed.', 'Curiosity.', 'Fame.'] },
+
+{ id: 'frankenstein-companion', category: 'video-games', question: 'What does the monster ask Victor to create?', answer: 'A companion.', choices: ['A companion.', 'A castle.', 'A laboratory.', 'A weapon.'] },
+
+{ id: 'frankenstein-destruction', category: 'video-games', question: 'What does Victor do to the unfinished companion?', answer: 'Destroys it.', choices: ['Destroys it.', 'Activates it.', 'Sells it.', 'Hides it underground.'] },
+
+{ id: 'frankenstein-walton', category: 'video-games', question: 'Which explorer records Victor Frankenstein\'s story?', answer: 'Robert Walton.', choices: ['Robert Walton.', 'Jonathan Harker.', 'Captain Nemo.', 'Ishmael.'] },
+
+{ id: 'frankenstein-education', category: 'video-games', question: 'How does the monster learn language and human behavior?', answer: 'By secretly observing a family.', choices: ['By secretly observing a family.', 'From Victor.', 'At school.', 'From books alone.'] },
+
+{ id: 'frankenstein-video-game-boss', category: 'video-games', question: 'In many video games, Frankenstein\'s monster is commonly featured as what?', answer: 'A boss enemy.', choices: ['A boss enemy.', 'A merchant.', 'A tutorial guide.', 'A racer.'] },
+
+{ id: 'frankenstein-horror-genre', category: 'video-games', question: 'Frankenstein is most closely associated with which genre?', answer: 'Horror.', choices: ['Horror.', 'Western.', 'Romance.', 'Sports.'] },
+
+{ id: 'frankenstein-villain', category: 'video-games', question: 'Who is often considered the true tragic figure of the story?', answer: 'The monster.', choices: ['The monster.', 'Igor.', 'Elizabeth.', 'Robert Walton.'] },
+
+{ id: 'frankenstein-elizabeth', category: 'video-games', question: 'What is the name of Victor Frankenstein\'s fiancée?', answer: 'Elizabeth.', choices: ['Elizabeth.', 'Catherine.', 'Margaret.', 'Lucy.'] },
+
+{ id: 'frankenstein-setting-era', category: 'video-games', question: 'Frankenstein was originally published during which century?', answer: 'The 19th century.', choices: ['The 19th century.', 'The 17th century.', 'The 18th century.', 'The 20th century.'] },
+
+{ id: 'frankenstein-electricity', category: 'video-games', question: 'The idea of reanimating life through electricity is linked to what scientific concept?', answer: 'Galvanism.', choices: ['Galvanism.', 'Alchemy.', 'Fusion.', 'Photosynthesis.'] },
+
+{ id: 'frankenstein-theme', category: 'video-games', question: 'A major theme of Frankenstein is the danger of:', answer: 'Unchecked ambition.', choices: ['Unchecked ambition.', 'Travel.', 'Friendship.', 'Competition.'] },
+
+{ id: 'frankenstein-creature-size', category: 'video-games', question: 'Victor intentionally creates the creature at approximately what height?', answer: 'About 8 feet tall.', choices: ['About 8 feet tall.', 'About 5 feet tall.', 'About 10 feet tall.', 'About 12 feet tall.'] },
+
+{ id: 'frankenstein-modern-games', category: 'video-games', question: 'Frankenstein-inspired enemies are especially common in which type of games?', answer: 'Horror games.', choices: ['Horror games.', 'Golf games.', 'Flight simulators.', 'Puzzle word games.'] },
+
+{ id: 'frankenstein-sympathy', category: 'video-games', question: 'Despite his appearance, the monster initially desires:', answer: 'Acceptance and companionship.', choices: ['Acceptance and companionship.', 'Wealth and power.', 'Military conquest.', 'Immortality.'] },
+
+{ id: 'frankenstein-legacy', category: 'video-games', question: 'Frankenstein is often considered one of the earliest examples of:', answer: 'Science fiction.', choices: ['Science fiction.', 'Cyberpunk.', 'Space opera.', 'Steampunk.'] },
+
+{ id: 'frankenstein-pop-culture', category: 'video-games', question: 'What misconception is common in popular culture?', answer: 'People call the monster "Frankenstein."', choices: ['People call the monster "Frankenstein."', 'Victor is a vampire.', 'Igor wrote the story.', 'The monster is invisible.'] },
+];
 })();
