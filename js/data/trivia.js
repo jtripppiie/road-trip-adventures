@@ -1,104 +1,32 @@
 /* Additional offline trivia data for Road Trip Adventures. */
 (function () {
-  window.RTA_TRIVIA_CATEGORIES = [
-    {
-      id: "nationalparks",
-      label: "National Parks",
-      emoji: "🏞️"
-    },
-    {
-      id: "alaska",
-      label: "Alaska",
-      emoji: "❄️"
-    },
-    {
-      id: "alaskarail",
-      label: "Alaska Rail",
-      emoji: "🚂"
-    },
-    {
-      id: "civil-engineering",
-      label: "Civil Engineering",
-      emoji: "🌉"
-    },
-    {
-      id: "weirdlaws",
-      label: "Weird Law Legends",
-      emoji: "⚖️"
-    },
-    {
-      id: "history",
-      label: "History Nerds",
-      emoji: "📜"
-    },
-    {
-      id: "general",
-      label: "General Trivia",
-      emoji: "💬"
-    },
-    {
-      id: "geography",
-      label: "Geography",
-      emoji: "🌍"
-    },
-    {
-      id: "animals",
-      label: "Animals",
-      emoji: "🐾"
-    },
-    {
-      id: "science",
-      label: "Science",
-      emoji: "🔬"
-    },
-    {
-      id: "technology",
-      label: "Technology",
-      emoji: "💻"
-    },
-    {
-      id: "math",
-      label: "Math",
-      emoji: "➗"
-    },
-    {
-      id: "food",
-      label: "Food",
-      emoji: "🍔"
-    },
-    {
-      id: "music",
-      label: "Music",
-      emoji: "🎵"
-    },
-    {
-      id: "movies",
-      label: "Movies",
-      emoji: "🎬"
-    },
-    {
-      id: "tv",
-      label: "TV",
-      emoji: "📺"
-    },
-    {
-      id: "sports",
-      label: "Sports Mix",
-      emoji: "🏅"
-    },
-    {
-      id: "decades",
-      label: "Decades",
-      emoji: "📼"
-    },
-    {
-      id: "video-games",
-      label: "Frankenstein & Games",
-      emoji: "🧟"
-    }
-  ];
+  function buildTriviaCategories(entries) {
+    return entries.map(([id, label, emoji]) => ({ id, label, emoji }));
+  }
 
-  window.RTA_TRIVIA_QUESTIONS = [
+  const triviaCategories = buildTriviaCategories([
+    ['nationalparks', 'National Parks', '🏞️'],
+    ['alaska', 'Alaska', '❄️'],
+    ['alaskarail', 'Alaska Rail', '🚂'],
+    ['civil-engineering', 'Civil Engineering', '🌉'],
+    ['weirdlaws', 'Weird Law Legends', '⚖️'],
+    ['history', 'History Nerds', '📜'],
+    ['general', 'General Trivia', '💬'],
+    ['geography', 'Geography', '🌍'],
+    ['animals', 'Animals', '🐾'],
+    ['science', 'Science', '🔬'],
+    ['technology', 'Technology', '💻'],
+    ['math', 'Math', '➗'],
+    ['food', 'Food', '🍔'],
+    ['music', 'Music', '🎵'],
+    ['movies', 'Movies', '🎬'],
+    ['tv', 'TV', '📺'],
+    ['sports', 'Sports Mix', '🏅'],
+    ['decades', 'Decades', '📼'],
+    ['video-games', 'Frankenstein & Games', '🧟'],
+  ]);
+
+  const triviaQuestions = [
     {
       id: "parks-acadia-state",
       category: "nationalparks",
@@ -7268,4 +7196,7 @@
       ]
     }
   ];
+
+  window.RTA_TRIVIA_CATEGORIES = triviaCategories;
+  window.RTA_TRIVIA_QUESTIONS = triviaQuestions;
 })();

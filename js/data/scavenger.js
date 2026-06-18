@@ -4,6 +4,10 @@
    Keep each id unique, lowercase, and hyphenated.
 */
 (function () {
+  function flattenSections(sections) {
+    return sections.flat();
+  }
+
   // Vehicles, Plates, And Road Gear
   const vehicleAndPlateItems = [
     // Vehicle Colors And Types
@@ -1778,11 +1782,15 @@
     },
   ];
 
-  window.RTA_SCAVENGER_ITEMS = vehicleAndPlateItems
-    .concat(signAndRouteItems)
-    .concat(placeAndServiceItems)
-    .concat(natureAndWeatherItems)
-    .concat(landmarkAndOddityItems);
+  const scavengerItems = flattenSections([
+    vehicleAndPlateItems,
+    signAndRouteItems,
+    placeAndServiceItems,
+    natureAndWeatherItems,
+    landmarkAndOddityItems,
+  ]);
+
+  window.RTA_SCAVENGER_ITEMS = scavengerItems;
 
   // Lightning Round Prompts
   window.RTA_LIGHTNING_ROUNDS = [
