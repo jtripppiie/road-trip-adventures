@@ -1,751 +1,7271 @@
 /* Additional offline trivia data for Road Trip Adventures. */
 (function () {
   window.RTA_TRIVIA_CATEGORIES = [
-    { id: 'nationalparks', label: 'National Parks', emoji: '🏞️' },
-    { id: 'alaska', label: 'Alaska', emoji: '❄️' },
-    { id: 'alaskarail', label: 'Alaska Rail', emoji: '🚂' },
-    { id: 'weirdlaws', label: 'Weird Law Legends', emoji: '⚖️' },
-    { id: 'history', label: 'History Nerds', emoji: '📜' },
-    { id: 'general', label: 'General Trivia', emoji: '💬' },
-    { id: 'movies', label: 'Movies', emoji: '🎬' },
-    { id: 'animals', label: 'Animals', emoji: '🐾' },
-    { id: 'technology', label: 'Technology', emoji: '💻' },
-    { id: 'sports', label: 'Sports Mix', emoji: '🏅' },
-    { id: 'food', label: 'Food', emoji: '🍔' },
-    { id: 'math', label: 'Math', emoji: '➗' },
-    { id: 'science', label: 'Science', emoji: '🔬' },
-    { id: 'music', label: 'Music', emoji: '🎵' },
-    { id: 'tv', label: 'TV', emoji: '📺' },
-    { id: 'geography', label: 'Geography', emoji: '🌍' },
-    { id: 'decades', label: 'Decades', emoji: '📼' },
+    {
+      id: "nationalparks",
+      label: "National Parks",
+      emoji: "🏞️"
+    },
+    {
+      id: "alaska",
+      label: "Alaska",
+      emoji: "❄️"
+    },
+    {
+      id: "alaskarail",
+      label: "Alaska Rail",
+      emoji: "🚂"
+    },
+    {
+      id: "civil-engineering",
+      label: "Civil Engineering",
+      emoji: "🌉"
+    },
+    {
+      id: "weirdlaws",
+      label: "Weird Law Legends",
+      emoji: "⚖️"
+    },
+    {
+      id: "history",
+      label: "History Nerds",
+      emoji: "📜"
+    },
+    {
+      id: "general",
+      label: "General Trivia",
+      emoji: "💬"
+    },
+    {
+      id: "geography",
+      label: "Geography",
+      emoji: "🌍"
+    },
+    {
+      id: "animals",
+      label: "Animals",
+      emoji: "🐾"
+    },
+    {
+      id: "science",
+      label: "Science",
+      emoji: "🔬"
+    },
+    {
+      id: "technology",
+      label: "Technology",
+      emoji: "💻"
+    },
+    {
+      id: "math",
+      label: "Math",
+      emoji: "➗"
+    },
+    {
+      id: "food",
+      label: "Food",
+      emoji: "🍔"
+    },
+    {
+      id: "music",
+      label: "Music",
+      emoji: "🎵"
+    },
+    {
+      id: "movies",
+      label: "Movies",
+      emoji: "🎬"
+    },
+    {
+      id: "tv",
+      label: "TV",
+      emoji: "📺"
+    },
+    {
+      id: "sports",
+      label: "Sports Mix",
+      emoji: "🏅"
+    },
+    {
+      id: "decades",
+      label: "Decades",
+      emoji: "📼"
+    },
+    {
+      id: "video-games",
+      label: "Frankenstein & Games",
+      emoji: "🧟"
+    }
   ];
 
   window.RTA_TRIVIA_QUESTIONS = [
-    { id: 'parks-acadia-state', category: 'nationalparks', question: 'Which U.S. state is home to Acadia National Park?', answer: 'Maine.', choices: ['Maine.', 'Vermont.', 'Oregon.', 'Michigan.'] },
-    { id: 'parks-grand-canyon-river', category: 'nationalparks', question: 'Which river carved the Grand Canyon?', answer: 'The Colorado River.', choices: ['The Colorado River.', 'The Columbia River.', 'The Rio Grande.', 'The Snake River.'] },
-    { id: 'parks-yellowstone-first', category: 'nationalparks', question: 'Which national park is often called the first national park in the world?', answer: 'Yellowstone National Park.', choices: ['Yellowstone National Park.', 'Yosemite National Park.', 'Grand Canyon National Park.', 'Zion National Park.'] },
-    { id: 'parks-everglades-state', category: 'nationalparks', question: 'Everglades National Park is in which state?', answer: 'Florida.', choices: ['Florida.', 'Louisiana.', 'Georgia.', 'South Carolina.'] },
-    { id: 'parks-yosemite-waterfall', category: 'nationalparks', question: 'Which California park is famous for Yosemite Falls and El Capitan?', answer: 'Yosemite National Park.', choices: ['Yosemite National Park.', 'Joshua Tree National Park.', 'Sequoia National Park.', 'Death Valley National Park.'] },
-    { id: 'parks-denali-mountain', category: 'nationalparks', question: 'Denali National Park is named for what major natural feature?', answer: 'North America\'s tallest mountain.', choices: ['North America\'s tallest mountain.', 'A giant glacier lake.', 'A volcanic island.', 'A desert canyon.'] },
-    { id: 'parks-zion-state', category: 'nationalparks', question: 'Zion National Park is in which state?', answer: 'Utah.', choices: ['Utah.', 'Arizona.', 'Colorado.', 'Nevada.'] },
-    { id: 'parks-dry-tortugas-access', category: 'nationalparks', question: 'Dry Tortugas National Park is unusual because most visitors arrive by what?', answer: 'Boat or seaplane.', choices: ['Boat or seaplane.', 'Subway.', 'Cable car.', 'Desert shuttle.'] },
-    { id: 'parks-big-bend-state', category: 'nationalparks', question: 'Big Bend National Park is located in which state?', answer: 'Texas.', choices: ['Texas.', 'Arizona.', 'New Mexico.', 'Nevada.'] },
-{ id: 'parks-glacier-road', category: 'nationalparks', question: 'What famous scenic road runs through Glacier National Park?', answer: 'Going-to-the-Sun Road.', choices: ['Going-to-the-Sun Road.', 'Skyline Drive.', 'Trail Ridge Road.', 'Needles Highway.'] },
-{ id: 'parks-joshua-tree-state', category: 'nationalparks', question: 'Joshua Tree National Park is located in which state?', answer: 'California.', choices: ['California.', 'Arizona.', 'Nevada.', 'Utah.'] },
-{ id: 'parks-great-smoky-states', category: 'nationalparks', question: 'Great Smoky Mountains National Park lies between which two states?', answer: 'Tennessee and North Carolina.', choices: ['Tennessee and North Carolina.', 'Virginia and Kentucky.', 'Georgia and Florida.', 'West Virginia and Virginia.'] },
-{ id: 'parks-redwood-tallest', category: 'nationalparks', question: 'Redwood National Park is famous for what natural record?', answer: 'The tallest trees on Earth.', choices: ['The tallest trees on Earth.', 'The deepest canyon.', 'The oldest volcano.', 'The largest cave.'] },
-{ id: 'parks-canyonlands-state', category: 'nationalparks', question: 'Canyonlands National Park is located in which state?', answer: 'Utah.', choices: ['Utah.', 'Colorado.', 'Arizona.', 'Nevada.'] },
-{ id: 'parks-mesa-verde-famous', category: 'nationalparks', question: 'Mesa Verde National Park is famous for preserving what?', answer: 'Ancient cliff dwellings.', choices: ['Ancient cliff dwellings.', 'Geysers.', 'Waterfalls.', 'Sand dunes.'] },
-{ id: 'parks-hot-springs-state', category: 'nationalparks', question: 'Hot Springs National Park is located in which state?', answer: 'Arkansas.', choices: ['Arkansas.', 'Missouri.', 'Oklahoma.', 'Louisiana.'] },
-{ id: 'parks-kings-canyon-state', category: 'nationalparks', question: 'Kings Canyon National Park is located in which state?', answer: 'California.', choices: ['California.', 'Oregon.', 'Washington.', 'Idaho.'] },
-{ id: 'parks-lassen-volcanoes', category: 'nationalparks', question: 'Lassen Volcanic National Park is known for what feature?', answer: 'Active volcanic landscapes.', choices: ['Active volcanic landscapes.', 'Coral reefs.', 'Desert dunes.', 'Mangrove forests.'] },
-{ id: 'parks-white-sands-state', category: 'nationalparks', question: 'White Sands National Park is located in which state?', answer: 'New Mexico.', choices: ['New Mexico.', 'Texas.', 'Arizona.', 'Nevada.'] },
-{ id: 'parks-great-sand-dunes-state', category: 'nationalparks', question: 'Great Sand Dunes National Park is located in which state?', answer: 'Colorado.', choices: ['Colorado.', 'Utah.', 'Wyoming.', 'Montana.'] },
-{ id: 'parks-voyageurs-state', category: 'nationalparks', question: 'Voyageurs National Park is located in which state?', answer: 'Minnesota.', choices: ['Minnesota.', 'Wisconsin.', 'Michigan.', 'North Dakota.'] },
-{ id: 'parks-isle-royale-state', category: 'nationalparks', question: 'Isle Royale National Park is located in which state?', answer: 'Michigan.', choices: ['Michigan.', 'Minnesota.', 'Wisconsin.', 'Ohio.'] },
-{ id: 'parks-congaree-state', category: 'nationalparks', question: 'Congaree National Park is located in which state?', answer: 'South Carolina.', choices: ['South Carolina.', 'Georgia.', 'Florida.', 'North Carolina.'] },
-{ id: 'parks-guadalupe-peak', category: 'nationalparks', question: 'Guadalupe Mountains National Park contains the highest point in which state?', answer: 'Texas.', choices: ['Texas.', 'New Mexico.', 'Arizona.', 'Oklahoma.'] },
-{ id: 'parks-north-cascades-state', category: 'nationalparks', question: 'North Cascades National Park is located in which state?', answer: 'Washington.', choices: ['Washington.', 'Oregon.', 'Montana.', 'Idaho.'] },
-{ id: 'parks-rainier-mountain', category: 'nationalparks', question: 'Mount Rainier National Park is named after what?', answer: 'A massive active volcano.', choices: ['A massive active volcano.', 'A glacier lake.', 'A canyon.', 'A waterfall.'] },
-{ id: 'parks-sequoia-general-sherman', category: 'nationalparks', question: 'What famous tree can visitors see in Sequoia National Park?', answer: 'The General Sherman Tree.', choices: ['The General Sherman Tree.', 'The Liberty Tree.', 'The Pioneer Tree.', 'The Lincoln Redwood.'] },
-{ id: 'parks-yellowstone-animal', category: 'nationalparks', question: 'Yellowstone National Park is especially famous for protecting which large mammal?', answer: 'American bison.', choices: ['American bison.', 'Moose.', 'Mountain lions.', 'Black bears.'] },
-{ id: 'parks-grand-teton-state', category: 'nationalparks', question: 'Grand Teton National Park is located in which state?', answer: 'Wyoming.', choices: ['Wyoming.', 'Montana.', 'Colorado.', 'Utah.'] },
-{ id: 'parks-kenai-state', category: 'nationalparks', question: 'Kenai Fjords National Park is located in which state?', answer: 'Alaska.', choices: ['Alaska.', 'Washington.', 'Oregon.', 'Maine.'] },
-{ id: 'parks-exit-glacier', category: 'nationalparks', question: 'What famous glacier can visitors walk near in Kenai Fjords National Park?', answer: 'Exit Glacier.', choices: ['Exit Glacier.', 'Mendenhall Glacier.', 'Matanuska Glacier.', 'Columbia Glacier.'] },
-{ id: 'parks-katmai-bears-river', category: 'nationalparks', question: 'At Katmai National Park, bears are often photographed catching salmon at which falls?', answer: 'Brooks Falls.', choices: ['Brooks Falls.', 'Rainbow Falls.', 'Virginia Falls.', 'Twin Falls.'] },
-{ id: 'parks-arches-delicate', category: 'nationalparks', question: 'What famous arch appears on many Utah license plates?', answer: 'Delicate Arch.', choices: ['Delicate Arch.', 'Landscape Arch.', 'Double Arch.', 'Skyline Arch.'] },
-{ id: 'parks-bryce-rocks', category: 'nationalparks', question: 'Bryce Canyon National Park is famous for unusual rock formations called what?', answer: 'Hoodoos.', choices: ['Hoodoos.', 'Monoliths.', 'Buttes.', 'Torres.'] },
-{ id: 'parks-death-valley-lowest-elevation', category: 'nationalparks', question: 'Death Valley contains the lowest point in North America at approximately how many feet below sea level?', answer: 'About 282 feet below sea level.', choices: ['About 282 feet below sea level.', 'About 100 feet below sea level.', 'About 500 feet below sea level.', 'About 1,000 feet below sea level.'] },
-{ id: 'parks-everglades-manatee', category: 'nationalparks', question: 'Which gentle marine mammal can sometimes be found in Everglades National Park?', answer: 'Manatee.', choices: ['Manatee.', 'Seal.', 'Walrus.', 'Sea otter.'] },
-{ id: 'parks-glacier-name', category: 'nationalparks', question: 'Glacier National Park is often called the "Crown of what?"', answer: 'The Continent.', choices: ['The Continent.', 'The Rockies.', 'The West.', 'The Wilderness.'] },
-{ id: 'parks-yellowstone-old-faithful', category: 'nationalparks', question: 'What famous Yellowstone geyser erupts on a fairly predictable schedule?', answer: 'Old Faithful.', choices: ['Old Faithful.', 'Steamboat Geyser.', 'Castle Geyser.', 'Beehive Geyser.'] },
-     
-{ id: 'alaska-keyboard', category: 'alaska', question: 'Which U.S. state can be typed using one row of a standard QWERTY keyboard?', answer: 'Alaska.', choices: ['Alaska.', 'Texas.', 'Maine.', 'Ohio.'] },
-{ id: 'alaska-capital', category: 'alaska', question: 'What is the capital of Alaska?', answer: 'Juneau.', choices: ['Juneau.', 'Anchorage.', 'Fairbanks.', 'Sitka.'] },
-{ id: 'alaska-nickname', category: 'alaska', question: 'What is Alaska\'s state nickname?', answer: 'The Last Frontier.', choices: ['The Last Frontier.', 'The Evergreen State.', 'The Treasure State.', 'The North Star State.'] },
-{ id: 'alaska-largest-state', category: 'alaska', question: 'By land area, Alaska is the largest U.S. state. True or false?', answer: 'True.', choices: ['True.', 'False.'] },
-{ id: 'alaska-denali-height', category: 'alaska', question: 'Denali is best known for being what?', answer: 'The tallest mountain in North America.', choices: ['The tallest mountain in North America.', 'The deepest lake in the U.S.', 'The longest U.S. river.', 'The largest island in Hawaii.'] },
-{ id: 'alaska-aurora', category: 'alaska', question: 'The colorful lights often seen in Alaska night skies are called what?', answer: 'The aurora borealis.', choices: ['The aurora borealis.', 'The trade winds.', 'The equinox shadow.', 'The solar tide.'] },
-{ id: 'alaska-purchase-year', category: 'alaska', question: 'In what year did the United States purchase Alaska from Russia?', answer: '1867.', choices: ['1867.', '1776.', '1901.', '1945.'] },
-{ id: 'alaska-purchase-price', category: 'alaska', question: 'Approximately how much did the United States pay Russia for Alaska?', answer: '$7.2 million.', choices: ['$7.2 million.', '$72 million.', '$700,000.', '$27 million.'] },
-{ id: 'alaska-largest-city', category: 'alaska', question: 'What is the largest city in Alaska by population?', answer: 'Anchorage.', choices: ['Anchorage.', 'Juneau.', 'Fairbanks.', 'Sitka.'] },
-{ id: 'alaska-statehood', category: 'alaska', question: 'Alaska became the 49th U.S. state in what year?', answer: '1959.', choices: ['1959.', '1949.', '1965.', '1912.'] },
-{ id: 'alaska-russia-distance', category: 'alaska', question: 'At their closest point, Alaska and Russia are separated by about how many miles?', answer: 'About 55 miles.', choices: ['About 55 miles.', 'About 5 miles.', 'About 150 miles.', 'About 500 miles.'] },
-{ id: 'alaska-no-road-juneau', category: 'alaska', question: 'What is unusual about Alaska’s capital city, Juneau?', answer: 'It cannot be reached by road.', choices: ['It cannot be reached by road.', 'It has no airport.', 'It is north of the Arctic Ocean.', 'It is located on an island volcano.'] },
-{ id: 'alaska-midnight-sun', category: 'alaska', question: 'What is the term for the long summer days when the sun barely sets?', answer: 'The Midnight Sun.', choices: ['The Midnight Sun.', 'Polar Twilight.', 'Aurora Season.', 'The Long Dawn.'] },
-{ id: 'alaska-arctic-circle', category: 'alaska', question: 'What imaginary line crosses northern Alaska?', answer: 'The Arctic Circle.', choices: ['The Arctic Circle.', 'The Equator.', 'The Prime Meridian.', 'The Tropic of Cancer.'] },
-{ id: 'alaska-state-bird', category: 'alaska', question: 'What is Alaska’s state bird?', answer: 'Willow Ptarmigan.', choices: ['Willow Ptarmigan.', 'Bald Eagle.', 'Puffin.', 'Raven.'] },
-{ id: 'alaska-state-flower', category: 'alaska', question: 'What is Alaska’s state flower?', answer: 'Forget-me-not.', choices: ['Forget-me-not.', 'Rose.', 'Lupine.', 'Fireweed.'] },
-{ id: 'alaska-state-fish', category: 'alaska', question: 'What is Alaska’s official state fish?', answer: 'King Salmon.', choices: ['King Salmon.', 'Halibut.', 'Rainbow Trout.', 'Arctic Char.'] },
-{ id: 'alaska-state-mammal', category: 'alaska', question: 'What is Alaska’s official state land mammal?', answer: 'Moose.', choices: ['Moose.', 'Brown Bear.', 'Wolf.', 'Caribou.'] },
-{ id: 'alaska-highest-peak', category: 'alaska', question: 'What is the name of Alaska’s highest mountain?', answer: 'Denali.', choices: ['Denali.', 'Mount Foraker.', 'Mount St. Elias.', 'Mount Blackburn.'] },
-{ id: 'alaska-brown-bears', category: 'alaska', question: 'Alaska is home to approximately what percentage of the world’s brown bear population?', answer: 'About 30%.', choices: ['About 30%.', 'About 5%.', 'About 50%.', 'About 80%.'] },
-{ id: 'alaska-glacier-count', category: 'alaska', question: 'Approximately how many glaciers are found in Alaska?', answer: 'More than 25,000.', choices: ['More than 25,000.', 'About 500.', 'About 2,000.', 'About 10,000.'] },
-{ id: 'alaska-longest-day', category: 'alaska', question: 'Around the summer solstice, Anchorage experiences roughly how many hours of daylight?', answer: 'About 19 hours.', choices: ['About 19 hours.', 'About 12 hours.', 'About 15 hours.', 'About 24 hours.'] },
-{ id: 'alaska-iditarod', category: 'alaska', question: 'What famous sled dog race runs across Alaska each year?', answer: 'The Iditarod.', choices: ['The Iditarod.', 'The Yukon Quest.', 'The Iron Dog.', 'The Last Frontier Dash.'] },
-{ id: 'alaska-native-peoples', category: 'alaska', question: 'How many federally recognized Alaska Native tribes are there?', answer: 'More than 200.', choices: ['More than 200.', 'About 50.', 'About 100.', 'About 500.'] },
-{ id: 'alaska-fireweed', category: 'alaska', question: 'Which bright purple flower is often associated with Alaska summers?', answer: 'Fireweed.', choices: ['Fireweed.', 'Bluebell.', 'Lupine.', 'Foxglove.'] },
-{ id: 'alaska-bald-eagles', category: 'alaska', question: 'Alaska is home to one of the largest populations of which bird?', answer: 'Bald Eagles.', choices: ['Bald Eagles.', 'Penguins.', 'Flamingos.', 'Peacocks.'] },
-{ id: 'alaska-halibut', category: 'alaska', question: 'Which giant flatfish is a favorite catch in Alaska?', answer: 'Halibut.', choices: ['Halibut.', 'Tuna.', 'Mackerel.', 'Catfish.'] },
-{ id: 'alaska-gold-rush', category: 'alaska', question: 'Which precious metal brought many prospectors to Alaska in the late 1800s?', answer: 'Gold.', choices: ['Gold.', 'Silver.', 'Copper.', 'Platinum.'] },
-{ id: 'alaska-kodiak-bear', category: 'alaska', question: 'Kodiak Island is famous for which massive animal?', answer: 'Kodiak bears.', choices: ['Kodiak bears.', 'Bison.', 'Elk.', 'Wolverines.'] },
-{ id: 'alaska-marine-highway', category: 'alaska', question: 'What is the name of Alaska’s state ferry system?', answer: 'The Alaska Marine Highway.', choices: ['The Alaska Marine Highway.', 'The Glacier Express.', 'The Northern Passage.', 'The Arctic Connector.'] },
-{ id: 'alaska-mount-st-elias', category: 'alaska', question: 'Mount St. Elias sits on the border of Alaska and which country?', answer: 'Canada.', choices: ['Canada.', 'Russia.', 'Mexico.', 'Greenland.'] },
-{ id: 'alaska-arctic-animal', category: 'alaska', question: 'Which hoofed animal migrates in large herds across Alaska?', answer: 'Caribou.', choices: ['Caribou.', 'Bison.', 'Mountain goats.', 'Elk.'] },
-{ id: 'alaska-pipeline', category: 'alaska', question: 'What famous pipeline carries oil across much of Alaska?', answer: 'The Trans-Alaska Pipeline.', choices: ['The Trans-Alaska Pipeline.', 'The Yukon Pipeline.', 'The Northern Crude Line.', 'The Arctic Pipeline.'] },
-{ id: 'alaska-largest-national-park', category: 'alaska', question: 'What is the largest national park in Alaska?', answer: 'Wrangell–St. Elias National Park and Preserve.', choices: ['Wrangell–St. Elias National Park and Preserve.', 'Denali National Park.', 'Katmai National Park.', 'Kenai Fjords National Park.'] },
-{ id: 'alaska-fat-bear-week', category: 'alaska', question: 'What annual online competition celebrates Alaska bears preparing for winter?', answer: 'Fat Bear Week.', choices: ['Fat Bear Week.', 'Bear Olympics.', 'Salmon Season Showdown.', 'Grizzly Games.'] },
-{ id: 'alaska-northernmost-city', category: 'alaska', question: 'Utqiaġvik is famous for being what?', answer: 'The northernmost city in the United States.', choices: ['The northernmost city in the United States.', 'The oldest city in Alaska.', 'The largest city in Alaska.', 'The state capital.'] },
-{ id: 'alaskarail-main-cities', category: 'alaskarail', question: 'The Alaska Railroad is known for connecting which major Alaska cities?', answer: 'Seward, Anchorage, and Fairbanks.', choices: ['Seward, Anchorage, and Fairbanks.', 'Juneau, Nome, and Kodiak.', 'Sitka, Ketchikan, and Barrow.', 'Homer, Valdez, and Unalaska.'] },
-{ id: 'alaskarail-denali-park', category: 'alaskarail', question: 'Which famous national park can passengers reach by Alaska Railroad service?', answer: 'Denali National Park and Preserve.', choices: ['Denali National Park and Preserve.', 'Everglades National Park.', 'Acadia National Park.', 'Big Bend National Park.'] },
-{ id: 'alaskarail-viewing-cars', category: 'alaskarail', question: 'Why are dome cars popular on scenic train routes?', answer: 'They offer wide views of the landscape.', choices: ['They offer wide views of the landscape.', 'They make the train fly.', 'They store extra snow.', 'They replace the locomotive.'] },
-{ id: 'alaskarail-wildlife-watch', category: 'alaskarail', question: 'Which animal would be a realistic wildlife sighting on an Alaska rail trip?', answer: 'Moose.', choices: ['Moose.', 'Kangaroo.', 'Lemur.', 'Camel.'] },
-{ id: 'alaskarail-railroad-crossing', category: 'alaskarail', question: 'At railroad crossings, what should passengers look for as a train-safety clue?', answer: 'Lights, gates, and crossing signs.', choices: ['Lights, gates, and crossing signs.', 'Palm trees.', 'Basketball hoops.', 'Movie posters.'] },
-    { id: 'alaskarail-glacier-word', category: 'alaskarail', question: 'A glacier is best described as what?', answer: 'A large, slow-moving mass of ice.', choices: ['A large, slow-moving mass of ice.', 'A desert cactus.', 'A type of train ticket.', 'A warm ocean current.'] },
-    { id: 'alaskarail-aurora-name', category: 'alaskarail', question: 'What is another name for the northern lights seen in Alaska?', answer: 'Aurora borealis.', choices: ['Aurora borealis.', 'Solar eclipse.', 'Trade winds.', 'Sea breeze.'] },
-    { id: 'alaskarail-engineer-role', category: 'alaskarail', question: 'On a train, what does the engineer usually do?', answer: 'Operates the locomotive.', choices: ['Operates the locomotive.', 'Serves as the town mayor.', 'Builds the mountains.', 'Counts license plates.'] },
-    { id: 'alaskarail-conductor-role', category: 'alaskarail', question: 'On many passenger trains, what is a conductor responsible for?', answer: 'Helping manage passengers and train operations.', choices: ['Helping manage passengers and train operations.', 'Flying the train.', 'Painting glaciers.', 'Choosing every passenger’s lunch.'] },
-    { id: 'alaskarail-trestle', category: 'alaskarail', question: 'A railroad trestle is a type of what?', answer: 'Bridge.', choices: ['Bridge.', 'Tunnel.', 'Ticket.', 'Dining car.'] },
-    { id: 'alaskarail-spike', category: 'alaskarail', question: 'What is a railroad spike used for?', answer: 'Fastening rails or track parts in place.', choices: ['Fastening rails or track parts in place.', 'Measuring snowfall.', 'Cooking soup.', 'Cleaning windows.'] },
-    { id: 'alaskarail-snow-shed', category: 'alaskarail', question: 'In snowy mountain areas, a snow shed helps protect trains from what?', answer: 'Snow slides and avalanches.', choices: ['Snow slides and avalanches.', 'Mosquitoes.', 'Too much sunshine.', 'Radio commercials.'] },
-
-    { id: 'weirdlaws-arizona-donkey', category: 'weirdlaws', question: 'Which state is often linked to a strange old story about donkeys sleeping in bathtubs?', answer: 'Arizona.', choices: ['Arizona.', 'Texas.', 'Nevada.', 'Utah.'] },
-    { id: 'weirdlaws-alaska-bear-photo', category: 'weirdlaws', question: 'Which state is often linked to a strange rule about not waking a sleeping bear for a photo?', answer: 'Alaska.', choices: ['Alaska.', 'Montana.', 'Wyoming.', 'Idaho.'] },
-    { id: 'weirdlaws-hawaii-billboards', category: 'weirdlaws', question: 'Which U.S. state bans most roadside billboards?', answer: 'Hawaii.', choices: ['Hawaii.', 'California.', 'Florida.', 'Nevada.'] },
-{ id: 'weirdlaws-alabama-mustache', category: 'weirdlaws', question: 'Which state is often associated with a law against wearing a fake mustache that causes laughter in church?', answer: 'Alabama.', choices: ['Alabama.', 'Georgia.', 'Mississippi.', 'Louisiana.'] },
-{ id: 'weirdlaws-california-frog', category: 'weirdlaws', question: 'Which state reportedly says frogs that die during frog-jumping contests cannot be eaten?', answer: 'California.', choices: ['California.', 'Oregon.', 'Nevada.', 'Arizona.'] },
-{ id: 'weirdlaws-colorado-rocks', category: 'weirdlaws', question: 'Which state prohibits throwing rocks at cars?', answer: 'Colorado.', choices: ['Colorado.', 'Utah.', 'Wyoming.', 'Montana.'] },
-{ id: 'weirdlaws-connecticut-pickle', category: 'weirdlaws', question: 'Which state is famous for the claim that a pickle must bounce to officially be considered a pickle?', answer: 'Connecticut.', choices: ['Connecticut.', 'New York.', 'New Jersey.', 'Massachusetts.'] },
-{ id: 'weirdlaws-delaware-pants', category: 'weirdlaws', question: 'Which state reportedly had a rule against changing clothes in your car?', answer: 'Delaware.', choices: ['Delaware.', 'Maryland.', 'Pennsylvania.', 'New Jersey.'] },
-{ id: 'weirdlaws-florida-elephant', category: 'weirdlaws', question: 'Which state reportedly required circus elephants tied to parking meters to pay the meter fee?', answer: 'Florida.', choices: ['Florida.', 'Texas.', 'Georgia.', 'South Carolina.'] },
-{ id: 'weirdlaws-georgia-chicken', category: 'weirdlaws', question: 'Which state is associated with a law against eating fried chicken with a fork?', answer: 'Georgia.', choices: ['Georgia.', 'Kentucky.', 'Tennessee.', 'Alabama.'] },
-{ id: 'weirdlaws-idaho-cannibalism', category: 'weirdlaws', question: 'Which state specifically outlawed cannibalism except in extreme survival situations?', answer: 'Idaho.', choices: ['Idaho.', 'Montana.', 'Nevada.', 'Utah.'] },
-{ id: 'weirdlaws-indiana-pi', category: 'weirdlaws', question: 'Which state once considered legislation attempting to define pi?', answer: 'Indiana.', choices: ['Indiana.', 'Illinois.', 'Ohio.', 'Michigan.'] },
-{ id: 'weirdlaws-iowa-kiss', category: 'weirdlaws', question: 'Which state reportedly discouraged kisses lasting more than five minutes?', answer: 'Iowa.', choices: ['Iowa.', 'Nebraska.', 'Kansas.', 'Missouri.'] },
-{ id: 'weirdlaws-kansas-rabbits', category: 'weirdlaws', question: 'Which state reportedly prohibited catching fish with your bare hands?', answer: 'Kansas.', choices: ['Kansas.', 'Nebraska.', 'Oklahoma.', 'Missouri.'] },
-{ id: 'weirdlaws-kentucky-icecream', category: 'weirdlaws', question: 'Which state reportedly required people to bathe before attending public events?', answer: 'Kentucky.', choices: ['Kentucky.', 'Tennessee.', 'Virginia.', 'West Virginia.'] },
-{ id: 'weirdlaws-louisiana-gator', category: 'weirdlaws', question: 'Which state reportedly outlawed stealing someone else’s alligator?', answer: 'Louisiana.', choices: ['Louisiana.', 'Florida.', 'Texas.', 'Mississippi.'] },
-{ id: 'weirdlaws-maine-christmas', category: 'weirdlaws', question: 'Which state reportedly prohibited Christmas decorations before December 14?', answer: 'Maine.', choices: ['Maine.', 'Vermont.', 'New Hampshire.', 'Massachusetts.'] },
-{ id: 'weirdlaws-maryland-lions', category: 'weirdlaws', question: 'Which state reportedly made it illegal to bring a lion to the movies?', answer: 'Maryland.', choices: ['Maryland.', 'Virginia.', 'Delaware.', 'Pennsylvania.'] },
-{ id: 'weirdlaws-massachusetts-gorilla', category: 'weirdlaws', question: 'Which state reportedly prohibited taking a gorilla in the back seat of a car?', answer: 'Massachusetts.', choices: ['Massachusetts.', 'Rhode Island.', 'Connecticut.', 'New York.'] },
-{ id: 'weirdlaws-michigan-skunk', category: 'weirdlaws', question: 'Which state reportedly banned keeping a skunk as a pet without permission?', answer: 'Michigan.', choices: ['Michigan.', 'Wisconsin.', 'Minnesota.', 'Ohio.'] },
-{ id: 'weirdlaws-minnesota-duck', category: 'weirdlaws', question: 'Which state reportedly outlawed crossing state lines with a duck on your head?', answer: 'Minnesota.', choices: ['Minnesota.', 'North Dakota.', 'South Dakota.', 'Wisconsin.'] },
-{ id: 'weirdlaws-mississippi-horns', category: 'weirdlaws', question: 'Which state reportedly prohibited teaching others what polygamy is?', answer: 'Mississippi.', choices: ['Mississippi.', 'Alabama.', 'Arkansas.', 'Louisiana.'] },
-{ id: 'weirdlaws-missouri-bear', category: 'weirdlaws', question: 'Which state reportedly made it illegal to wrestle a bear?', answer: 'Missouri.', choices: ['Missouri.', 'Arkansas.', 'Kentucky.', 'Tennessee.'] },
-{ id: 'weirdlaws-montana-sheep', category: 'weirdlaws', question: 'Which state is famous for a bizarre rumor involving sheep in a truck?', answer: 'Montana.', choices: ['Montana.', 'Wyoming.', 'Idaho.', 'Colorado.'] },
-{ id: 'weirdlaws-nebraska-whale', category: 'weirdlaws', question: 'Which landlocked state reportedly made whale fishing illegal?', answer: 'Nebraska.', choices: ['Nebraska.', 'Kansas.', 'Iowa.', 'South Dakota.'] },
-{ id: 'weirdlaws-nevada-camel', category: 'weirdlaws', question: 'Which state is associated with unusual laws due to its Wild West history and once had roaming camels?', answer: 'Nevada.', choices: ['Nevada.', 'Arizona.', 'Utah.', 'New Mexico.'] },
-{ id: 'weirdlaws-newhampshire-seaweed', category: 'weirdlaws', question: 'Which state reportedly prohibited collecting seaweed at night?', answer: 'New Hampshire.', choices: ['New Hampshire.', 'Maine.', 'Massachusetts.', 'Rhode Island.'] },
-{ id: 'weirdlaws-newjersey-soup', category: 'weirdlaws', question: 'Which state reportedly made it illegal to slurp soup in public?', answer: 'New Jersey.', choices: ['New Jersey.', 'New York.', 'Pennsylvania.', 'Connecticut.'] },
-{ id: 'weirdlaws-newmexico-idiots', category: 'weirdlaws', question: 'Which state reportedly prohibited idiots from voting?', answer: 'New Mexico.', choices: ['New Mexico.', 'Arizona.', 'Texas.', 'Nevada.'] },
-{ id: 'weirdlaws-newyork-slippers', category: 'weirdlaws', question: 'Which state reportedly allowed people to walk backward only if they carried a lantern?', answer: 'New York.', choices: ['New York.', 'Massachusetts.', 'Pennsylvania.', 'New Jersey.'] },
-{ id: 'weirdlaws-northcarolina-bingo', category: 'weirdlaws', question: 'Which state reportedly limited how long bingo games could last?', answer: 'North Carolina.', choices: ['North Carolina.', 'South Carolina.', 'Virginia.', 'Georgia.'] },
-{ id: 'weirdlaws-northdakota-shoes', category: 'weirdlaws', question: 'Which state reportedly prohibited sleeping with your shoes on?', answer: 'North Dakota.', choices: ['North Dakota.', 'South Dakota.', 'Montana.', 'Minnesota.'] },
-{ id: 'weirdlaws-ohio-fish', category: 'weirdlaws', question: 'Which state reportedly prohibited getting a fish drunk?', answer: 'Ohio.', choices: ['Ohio.', 'Indiana.', 'Michigan.', 'Illinois.'] },
-{ id: 'weirdlaws-oklahoma-dogs', category: 'weirdlaws', question: 'Which state reportedly prohibited making ugly faces at dogs?', answer: 'Oklahoma.', choices: ['Oklahoma.', 'Texas.', 'Kansas.', 'Arkansas.'] },
-{ id: 'weirdlaws-oregon-boxing', category: 'weirdlaws', question: 'Which state reportedly prohibited boxing matches between kangaroos?', answer: 'Oregon.', choices: ['Oregon.', 'Washington.', 'California.', 'Nevada.'] },
-{ id: 'weirdlaws-pennsylvania-singing', category: 'weirdlaws', question: 'Which state reportedly required motorists to stop every mile at night to send off livestock with a flare?', answer: 'Pennsylvania.', choices: ['Pennsylvania.', 'Ohio.', 'West Virginia.', 'Maryland.'] },
-{ id: 'weirdlaws-rhodeisland-biting', category: 'weirdlaws', question: 'Which state reportedly prohibited biting off someone else’s limb?', answer: 'Rhode Island.', choices: ['Rhode Island.', 'Massachusetts.', 'Connecticut.', 'New York.'] },
-{ id: 'weirdlaws-southcarolina-horses', category: 'weirdlaws', question: 'Which state reportedly prohibited keeping horses in bathtubs?', answer: 'South Carolina.', choices: ['South Carolina.', 'Georgia.', 'North Carolina.', 'Virginia.'] },
-{ id: 'weirdlaws-southdakota-cheese', category: 'weirdlaws', question: 'Which state reportedly prohibited sleeping in a cheese factory?', answer: 'South Dakota.', choices: ['South Dakota.', 'North Dakota.', 'Wisconsin.', 'Minnesota.'] },
-{ id: 'weirdlaws-tennessee-skunk', category: 'weirdlaws', question: 'Which state reportedly prohibited sharing your Netflix password? Just kidding—which state reportedly banned skunks as pets?', answer: 'Tennessee.', choices: ['Tennessee.', 'Kentucky.', 'Virginia.', 'Arkansas.'] },
-{ id: 'weirdlaws-texas-crime', category: 'weirdlaws', question: 'Which state reportedly required criminals to give victims 24 hours notice before committing a crime?', answer: 'Texas.', choices: ['Texas.', 'Oklahoma.', 'Louisiana.', 'New Mexico.'] },
-{ id: 'weirdlaws-utah-violin', category: 'weirdlaws', question: 'Which state reportedly prohibited throwing violins in the street?', answer: 'Utah.', choices: ['Utah.', 'Nevada.', 'Colorado.', 'Idaho.'] },
-{ id: 'weirdlaws-vermont-whistle', category: 'weirdlaws', question: 'Which state reportedly prohibited whistling underwater?', answer: 'Vermont.', choices: ['Vermont.', 'Maine.', 'New Hampshire.', 'Massachusetts.'] },
-{ id: 'weirdlaws-virginia-tickle', category: 'weirdlaws', question: 'Which state reportedly prohibited tickling women?', answer: 'Virginia.', choices: ['Virginia.', 'Maryland.', 'North Carolina.', 'West Virginia.'] },
-    { id: 'history-dollar-bill', category: 'history', question: 'Which U.S. president appears on the one-dollar bill?', answer: 'George Washington.', choices: ['George Washington.', 'Abraham Lincoln.', 'Thomas Jefferson.', 'Theodore Roosevelt.'] },
-    { id: 'history-hundred-bill', category: 'history', question: 'Who is pictured on the U.S. hundred-dollar bill?', answer: 'Benjamin Franklin.', choices: ['Benjamin Franklin.', 'Alexander Hamilton.', 'Ulysses S. Grant.', 'John Adams.'] },
-    { id: 'history-two-dollar', category: 'history', question: 'Which president is pictured on the U.S. two-dollar bill?', answer: 'Thomas Jefferson.', choices: ['Thomas Jefferson.', 'James Madison.', 'Andrew Jackson.', 'John Quincy Adams.'] },
-    { id: 'history-earth-day-first', category: 'history', question: 'Earth Day was first celebrated in what year?', answer: '1970.', choices: ['1970.', '1962.', '1984.', '1991.'] },
-    { id: 'history-hiroshima', category: 'history', question: 'The first atomic bomb used in war was dropped on which Japanese city?', answer: 'Hiroshima.', choices: ['Hiroshima.', 'Nagasaki.', 'Tokyo.', 'Kyoto.'] },
-    { id: 'history-amelia-atlantic', category: 'history', question: 'Who was the first woman to fly solo across the Atlantic Ocean?', answer: 'Amelia Earhart.', choices: ['Amelia Earhart.', 'Bessie Coleman.', 'Sally Ride.', 'Jacqueline Cochran.'] },
-    { id: 'history-genghis-name', category: 'history', question: 'Temujin is better known by what historical name?', answer: 'Genghis Khan.', choices: ['Genghis Khan.', 'Kublai Khan.', 'Attila the Hun.', 'Tamerlane.'] },
-    { id: 'history-jfk-city', category: 'history', question: 'In which city was John F. Kennedy assassinated?', answer: 'Dallas.', choices: ['Dallas.', 'Austin.', 'Washington, D.C.', 'Boston.'] },
-
-    { id: 'general-area-51', category: 'general', question: 'Area 51 is located in which U.S. state?', answer: 'Nevada.', choices: ['Nevada.', 'New Mexico.', 'Arizona.', 'Utah.'] },
-    { id: 'general-stop-sign-shape', category: 'general', question: 'What shape is a standard stop sign?', answer: 'Octagon.', choices: ['Octagon.', 'Hexagon.', 'Diamond.', 'Circle.'] },
-    { id: 'general-lego-founded', category: 'general', question: 'The LEGO Group was founded in 1932. True or false?', answer: 'True.', choices: ['True.', 'False.'] },
-    { id: 'general-cynophobia', category: 'general', question: 'Cynophobia is the fear of what?', answer: 'Dogs.', choices: ['Dogs.', 'Heights.', 'Crowds.', 'Thunder.'] },
-    { id: 'general-jurassic-park-author', category: 'general', question: 'Who wrote Jurassic Park?', answer: 'Michael Crichton.', choices: ['Michael Crichton.', 'Stephen King.', 'John Grisham.', 'Ray Bradbury.'] },
-    { id: 'general-saffron', category: 'general', question: 'What is often called the world\'s most expensive spice by weight?', answer: 'Saffron.', choices: ['Saffron.', 'Cinnamon.', 'Paprika.', 'Nutmeg.'] },
-    { id: 'general-seconds-day', category: 'general', question: 'There are 86,400 seconds in a day. True or false?', answer: 'True.', choices: ['True.', 'False.'] },
-    { id: 'general-venus-rotation', category: 'general', question: 'Which planet rotates clockwise on its axis compared with most planets?', answer: 'Venus.', choices: ['Venus.', 'Mars.', 'Jupiter.', 'Mercury.'] },
-    { id: 'general-bond-code', category: 'general', question: 'What is James Bond\'s famous code number?', answer: '007.', choices: ['007.', '411.', '911.', '101.'] },
-    { id: 'general-muppets-creator', category: 'general', question: 'Jim Henson created which beloved cast of characters?', answer: 'The Muppets.', choices: ['The Muppets.', 'The Smurfs.', 'The Peanuts gang.', 'The Rugrats.'] },
-    { id: 'general-mona-lisa-museum', category: 'general', question: 'The Mona Lisa hangs in which museum?', answer: 'The Louvre.', choices: ['The Louvre.', 'The Prado.', 'The Met.', 'The Uffizi.'] },
-    { id: 'general-appalachian-trail-states', category: 'general', question: 'The Appalachian Trail crosses how many states?', answer: '14.', choices: ['14.', '9.', '20.', '6.'] },
-    { id: 'general-honey', category: 'general', question: 'What food is famous for staying edible for a very long time without spoiling?', answer: 'Honey.', choices: ['Honey.', 'Bread.', 'Milk.', 'Lettuce.'] },
-    { id: 'general-cloned-animal', category: 'general', question: 'What was the first mammal cloned from an adult cell?', answer: 'A sheep.', choices: ['A sheep.', 'A cat.', 'A cow.', 'A horse.'] },
-    { id: 'general-passport', category: 'general', question: 'What document is commonly required for international travel?', answer: 'A passport.', choices: ['A passport.', 'A library card.', 'A voter sticker.', 'A parking permit.'] },
-
-    { id: 'parks-arches-state', category: 'nationalparks', question: 'Arches National Park is located in which state?', answer: 'Utah.', choices: ['Utah.', 'Colorado.', 'Nevada.', 'Arizona.'] },
-    { id: 'parks-crater-lake-state', category: 'nationalparks', question: 'Crater Lake National Park is located in which state?', answer: 'Oregon.', choices: ['Oregon.', 'Washington.', 'Idaho.', 'Montana.'] },
-    { id: 'parks-bryce-state', category: 'nationalparks', question: 'Bryce Canyon National Park is located in which state?', answer: 'Utah.', choices: ['Utah.', 'Arizona.', 'Nevada.', 'Colorado.'] },
-    { id: 'parks-mammoth-cave-state', category: 'nationalparks', question: 'Mammoth Cave National Park is located in which state?', answer: 'Kentucky.', choices: ['Kentucky.', 'Tennessee.', 'Virginia.', 'Missouri.'] },
-    { id: 'parks-shenandoah-state', category: 'nationalparks', question: 'Shenandoah National Park is located in which state?', answer: 'Virginia.', choices: ['Virginia.', 'West Virginia.', 'North Carolina.', 'Pennsylvania.'] },
-    { id: 'parks-carlsbad-state', category: 'nationalparks', question: 'Carlsbad Caverns National Park is located in which state?', answer: 'New Mexico.', choices: ['New Mexico.', 'Texas.', 'Arizona.', 'Colorado.'] },
-    { id: 'parks-saguaro-state', category: 'nationalparks', question: 'Saguaro National Park is famous for which type of plant?', answer: 'Giant saguaro cacti.', choices: ['Giant saguaro cacti.', 'Joshua trees.', 'Redwood trees.', 'Bluebonnets.'] },
-    { id: 'parks-sequoia-trees', category: 'nationalparks', question: 'Sequoia National Park is best known for what?', answer: 'Giant sequoia trees.', choices: ['Giant sequoia trees.', 'Volcanoes.', 'Glaciers.', 'Sand dunes.'] },
-    { id: 'parks-olympic-ecosystems', category: 'nationalparks', question: 'Olympic National Park is famous because it contains beaches, mountains, and what else?', answer: 'Temperate rainforests.', choices: ['Temperate rainforests.', 'Coral reefs.', 'Prairies.', 'Mangrove swamps.'] },
-    { id: 'parks-great-smoky-visitors', category: 'nationalparks', question: 'Which national park is typically the most visited in the United States?', answer: 'Great Smoky Mountains National Park.', choices: ['Great Smoky Mountains National Park.', 'Yellowstone National Park.', 'Yosemite National Park.', 'Grand Canyon National Park.'] },
-    { id: 'parks-badlands-state', category: 'nationalparks', question: 'Badlands National Park is located in which state?', answer: 'South Dakota.', choices: ['South Dakota.', 'North Dakota.', 'Nebraska.', 'Wyoming.'] },
-    { id: 'parks-biscayne-state', category: 'nationalparks', question: 'Biscayne National Park is located in which state?', answer: 'Florida.', choices: ['Florida.', 'Georgia.', 'Louisiana.', 'South Carolina.'] },
-    { id: 'parks-cuyahoga-state', category: 'nationalparks', question: 'Cuyahoga Valley National Park is located in which state?', answer: 'Ohio.', choices: ['Ohio.', 'Indiana.', 'Michigan.', 'Pennsylvania.'] },
-    { id: 'parks-death-valley-hottest', category: 'nationalparks', question: 'Which national park is famous for being one of the hottest places on Earth?', answer: 'Death Valley National Park.', choices: ['Death Valley National Park.', 'Joshua Tree National Park.', 'Big Bend National Park.', 'Petrified Forest National Park.'] },
-    { id: 'parks-gateway-arch-state', category: 'nationalparks', question: 'Gateway Arch National Park is located in which state?', answer: 'Missouri.', choices: ['Missouri.', 'Illinois.', 'Kansas.', 'Arkansas.'] },
-    { id: 'parks-glacier-state', category: 'nationalparks', question: 'Glacier National Park is located in which state?', answer: 'Montana.', choices: ['Montana.', 'Wyoming.', 'Idaho.', 'Colorado.'] },
-    { id: 'parks-hawaii-volcanoes-state', category: 'nationalparks', question: 'Hawaiʻi Volcanoes National Park is located in which state?', answer: 'Hawaii.', choices: ['Hawaii.', 'California.', 'Alaska.', 'Florida.'] },
-    { id: 'parks-petrified-state', category: 'nationalparks', question: 'Petrified Forest National Park is located in which state?', answer: 'Arizona.', choices: ['Arizona.', 'New Mexico.', 'Nevada.', 'Utah.'] },
-    { id: 'parks-rocky-mountain-state', category: 'nationalparks', question: 'Rocky Mountain National Park is located in which state?', answer: 'Colorado.', choices: ['Colorado.', 'Montana.', 'Wyoming.', 'Idaho.'] },
-    { id: 'parks-wrangell-largest', category: 'nationalparks', question: 'What is the largest national park in the United States?', answer: 'Wrangell–St. Elias National Park and Preserve.', choices: ['Wrangell–St. Elias National Park and Preserve.', 'Yellowstone National Park.', 'Denali National Park.', 'Glacier National Park.'] },
-    { id: 'parks-yellowstone-geysers', category: 'nationalparks', question: 'Yellowstone National Park contains about half of the world’s active geysers. True or false?', answer: 'True.', choices: ['True.', 'False.'] },
-    { id: 'parks-grand-canyon-depth', category: 'nationalparks', question: 'About how deep is the Grand Canyon at its deepest point?', answer: 'About 1 mile deep.', choices: ['About 1 mile deep.', 'About 500 feet deep.', 'About 3 miles deep.', 'About 100 feet deep.'] },
-    { id: 'parks-joshua-tree-name', category: 'nationalparks', question: 'According to legend, who thought Joshua trees looked like a biblical figure raising his arms to the sky?', answer: 'Mormon settlers.', choices: ['Mormon settlers.', 'Spanish explorers.', 'Gold miners.', 'Native Hawaiian sailors.'] },
-    { id: 'parks-death-valley-lowest', category: 'nationalparks', question: 'Death Valley contains the lowest point in North America. What is it called?', answer: 'Badwater Basin.', choices: ['Badwater Basin.', 'Devil’s Sink.', 'Coyote Flats.', 'Lost Creek Hollow.'] },
-    { id: 'parks-denali-name', category: 'nationalparks', question: 'What does the name "Denali" mean in the Koyukon Athabaskan language?', answer: 'The High One.', choices: ['The High One.', 'Land of Ice.', 'Great Bear.', 'Endless Mountain.'] },
-    { id: 'parks-everglades-crocodiles', category: 'nationalparks', question: 'Everglades National Park is the only place in the world where alligators and what other reptile naturally live together?', answer: 'Crocodiles.', choices: ['Crocodiles.', 'Komodo dragons.', 'Gila monsters.', 'Iguanas.'] },
-    { id: 'parks-sequoia-age', category: 'nationalparks', question: 'Some giant sequoia trees in Sequoia National Park are approximately how old?', answer: 'More than 2,000 years old.', choices: ['More than 2,000 years old.', 'About 300 years old.', 'About 500 years old.', 'About 800 years old.'] },
-    { id: 'parks-mammoth-cave-length', category: 'nationalparks', question: 'Mammoth Cave National Park contains the world’s longest known cave system. About how many miles have been explored?', answer: 'More than 430 miles.', choices: ['More than 430 miles.', 'About 50 miles.', 'About 100 miles.', 'About 200 miles.'] },
-    { id: 'parks-arches-number', category: 'nationalparks', question: 'Approximately how many natural stone arches can be found in Arches National Park?', answer: 'More than 2,000.', choices: ['More than 2,000.', 'About 200.', 'About 500.', 'About 800.'] },
-    { id: 'parks-great-smoky-fireflies', category: 'nationalparks', question: 'Great Smoky Mountains National Park is famous for a rare natural light show involving what?', answer: 'Synchronous fireflies.', choices: ['Synchronous fireflies.', 'Glowing mushrooms.', 'Blue lightning bugs.', 'Sparkling waterfalls.'] },
-    { id: 'parks-carlsbad-bats', category: 'nationalparks', question: 'Each evening at Carlsbad Caverns, visitors gather to watch thousands of what animals emerge from the caves?', answer: 'Bats.', choices: ['Bats.', 'Owls.', 'Swallows.', 'Foxes.'] },
-    { id: 'parks-crater-lake-depth', category: 'nationalparks', question: 'Crater Lake is the deepest lake in the United States. About how deep is it?', answer: 'Nearly 2,000 feet deep.', choices: ['Nearly 2,000 feet deep.', 'About 500 feet deep.', 'About 1,000 feet deep.', 'About 3,000 feet deep.'] },
-    { id: 'parks-katmai-bears', category: 'nationalparks', question: 'Which national park is famous for bears catching salmon in waterfalls during Fat Bear Week?', answer: 'Katmai National Park and Preserve.', choices: ['Katmai National Park and Preserve.', 'Yellowstone National Park.', 'Glacier National Park.', 'Olympic National Park.'] },
-    { id: 'parks-saguaro-growth', category: 'nationalparks', question: 'A saguaro cactus usually doesn’t grow its first arm until it is about how old?', answer: 'Around 50–75 years old.', choices: ['Around 50–75 years old.', 'About 5 years old.', 'About 15 years old.', 'About 25 years old.'] },
-    { id: 'parks-olympic-rainforest', category: 'nationalparks', question: 'Olympic National Park contains mountains, beaches, and what unusual type of forest?', answer: 'Temperate rainforest.', choices: ['Temperate rainforest.', 'Mangrove forest.', 'Bamboo forest.', 'Pine savanna.'] },
-
-    { id: 'food-gazpacho-country', category: 'food', question: 'Which country is strongly associated with gazpacho?', answer: 'Spain.', choices: ['Spain.', 'Italy.', 'Portugal.', 'Mexico.'] },
-    { id: 'food-singapore-sling', category: 'food', question: 'At which hotel was the Singapore Sling originally invented?', answer: 'Raffles Hotel.', choices: ['Raffles Hotel.', 'Marina Bay Sands.', 'The Ritz.', 'The Peninsula Hotel.'] },
-    { id: 'food-nasi-goreng', category: 'food', question: 'Which country is strongly associated with the dish "Nasi Goreng"?', answer: 'Indonesia.', choices: ['Indonesia.', 'Malaysia.', 'Thailand.', 'Vietnam.'] },
-    { id: 'food-currywurst-city', category: 'food', question: 'In which city was Currywurst invented?', answer: 'Berlin.', choices: ['Berlin.', 'Munich.', 'Vienna.', 'Hamburg.'] },
-    { id: 'food-jollibee-country', category: 'food', question: 'Which country is famous for the fast-food chain Jollibee?', answer: 'Philippines.', choices: ['Philippines.', 'Japan.', 'Singapore.', 'South Korea.'] },
-    { id: 'food-timbits-chain', category: 'food', question: 'Which Canadian coffee chain sells Timbits?', answer: 'Tim Hortons.', choices: ['Tim Hortons.', 'Second Cup.', 'Starbucks.', 'Coffee Time.'] },
-    { id: 'food-kimchi-origin', category: 'food', question: 'Kimchi is a popular side dish from where?', answer: 'Korea.', choices: ['Korea.', 'China.', 'Japan.', 'Vietnam.'] },
-    { id: 'food-guinness-origin', category: 'food', question: 'Guinness beer originated in which country?', answer: 'Ireland.', choices: ['Ireland.', 'Scotland.', 'England.', 'Wales.'] },
-    { id: 'food-kakigori', category: 'food', question: 'What popular Japanese summer dessert is made from shaved ice?', answer: 'Kakigori.', choices: ['Kakigori.', 'Mochi.', 'Dorayaki.', 'Taiyaki.'] },
-    { id: 'food-satay', category: 'food', question: 'What is the name of the popular Southeast Asian meat skewer dish?', answer: 'Satay.', choices: ['Satay.', 'Rendang.', 'Laksa.', 'Adobo.'] },
-    { id: 'food-peanut-butter-patent', category: 'food', question: 'Who received one of the earliest patents for peanut paste, a precursor to peanut butter?', answer: 'Marcellus Gilmore Edson.', choices: ['Marcellus Gilmore Edson.', 'George Washington Carver.', 'John Harvey Kellogg.', 'Milton Hershey.'] },
-    { id: 'food-tim-tam-country', category: 'food', question: 'Which country is famous for the chocolate biscuit called a Tim Tam?', answer: 'Australia.', choices: ['Australia.', 'New Zealand.', 'England.', 'South Africa.'] },
-    { id: 'food-georgia-peaches', category: 'food', question: 'Which U.S. state is famous for its juicy peaches?', answer: 'Georgia.', choices: ['Georgia.', 'South Carolina.', 'California.', 'Florida.'] },
-    { id: 'food-sushi-wrap', category: 'food', question: 'What is sushi often wrapped in?', answer: 'Nori seaweed.', choices: ['Nori seaweed.', 'Rice paper.', 'Lettuce.', 'Cabbage leaves.'] },
-    { id: 'food-kosher-meaning', category: 'food', question: 'In Jewish dietary law, what does kosher food mean?', answer: 'Food that is permitted or proper to eat.', choices: ['Food that is permitted or proper to eat.', 'Food that is always spicy.', 'Food that is always vegetarian.', 'Food that is always raw.'] },
-    { id: 'food-mince-pie', category: 'food', question: 'Modern sweet mince pies are usually filled mostly with what?', answer: 'Dried fruit and spices.', choices: ['Dried fruit and spices.', 'Beef and gravy.', 'Custard and chocolate.', 'Cheese and onion.'] },
-    { id: 'food-new-york-fruit', category: 'food', question: 'What is the official state fruit of New York?', answer: 'Apple.', choices: ['Apple.', 'Grape.', 'Cherry.', 'Peach.'] },
-    { id: 'food-americano', category: 'food', question: 'What coffee drink is made by diluting espresso with hot water?', answer: 'Americano.', choices: ['Americano.', 'Latte.', 'Cappuccino.', 'Macchiato.'] },
-    { id: 'food-carne-asada', category: 'food', question: 'What does "carne asada" mean in Spanish?', answer: 'Grilled meat.', choices: ['Grilled meat.', 'Spicy chicken.', 'Roasted pork.', 'Seasoned rice.'] },
-    { id: 'food-smores', category: 'food', question: 'What campfire treat is made with marshmallows, graham crackers, and chocolate?', answer: 'S’mores.', choices: ['S’mores.', 'Moon Pies.', 'Whoopie Pies.', 'Rice Krispie Treats.'] },
-    { id: 'food-gumbo-origin', category: 'food', question: 'Which U.S. state is most associated with the stew gumbo?', answer: 'Louisiana.', choices: ['Louisiana.', 'Texas.', 'Mississippi.', 'Alabama.'] },
-    { id: 'food-pina-colada', category: 'food', question: 'What cocktail is made with rum, coconut, and pineapple?', answer: 'Piña colada.', choices: ['Piña colada.', 'Mai Tai.', 'Mojito.', 'Daiquiri.'] },
-    { id: 'food-bond-drink', category: 'food', question: 'What drink is James Bond famously known for ordering "shaken, not stirred"?', answer: 'Martini.', choices: ['Martini.', 'Old Fashioned.', 'Manhattan.', 'Whiskey Sour.'] },
-    { id: 'food-innout-founded', category: 'food', question: 'In what year was the burger chain In-N-Out founded?', answer: '1948.', choices: ['1948.', '1955.', '1962.', '1971.'] },
-    { id: 'food-hawaii-coffee', category: 'food', question: 'Which U.S. state is famous for commercially growing Kona coffee?', answer: 'Hawaii.', choices: ['Hawaii.', 'California.', 'Florida.', 'Texas.'] },
-    { id: 'food-fanta-origin', category: 'food', question: 'Which soft drink was created in Germany during World War II?', answer: 'Fanta.', choices: ['Fanta.', 'Sprite.', 'Dr Pepper.', 'Mountain Dew.'] },
-    { id: 'food-tiramisu', category: 'food', question: 'What Italian dessert is made with coffee, mascarpone cheese, and ladyfingers?', answer: 'Tiramisu.', choices: ['Tiramisu.', 'Cannoli.', 'Gelato.', 'Panna cotta.'] },
-    { id: 'food-vitamin-c-scurvy', category: 'food', question: 'A deficiency of which vitamin causes scurvy?', answer: 'Vitamin C.', choices: ['Vitamin C.', 'Vitamin D.', 'Vitamin B12.', 'Vitamin A.'] },
-    { id: 'food-avocado-varieties', category: 'food', question: 'About how many varieties of avocados exist worldwide?', answer: 'About 500.', choices: ['About 500.', 'About 50.', 'About 100.', 'About 1,000.'] },
-    { id: 'food-macadamia', category: 'food', question: 'What type of nut is a famous Hawaiian staple?', answer: 'Macadamia nuts.', choices: ['Macadamia nuts.', 'Pecans.', 'Walnuts.', 'Almonds.'] },
-    { id: 'food-sauerkraut', category: 'food', question: 'What is sauerkraut made from?', answer: 'Cabbage.', choices: ['Cabbage.', 'Potatoes.', 'Turnips.', 'Onions.'] },
-    { id: 'food-scurvy', category: 'food', question: 'A lack of Vitamin C can cause which disease?', answer: 'Scurvy.', choices: ['Scurvy.', 'Rickets.', 'Beriberi.', 'Anemia.'] },
-    { id: 'food-kfc-mascot', category: 'food', question: 'Who is the mascot of the fast-food chain KFC?', answer: 'Colonel Sanders.', choices: ['Colonel Sanders.', 'Wendy.', 'Ronald McDonald.', 'The Burger King.'] },
-    { id: 'food-dos-equis', category: 'food', question: 'Which beverage brand featured "The Most Interesting Man in the World" in its ads?', answer: 'Dos Equis.', choices: ['Dos Equis.', 'Corona.', 'Heineken.', 'Budweiser.'] },
-    { id: 'food-elote', category: 'food', question: 'What is the name of the popular Mexican street food made from corn?', answer: 'Elote.', choices: ['Elote.', 'Tamale.', 'Empanada.', 'Quesadilla.'] },
-    { id: 'food-caesar-salad', category: 'food', question: 'Which famous salad was invented in Tijuana, Mexico?', answer: 'Caesar salad.', choices: ['Caesar salad.', 'Cobb salad.', 'Greek salad.', 'Chef salad.'] },
-    { id: 'food-tzatziki', category: 'food', question: 'Tzatziki sauce is commonly served as a topping for what?', answer: 'Gyros.', choices: ['Gyros.', 'Tacos.', 'Hot dogs.', 'Pizza.'] },
-    { id: 'food-halal', category: 'food', question: 'Under Muslim dietary rules, what term describes foods that are permitted to eat?', answer: 'Halal.', choices: ['Halal.', 'Kosher.', 'Haram.', 'Fasting.'] },
-    { id: 'food-heinz-57', category: 'food', question: 'How many varieties are advertised in Heinz Tomato Ketchup’s famous slogan?', answer: '57.', choices: ['57.', '47.', '67.', '77.'] },
-    { id: 'food-fry-sauce', category: 'food', question: 'What condiment is commonly made by mixing ketchup and mayonnaise?', answer: 'Fry sauce.', choices: ['Fry sauce.', 'Tartar sauce.', 'Ranch dressing.', 'Cocktail sauce.'] },
-    { id: 'food-pasta-shaped-like-rice', category: 'food', question: 'What kind of pasta is shaped like little rice grains?', answer: 'Orzo.', choices: ['Orzo.', 'Penne.', 'Fusilli.', 'Rigatoni.'] },
-    { id: 'food-marzipan-nut', category: 'food', question: 'Which nut is used to make marzipan?', answer: 'Almond.', choices: ['Almond.', 'Peanut.', 'Walnut.', 'Cashew.'] },
-    { id: 'food-pizza-invention-country', category: 'food', question: 'Which country is credited with inventing modern pizza?', answer: 'Italy.', choices: ['Italy.', 'France.', 'Greece.', 'Spain.'] },
-    { id: 'food-tofu-made-from', category: 'food', question: 'What is tofu primarily made from?', answer: 'Soybeans.', choices: ['Soybeans.', 'Rice.', 'Chickpeas.', 'Lentils.'] },
-    { id: 'food-honeycrisp-granny-smith', category: 'food', question: 'Which fruit has varieties called Honeycrisp and Granny Smith?', answer: 'Apple.', choices: ['Apple.', 'Pear.', 'Peach.', 'Plum.'] },
-
-    { id: 'math-prime-under-10', category: 'math', question: 'Which of these numbers is prime?', answer: '7.', choices: ['7.', '9.', '12.', '15.'] },
-    { id: 'math-percent-25-of-80', category: 'math', question: 'What is 25% of 80?', answer: '20.', choices: ['20.', '25.', '15.', '40.'] },
-    { id: 'math-area-rectangle-8-5', category: 'math', question: 'What is the area of a rectangle that is 8 units long and 5 units wide?', answer: '40 square units.', choices: ['40 square units.', '13 square units.', '26 square units.', '80 square units.'] },
-    { id: 'math-dozen-half', category: 'math', question: 'How many items are in half a dozen?', answer: '6.', choices: ['6.', '12.', '3.', '24.'] },
-    { id: 'math-pi-first-three', category: 'math', question: 'What are the first three digits of pi?', answer: '3.14.', choices: ['3.14.', '2.71.', '1.62.', '4.13.'] },
-    { id: 'math-triangle-angles', category: 'math', question: 'The angles inside a triangle add up to how many degrees?', answer: '180 degrees.', choices: ['180 degrees.', '90 degrees.', '270 degrees.', '360 degrees.'] },
-    { id: 'math-square-root-144', category: 'math', question: 'What is the square root of 144?', answer: '12.', choices: ['12.', '14.', '10.', '16.'] },
-    { id: 'math-roman-x', category: 'math', question: 'In Roman numerals, what number does X represent?', answer: '10.', choices: ['10.', '5.', '50.', '100.'] },
-
-    { id: 'science-light-speed-fastest', category: 'science', question: 'What travels faster in a vacuum: light or sound?', answer: 'Light.', choices: ['Light.', 'Sound.', 'They travel the same speed.', 'Neither can travel.'] },
-    { id: 'science-ice-less-dense', category: 'science', question: 'Why does ice float on water?', answer: 'Ice is less dense than liquid water.', choices: ['Ice is less dense than liquid water.', 'Ice is heavier than water.', 'Ice has no mass.', 'Water pushes everything upward equally.'] },
-    { id: 'science-earth-layer-crust', category: 'science', question: 'What is the outermost solid layer of Earth called?', answer: 'The crust.', choices: ['The crust.', 'The core.', 'The mantle.', 'The atmosphere.'] },
-    { id: 'science-battery-energy', category: 'science', question: 'A battery stores energy mostly in what form?', answer: 'Chemical energy.', choices: ['Chemical energy.', 'Sound energy.', 'Gravitational energy.', 'Thermal insulation.'] },
-    { id: 'science-evaporation', category: 'science', question: 'What is the process called when liquid water changes into water vapor?', answer: 'Evaporation.', choices: ['Evaporation.', 'Condensation.', 'Freezing.', 'Erosion.'] },
-    { id: 'science-stars-made-mostly', category: 'science', question: 'Stars are made mostly of which two elements?', answer: 'Hydrogen and helium.', choices: ['Hydrogen and helium.', 'Oxygen and carbon.', 'Iron and nickel.', 'Nitrogen and argon.'] },
-    { id: 'science-magnet-poles', category: 'science', question: 'Magnets have north and what other pole?', answer: 'South.', choices: ['South.', 'East.', 'Positive.', 'Center.'] },
-    { id: 'science-cloud-rain-type', category: 'science', question: 'What type of cloud is commonly associated with thunderstorms?', answer: 'Cumulonimbus.', choices: ['Cumulonimbus.', 'Cirrus.', 'Stratus.', 'Altocumulus.'] },
-    { id: 'science-red-planet-bonus', category: 'science', question: 'What planet is known as the Red Planet?', answer: 'Mars.', choices: ['Mars.', 'Venus.', 'Jupiter.', 'Mercury.'] },
-    { id: 'science-adult-human-bones-bonus', category: 'science', question: 'How many bones are in the adult human body?', answer: '206.', choices: ['206.', '198.', '214.', '220.'] },
-    { id: 'science-water-boiling-celsius-bonus', category: 'science', question: 'What is the boiling point of water at sea level?', answer: '100°C.', choices: ['100°C.', '90°C.', '95°C.', '110°C.'] },
-    { id: 'science-universal-donor', category: 'science', question: 'Which blood type is known as the universal donor for red blood cell donation?', answer: 'O negative.', choices: ['O negative.', 'A positive.', 'B negative.', 'AB positive.'] },
-    { id: 'science-saturn-rings', category: 'science', question: 'Which planet is famous for its spectacular ring system?', answer: 'Saturn.', choices: ['Saturn.', 'Jupiter.', 'Uranus.', 'Neptune.'] },
-
-    { id: 'music-tempo-speed', category: 'music', question: 'In music, tempo describes what?', answer: 'The speed of the music.', choices: ['The speed of the music.', 'The volume of the music.', 'The lyrics of a song.', 'The number of instruments.'] },
-    { id: 'music-bass-clef-range', category: 'music', question: 'The bass clef is usually used for notes in what range?', answer: 'Lower notes.', choices: ['Lower notes.', 'Higher notes.', 'Only drum notes.', 'Only vocal notes.'] },
-    { id: 'music-orchestra-leader', category: 'music', question: 'Who usually leads an orchestra during a performance?', answer: 'A conductor.', choices: ['A conductor.', 'A producer.', 'A choreographer.', 'A critic.'] },
-    { id: 'music-jazz-city-new-orleans', category: 'music', question: 'Which U.S. city is strongly associated with the birth of jazz?', answer: 'New Orleans.', choices: ['New Orleans.', 'Seattle.', 'Nashville.', 'Detroit.'] },
-    { id: 'music-country-capital', category: 'music', question: 'Which city is often called Music City and is famous for country music?', answer: 'Nashville.', choices: ['Nashville.', 'Memphis.', 'Austin.', 'Atlanta.'] },
-    { id: 'music-bts-country', category: 'music', question: 'The group BTS is from which country?', answer: 'South Korea.', choices: ['South Korea.', 'Japan.', 'Thailand.', 'China.'] },
-    { id: 'music-madonna-material-girl', category: 'music', question: 'Which singer is known as the "Material Girl"?', answer: 'Madonna.', choices: ['Madonna.', 'Cyndi Lauper.', 'Cher.', 'Janet Jackson.'] },
-    { id: 'music-eagles-hotel-california', category: 'music', question: 'Which band recorded the song "Hotel California"?', answer: 'Eagles.', choices: ['Eagles.', 'Fleetwood Mac.', 'Journey.', 'Chicago.'] },
-    { id: 'music-taylor-1989-single', category: 'music', question: 'Which Taylor Swift album shares its name with a year?', answer: '1989.', choices: ['1989.', 'Red.', 'Lover.', 'Midnights.'] },
-    { id: 'music-kpop-blackpink-members', category: 'music', question: 'BLACKPINK is best known as what kind of K-pop group?', answer: 'A girl group.', choices: ['A girl group.', 'A boy band.', 'A rock band.', 'A classical quartet.'] },
-
-    { id: 'tv-lucy-vitameatavegamin', category: 'tv', question: 'Which classic sitcom featured Lucy Ricardo?', answer: 'I Love Lucy.', choices: ['I Love Lucy.', 'The Mary Tyler Moore Show.', 'Bewitched.', 'The Golden Girls.'] },
-    { id: 'tv-golden-girls-city', category: 'tv', question: 'The Golden Girls is mainly set in which city?', answer: 'Miami.', choices: ['Miami.', 'Phoenix.', 'San Diego.', 'Atlanta.'] },
-    { id: 'tv-fresh-prince-city', category: 'tv', question: 'The Fresh Prince of Bel-Air begins with Will moving from Philadelphia to which city?', answer: 'Los Angeles.', choices: ['Los Angeles.', 'New York.', 'Chicago.', 'Miami.'] },
-    { id: 'tv-seinfeld-cafe', category: 'tv', question: 'On Seinfeld, what is the name of the diner the group often visits?', answer: 'Monk\'s Cafe.', choices: ['Monk\'s Cafe.', 'Central Perk.', 'Luke\'s Diner.', 'MacLaren\'s Pub.'] },
-    { id: 'tv-friends-coffee-shop', category: 'tv', question: 'On Friends, what is the name of the coffee shop?', answer: 'Central Perk.', choices: ['Central Perk.', 'Monk\'s Cafe.', 'The Max.', 'Cafe Nervosa.'] },
-    { id: 'tv-rick-morty-portal', category: 'tv', question: 'Rick and Morty often travel using what kind of device?', answer: 'A portal gun.', choices: ['A portal gun.', 'A magic wand.', 'A sonic screwdriver.', 'A time necklace.'] },
-    { id: 'tv-southpark-state', category: 'tv', question: 'South Park is set in which U.S. state?', answer: 'Colorado.', choices: ['Colorado.', 'Utah.', 'Wyoming.', 'Montana.'] },
-    { id: 'tv-frasier-city', category: 'tv', question: 'Frasier is primarily set in which U.S. city?', answer: 'Seattle.', choices: ['Seattle.', 'Boston.', 'Chicago.', 'Denver.'] },
-    { id: 'tv-cheers-bar-city', category: 'tv', question: 'Cheers is set in which city?', answer: 'Boston.', choices: ['Boston.', 'New York.', 'Chicago.', 'Philadelphia.'] },
-    { id: 'tv-mash-war', category: 'tv', question: 'M*A*S*H takes place during which war?', answer: 'The Korean War.', choices: ['The Korean War.', 'World War II.', 'The Vietnam War.', 'The Gulf War.'] },
-    { id: 'tv-office-paper-company', category: 'tv', question: 'What is the name of the paper company in The Office?', answer: 'Dunder Mifflin.', choices: ['Dunder Mifflin.', 'Prestige Worldwide.', 'Bluth Company.', 'Sterling Cooper.'] },
-    { id: 'tv-office-city', category: 'tv', question: 'The Office is set in which Pennsylvania city?', answer: 'Scranton.', choices: ['Scranton.', 'Pittsburgh.', 'Philadelphia.', 'Allentown.'] },
-    { id: 'tv-simpsons-town', category: 'tv', question: 'What town does The Simpsons take place in?', answer: 'Springfield.', choices: ['Springfield.', 'Shelbyville.', 'Quahog.', 'Arlen.'] },
-
-    { id: 'tv-family-guy-town', category: 'tv', question: 'Family Guy is set in which fictional city?', answer: 'Quahog.', choices: ['Quahog.', 'Springfield.', 'Langley Falls.', 'Arlen.'] },
-    { id: 'tv-bobs-burgers-family-name', category: 'tv', question: 'What is the last name of the family in Bob\'s Burgers?', answer: 'Belcher.', choices: ['Belcher.', 'Hill.', 'Griffin.', 'Smith.'] },
-    { id: 'tv-king-of-the-hill-town', category: 'tv', question: 'King of the Hill takes place in what fictional Texas town?', answer: 'Arlen.', choices: ['Arlen.', 'Lubbock.', 'Wichita Falls.', 'Plano.'] },
-    { id: 'tv-american-dad-agent', category: 'tv', question: 'What is Stan Smith\'s occupation in American Dad!?', answer: 'CIA agent.', choices: ['CIA agent.', 'Police officer.', 'Teacher.', 'Lawyer.'] },
-    { id: 'tv-futurama-delivery-company', category: 'tv', question: 'What is the name of the delivery company in Futurama?', answer: 'Planet Express.', choices: ['Planet Express.', 'Galaxy Delivery.', 'Space Freight.', 'Cosmo Courier.'] },
-
-    { id: 'tv-stranger-things-town', category: 'tv', question: 'Stranger Things is set in which fictional Indiana town?', answer: 'Hawkins.', choices: ['Hawkins.', 'Sunnydale.', 'Stars Hollow.', 'Riverdale.'] },
-    { id: 'tv-breaking-bad-city', category: 'tv', question: 'Breaking Bad is primarily set in which city?', answer: 'Albuquerque.', choices: ['Albuquerque.', 'Phoenix.', 'El Paso.', 'Santa Fe.'] },
-    { id: 'tv-better-call-saul-name', category: 'tv', question: 'What is Saul Goodman\'s real first name?', answer: 'Jimmy.', choices: ['Jimmy.', 'Mike.', 'Howard.', 'Chuck.'] },
-    { id: 'tv-walking-dead-sheriff', category: 'tv', question: 'What is the first name of the sheriff in The Walking Dead?', answer: 'Rick.', choices: ['Rick.', 'Daryl.', 'Glenn.', 'Shane.'] },
-    { id: 'tv-game-of-thrones-throne', category: 'tv', question: 'What is the name of the throne in Game of Thrones?', answer: 'The Iron Throne.', choices: ['The Iron Throne.', 'The Dragon Throne.', 'The Golden Throne.', 'The King\'s Seat.'] },
-
-    { id: 'tv-gilmore-girls-town', category: 'tv', question: 'Gilmore Girls is set in which fictional Connecticut town?', answer: 'Stars Hollow.', choices: ['Stars Hollow.', 'Rosewood.', 'Mystic Falls.', 'Tree Hill.'] },
-    { id: 'tv-greys-anatomy-hospital', category: 'tv', question: 'What hospital is featured in Grey\'s Anatomy?', answer: 'Grey Sloan Memorial Hospital.', choices: ['Grey Sloan Memorial Hospital.', 'Seattle Grace Hospital.', 'Sacred Heart Hospital.', 'Princeton-Plainsboro Hospital.'] },
-    { id: 'tv-scrubs-hospital', category: 'tv', question: 'What is the name of the hospital in Scrubs?', answer: 'Sacred Heart Hospital.', choices: ['Sacred Heart Hospital.', 'Grey Sloan Memorial Hospital.', 'County General.', 'Princeton-Plainsboro Hospital.'] },
-    { id: 'tv-house-hospital', category: 'tv', question: 'What hospital does Dr. House work at?', answer: 'Princeton-Plainsboro Teaching Hospital.', choices: ['Princeton-Plainsboro Teaching Hospital.', 'Sacred Heart Hospital.', 'Seattle Grace Hospital.', 'County General.'] },
-    { id: 'tv-er-city', category: 'tv', question: 'ER takes place in which city?', answer: 'Chicago.', choices: ['Chicago.', 'Boston.', 'Seattle.', 'New York.'] },
-
-    { id: 'tv-big-bang-neighbor', category: 'tv', question: 'What is the name of Sheldon and Leonard\'s neighbor in The Big Bang Theory?', answer: 'Penny.', choices: ['Penny.', 'Amy.', 'Bernadette.', 'Leslie.'] },
-    { id: 'tv-how-i-met-your-mother-bar', category: 'tv', question: 'What bar do the friends often visit in How I Met Your Mother?', answer: 'MacLaren\'s Pub.', choices: ['MacLaren\'s Pub.', 'Central Perk.', 'Monk\'s Cafe.', 'Cheers.'] },
-    { id: 'tv-full-house-city', category: 'tv', question: 'Full House is set in which city?', answer: 'San Francisco.', choices: ['San Francisco.', 'Los Angeles.', 'Seattle.', 'Portland.'] },
-    { id: 'tv-saved-by-the-bell-school', category: 'tv', question: 'What is the name of the high school in Saved by the Bell?', answer: 'Bayside High.', choices: ['Bayside High.', 'West Beverly High.', 'Ridgemont High.', 'Sunnydale High.'] },
-    { id: 'tv-boy-meets-world-teacher', category: 'tv', question: 'What is the last name of Cory Matthews\' beloved teacher in Boy Meets World?', answer: 'Feeny.', choices: ['Feeny.', 'Turner.', 'Hunter.', 'Lawrence.'] },
-    { id: 'tv-rickmorty-grandson', category: 'tv', question: 'What is the name of Rick\'s grandson?', answer: 'Morty Smith.', choices: ['Morty Smith.', 'Jerry Smith.', 'Summer Smith.', 'Birdperson.'] },
-    { id: 'tv-rickmorty-granddaughter', category: 'tv', question: 'What is the name of Morty\'s older sister?', answer: 'Summer Smith.', choices: ['Summer Smith.', 'Beth Smith.', 'Jessica.', 'Tammy.'] },
-    { id: 'tv-rickmorty-daughter', category: 'tv', question: 'What is the name of Rick\'s daughter?', answer: 'Beth Smith.', choices: ['Beth Smith.', 'Summer Smith.', 'Tammy.', 'Jessica.'] },
-    { id: 'tv-rickmorty-father', category: 'tv', question: 'What is the name of Morty\'s father?', answer: 'Jerry Smith.', choices: ['Jerry Smith.', 'Rick Sanchez.', 'Birdperson.', 'Mr. Poopybutthole.'] },
-    { id: 'tv-rickmorty-catchphrase', category: 'tv', question: 'Rick often lets out what distinctive burping sound while speaking?', answer: 'A burp.', choices: ['A burp.', 'A whistle.', 'A sneeze.', 'A hiccup.'] },
-
-    { id: 'tv-rickmorty-pickle', category: 'tv', question: 'What food item does Rick turn himself into in a famous episode?', answer: 'A pickle.', choices: ['A pickle.', 'A cucumber.', 'A hot dog.', 'A potato.'] },
-    { id: 'tv-rickmorty-dog', category: 'tv', question: 'What is the name of the Smith family dog?', answer: 'Snuffles.', choices: ['Snuffles.', 'Snowball.', 'Both Snuffles and Snowball.', 'Squanchy.'] },
-    { id: 'tv-rickmorty-catchphrase-wubba', category: 'tv', question: 'Complete the phrase: "Wubba Lubba Dub Dub" originally means what in Birdperson\'s language?', answer: 'I am in great pain, please help me.', choices: ['I am in great pain, please help me.', 'Let\'s party!', 'Victory is ours!', 'Goodbye, my friend.'] },
-    { id: 'tv-rickmorty-birdperson', category: 'tv', question: 'What species is Birdperson?', answer: 'Bird-Person.', choices: ['Bird-Person.', 'Human.', 'Cronenberg.', 'Gazorpian.'] },
-    { id: 'tv-rickmorty-meeseeks-box', category: 'tv', question: 'What device creates Mr. Meeseeks?', answer: 'The Meeseeks Box.', choices: ['The Meeseeks Box.', 'The Portal Gun.', 'The Butter Robot.', 'The Plumbus.'] },
-
-    { id: 'tv-rickmorty-butter-robot', category: 'tv', question: 'What is the Butter Robot\'s only purpose?', answer: 'To pass the butter.', choices: ['To pass the butter.', 'To clean the house.', 'To protect Morty.', 'To make breakfast.'] },
-    { id: 'tv-rickmorty-plumbus', category: 'tv', question: 'According to the show, everyone has what common household item?', answer: 'A Plumbus.', choices: ['A Plumbus.', 'A Flooble.', 'A Smoogle.', 'A Squanch.'] },
-    { id: 'tv-rickmorty-citadel', category: 'tv', question: 'What is the name of the society made up of alternate versions of Rick and Morty?', answer: 'The Citadel of Ricks.', choices: ['The Citadel of Ricks.', 'The Galactic Federation.', 'The Council of Mortys.', 'Planet Squanch.'] },
-    { id: 'tv-rickmorty-president', category: 'tv', question: 'Who frequently clashes with Rick on Earth?', answer: 'The President of the United States.', choices: ['The President of the United States.', 'Principal Vagina.', 'Birdperson.', 'Jerry Smith.'] },
-    { id: 'tv-rickmorty-jessica', category: 'tv', question: 'Who is Morty\'s longtime crush?', answer: 'Jessica.', choices: ['Jessica.', 'Tammy.', 'Summer.', 'Beth.'] },
-
-    { id: 'tv-rickmorty-galactic-federation', category: 'tv', question: 'What is the name of the intergalactic government Rick opposes?', answer: 'The Galactic Federation.', choices: ['The Galactic Federation.', 'The United Planets.', 'The Citadel.', 'The Space Senate.'] },
-    { id: 'tv-rickmorty-evil-morty', category: 'tv', question: 'What nickname is commonly used for the Morty who becomes a major antagonist?', answer: 'Evil Morty.', choices: ['Evil Morty.', 'Dark Morty.', 'President Morty.', 'Prime Morty.'] },
-    { id: 'tv-rickmorty-principal', category: 'tv', question: 'What is the name of Morty\'s school principal?', answer: 'Principal Vagina.', choices: ['Principal Vagina.', 'Principal Skinner.', 'Principal Lewis.', 'Principal Shepherd.'] },
-    { id: 'tv-rickmorty-squanchy', category: 'tv', question: 'What is the name of Rick\'s cat-like friend who loves to "squanch"?', answer: 'Squanchy.', choices: ['Squanchy.', 'Gearhead.', 'Abradolf Lincler.', 'Noob-Noob.'] },
-    { id: 'tv-rickmorty-noobnoob', category: 'tv', question: 'Which Vindicators member is praised with the line "Who the f*** is Noob-Noob?"', answer: 'Noob-Noob.', choices: ['Noob-Noob.', 'Supernova.', 'Million Ants.', 'Crocubot.'] },
-
-    { id: 'tv-simpsons-father', category: 'tv', question: 'What is the first name of the Simpson family father?', answer: 'Homer.', choices: ['Homer.', 'Herb.', 'Ned.', 'Abe.'] },
-    { id: 'tv-simpsons-mother', category: 'tv', question: 'What is the first name of Homer\'s wife?', answer: 'Marge.', choices: ['Marge.', 'Patty.', 'Selma.', 'Edna.'] },
-    { id: 'tv-simpsons-son', category: 'tv', question: 'What is the name of the Simpson family son?', answer: 'Bart.', choices: ['Bart.', 'Milhouse.', 'Nelson.', 'Ralph.'] },
-    { id: 'tv-simpsons-daughter', category: 'tv', question: 'What is the name of the Simpson family\'s older daughter?', answer: 'Lisa.', choices: ['Lisa.', 'Maggie.', 'Allison.', 'Janey.'] },
-    { id: 'tv-simpsons-baby', category: 'tv', question: 'What is the name of the Simpson family baby?', answer: 'Maggie.', choices: ['Maggie.', 'Lisa.', 'Ling.', 'Janey.'] },
-
-    { id: 'tv-simpsons-neighbor', category: 'tv', question: 'Who is the Simpsons\' overly friendly neighbor?', answer: 'Ned Flanders.', choices: ['Ned Flanders.', 'Moe Szyslak.', 'Barney Gumble.', 'Lenny Leonard.'] },
-    { id: 'tv-simpsons-school', category: 'tv', question: 'What elementary school do Bart and Lisa attend?', answer: 'Springfield Elementary.', choices: ['Springfield Elementary.', 'Shelbyville Elementary.', 'West Springfield Elementary.', 'South Springfield Elementary.'] },
-    { id: 'tv-simpsons-principal', category: 'tv', question: 'Who is the principal of Springfield Elementary?', answer: 'Principal Skinner.', choices: ['Principal Skinner.', 'Superintendent Chalmers.', 'Otto Mann.', 'Groundskeeper Willie.'] },
-    { id: 'tv-simpsons-bully', category: 'tv', question: 'Who is Springfield Elementary\'s main bully?', answer: 'Nelson Muntz.', choices: ['Nelson Muntz.', 'Milhouse Van Houten.', 'Martin Prince.', 'Ralph Wiggum.'] },
-    { id: 'tv-simpsons-best-friend', category: 'tv', question: 'Who is Bart Simpson\'s best friend?', answer: 'Milhouse Van Houten.', choices: ['Milhouse Van Houten.', 'Nelson Muntz.', 'Martin Prince.', 'Ralph Wiggum.'] },
-
-    { id: 'tv-simpsons-bar', category: 'tv', question: 'What is the name of Moe\'s bar?', answer: 'Moe\'s Tavern.', choices: ['Moe\'s Tavern.', 'Duff\'s Pub.', 'The Frying Dutchman.', 'The Leftorium.'] },
-    { id: 'tv-simpsons-owner', category: 'tv', question: 'Who owns Moe\'s Tavern?', answer: 'Moe Szyslak.', choices: ['Moe Szyslak.', 'Barney Gumble.', 'Lenny Leonard.', 'Carl Carlson.'] },
-    { id: 'tv-simpsons-plant-owner', category: 'tv', question: 'Who owns the Springfield Nuclear Power Plant?', answer: 'Mr. Burns.', choices: ['Mr. Burns.', 'Waylon Smithers.', 'Homer Simpson.', 'Mayor Quimby.'] },
-    { id: 'tv-simpsons-assistant', category: 'tv', question: 'Who is Mr. Burns\' loyal assistant?', answer: 'Waylon Smithers.', choices: ['Waylon Smithers.', 'Moe Szyslak.', 'Ned Flanders.', 'Principal Skinner.'] },
-    { id: 'tv-simpsons-job', category: 'tv', question: 'Where does Homer Simpson work?', answer: 'Springfield Nuclear Power Plant.', choices: ['Springfield Nuclear Power Plant.', 'Kwik-E-Mart.', 'Moe\'s Tavern.', 'Springfield Elementary.'] },
-
-    { id: 'tv-simpsons-store', category: 'tv', question: 'What convenience store is run by Apu?', answer: 'Kwik-E-Mart.', choices: ['Kwik-E-Mart.', 'Quick Stop.', 'Mini Mart.', 'Speedy Shop.'] },
-    { id: 'tv-simpsons-clown', category: 'tv', question: 'What is the name of Bart\'s favorite TV clown?', answer: 'Krusty the Clown.', choices: ['Krusty the Clown.', 'Sideshow Bob.', 'Itchy.', 'Scratchy.'] },
-    { id: 'tv-simpsons-sidekick', category: 'tv', question: 'Who is Krusty the Clown\'s former sidekick?', answer: 'Sideshow Bob.', choices: ['Sideshow Bob.', 'Troy McClure.', 'Disco Stu.', 'Comic Book Guy.'] },
-    { id: 'tv-simpsons-cartoon', category: 'tv', question: 'What cartoon do Bart and Lisa love to watch?', answer: 'The Itchy & Scratchy Show.', choices: ['The Itchy & Scratchy Show.', 'Poochie Time.', 'Worker and Parasite.', 'Krusty\'s Comedy Hour.'] },
-    { id: 'tv-simpsons-mascot', category: 'tv', question: 'What is the name of Springfield Elementary\'s mascot?', answer: 'The Fighting Hellfish.', choices: ['The Fighting Hellfish.', 'The Isotopes.', 'The Wildcats.', 'The Spartans.'] },
-
-    { id: 'tv-simpsons-mayor', category: 'tv', question: 'Who is the mayor of Springfield?', answer: 'Mayor Quimby.', choices: ['Mayor Quimby.', 'Mr. Burns.', 'Chief Wiggum.', 'Kent Brockman.'] },
-    { id: 'tv-simpsons-police-chief', category: 'tv', question: 'Who is Springfield\'s police chief?', answer: 'Chief Wiggum.', choices: ['Chief Wiggum.', 'Lou.', 'Eddie.', 'Snake.'] },
-    { id: 'tv-simpsons-news-anchor', category: 'tv', question: 'Who is Springfield\'s longtime news anchor?', answer: 'Kent Brockman.', choices: ['Kent Brockman.', 'Troy McClure.', 'Arnie Pye.', 'Rainier Wolfcastle.'] },
-    { id: 'tv-simpsons-catchphrase', category: 'tv', question: 'What is Homer Simpson\'s famous catchphrase?', answer: 'D\'oh!', choices: ['D\'oh!', 'Excellent.', 'Ay, caramba!', 'Woo-hoo!'] },
-    { id: 'tv-simpsons-bart-catchphrase', category: 'tv', question: 'What catchphrase is Bart Simpson best known for?', answer: 'Ay, caramba!', choices: ['Ay, caramba!', 'Eat my shorts.', 'Cowabunga.', 'Both "Ay, caramba!" and "Eat my shorts."'] },
-
-    { id: 'nba-court-players', category: 'sports', question: 'How many players from one NBA team are on the court during normal play?', answer: 'Five.', choices: ['Five.', 'Six.', 'Seven.', 'Four.'] },
-    { id: 'nba-shot-clock', category: 'sports', question: 'How many seconds are on the NBA shot clock?', answer: '24 seconds.', choices: ['24 seconds.', '30 seconds.', '20 seconds.', '35 seconds.'] },
-    { id: 'nba-three-pointer-line', category: 'sports', question: 'A basket made from beyond the arc is worth how many points?', answer: 'Three points.', choices: ['Three points.', 'Two points.', 'One point.', 'Four points.'] },
-    { id: 'nba-finals-trophy', category: 'sports', question: 'What trophy is awarded to the NBA champion?', answer: 'The Larry O\'Brien Trophy.', choices: ['The Larry O\'Brien Trophy.', 'The Stanley Cup.', 'The Lombardi Trophy.', 'The Commissioner\'s Trophy.'] },
-    { id: 'nfl-field-yards', category: 'sports', question: 'How long is an NFL field from goal line to goal line?', answer: '100 yards.', choices: ['100 yards.', '90 yards.', '110 yards.', '120 yards.'] },
-    { id: 'nfl-super-bowl-trophy', category: 'sports', question: 'What trophy is awarded to the Super Bowl winner?', answer: 'The Vince Lombardi Trophy.', choices: ['The Vince Lombardi Trophy.', 'The Stanley Cup.', 'The Heisman Trophy.', 'The Larry O\'Brien Trophy.'] },
-    { id: 'nfl-extra-point-kick', category: 'sports', question: 'After a touchdown, a successful extra-point kick is worth how many points?', answer: 'One point.', choices: ['One point.', 'Two points.', 'Three points.', 'Six points.'] },
-    { id: 'nfl-quarterback-role', category: 'sports', question: 'Which football position usually throws passes and calls plays?', answer: 'Quarterback.', choices: ['Quarterback.', 'Kicker.', 'Linebacker.', 'Center.'] },
-    { id: 'soccer-penalty-spot', category: 'sports', question: 'A penalty kick in soccer is taken from how many yards away?', answer: '12 yards.', choices: ['12 yards.', '10 yards.', '18 yards.', '20 yards.'] },
-    { id: 'soccer-goalkeeper-hands', category: 'sports', question: 'Which soccer player can usually use their hands inside the penalty area?', answer: 'The goalkeeper.', choices: ['The goalkeeper.', 'The striker.', 'The captain.', 'The referee.'] },
-    { id: 'soccer-match-halves', category: 'sports', question: 'A standard soccer match is divided into how many halves?', answer: 'Two.', choices: ['Two.', 'Three.', 'Four.', 'One.'] },
-    { id: 'soccer-yellow-card', category: 'sports', question: 'In soccer, what does a yellow card usually mean?', answer: 'A caution.', choices: ['A caution.', 'A goal.', 'A substitution.', 'A corner kick.'] },
-    { id: 'baseball-innings', category: 'sports', question: 'How many innings are in a standard Major League Baseball game?', answer: 'Nine.', choices: ['Nine.', 'Seven.', 'Eight.', 'Ten.'] },
-    { id: 'baseball-home-run', category: 'sports', question: 'What is it called when a batter hits the ball out of play in fair territory and rounds all bases?', answer: 'A home run.', choices: ['A home run.', 'A bunt.', 'A double play.', 'A walk.'] },
-    { id: 'baseball-world-series-trophy', category: 'sports', question: 'What is the championship series of Major League Baseball called?', answer: 'The World Series.', choices: ['The World Series.', 'The Super Bowl.', 'The Stanley Cup Final.', 'The Finals.'] },
-    { id: 'baseball-pitcher-mound', category: 'sports', question: 'Which player throws the ball from the mound?', answer: 'The pitcher.', choices: ['The pitcher.', 'The catcher.', 'The shortstop.', 'The umpire.'] },
-    { id: 'sports-touchdown-points', category: 'sports', question: 'How many points is a touchdown worth in American football?', answer: '6.', choices: ['6.', '5.', '7.', '8.'] },
-    { id: 'sports-2019-womens-world-cup', category: 'sports', question: 'Which country won the 2019 FIFA Women\'s World Cup?', answer: 'United States.', choices: ['United States.', 'England.', 'Germany.', 'Netherlands.'] },
-    { id: 'sports-baseball-strikes-out', category: 'sports', question: 'In baseball, how many strikes make an out?', answer: 'Three.', choices: ['Three.', 'Two.', 'Four.', 'Five.'] },
-    { id: 'sports-auto-racing-winner-flag', category: 'sports', question: 'What color flag signals the winner in auto racing?', answer: 'Checkered.', choices: ['Checkered.', 'Green.', 'Red.', 'Yellow.'] },
-    { id: 'sports-slalom-giant-slalom', category: 'sports', question: 'What sport features events called slalom and giant slalom?', answer: 'Skiing.', choices: ['Skiing.', 'Snowboarding.', 'Bobsled.', 'Curling.'] },
-
-    { id: 'decades-80s-vhs', category: 'decades', question: 'In the 1980s, what home video format became widely popular?', answer: 'VHS.', choices: ['VHS.', 'Blu-ray.', 'DVD.', 'LaserDisc only.'] },
-    { id: 'decades-90s-beanie-babies', category: 'decades', question: 'Which small stuffed collectibles became a major craze in the 1990s?', answer: 'Beanie Babies.', choices: ['Beanie Babies.', 'Furbies.', 'Troll dolls.', 'Pogs.'] },
-    { id: 'decades-2000s-wii', category: 'decades', question: 'Which Nintendo console made motion-control bowling famous in the 2000s?', answer: 'Wii.', choices: ['Wii.', 'GameCube.', 'Nintendo 64.', 'Switch.'] },
-    { id: 'decades-2010s-instagram', category: 'decades', question: 'Which photo-sharing app launched in 2010 and became a major social platform?', answer: 'Instagram.', choices: ['Instagram.', 'Myspace.', 'AOL.', 'Vine.'] },
-    { id: 'decades-2020s-barbenheimer', category: 'decades', question: 'Which nickname described the same-day 2023 release buzz around Barbie and Oppenheimer?', answer: 'Barbenheimer.', choices: ['Barbenheimer.', 'Marvelmania.', 'Pink Friday.', 'Double Feature Day.'] },
-
-    { id: 'movies-frozen-kingdom-arendelle', category: 'movies', question: 'What is the name of the kingdom in Frozen?', answer: 'Arendelle.', choices: ['Arendelle.', 'Corona.', 'Andalasia.', 'DunBroch.'] },
-    { id: 'movies-toy-story-woody-voice', category: 'movies', question: 'Who voiced Woody in Toy Story?', answer: 'Tom Hanks.', choices: ['Tom Hanks.', 'Tim Allen.', 'Billy Crystal.', 'Robin Williams.'] },
-    { id: 'movies-jurassic-park-main-dinosaur', category: 'movies', question: 'Which dinosaur species is the main attraction in Jurassic Park?', answer: 'Tyrannosaurus rex.', choices: ['Tyrannosaurus rex.', 'Velociraptor.', 'Brachiosaurus.', 'Triceratops.'] },
-    { id: 'movies-harry-potter-owl', category: 'movies', question: 'What is the name of Harry Potter\'s owl?', answer: 'Hedwig.', choices: ['Hedwig.', 'Errol.', 'Crookshanks.', 'Pigwidgeon.'] },
-    { id: 'movies-finding-nemo-clownfish', category: 'movies', question: 'What is the name of Nemo’s father in Finding Nemo?', answer: 'Marlin.', choices: ['Marlin.', 'Bruce.', 'Gill.', 'Nigel.'] },
-    { id: 'movies-lion-king-simba-father', category: 'movies', question: 'What is the name of Simba’s father in The Lion King?', answer: 'Mufasa.', choices: ['Mufasa.', 'Scar.', 'Zazu.', 'Rafiki.'] },
-    { id: 'movies-shrek-donkey-voice', category: 'movies', question: 'Who voiced Donkey in Shrek?', answer: 'Eddie Murphy.', choices: ['Eddie Murphy.', 'Mike Myers.', 'Chris Rock.', 'Martin Lawrence.'] },
-    { id: 'movies-moana-pet-rooster', category: 'movies', question: 'What is the name of Moana’s pet rooster?', answer: 'Heihei.', choices: ['Heihei.', 'Pua.', 'Tamatoa.', 'Maui.'] },
-    { id: 'movies-aladdin-genie-voice', category: 'movies', question: 'Who voiced the Genie in Disney’s Aladdin (1992)?', answer: 'Robin Williams.', choices: ['Robin Williams.', 'Gilbert Gottfried.', 'Tom Hanks.', 'Danny DeVito.'] },
-    { id: 'movies-beauty-and-the-beast-candlestick', category: 'movies', question: 'What is the name of the candlestick in Beauty and the Beast?', answer: 'Lumière.', choices: ['Lumière.', 'Cogsworth.', 'Chip.', 'Maurice.'] },
-
-    { id: 'movies-up-house-destination', category: 'movies', question: 'In Up, where is Carl trying to fly his house?', answer: 'Paradise Falls.', choices: ['Paradise Falls.', 'Angel Falls.', 'Neverland.', 'Radiator Springs.'] },
-    { id: 'movies-cars-lightning-number', category: 'movies', question: 'What number does Lightning McQueen race with in Cars?', answer: '95.', choices: ['95.', '51.', '43.', '88.'] },
-    { id: 'movies-monsters-inc-green-one-eyed', category: 'movies', question: 'What is the name of the small green one-eyed monster in Monsters, Inc.?', answer: 'Mike Wazowski.', choices: ['Mike Wazowski.', 'Sulley.', 'Randall.', 'Roz.'] },
-    { id: 'movies-coco-main-character', category: 'movies', question: 'Who is the main character in Coco?', answer: 'Miguel.', choices: ['Miguel.', 'Hector.', 'Ernesto.', 'Dante.'] },
-    { id: 'movies-inside-out-emotion-blue', category: 'movies', question: 'Which emotion is represented by the color blue in Inside Out?', answer: 'Sadness.', choices: ['Sadness.', 'Joy.', 'Fear.', 'Disgust.'] },
-
-    { id: 'movies-star-wars-princess', category: 'movies', question: 'What is Princess Leia’s last name?', answer: 'Organa.', choices: ['Organa.', 'Skywalker.', 'Solo.', 'Amidala.'] },
-    { id: 'movies-star-wars-wookiee', category: 'movies', question: 'What is the name of Han Solo’s Wookiee co-pilot?', answer: 'Chewbacca.', choices: ['Chewbacca.', 'Yoda.', 'Jar Jar Binks.', 'Lando.'] },
-    { id: 'movies-et-phone-home', category: 'movies', question: 'Complete the famous E.T. quote: "E.T. ____ home."', answer: 'phone.', choices: ['phone.', 'calls.', 'wants.', 'goes.'] },
-    { id: 'movies-wizard-of-oz-road', category: 'movies', question: 'What color is the road Dorothy follows in The Wizard of Oz?', answer: 'Yellow.', choices: ['Yellow.', 'Red.', 'Gold.', 'Blue.'] },
-    { id: 'movies-home-alone-burglars', category: 'movies', question: 'What nickname is given to the burglars in Home Alone?', answer: 'The Wet Bandits.', choices: ['The Wet Bandits.', 'The Sticky Bandits.', 'The Midnight Bandits.', 'The Sneaky Bandits.'] },
-
-    { id: 'movies-avengers-hammer', category: 'movies', question: 'What is the name of Thor’s hammer?', answer: 'Mjölnir.', choices: ['Mjölnir.', 'Stormbreaker.', 'Gungnir.', 'Excalibur.'] },
-    { id: 'movies-black-panther-country', category: 'movies', question: 'What fictional country does Black Panther rule?', answer: 'Wakanda.', choices: ['Wakanda.', 'Genovia.', 'Latveria.', 'Sokovia.'] },
-    { id: 'movies-avengers-purple-villain', category: 'movies', question: 'What is the name of the purple villain in Avengers: Infinity War?', answer: 'Thanos.', choices: ['Thanos.', 'Loki.', 'Ultron.', 'Red Skull.'] },
-    { id: 'movies-spider-man-aunt', category: 'movies', question: 'What is the name of Spider-Man’s aunt?', answer: 'May.', choices: ['May.', 'Anna.', 'June.', 'Rose.'] },
-    { id: 'movies-batman-city', category: 'movies', question: 'What city does Batman protect?', answer: 'Gotham City.', choices: ['Gotham City.', 'Metropolis.', 'Central City.', 'Star City.'] },
-
-    { id: 'movies-princess-bride-giant', category: 'movies', question: 'What is the name of the giant in The Princess Bride?', answer: 'Fezzik.', choices: ['Fezzik.', 'Inigo.', 'Westley.', 'Humperdinck.'] },
-    { id: 'movies-back-to-future-car', category: 'movies', question: 'What type of car is used as the time machine in Back to the Future?', answer: 'DeLorean.', choices: ['DeLorean.', 'Mustang.', 'Corvette.', 'Camaro.'] },
-    { id: 'movies-hunger-games-heroine', category: 'movies', question: 'Who is the heroine of The Hunger Games?', answer: 'Katniss Everdeen.', choices: ['Katniss Everdeen.', 'Primrose Everdeen.', 'Johanna Mason.', 'Rue.'] },
-    { id: 'movies-minions-villain', category: 'movies', question: 'Who is the main villain in Minions?', answer: 'Scarlet Overkill.', choices: ['Scarlet Overkill.', 'Gru.', 'Vector.', 'Balthazar Bratt.'] },
-    { id: 'movies-how-to-train-your-dragon', category: 'movies', question: 'What is the name of Hiccup’s dragon in How to Train Your Dragon?', answer: 'Toothless.', choices: ['Toothless.', 'Stormfly.', 'Hookfang.', 'Barf and Belch.'] },
-
-    { id: 'geography-largest-ocean-pacific', category: 'geography', question: 'What is the largest ocean on Earth?', answer: 'Pacific.', choices: ['Pacific.', 'Atlantic.', 'Indian.', 'Arctic.'] },
-    { id: 'geography-most-active-volcanoes-state', category: 'geography', question: 'Which U.S. state has the most active volcanoes?', answer: 'Alaska.', choices: ['Alaska.', 'California.', 'Hawaii.', 'Washington.'] },
-    { id: 'geography-canada-capital-ottawa', category: 'geography', question: 'What is the capital of Canada?', answer: 'Ottawa.', choices: ['Ottawa.', 'Toronto.', 'Montreal.', 'Vancouver.'] },
-    { id: 'geography-sahara-northern-africa', category: 'geography', question: 'Which desert covers much of northern Africa?', answer: 'Sahara.', choices: ['Sahara.', 'Gobi.', 'Kalahari.', 'Mojave.'] },
-    { id: 'geography-south-america-longest-river', category: 'geography', question: 'What is the longest river in South America?', answer: 'Amazon.', choices: ['Amazon.', 'Paraná.', 'Orinoco.', 'Madeira.'] },
-    { id: 'geography-largest-country', category: 'geography', question: 'What is the largest country in the world by land area?', answer: 'Russia.', choices: ['Russia.', 'Canada.', 'China.', 'United States.'] },
-    { id: 'geography-highest-mountain', category: 'geography', question: 'What is the highest mountain above sea level?', answer: 'Mount Everest.', choices: ['Mount Everest.', 'K2.', 'Kangchenjunga.', 'Denali.'] },
-    { id: 'geography-smallest-country', category: 'geography', question: 'What is the smallest country in the world?', answer: 'Vatican City.', choices: ['Vatican City.', 'Monaco.', 'San Marino.', 'Liechtenstein.'] },
-    { id: 'geography-africa-largest-lake', category: 'geography', question: 'What is the largest lake in Africa by surface area?', answer: 'Lake Victoria.', choices: ['Lake Victoria.', 'Lake Tanganyika.', 'Lake Malawi.', 'Lake Chad.'] },
-    { id: 'geography-country-most-time-zones', category: 'geography', question: 'Which country has the most time zones?', answer: 'France.', choices: ['France.', 'Russia.', 'United States.', 'Australia.'] },
-    { id: 'geography-ring-of-fire', category: 'geography', question: 'What is the name of the earthquake- and volcano-prone region around the Pacific Ocean?', answer: 'Ring of Fire.', choices: ['Ring of Fire.', 'Pacific Belt.', 'Volcanic Arc.', 'Fire Circle.'] },
-    { id: 'geography-nile-flows-into', category: 'geography', question: 'Into which sea does the Nile River empty?', answer: 'Mediterranean Sea.', choices: ['Mediterranean Sea.', 'Red Sea.', 'Black Sea.', 'Arabian Sea.'] },
-    { id: 'geography-australia-capital', category: 'geography', question: 'What is the capital of Australia?', answer: 'Canberra.', choices: ['Canberra.', 'Sydney.', 'Melbourne.', 'Perth.'] },
-    { id: 'geography-largest-island', category: 'geography', question: 'What is the largest island in the world?', answer: 'Greenland.', choices: ['Greenland.', 'New Guinea.', 'Borneo.', 'Madagascar.'] },
-    { id: 'geography-japan-mountain', category: 'geography', question: 'What is the highest mountain in Japan?', answer: 'Mount Fuji.', choices: ['Mount Fuji.', 'Mount Kita.', 'Mount Hotaka.', 'Mount Tate.'] },
-
-    { id: 'animals-largest-shark', category: 'animals', question: 'What is the largest species of shark?', answer: 'Whale shark.', choices: ['Whale shark.', 'Great white shark.', 'Hammerhead shark.', 'Tiger shark.'] },
-    { id: 'animals-ship-of-the-desert', category: 'animals', question: 'Which animal is known as the "ship of the desert"?', answer: 'Camel.', choices: ['Camel.', 'Horse.', 'Donkey.', 'Llama.'] },
-    { id: 'animals-octopus-hearts', category: 'animals', question: 'How many hearts does an octopus have?', answer: 'Three.', choices: ['Three.', 'One.', 'Two.', 'Four.'] },
-    { id: 'animals-baby-kangaroo', category: 'animals', question: 'What is a baby kangaroo called?', answer: 'Joey.', choices: ['Joey.', 'Cub.', 'Pup.', 'Kit.'] },
-    { id: 'animals-black-white-stripes', category: 'animals', question: 'Which animal has black-and-white stripes?', answer: 'Zebra.', choices: ['Zebra.', 'Okapi.', 'Tapir.', 'Gazelle.'] },
-    { id: 'animals-fastest-land-animal', category: 'animals', question: 'What is the fastest land animal?', answer: 'Cheetah.', choices: ['Cheetah.', 'Lion.', 'Pronghorn.', 'Greyhound.'] },
-    { id: 'animals-largest-mammal', category: 'animals', question: 'What is the largest animal ever known to exist?', answer: 'Blue whale.', choices: ['Blue whale.', 'African elephant.', 'Whale shark.', 'Megalodon.'] },
-    { id: 'animals-group-of-crows', category: 'animals', question: 'What is a group of crows called?', answer: 'Murder.', choices: ['Murder.', 'Pack.', 'Pod.', 'Flock.'] },
-    { id: 'animals-only-mammal-true-flight', category: 'animals', question: 'Which mammals are capable of true powered flight?', answer: 'Bats.', choices: ['Bats.', 'Flying squirrels.', 'Sugar gliders.', 'Colugos.'] },
-    { id: 'animals-largest-cat', category: 'animals', question: 'What is the largest species of wild cat?', answer: 'Tiger.', choices: ['Tiger.', 'Lion.', 'Jaguar.', 'Leopard.'] },
-    { id: 'animals-koala-diet', category: 'animals', question: 'What do koalas primarily eat?', answer: 'Eucalyptus leaves.', choices: ['Eucalyptus leaves.', 'Bamboo.', 'Grass.', 'Fruit.'] },
-    { id: 'animals-polar-bear-color', category: 'animals', question: 'What color is a polar bear’s skin beneath its fur?', answer: 'Black.', choices: ['Black.', 'White.', 'Pink.', 'Gray.'] },
-    { id: 'animals-largest-bird', category: 'animals', question: 'What is the largest living bird?', answer: 'Ostrich.', choices: ['Ostrich.', 'Emu.', 'Cassowary.', 'Condor.'] },
-    { id: 'animals-dolphin-mammal', category: 'animals', question: 'Are dolphins fish or mammals?', answer: 'Mammals.', choices: ['Mammals.', 'Fish.', 'Amphibians.', 'Reptiles.'] },
-    { id: 'animals-sloth-toes', category: 'animals', question: 'How many toes do three-toed sloths have on their hind feet?', answer: 'Three.', choices: ['Three.', 'Two.', 'Four.', 'Five.'] },
-
-    { id: 'history-first-state-delaware', category: 'history', question: 'Which state was the first to join the United States?', answer: 'Delaware.', choices: ['Delaware.', 'Virginia.', 'Pennsylvania.', 'Massachusetts.'] },
-    { id: 'history-first-moon-walker', category: 'history', question: 'Who was the first person to walk on the Moon?', answer: 'Neil Armstrong.', choices: ['Neil Armstrong.', 'Buzz Aldrin.', 'Michael Collins.', 'Alan Shepard.'] },
-    { id: 'history-machu-picchu-civilization', category: 'history', question: 'Which ancient civilization built Machu Picchu?', answer: 'Inca.', choices: ['Inca.', 'Maya.', 'Aztec.', 'Olmec.'] },
-    { id: 'history-statue-liberty-france-bonus', category: 'history', question: 'The Statue of Liberty was a gift from which country?', answer: 'France.', choices: ['France.', 'England.', 'Germany.', 'Italy.'] },
-    { id: 'history-maid-of-orleans', category: 'history', question: 'Who was known as the Maid of Orléans?', answer: 'Joan of Arc.', choices: ['Joan of Arc.', 'Marie Antoinette.', 'Catherine de Medici.', 'Eleanor of Aquitaine.'] },
-    { id: 'history-berlin-wall-fall', category: 'history', question: 'In what year did the Berlin Wall fall?', answer: '1989.', choices: ['1989.', '1985.', '1991.', '1979.'] },
-    { id: 'history-us-independence', category: 'history', question: 'In what year was the Declaration of Independence adopted?', answer: '1776.', choices: ['1776.', '1783.', '1775.', '1789.'] },
-    { id: 'history-egyptian-pyramids', category: 'history', question: 'Which civilization built the Great Pyramids of Giza?', answer: 'Ancient Egyptians.', choices: ['Ancient Egyptians.', 'Romans.', 'Greeks.', 'Persians.'] },
-    { id: 'history-magna-carta-country', category: 'history', question: 'The Magna Carta was first issued in which country?', answer: 'England.', choices: ['England.', 'France.', 'Scotland.', 'Germany.'] },
-    { id: 'history-first-president', category: 'history', question: 'Who was the first President of the United States?', answer: 'George Washington.', choices: ['George Washington.', 'John Adams.', 'Thomas Jefferson.', 'James Madison.'] },
-    { id: 'history-titanic-year', category: 'history', question: 'In what year did the Titanic sink?', answer: '1912.', choices: ['1912.', '1905.', '1918.', '1921.'] },
-    { id: 'history-world-war-two-end', category: 'history', question: 'In what year did World War II end?', answer: '1945.', choices: ['1945.', '1944.', '1946.', '1939.'] },
-    { id: 'history-great-wall-country', category: 'history', question: 'The Great Wall was built in which country?', answer: 'China.', choices: ['China.', 'Japan.', 'Mongolia.', 'India.'] },
-    { id: 'history-lincoln-assassinated-theater', category: 'history', question: 'At which theater was Abraham Lincoln assassinated?', answer: 'Ford’s Theatre.', choices: ['Ford’s Theatre.', 'Booth Theatre.', 'National Theatre.', 'Liberty Theatre.'] },
-    { id: 'history-rosetta-stone-discovery-country', category: 'history', question: 'In which country was the Rosetta Stone discovered?', answer: 'Egypt.', choices: ['Egypt.', 'Greece.', 'Turkey.', 'Italy.'] },
-
-    { id: 'technology-url-stands-for', category: 'technology', question: 'What does URL stand for?', answer: 'Uniform Resource Locator.', choices: ['Uniform Resource Locator.', 'Universal Resource Locator.', 'Uniform Retrieval Link.', 'Universal Retrieval Locator.'] },
-    { id: 'technology-android-developer', category: 'technology', question: 'Which company developed the Android operating system?', answer: 'Google.', choices: ['Google.', 'Apple.', 'Microsoft.', 'Samsung.'] },
-    { id: 'technology-pdf-stands-for', category: 'technology', question: 'What does PDF stand for?', answer: 'Portable Document Format.', choices: ['Portable Document Format.', 'Personal Data File.', 'Printed Document File.', 'Programmed Data Format.'] },
-    { id: 'technology-apple-voice-assistant', category: 'technology', question: 'What is the name of Apple\'s voice assistant?', answer: 'Siri.', choices: ['Siri.', 'Alexa.', 'Cortana.', 'Bixby.'] },
-    { id: 'technology-minecraft-creator', category: 'technology', question: 'Which company created Minecraft?', answer: 'Mojang.', choices: ['Mojang.', 'Valve.', 'Epic Games.', 'Blizzard.'] },
-
-    { id: 'general-hexagon-sides-bonus', category: 'general', question: 'How many sides does a hexagon have?', answer: '6.', choices: ['6.', '5.', '7.', '8.'] },
-    { id: 'general-leap-year-extra-day', category: 'general', question: 'Which month has an extra day during a leap year?', answer: 'February.', choices: ['February.', 'January.', 'March.', 'April.'] },
-    { id: 'general-emerald-color', category: 'general', question: 'What color are emeralds?', answer: 'Green.', choices: ['Green.', 'Blue.', 'Red.', 'Purple.'] },
-    { id: 'general-continents-count', category: 'general', question: 'How many continents are there?', answer: '7.', choices: ['7.', '5.', '6.', '8.'] },
-    { id: 'general-tallest-animal-bonus', category: 'general', question: 'What is the tallest animal in the world?', answer: 'Giraffe.', choices: ['Giraffe.', 'Elephant.', 'Camel.', 'Moose.'] },
-    { id: 'technology-html-stands-for', category: 'technology', question: 'What does HTML stand for?', answer: 'HyperText Markup Language.', choices: ['HyperText Markup Language.', 'HighText Machine Language.', 'Hyperlink Text Management Language.', 'Home Tool Markup Language.'] },
-{ id: 'technology-www-stands-for', category: 'technology', question: 'What does WWW stand for?', answer: 'World Wide Web.', choices: ['World Wide Web.', 'World Web Window.', 'Wide World Web.', 'Web World Wide.'] },
-{ id: 'technology-microsoft-founder', category: 'technology', question: 'Which person co-founded Microsoft?', answer: 'Bill Gates.', choices: ['Bill Gates.', 'Steve Jobs.', 'Mark Zuckerberg.', 'Elon Musk.'] },
-{ id: 'technology-google-browser', category: 'technology', question: 'What is the name of Google\'s web browser?', answer: 'Chrome.', choices: ['Chrome.', 'Safari.', 'Firefox.', 'Edge.'] },
-{ id: 'technology-computer-brain', category: 'technology', question: 'What part of a computer is often called its "brain"?', answer: 'CPU.', choices: ['CPU.', 'Monitor.', 'Keyboard.', 'Mouse.'] },
-{ id: 'technology-usb-stands-for', category: 'technology', question: 'What does USB stand for?', answer: 'Universal Serial Bus.', choices: ['Universal Serial Bus.', 'United System Board.', 'Universal Service Band.', 'User System Bridge.'] },
-{ id: 'technology-video-site', category: 'technology', question: 'Which website is best known for sharing videos?', answer: 'YouTube.', choices: ['YouTube.', 'LinkedIn.', 'Reddit.', 'Pinterest.'] },
-{ id: 'technology-playstation-maker', category: 'technology', question: 'Which company makes the PlayStation?', answer: 'Sony.', choices: ['Sony.', 'Nintendo.', 'Microsoft.', 'Sega.'] },
-{ id: 'technology-nintendo-mascot', category: 'technology', question: 'Who is Nintendo\'s famous plumber mascot?', answer: 'Mario.', choices: ['Mario.', 'Link.', 'Sonic.', 'Kirby.'] },
-{ id: 'technology-email-symbol', category: 'technology', question: 'Which symbol is commonly used in email addresses?', answer: '@.', choices: ['@.', '#.', '&.', '% .'] },
-
-{ id: 'general-largest-ocean', category: 'general', question: 'What is the largest ocean on Earth?', answer: 'Pacific Ocean.', choices: ['Pacific Ocean.', 'Atlantic Ocean.', 'Indian Ocean.', 'Arctic Ocean.'] },
-{ id: 'general-spider-legs', category: 'general', question: 'How many legs does a spider have?', answer: '8.', choices: ['8.', '6.', '10.', '12.'] },
-{ id: 'general-rainbow-colors', category: 'general', question: 'How many colors are traditionally listed in a rainbow?', answer: '7.', choices: ['7.', '5.', '6.', '8.'] },
-{ id: 'general-baby-frog', category: 'general', question: 'What is a baby frog called?', answer: 'Tadpole.', choices: ['Tadpole.', 'Pup.', 'Calf.', 'Cub.'] },
-{ id: 'general-penguin-bird', category: 'general', question: 'What type of animal is a penguin?', answer: 'Bird.', choices: ['Bird.', 'Fish.', 'Mammal.', 'Reptile.'] },
-{ id: 'general-bee-honey', category: 'general', question: 'Which insect makes honey?', answer: 'Bee.', choices: ['Bee.', 'Butterfly.', 'Ant.', 'Beetle.'] },
-{ id: 'general-freezing-point', category: 'general', question: 'At what temperature does water freeze in Celsius?', answer: '0 degrees.', choices: ['0 degrees.', '10 degrees.', '32 degrees.', '100 degrees.'] },
-{ id: 'general-largest-planet', category: 'general', question: 'Which planet is the largest in our solar system?', answer: 'Jupiter.', choices: ['Jupiter.', 'Saturn.', 'Earth.', 'Mars.'] },
-{ id: 'general-cheetah-fastest', category: 'general', question: 'What is the fastest land animal?', answer: 'Cheetah.', choices: ['Cheetah.', 'Lion.', 'Horse.', 'Leopard.'] },
-{ id: 'general-human-teeth', category: 'general', question: 'How many teeth does a typical adult human have?', answer: '32.', choices: ['32.', '28.', '30.', '36.'] },
-{ id: 'technology-gps-stands-for', category: 'technology', question: 'What does GPS stand for?', answer: 'Global Positioning System.', choices: ['Global Positioning System.', 'General Positioning Service.', 'Global Path System.', 'General Path Service.'] },
-{ id: 'technology-amazon-assistant', category: 'technology', question: 'What is the name of Amazon\'s voice assistant?', answer: 'Alexa.', choices: ['Alexa.', 'Siri.', 'Cortana.', 'Bixby.'] },
-{ id: 'technology-bluetooth-origin', category: 'technology', question: 'Bluetooth technology is named after a king from which country?', answer: 'Denmark.', choices: ['Denmark.', 'Sweden.', 'Norway.', 'Germany.'] },
-{ id: 'technology-wifi-meaning', category: 'technology', question: 'True or False: Wi-Fi officially stands for "Wireless Fidelity."', answer: 'False.', choices: ['True.', 'False.', 'Only in Europe.', 'Only in the U.S.'] },
-{ id: 'technology-linux-mascot', category: 'technology', question: 'What is the name of the Linux mascot?', answer: 'Tux.', choices: ['Tux.', 'Pingu.', 'Nibbles.', 'Kernel.'] },
-{ id: 'technology-iphone-first-year', category: 'technology', question: 'In what year was the first iPhone released?', answer: '2007.', choices: ['2007.', '2005.', '2008.', '2010.'] },
-{ id: 'technology-xbox-maker', category: 'technology', question: 'Which company makes the Xbox?', answer: 'Microsoft.', choices: ['Microsoft.', 'Sony.', 'Nintendo.', 'Sega.'] },
-{ id: 'technology-file-extension-jpeg', category: 'technology', question: 'JPEG files are primarily used for what?', answer: 'Images.', choices: ['Images.', 'Music.', 'Spreadsheets.', 'Videos.'] },
-{ id: 'technology-cloud-computing', category: 'technology', question: 'What does "the cloud" generally refer to?', answer: 'Remote servers accessed over the internet.', choices: ['Remote servers accessed over the internet.', 'Weather satellites.', 'Computer fans.', 'Local hard drives.'] },
-{ id: 'technology-spam-origin', category: 'technology', question: 'What does the term "spam" usually refer to in technology?', answer: 'Unwanted messages.', choices: ['Unwanted messages.', 'Computer memory.', 'Video games.', 'Search engines.'] },
-
-{ id: 'general-largest-desert', category: 'general', question: 'What is the largest desert in the world?', answer: 'Antarctica.', choices: ['Antarctica.', 'Sahara Desert.', 'Gobi Desert.', 'Arabian Desert.'] },
-{ id: 'general-octopus-hearts', category: 'general', question: 'How many hearts does an octopus have?', answer: '3.', choices: ['3.', '2.', '1.', '4.'] },
-{ id: 'general-banana-berry', category: 'general', question: 'True or False: Bananas are classified as berries.', answer: 'True.', choices: ['True.', 'False.', 'Only wild bananas.', 'Only ripe bananas.'] },
-{ id: 'general-koala-country', category: 'general', question: 'Koalas are native to which country?', answer: 'Australia.', choices: ['Australia.', 'New Zealand.', 'South Africa.', 'Brazil.'] },
-{ id: 'general-venus-rotation', category: 'general', question: 'Which planet rotates in the opposite direction of most planets in our solar system?', answer: 'Venus.', choices: ['Venus.', 'Mars.', 'Neptune.', 'Mercury.'] },
-{ id: 'general-shark-skeleton', category: 'general', question: 'What are shark skeletons primarily made of?', answer: 'Cartilage.', choices: ['Cartilage.', 'Bone.', 'Calcium.', 'Shell.'] },
-{ id: 'general-blue-whale-heart', category: 'general', question: 'Which animal has a heart that can weigh over 400 pounds?', answer: 'Blue whale.', choices: ['Blue whale.', 'Elephant.', 'Giraffe.', 'Hippopotamus.'] },
-{ id: 'general-venus-hottest', category: 'general', question: 'Which planet is the hottest in our solar system?', answer: 'Venus.', choices: ['Venus.', 'Mercury.', 'Mars.', 'Jupiter.'] },
-{ id: 'general-human-bones', category: 'general', question: 'How many bones does the average adult human body have?', answer: '206.', choices: ['206.', '212.', '198.', '224.'] },
-{ id: 'general-sloth-speed', category: 'general', question: 'What is considered one of the slowest mammals in the world?', answer: 'Sloth.', choices: ['Sloth.', 'Koala.', 'Panda.', 'Armadillo.'] },
-{ id: 'technology-email-inventor', category: 'technology', question: 'Who is credited with inventing modern email?', answer: 'Ray Tomlinson.', choices: ['Ray Tomlinson.', 'Bill Gates.', 'Steve Jobs.', 'Tim Berners-Lee.'] },
-{ id: 'technology-first-web-browser', category: 'technology', question: 'What was the name of the first web browser?', answer: 'WorldWideWeb.', choices: ['WorldWideWeb.', 'Netscape.', 'Internet Explorer.', 'Mosaic.'] },
-{ id: 'technology-internet-creator', category: 'technology', question: 'Who is known as the inventor of the World Wide Web?', answer: 'Tim Berners-Lee.', choices: ['Tim Berners-Lee.', 'Bill Gates.', 'Steve Wozniak.', 'Larry Page.'] },
-{ id: 'technology-mozilla-browser', category: 'technology', question: 'Which browser is developed by Mozilla?', answer: 'Firefox.', choices: ['Firefox.', 'Edge.', 'Opera.', 'Safari.'] },
-{ id: 'technology-png-stands-for', category: 'technology', question: 'What does PNG stand for?', answer: 'Portable Network Graphics.', choices: ['Portable Network Graphics.', 'Personal Network Graphics.', 'Public Network Graphics.', 'Program Network Graphics.'] },
-{ id: 'technology-qwerty-layout', category: 'technology', question: 'What is the most common keyboard layout called?', answer: 'QWERTY.', choices: ['QWERTY.', 'DVORAK.', 'AZERTY.', 'QWERZ.'] },
-{ id: 'technology-mac-operating-system', category: 'technology', question: 'What operating system runs on Apple Mac computers?', answer: 'macOS.', choices: ['macOS.', 'iOS.', 'Windows.', 'Linux.'] },
-{ id: 'technology-screenshot-purpose', category: 'technology', question: 'What is a screenshot?', answer: 'A picture of what is displayed on a screen.', choices: ['A picture of what is displayed on a screen.', 'A printed webpage.', 'A scanned document.', 'A video recording.'] },
-{ id: 'technology-router-purpose', category: 'technology', question: 'What device directs internet traffic between networks in many homes?', answer: 'Router.', choices: ['Router.', 'Monitor.', 'Printer.', 'Scanner.'] },
-{ id: 'technology-qr-code-use', category: 'technology', question: 'What can a QR code typically be scanned with?', answer: 'A smartphone camera.', choices: ['A smartphone camera.', 'A television remote.', 'A game controller.', 'A calculator.'] },
-
-{ id: 'general-animal-king', category: 'general', question: 'Which animal is often called the "King of the Jungle"?', answer: 'Lion.', choices: ['Lion.', 'Tiger.', 'Elephant.', 'Bear.'] },
-{ id: 'general-mount-everest-location', category: 'general', question: 'Mount Everest lies on the border of Nepal and which country?', answer: 'China.', choices: ['China.', 'India.', 'Pakistan.', 'Bhutan.'] },
-{ id: 'general-polar-bear-region', category: 'general', question: 'Polar bears naturally live in which region?', answer: 'The Arctic.', choices: ['The Arctic.', 'Antarctica.', 'The Amazon.', 'Siberia.'] },
-{ id: 'general-largest-bird', category: 'general', question: 'What is the largest living bird?', answer: 'Ostrich.', choices: ['Ostrich.', 'Emu.', 'Eagle.', 'Penguin.'] },
-{ id: 'general-longest-river', category: 'general', question: 'Which river is traditionally taught as the longest in the world?', answer: 'The Nile.', choices: ['The Nile.', 'The Amazon.', 'The Mississippi.', 'The Yangtze.'] },
-{ id: 'general-blood-color', category: 'general', question: 'What color is human blood inside the body?', answer: 'Red.', choices: ['Red.', 'Blue.', 'Purple.', 'Green.'] },
-{ id: 'general-elephant-trunk', category: 'general', question: 'What body part do elephants use like a nose and an arm?', answer: 'Their trunk.', choices: ['Their trunk.', 'Their tusks.', 'Their tail.', 'Their ears.'] },
-{ id: 'general-fastest-bird', category: 'general', question: 'What is the fastest animal on Earth during a dive?', answer: 'Peregrine falcon.', choices: ['Peregrine falcon.', 'Cheetah.', 'Golden eagle.', 'Sailfish.'] },
-{ id: 'general-honey-never-spoils', category: 'general', question: 'True or False: Honey can last for thousands of years without spoiling.', answer: 'True.', choices: ['True.', 'False.', 'Only if refrigerated.', 'Only if unopened.'] },
-{ id: 'general-human-brain-weight', category: 'general', question: 'About how much does the average adult human brain weigh?', answer: 'About 3 pounds.', choices: ['About 3 pounds.', 'About 1 pound.', 'About 5 pounds.', 'About 8 pounds.'] },
-{ id: 'civil-alaska-permafrost', category: 'civil-engineering', question: 'What is the primary concern when constructing foundations on permafrost?', answer: 'Preventing the frozen ground from thawing.', choices: ['Preventing the frozen ground from thawing.', 'Increasing groundwater flow.', 'Reducing earthquake shaking.', 'Improving soil color.'] },
-
-{ id: 'civil-alaska-richardson-highway', category: 'civil-engineering', question: 'What was Alaska’s first major road connecting Valdez and Fairbanks?', answer: 'The Richardson Highway.', choices: ['The Richardson Highway.', 'The Dalton Highway.', 'The Seward Highway.', 'The Parks Highway.'] },
-
-{ id: 'civil-alaska-frost-heave', category: 'civil-engineering', question: 'What phenomenon causes roads to buckle and shift due to freezing and thawing soils?', answer: 'Frost heave.', choices: ['Liquefaction.', 'Subsidence.', 'Frost heave.', 'Scouring.'] },
-
-{ id: 'civil-alaska-trans-alaska-pipeline', category: 'civil-engineering', question: 'Approximately how long is the Trans-Alaska Pipeline System?', answer: 'About 800 miles.', choices: ['About 800 miles.', 'About 250 miles.', 'About 1,500 miles.', 'About 3,000 miles.'] },
-
-{ id: 'civil-alaska-pipeline-elevated', category: 'civil-engineering', question: 'Why are large sections of the Trans-Alaska Pipeline elevated above the ground?', answer: 'To avoid thawing permafrost.', choices: ['To avoid thawing permafrost.', 'To improve aesthetics.', 'To reduce wind resistance.', 'To allow larger trucks underneath.'] },
-
-{ id: 'civil-alaska-earthquake-design', category: 'civil-engineering', question: 'Which natural hazard heavily influences structural design standards in Alaska?', answer: 'Earthquakes.', choices: ['Tornadoes.', 'Earthquakes.', 'Hurricanes.', 'Wildfires.'] },
-
-{ id: 'civil-alaska-1964', category: 'civil-engineering', question: 'What major event transformed seismic engineering practices in Alaska?', answer: 'The 1964 Great Alaska Earthquake.', choices: ['The 1964 Great Alaska Earthquake.', 'The 1912 Novarupta eruption.', 'The 1989 Exxon Valdez spill.', 'The 2002 Denali wildfire.'] },
-
-{ id: 'civil-alaska-liquefaction', category: 'civil-engineering', question: 'During earthquakes, what process causes saturated soils to temporarily lose strength?', answer: 'Liquefaction.', choices: ['Erosion.', 'Liquefaction.', 'Sedimentation.', 'Compaction.'] },
-
-{ id: 'civil-alaska-dalton', category: 'civil-engineering', question: 'Which highway was originally built to support construction of the Trans-Alaska Pipeline?', answer: 'The Dalton Highway.', choices: ['The Dalton Highway.', 'The Glenn Highway.', 'The Alaska Highway.', 'The Sterling Highway.'] },
-
-{ id: 'civil-alaska-ice-roads', category: 'civil-engineering', question: 'What temporary transportation routes are sometimes used in remote Alaskan regions during winter?', answer: 'Ice roads.', choices: ['Ice roads.', 'Floating roads.', 'Magnetic roads.', 'Solar roads.'] },
-
-{ id: 'civil-alaska-scour', category: 'civil-engineering', question: 'What term describes erosion around bridge foundations caused by flowing water?', answer: 'Scour.', choices: ['Scour.', 'Settlement.', 'Heave.', 'Deflection.'] },
-
-{ id: 'civil-alaska-denali-fault', category: 'civil-engineering', question: 'Which major fault system crosses central Alaska?', answer: 'The Denali Fault.', choices: ['The Denali Fault.', 'The San Andreas Fault.', 'The New Madrid Fault.', 'The Hayward Fault.'] },
-
-{ id: 'civil-alaska-thermal-piles', category: 'civil-engineering', question: 'What devices are used to help keep permafrost frozen beneath structures?', answer: 'Thermosyphons.', choices: ['Thermosyphons.', 'Caissons.', 'Sheet piles.', 'Riprap.'] },
-
-{ id: 'civil-alaska-riprap', category: 'civil-engineering', question: 'What material is commonly placed along shorelines and embankments to reduce erosion?', answer: 'Riprap.', choices: ['Riprap.', 'Asphalt.', 'Rebar.', 'Plywood.'] },
-
-{ id: 'civil-alaska-bearing-capacity', category: 'civil-engineering', question: 'What geotechnical term describes the maximum load soil can safely support?', answer: 'Bearing capacity.', choices: ['Bearing capacity.', 'Elastic modulus.', 'Hydraulic gradient.', 'Flow rate.'] },
-
-{ id: 'civil-alaska-freeze-thaw', category: 'civil-engineering', question: 'Repeated cycles of freezing and thawing primarily affect what aspect of infrastructure?', answer: 'Pavement durability.', choices: ['Pavement durability.', 'Electrical voltage.', 'Bridge paint color.', 'Traffic signals.'] },
-
-{ id: 'civil-alaska-culvert', category: 'civil-engineering', question: 'What structure allows water to pass beneath a roadway?', answer: 'A culvert.', choices: ['A culvert.', 'A retaining wall.', 'A parapet.', 'A pier cap.'] },
-
-{ id: 'civil-alaska-seismic-joints', category: 'civil-engineering', question: 'Expansion joints in bridges help accommodate what movement?', answer: 'Thermal expansion and seismic movement.', choices: ['Thermal expansion and seismic movement.', 'Only vehicle loads.', 'Only snow accumulation.', 'Wind noise.'] },
-
-{ id: 'civil-alaska-remote-construction', category: 'civil-engineering', question: 'One of the biggest challenges of construction in rural Alaska is:', answer: 'Transporting materials to remote sites.', choices: ['Transporting materials to remote sites.', 'Finding limestone.', 'Lack of daylight year-round.', 'Too many toll roads.'] },
-
-{ id: 'civil-alaska-snow-load', category: 'civil-engineering', question: 'Roofs in many parts of Alaska must be designed for high levels of what?', answer: 'Snow load.', choices: ['Snow load.', 'Hail load.', 'Ash load.', 'Sand load.'] },
-
-{ id: 'civil-alaska-glacial-silt', category: 'civil-engineering', question: 'Fine sediment produced by glaciers is commonly called:', answer: 'Glacial silt.', choices: ['Glacial silt.', 'Peat.', 'Loess.', 'Tillite.'] },
-
-{ id: 'civil-alaska-sheet-pile', category: 'civil-engineering', question: 'What type of retaining system uses interlocking steel sections driven into the ground?', answer: 'Sheet piling.', choices: ['Sheet piling.', 'Gabions.', 'Trusses.', 'Tie beams.'] },
-
-{ id: 'civil-alaska-active-layer', category: 'civil-engineering', question: 'What is the name of the top layer of soil above permafrost that thaws each summer?', answer: 'The active layer.', choices: ['The active layer.', 'The caprock.', 'The aquifer.', 'The overburden.'] },
-
-{ id: 'civil-alaska-bridge-inspection', category: 'civil-engineering', question: 'What is a primary purpose of routine bridge inspections?', answer: 'Identifying structural deterioration.', choices: ['Identifying structural deterioration.', 'Increasing speed limits.', 'Changing paint colors.', 'Reducing toll costs.'] },
-
-{ id: 'civil-alaska-embankment', category: 'civil-engineering', question: 'Raised sections of earth supporting a roadway are called:', answer: 'Embankments.', choices: ['Embankments.', 'Abutments.', 'Lintels.', 'Aprons.'] },
-
-{ id: 'civil-alaska-denali-pipeline', category: 'civil-engineering', question: 'The Trans-Alaska Pipeline crosses approximately how many mountain ranges?', answer: 'Three major mountain ranges.', choices: ['Three major mountain ranges.', 'One mountain range.', 'Five mountain ranges.', 'Seven mountain ranges.'] },
-
-{ id: 'civil-alaska-abutment', category: 'civil-engineering', question: 'What bridge component supports the ends of the bridge span?', answer: 'The abutment.', choices: ['The abutment.', 'The girder.', 'The deck.', 'The parapet.'] },
-
-{ id: 'civil-alaska-runoff', category: 'civil-engineering', question: 'Spring snowmelt most significantly increases what concern for engineers?', answer: 'Stormwater runoff.', choices: ['Stormwater runoff.', 'Traffic congestion.', 'Air pollution.', 'Noise complaints.'] },
-
-{ id: 'civil-alaska-geotech', category: 'civil-engineering', question: 'Which branch of civil engineering focuses on soil and foundation behavior?', answer: 'Geotechnical engineering.', choices: ['Geotechnical engineering.', 'Environmental engineering.', 'Transportation engineering.', 'Structural drafting.'] },
-
-{ id: 'civil-alaska-surveying', category: 'civil-engineering', question: 'What profession is responsible for establishing precise property boundaries and site measurements?', answer: 'Land surveying.', choices: ['Land surveying.', 'Architecture.', 'Urban forestry.', 'Meteorology.'] },
-{ id: 'civil-kenai-sterling-highway', category: 'civil-engineering', question: 'Which major highway serves as the primary transportation corridor through much of the Kenai Peninsula?', answer: 'The Sterling Highway.', choices: ['The Sterling Highway.', 'The Dalton Highway.', 'The Richardson Highway.', 'The Glenn Highway.'] },
-
-{ id: 'civil-kenai-seward-highway', category: 'civil-engineering', question: 'What highway connects Anchorage to the Kenai Peninsula via the Turnagain Arm?', answer: 'The Seward Highway.', choices: ['The Seward Highway.', 'The Parks Highway.', 'The Elliott Highway.', 'The Alaska Highway.'] },
-
-{ id: 'civil-kenai-moose-river', category: 'civil-engineering', question: 'The Sterling Highway crosses the Kenai River near Soldotna using what type of infrastructure?', answer: 'A bridge.', choices: ['A bridge.', 'A tunnel.', 'A ferry.', 'A causeway.'] },
-
-{ id: 'civil-kenai-earthquake', category: 'civil-engineering', question: 'What major natural hazard must engineers account for on the Kenai Peninsula?', answer: 'Earthquakes.', choices: ['Earthquakes.', 'Hurricanes.', 'Tornadoes.', 'Dust storms.'] },
-
-{ id: 'civil-kenai-tsunami', category: 'civil-engineering', question: 'Coastal communities such as Seward must consider what additional hazard in infrastructure planning?', answer: 'Tsunamis.', choices: ['Tsunamis.', 'Wildfires.', 'Sinkholes.', 'Volcanic lava flows.'] },
-
-{ id: 'civil-kenai-seward-1964', category: 'civil-engineering', question: 'Which Kenai Peninsula community suffered major damage from the 1964 Great Alaska Earthquake and tsunami?', answer: 'Seward.', choices: ['Seward.', 'Soldotna.', 'Cooper Landing.', 'Ninilchik.'] },
-
-{ id: 'civil-kenai-turnagain', category: 'civil-engineering', question: 'The highway route into the Kenai Peninsula follows which body of water known for extreme tides?', answer: 'Turnagain Arm.', choices: ['Turnagain Arm.', 'Cook Inlet.', 'Prince William Sound.', 'Kachemak Bay.'] },
-
-{ id: 'civil-kenai-cook-inlet', category: 'civil-engineering', question: 'What body of water separates much of the Kenai Peninsula from mainland Alaska?', answer: 'Cook Inlet.', choices: ['Cook Inlet.', 'Bristol Bay.', 'Norton Sound.', 'Yakutat Bay.'] },
-
-{ id: 'civil-kenai-frost-heave', category: 'civil-engineering', question: 'What cold-weather process commonly damages roads on the Kenai Peninsula?', answer: 'Frost heave.', choices: ['Frost heave.', 'Desertification.', 'Salt intrusion.', 'Karst collapse.'] },
-
-{ id: 'civil-kenai-drainage', category: 'civil-engineering', question: 'Proper drainage along Kenai Peninsula roads primarily helps reduce:', answer: 'Freeze-thaw pavement damage.', choices: ['Freeze-thaw pavement damage.', 'Hail damage.', 'Traffic congestion.', 'Noise pollution.'] },
-
-{ id: 'civil-kenai-russian-river', category: 'civil-engineering', question: 'Near which famous salmon fishing destination do engineers maintain transportation infrastructure on the Sterling Highway?', answer: 'The Russian River.', choices: ['The Russian River.', 'The Yukon River.', 'The Chena River.', 'The Kuskokwim River.'] },
-
-{ id: 'civil-kenai-cooper-landing', category: 'civil-engineering', question: 'Which Kenai Peninsula community has been the focus of major Sterling Highway improvement projects?', answer: 'Cooper Landing.', choices: ['Cooper Landing.', 'Hope.', 'Homer.', 'Seldovia.'] },
-
-{ id: 'civil-kenai-soldotna', category: 'civil-engineering', question: 'Which city is often considered the transportation hub of the central Kenai Peninsula?', answer: 'Soldotna.', choices: ['Soldotna.', 'Seward.', 'Whittier.', 'Valdez.'] },
-
-{ id: 'civil-kenai-homer-spit', category: 'civil-engineering', question: 'What narrow landform extending into Kachemak Bay presents unique engineering challenges in Homer?', answer: 'The Homer Spit.', choices: ['The Homer Spit.', 'The Kenai Flats.', 'The Harding Moraine.', 'The Anchor Delta.'] },
-
-{ id: 'civil-kenai-spit-hazard', category: 'civil-engineering', question: 'Infrastructure on the Homer Spit is especially vulnerable to:', answer: 'Storm surge and tsunami impacts.', choices: ['Storm surge and tsunami impacts.', 'Landslides from volcanoes.', 'Dust storms.', 'Avalanches.'] },
-
-{ id: 'civil-kenai-airport', category: 'civil-engineering', question: 'Which Kenai Peninsula city has a commercial airport that supports regional transportation needs?', answer: 'Kenai.', choices: ['Kenai.', 'Moose Pass.', 'Anchor Point.', 'Nikolaevsk.'] },
-
-{ id: 'civil-kenai-bridge-inspection', category: 'civil-engineering', question: 'Regular inspections of Kenai Peninsula bridges primarily help identify:', answer: 'Structural deterioration.', choices: ['Structural deterioration.', 'Wildlife migration.', 'Tourism trends.', 'Weather forecasts.'] },
-
-{ id: 'civil-kenai-snow-load', category: 'civil-engineering', question: 'Buildings on the Kenai Peninsula must often be designed to withstand significant:', answer: 'Snow loads.', choices: ['Snow loads.', 'Sand loads.', 'Ash loads.', 'Hurricane loads.'] },
-
-{ id: 'civil-kenai-seldovia', category: 'civil-engineering', question: 'Which Kenai Peninsula community is inaccessible by road from the main highway system?', answer: 'Seldovia.', choices: ['Seldovia.', 'Soldotna.', 'Kenai.', 'Nikiski.'] },
-
-{ id: 'civil-kenai-logistics', category: 'civil-engineering', question: 'Supplying construction materials to communities like Seldovia often requires:', answer: 'Marine or air transportation.', choices: ['Marine or air transportation.', 'Subway systems.', 'Interstate trucking only.', 'Pipeline delivery.'] },
-
-{ id: 'civil-kenai-avalanche', category: 'civil-engineering', question: 'Mountain corridors near Seward require engineers to account for what seasonal hazard?', answer: 'Avalanches.', choices: ['Avalanches.', 'Dust devils.', 'Tornadoes.', 'Locust swarms.'] },
-
-{ id: 'civil-kenai-kenai-river', category: 'civil-engineering', question: 'The Kenai River is particularly important to engineers because transportation infrastructure must balance access with:', answer: 'Protection of salmon habitat.', choices: ['Protection of salmon habitat.', 'Oil refining.', 'Military operations.', 'Mining access.'] },
-
-{ id: 'civil-kenai-culvert-fish', category: 'civil-engineering', question: 'Modern culvert designs on the Kenai Peninsula often incorporate what environmental consideration?', answer: 'Fish passage.', choices: ['Fish passage.', 'Solar panels.', 'Bicycle lanes.', 'Snow fences.'] },
-
-{ id: 'civil-kenai-erosion', category: 'civil-engineering', question: 'Along the Kenai River, engineers frequently address problems related to:', answer: 'Bank erosion.', choices: ['Bank erosion.', 'Desert erosion.', 'Glacier calving.', 'Volcanic ash.'] },
-
-{ id: 'civil-kenai-kachemak', category: 'civil-engineering', question: 'Homer sits along which bay on the southern Kenai Peninsula?', answer: 'Kachemak Bay.', choices: ['Kachemak Bay.', 'Resurrection Bay.', 'Bristol Bay.', 'Yakutat Bay.'] },
-
-{ id: 'civil-kenai-resurrection', category: 'civil-engineering', question: 'Seward is located at the head of which bay?', answer: 'Resurrection Bay.', choices: ['Resurrection Bay.', 'Kachemak Bay.', 'Prince William Sound.', 'Cook Inlet.'] },
-
-{ id: 'civil-kenai-wetlands', category: 'civil-engineering', question: 'Projects on the Kenai Peninsula often require additional permitting due to the presence of:', answer: 'Wetlands.', choices: ['Wetlands.', 'Deserts.', 'Coral reefs.', 'Prairies.'] },
-
-{ id: 'civil-kenai-nikiski', category: 'civil-engineering', question: 'Nikiski is historically associated with which type of industrial infrastructure?', answer: 'Oil and gas facilities.', choices: ['Oil and gas facilities.', 'Steel mills.', 'Automobile factories.', 'Nuclear power plants.'] },
-
-{ id: 'civil-kenai-habitat', category: 'civil-engineering', question: 'Civil engineers working near salmon streams frequently coordinate with agencies focused on:', answer: 'Habitat protection.', choices: ['Habitat protection.', 'Space exploration.', 'Railroad privatization.', 'Currency exchange.'] },
-
-{ id: 'civil-kenai-tourism', category: 'civil-engineering', question: 'During summer, transportation infrastructure on the Kenai Peninsula experiences increased demand due largely to:', answer: 'Tourism and fishing activity.', choices: ['Tourism and fishing activity.', 'College football games.', 'Manufacturing exports.', 'International shipping traffic.'] },
-{ id: 'frankenstein-player-character', category: 'video-games', question: 'In Mary Shelley\'s original story, who creates Frankenstein\'s monster?', answer: 'Victor Frankenstein.', choices: ['Victor Frankenstein.', 'Henry Jekyll.', 'Dracula.', 'Dr. Moreau.'] },
-
-{ id: 'frankenstein-boris-karloff', category: 'video-games', question: 'Which actor famously portrayed Frankenstein\'s monster in the 1931 film?', answer: 'Boris Karloff.', choices: ['Boris Karloff.', 'Bela Lugosi.', 'Lon Chaney Jr.', 'Vincent Price.'] },
-
-{ id: 'frankenstein-author', category: 'video-games', question: 'Who wrote the novel Frankenstein?', answer: 'Mary Shelley.', choices: ['Mary Shelley.', 'Jane Austen.', 'Emily Brontë.', 'Bram Stoker.'] },
-
-{ id: 'frankenstein-subtitle', category: 'video-games', question: 'What is the subtitle of Mary Shelley\'s Frankenstein?', answer: 'The Modern Prometheus.', choices: ['The Modern Prometheus.', 'The Living Dead.', 'The Electric Man.', 'The Last Alchemist.'] },
-
-{ id: 'frankenstein-setting', category: 'video-games', question: 'Victor Frankenstein was a student of what field?', answer: 'Natural philosophy and science.', choices: ['Natural philosophy and science.', 'Law.', 'Astronomy.', 'Architecture.'] },
-
-{ id: 'frankenstein-switzerland', category: 'video-games', question: 'In the novel, Victor Frankenstein is originally from which country?', answer: 'Switzerland.', choices: ['Switzerland.', 'Germany.', 'England.', 'France.'] },
-
-{ id: 'frankenstein-igor', category: 'video-games', question: 'True or False: Igor appears in Mary Shelley\'s original novel.', answer: 'False.', choices: ['True.', 'False.', 'Only in the sequel.', 'Only in the stage play.'] },
-
-{ id: 'frankenstein-monster-name', category: 'video-games', question: 'What is the monster\'s actual name in the original novel?', answer: 'He has no name.', choices: ['He has no name.', 'Adam.', 'Igor.', 'Henry.'] },
-
-{ id: 'frankenstein-arctic', category: 'video-games', question: 'The novel begins and ends in what icy region?', answer: 'The Arctic.', choices: ['The Arctic.', 'Antarctica.', 'Siberia.', 'Greenland.'] },
-
-{ id: 'frankenstein-lightning', category: 'video-games', question: 'What force is commonly associated with bringing Frankenstein\'s monster to life in popular culture?', answer: 'Lightning.', choices: ['Lightning.', 'Moonlight.', 'Fire.', 'Steam.'] },
-
-{ id: 'frankenstein-castlevania', category: 'video-games', question: 'Frankenstein\'s monster appears as an enemy in which famous Konami series?', answer: 'Castlevania.', choices: ['Castlevania.', 'Metal Gear.', 'Contra.', 'Silent Hill.'] },
-
-{ id: 'frankenstein-darkstalkers', category: 'video-games', question: 'Which Darkstalkers character is inspired by Frankenstein\'s monster?', answer: 'Victor.', choices: ['Victor.', 'Demitri.', 'Felicia.', 'Morrigan.'] },
-
-{ id: 'frankenstein-monster-strength', category: 'video-games', question: 'Frankenstein\'s monster is typically depicted as having extraordinary:', answer: 'Strength.', choices: ['Strength.', 'Speed.', 'Telepathy.', 'Invisibility.'] },
-
-{ id: 'frankenstein-revenge', category: 'video-games', question: 'What motivates the monster after Victor rejects him?', answer: 'Revenge and loneliness.', choices: ['Revenge and loneliness.', 'Greed.', 'Curiosity.', 'Fame.'] },
-
-{ id: 'frankenstein-companion', category: 'video-games', question: 'What does the monster ask Victor to create?', answer: 'A companion.', choices: ['A companion.', 'A castle.', 'A laboratory.', 'A weapon.'] },
-
-{ id: 'frankenstein-destruction', category: 'video-games', question: 'What does Victor do to the unfinished companion?', answer: 'Destroys it.', choices: ['Destroys it.', 'Activates it.', 'Sells it.', 'Hides it underground.'] },
-
-{ id: 'frankenstein-walton', category: 'video-games', question: 'Which explorer records Victor Frankenstein\'s story?', answer: 'Robert Walton.', choices: ['Robert Walton.', 'Jonathan Harker.', 'Captain Nemo.', 'Ishmael.'] },
-
-{ id: 'frankenstein-education', category: 'video-games', question: 'How does the monster learn language and human behavior?', answer: 'By secretly observing a family.', choices: ['By secretly observing a family.', 'From Victor.', 'At school.', 'From books alone.'] },
-
-{ id: 'frankenstein-video-game-boss', category: 'video-games', question: 'In many video games, Frankenstein\'s monster is commonly featured as what?', answer: 'A boss enemy.', choices: ['A boss enemy.', 'A merchant.', 'A tutorial guide.', 'A racer.'] },
-
-{ id: 'frankenstein-horror-genre', category: 'video-games', question: 'Frankenstein is most closely associated with which genre?', answer: 'Horror.', choices: ['Horror.', 'Western.', 'Romance.', 'Sports.'] },
-
-{ id: 'frankenstein-villain', category: 'video-games', question: 'Who is often considered the true tragic figure of the story?', answer: 'The monster.', choices: ['The monster.', 'Igor.', 'Elizabeth.', 'Robert Walton.'] },
-
-{ id: 'frankenstein-elizabeth', category: 'video-games', question: 'What is the name of Victor Frankenstein\'s fiancée?', answer: 'Elizabeth.', choices: ['Elizabeth.', 'Catherine.', 'Margaret.', 'Lucy.'] },
-
-{ id: 'frankenstein-setting-era', category: 'video-games', question: 'Frankenstein was originally published during which century?', answer: 'The 19th century.', choices: ['The 19th century.', 'The 17th century.', 'The 18th century.', 'The 20th century.'] },
-
-{ id: 'frankenstein-electricity', category: 'video-games', question: 'The idea of reanimating life through electricity is linked to what scientific concept?', answer: 'Galvanism.', choices: ['Galvanism.', 'Alchemy.', 'Fusion.', 'Photosynthesis.'] },
-
-{ id: 'frankenstein-theme', category: 'video-games', question: 'A major theme of Frankenstein is the danger of:', answer: 'Unchecked ambition.', choices: ['Unchecked ambition.', 'Travel.', 'Friendship.', 'Competition.'] },
-
-{ id: 'frankenstein-creature-size', category: 'video-games', question: 'Victor intentionally creates the creature at approximately what height?', answer: 'About 8 feet tall.', choices: ['About 8 feet tall.', 'About 5 feet tall.', 'About 10 feet tall.', 'About 12 feet tall.'] },
-
-{ id: 'frankenstein-modern-games', category: 'video-games', question: 'Frankenstein-inspired enemies are especially common in which type of games?', answer: 'Horror games.', choices: ['Horror games.', 'Golf games.', 'Flight simulators.', 'Puzzle word games.'] },
-
-{ id: 'frankenstein-sympathy', category: 'video-games', question: 'Despite his appearance, the monster initially desires:', answer: 'Acceptance and companionship.', choices: ['Acceptance and companionship.', 'Wealth and power.', 'Military conquest.', 'Immortality.'] },
-
-{ id: 'frankenstein-legacy', category: 'video-games', question: 'Frankenstein is often considered one of the earliest examples of:', answer: 'Science fiction.', choices: ['Science fiction.', 'Cyberpunk.', 'Space opera.', 'Steampunk.'] },
-
-{ id: 'frankenstein-pop-culture', category: 'video-games', question: 'What misconception is common in popular culture?', answer: 'People call the monster "Frankenstein."', choices: ['People call the monster "Frankenstein."', 'Victor is a vampire.', 'Igor wrote the story.', 'The monster is invisible.'] },
-];
+    {
+      id: "parks-acadia-state",
+      category: "nationalparks",
+      question: "Which U.S. state is home to Acadia National Park?",
+      answer: "Maine.",
+      choices: [
+        "Maine.",
+        "Vermont.",
+        "Oregon.",
+        "Michigan."
+      ]
+    },
+    {
+      id: "parks-grand-canyon-river",
+      category: "nationalparks",
+      question: "Which river carved the Grand Canyon?",
+      answer: "The Colorado River.",
+      choices: [
+        "The Colorado River.",
+        "The Columbia River.",
+        "The Rio Grande.",
+        "The Snake River."
+      ]
+    },
+    {
+      id: "parks-yellowstone-first",
+      category: "nationalparks",
+      question: "Which national park is often called the first national park in the world?",
+      answer: "Yellowstone National Park.",
+      choices: [
+        "Yellowstone National Park.",
+        "Yosemite National Park.",
+        "Grand Canyon National Park.",
+        "Zion National Park."
+      ]
+    },
+    {
+      id: "parks-everglades-state",
+      category: "nationalparks",
+      question: "Everglades National Park is in which state?",
+      answer: "Florida.",
+      choices: [
+        "Florida.",
+        "Louisiana.",
+        "Georgia.",
+        "South Carolina."
+      ]
+    },
+    {
+      id: "parks-yosemite-waterfall",
+      category: "nationalparks",
+      question: "Which California park is famous for Yosemite Falls and El Capitan?",
+      answer: "Yosemite National Park.",
+      choices: [
+        "Yosemite National Park.",
+        "Joshua Tree National Park.",
+        "Sequoia National Park.",
+        "Death Valley National Park."
+      ]
+    },
+    {
+      id: "parks-denali-mountain",
+      category: "nationalparks",
+      question: "Denali National Park is named for what major natural feature?",
+      answer: "North America's tallest mountain.",
+      choices: [
+        "North America's tallest mountain.",
+        "A giant glacier lake.",
+        "A volcanic island.",
+        "A desert canyon."
+      ]
+    },
+    {
+      id: "parks-zion-state",
+      category: "nationalparks",
+      question: "Zion National Park is in which state?",
+      answer: "Utah.",
+      choices: [
+        "Utah.",
+        "Arizona.",
+        "Colorado.",
+        "Nevada."
+      ]
+    },
+    {
+      id: "parks-dry-tortugas-access",
+      category: "nationalparks",
+      question: "Dry Tortugas National Park is unusual because most visitors arrive by what?",
+      answer: "Boat or seaplane.",
+      choices: [
+        "Boat or seaplane.",
+        "Subway.",
+        "Cable car.",
+        "Desert shuttle."
+      ]
+    },
+    {
+      id: "parks-big-bend-state",
+      category: "nationalparks",
+      question: "Big Bend National Park is located in which state?",
+      answer: "Texas.",
+      choices: [
+        "Texas.",
+        "Arizona.",
+        "New Mexico.",
+        "Nevada."
+      ]
+    },
+    {
+      id: "parks-glacier-road",
+      category: "nationalparks",
+      question: "What famous scenic road runs through Glacier National Park?",
+      answer: "Going-to-the-Sun Road.",
+      choices: [
+        "Going-to-the-Sun Road.",
+        "Skyline Drive.",
+        "Trail Ridge Road.",
+        "Needles Highway."
+      ]
+    },
+    {
+      id: "parks-joshua-tree-state",
+      category: "nationalparks",
+      question: "Joshua Tree National Park is located in which state?",
+      answer: "California.",
+      choices: [
+        "California.",
+        "Arizona.",
+        "Nevada.",
+        "Utah."
+      ]
+    },
+    {
+      id: "parks-great-smoky-states",
+      category: "nationalparks",
+      question: "Great Smoky Mountains National Park lies between which two states?",
+      answer: "Tennessee and North Carolina.",
+      choices: [
+        "Tennessee and North Carolina.",
+        "Virginia and Kentucky.",
+        "Georgia and Florida.",
+        "West Virginia and Virginia."
+      ]
+    },
+    {
+      id: "parks-redwood-tallest",
+      category: "nationalparks",
+      question: "Redwood National Park is famous for what natural record?",
+      answer: "The tallest trees on Earth.",
+      choices: [
+        "The tallest trees on Earth.",
+        "The deepest canyon.",
+        "The oldest volcano.",
+        "The largest cave."
+      ]
+    },
+    {
+      id: "parks-canyonlands-state",
+      category: "nationalparks",
+      question: "Canyonlands National Park is located in which state?",
+      answer: "Utah.",
+      choices: [
+        "Utah.",
+        "Colorado.",
+        "Arizona.",
+        "Nevada."
+      ]
+    },
+    {
+      id: "parks-mesa-verde-famous",
+      category: "nationalparks",
+      question: "Mesa Verde National Park is famous for preserving what?",
+      answer: "Ancient cliff dwellings.",
+      choices: [
+        "Ancient cliff dwellings.",
+        "Geysers.",
+        "Waterfalls.",
+        "Sand dunes."
+      ]
+    },
+    {
+      id: "parks-hot-springs-state",
+      category: "nationalparks",
+      question: "Hot Springs National Park is located in which state?",
+      answer: "Arkansas.",
+      choices: [
+        "Arkansas.",
+        "Missouri.",
+        "Oklahoma.",
+        "Louisiana."
+      ]
+    },
+    {
+      id: "parks-kings-canyon-state",
+      category: "nationalparks",
+      question: "Kings Canyon National Park is located in which state?",
+      answer: "California.",
+      choices: [
+        "California.",
+        "Oregon.",
+        "Washington.",
+        "Idaho."
+      ]
+    },
+    {
+      id: "parks-lassen-volcanoes",
+      category: "nationalparks",
+      question: "Lassen Volcanic National Park is known for what feature?",
+      answer: "Active volcanic landscapes.",
+      choices: [
+        "Active volcanic landscapes.",
+        "Coral reefs.",
+        "Desert dunes.",
+        "Mangrove forests."
+      ]
+    },
+    {
+      id: "parks-white-sands-state",
+      category: "nationalparks",
+      question: "White Sands National Park is located in which state?",
+      answer: "New Mexico.",
+      choices: [
+        "New Mexico.",
+        "Texas.",
+        "Arizona.",
+        "Nevada."
+      ]
+    },
+    {
+      id: "parks-great-sand-dunes-state",
+      category: "nationalparks",
+      question: "Great Sand Dunes National Park is located in which state?",
+      answer: "Colorado.",
+      choices: [
+        "Colorado.",
+        "Utah.",
+        "Wyoming.",
+        "Montana."
+      ]
+    },
+    {
+      id: "parks-voyageurs-state",
+      category: "nationalparks",
+      question: "Voyageurs National Park is located in which state?",
+      answer: "Minnesota.",
+      choices: [
+        "Minnesota.",
+        "Wisconsin.",
+        "Michigan.",
+        "North Dakota."
+      ]
+    },
+    {
+      id: "parks-isle-royale-state",
+      category: "nationalparks",
+      question: "Isle Royale National Park is located in which state?",
+      answer: "Michigan.",
+      choices: [
+        "Michigan.",
+        "Minnesota.",
+        "Wisconsin.",
+        "Ohio."
+      ]
+    },
+    {
+      id: "parks-congaree-state",
+      category: "nationalparks",
+      question: "Congaree National Park is located in which state?",
+      answer: "South Carolina.",
+      choices: [
+        "South Carolina.",
+        "Georgia.",
+        "Florida.",
+        "North Carolina."
+      ]
+    },
+    {
+      id: "parks-guadalupe-peak",
+      category: "nationalparks",
+      question: "Guadalupe Mountains National Park contains the highest point in which state?",
+      answer: "Texas.",
+      choices: [
+        "Texas.",
+        "New Mexico.",
+        "Arizona.",
+        "Oklahoma."
+      ]
+    },
+    {
+      id: "parks-north-cascades-state",
+      category: "nationalparks",
+      question: "North Cascades National Park is located in which state?",
+      answer: "Washington.",
+      choices: [
+        "Washington.",
+        "Oregon.",
+        "Montana.",
+        "Idaho."
+      ]
+    },
+    {
+      id: "parks-rainier-mountain",
+      category: "nationalparks",
+      question: "Mount Rainier National Park is named after what?",
+      answer: "A massive active volcano.",
+      choices: [
+        "A massive active volcano.",
+        "A glacier lake.",
+        "A canyon.",
+        "A waterfall."
+      ]
+    },
+    {
+      id: "parks-sequoia-general-sherman",
+      category: "nationalparks",
+      question: "What famous tree can visitors see in Sequoia National Park?",
+      answer: "The General Sherman Tree.",
+      choices: [
+        "The General Sherman Tree.",
+        "The Liberty Tree.",
+        "The Pioneer Tree.",
+        "The Lincoln Redwood."
+      ]
+    },
+    {
+      id: "parks-yellowstone-animal",
+      category: "nationalparks",
+      question: "Yellowstone National Park is especially famous for protecting which large mammal?",
+      answer: "American bison.",
+      choices: [
+        "American bison.",
+        "Moose.",
+        "Mountain lions.",
+        "Black bears."
+      ]
+    },
+    {
+      id: "parks-grand-teton-state",
+      category: "nationalparks",
+      question: "Grand Teton National Park is located in which state?",
+      answer: "Wyoming.",
+      choices: [
+        "Wyoming.",
+        "Montana.",
+        "Colorado.",
+        "Utah."
+      ]
+    },
+    {
+      id: "parks-kenai-state",
+      category: "nationalparks",
+      question: "Kenai Fjords National Park is located in which state?",
+      answer: "Alaska.",
+      choices: [
+        "Alaska.",
+        "Washington.",
+        "Oregon.",
+        "Maine."
+      ]
+    },
+    {
+      id: "parks-exit-glacier",
+      category: "nationalparks",
+      question: "What famous glacier can visitors walk near in Kenai Fjords National Park?",
+      answer: "Exit Glacier.",
+      choices: [
+        "Exit Glacier.",
+        "Mendenhall Glacier.",
+        "Matanuska Glacier.",
+        "Columbia Glacier."
+      ]
+    },
+    {
+      id: "parks-katmai-bears-river",
+      category: "nationalparks",
+      question: "At Katmai National Park, bears are often photographed catching salmon at which falls?",
+      answer: "Brooks Falls.",
+      choices: [
+        "Brooks Falls.",
+        "Rainbow Falls.",
+        "Virginia Falls.",
+        "Twin Falls."
+      ]
+    },
+    {
+      id: "parks-arches-delicate",
+      category: "nationalparks",
+      question: "What famous arch appears on many Utah license plates?",
+      answer: "Delicate Arch.",
+      choices: [
+        "Delicate Arch.",
+        "Landscape Arch.",
+        "Double Arch.",
+        "Skyline Arch."
+      ]
+    },
+    {
+      id: "parks-bryce-rocks",
+      category: "nationalparks",
+      question: "Bryce Canyon National Park is famous for unusual rock formations called what?",
+      answer: "Hoodoos.",
+      choices: [
+        "Hoodoos.",
+        "Monoliths.",
+        "Buttes.",
+        "Torres."
+      ]
+    },
+    {
+      id: "parks-death-valley-lowest-elevation",
+      category: "nationalparks",
+      question: "Death Valley contains the lowest point in North America at approximately how many feet below sea level?",
+      answer: "About 282 feet below sea level.",
+      choices: [
+        "About 282 feet below sea level.",
+        "About 100 feet below sea level.",
+        "About 500 feet below sea level.",
+        "About 1,000 feet below sea level."
+      ]
+    },
+    {
+      id: "parks-everglades-manatee",
+      category: "nationalparks",
+      question: "Which gentle marine mammal can sometimes be found in Everglades National Park?",
+      answer: "Manatee.",
+      choices: [
+        "Manatee.",
+        "Seal.",
+        "Walrus.",
+        "Sea otter."
+      ]
+    },
+    {
+      id: "parks-glacier-name",
+      category: "nationalparks",
+      question: "Glacier National Park is often called the \"Crown of what?\"",
+      answer: "The Continent.",
+      choices: [
+        "The Continent.",
+        "The Rockies.",
+        "The West.",
+        "The Wilderness."
+      ]
+    },
+    {
+      id: "parks-yellowstone-old-faithful",
+      category: "nationalparks",
+      question: "What famous Yellowstone geyser erupts on a fairly predictable schedule?",
+      answer: "Old Faithful.",
+      choices: [
+        "Old Faithful.",
+        "Steamboat Geyser.",
+        "Castle Geyser.",
+        "Beehive Geyser."
+      ]
+    },
+    {
+      id: "parks-arches-state",
+      category: "nationalparks",
+      question: "Arches National Park is located in which state?",
+      answer: "Utah.",
+      choices: [
+        "Utah.",
+        "Colorado.",
+        "Nevada.",
+        "Arizona."
+      ]
+    },
+    {
+      id: "parks-crater-lake-state",
+      category: "nationalparks",
+      question: "Crater Lake National Park is located in which state?",
+      answer: "Oregon.",
+      choices: [
+        "Oregon.",
+        "Washington.",
+        "Idaho.",
+        "Montana."
+      ]
+    },
+    {
+      id: "parks-bryce-state",
+      category: "nationalparks",
+      question: "Bryce Canyon National Park is located in which state?",
+      answer: "Utah.",
+      choices: [
+        "Utah.",
+        "Arizona.",
+        "Nevada.",
+        "Colorado."
+      ]
+    },
+    {
+      id: "parks-mammoth-cave-state",
+      category: "nationalparks",
+      question: "Mammoth Cave National Park is located in which state?",
+      answer: "Kentucky.",
+      choices: [
+        "Kentucky.",
+        "Tennessee.",
+        "Virginia.",
+        "Missouri."
+      ]
+    },
+    {
+      id: "parks-shenandoah-state",
+      category: "nationalparks",
+      question: "Shenandoah National Park is located in which state?",
+      answer: "Virginia.",
+      choices: [
+        "Virginia.",
+        "West Virginia.",
+        "North Carolina.",
+        "Pennsylvania."
+      ]
+    },
+    {
+      id: "parks-carlsbad-state",
+      category: "nationalparks",
+      question: "Carlsbad Caverns National Park is located in which state?",
+      answer: "New Mexico.",
+      choices: [
+        "New Mexico.",
+        "Texas.",
+        "Arizona.",
+        "Colorado."
+      ]
+    },
+    {
+      id: "parks-saguaro-state",
+      category: "nationalparks",
+      question: "Saguaro National Park is famous for which type of plant?",
+      answer: "Giant saguaro cacti.",
+      choices: [
+        "Giant saguaro cacti.",
+        "Joshua trees.",
+        "Redwood trees.",
+        "Bluebonnets."
+      ]
+    },
+    {
+      id: "parks-sequoia-trees",
+      category: "nationalparks",
+      question: "Sequoia National Park is best known for what?",
+      answer: "Giant sequoia trees.",
+      choices: [
+        "Giant sequoia trees.",
+        "Volcanoes.",
+        "Glaciers.",
+        "Sand dunes."
+      ]
+    },
+    {
+      id: "parks-olympic-ecosystems",
+      category: "nationalparks",
+      question: "Olympic National Park is famous because it contains beaches, mountains, and what else?",
+      answer: "Temperate rainforests.",
+      choices: [
+        "Temperate rainforests.",
+        "Coral reefs.",
+        "Prairies.",
+        "Mangrove swamps."
+      ]
+    },
+    {
+      id: "parks-great-smoky-visitors",
+      category: "nationalparks",
+      question: "Which national park is typically the most visited in the United States?",
+      answer: "Great Smoky Mountains National Park.",
+      choices: [
+        "Great Smoky Mountains National Park.",
+        "Yellowstone National Park.",
+        "Yosemite National Park.",
+        "Grand Canyon National Park."
+      ]
+    },
+    {
+      id: "parks-badlands-state",
+      category: "nationalparks",
+      question: "Badlands National Park is located in which state?",
+      answer: "South Dakota.",
+      choices: [
+        "South Dakota.",
+        "North Dakota.",
+        "Nebraska.",
+        "Wyoming."
+      ]
+    },
+    {
+      id: "parks-biscayne-state",
+      category: "nationalparks",
+      question: "Biscayne National Park is located in which state?",
+      answer: "Florida.",
+      choices: [
+        "Florida.",
+        "Georgia.",
+        "Louisiana.",
+        "South Carolina."
+      ]
+    },
+    {
+      id: "parks-cuyahoga-state",
+      category: "nationalparks",
+      question: "Cuyahoga Valley National Park is located in which state?",
+      answer: "Ohio.",
+      choices: [
+        "Ohio.",
+        "Indiana.",
+        "Michigan.",
+        "Pennsylvania."
+      ]
+    },
+    {
+      id: "parks-death-valley-hottest",
+      category: "nationalparks",
+      question: "Which national park is famous for being one of the hottest places on Earth?",
+      answer: "Death Valley National Park.",
+      choices: [
+        "Death Valley National Park.",
+        "Joshua Tree National Park.",
+        "Big Bend National Park.",
+        "Petrified Forest National Park."
+      ]
+    },
+    {
+      id: "parks-gateway-arch-state",
+      category: "nationalparks",
+      question: "Gateway Arch National Park is located in which state?",
+      answer: "Missouri.",
+      choices: [
+        "Missouri.",
+        "Illinois.",
+        "Kansas.",
+        "Arkansas."
+      ]
+    },
+    {
+      id: "parks-glacier-state",
+      category: "nationalparks",
+      question: "Glacier National Park is located in which state?",
+      answer: "Montana.",
+      choices: [
+        "Montana.",
+        "Wyoming.",
+        "Idaho.",
+        "Colorado."
+      ]
+    },
+    {
+      id: "parks-hawaii-volcanoes-state",
+      category: "nationalparks",
+      question: "Hawaiʻi Volcanoes National Park is located in which state?",
+      answer: "Hawaii.",
+      choices: [
+        "Hawaii.",
+        "California.",
+        "Alaska.",
+        "Florida."
+      ]
+    },
+    {
+      id: "parks-petrified-state",
+      category: "nationalparks",
+      question: "Petrified Forest National Park is located in which state?",
+      answer: "Arizona.",
+      choices: [
+        "Arizona.",
+        "New Mexico.",
+        "Nevada.",
+        "Utah."
+      ]
+    },
+    {
+      id: "parks-rocky-mountain-state",
+      category: "nationalparks",
+      question: "Rocky Mountain National Park is located in which state?",
+      answer: "Colorado.",
+      choices: [
+        "Colorado.",
+        "Montana.",
+        "Wyoming.",
+        "Idaho."
+      ]
+    },
+    {
+      id: "parks-wrangell-largest",
+      category: "nationalparks",
+      question: "What is the largest national park in the United States?",
+      answer: "Wrangell–St. Elias National Park and Preserve.",
+      choices: [
+        "Wrangell–St. Elias National Park and Preserve.",
+        "Yellowstone National Park.",
+        "Denali National Park.",
+        "Glacier National Park."
+      ]
+    },
+    {
+      id: "parks-yellowstone-geysers",
+      category: "nationalparks",
+      question: "Yellowstone National Park contains about half of the world’s active geysers. True or false?",
+      answer: "True.",
+      choices: [
+        "True.",
+        "False."
+      ]
+    },
+    {
+      id: "parks-grand-canyon-depth",
+      category: "nationalparks",
+      question: "About how deep is the Grand Canyon at its deepest point?",
+      answer: "About 1 mile deep.",
+      choices: [
+        "About 1 mile deep.",
+        "About 500 feet deep.",
+        "About 3 miles deep.",
+        "About 100 feet deep."
+      ]
+    },
+    {
+      id: "parks-joshua-tree-name",
+      category: "nationalparks",
+      question: "According to legend, who thought Joshua trees looked like a biblical figure raising his arms to the sky?",
+      answer: "Mormon settlers.",
+      choices: [
+        "Mormon settlers.",
+        "Spanish explorers.",
+        "Gold miners.",
+        "Native Hawaiian sailors."
+      ]
+    },
+    {
+      id: "parks-death-valley-lowest",
+      category: "nationalparks",
+      question: "Death Valley contains the lowest point in North America. What is it called?",
+      answer: "Badwater Basin.",
+      choices: [
+        "Badwater Basin.",
+        "Devil’s Sink.",
+        "Coyote Flats.",
+        "Lost Creek Hollow."
+      ]
+    },
+    {
+      id: "parks-denali-name",
+      category: "nationalparks",
+      question: "What does the name \"Denali\" mean in the Koyukon Athabaskan language?",
+      answer: "The High One.",
+      choices: [
+        "The High One.",
+        "Land of Ice.",
+        "Great Bear.",
+        "Endless Mountain."
+      ]
+    },
+    {
+      id: "parks-everglades-crocodiles",
+      category: "nationalparks",
+      question: "Everglades National Park is the only place in the world where alligators and what other reptile naturally live together?",
+      answer: "Crocodiles.",
+      choices: [
+        "Crocodiles.",
+        "Komodo dragons.",
+        "Gila monsters.",
+        "Iguanas."
+      ]
+    },
+    {
+      id: "parks-sequoia-age",
+      category: "nationalparks",
+      question: "Some giant sequoia trees in Sequoia National Park are approximately how old?",
+      answer: "More than 2,000 years old.",
+      choices: [
+        "More than 2,000 years old.",
+        "About 300 years old.",
+        "About 500 years old.",
+        "About 800 years old."
+      ]
+    },
+    {
+      id: "parks-mammoth-cave-length",
+      category: "nationalparks",
+      question: "Mammoth Cave National Park contains the world’s longest known cave system. About how many miles have been explored?",
+      answer: "More than 430 miles.",
+      choices: [
+        "More than 430 miles.",
+        "About 50 miles.",
+        "About 100 miles.",
+        "About 200 miles."
+      ]
+    },
+    {
+      id: "parks-arches-number",
+      category: "nationalparks",
+      question: "Approximately how many natural stone arches can be found in Arches National Park?",
+      answer: "More than 2,000.",
+      choices: [
+        "More than 2,000.",
+        "About 200.",
+        "About 500.",
+        "About 800."
+      ]
+    },
+    {
+      id: "parks-great-smoky-fireflies",
+      category: "nationalparks",
+      question: "Great Smoky Mountains National Park is famous for a rare natural light show involving what?",
+      answer: "Synchronous fireflies.",
+      choices: [
+        "Synchronous fireflies.",
+        "Glowing mushrooms.",
+        "Blue lightning bugs.",
+        "Sparkling waterfalls."
+      ]
+    },
+    {
+      id: "parks-carlsbad-bats",
+      category: "nationalparks",
+      question: "Each evening at Carlsbad Caverns, visitors gather to watch thousands of what animals emerge from the caves?",
+      answer: "Bats.",
+      choices: [
+        "Bats.",
+        "Owls.",
+        "Swallows.",
+        "Foxes."
+      ]
+    },
+    {
+      id: "parks-crater-lake-depth",
+      category: "nationalparks",
+      question: "Crater Lake is the deepest lake in the United States. About how deep is it?",
+      answer: "Nearly 2,000 feet deep.",
+      choices: [
+        "Nearly 2,000 feet deep.",
+        "About 500 feet deep.",
+        "About 1,000 feet deep.",
+        "About 3,000 feet deep."
+      ]
+    },
+    {
+      id: "parks-katmai-bears",
+      category: "nationalparks",
+      question: "Which national park is famous for bears catching salmon in waterfalls during Fat Bear Week?",
+      answer: "Katmai National Park and Preserve.",
+      choices: [
+        "Katmai National Park and Preserve.",
+        "Yellowstone National Park.",
+        "Glacier National Park.",
+        "Olympic National Park."
+      ]
+    },
+    {
+      id: "parks-saguaro-growth",
+      category: "nationalparks",
+      question: "A saguaro cactus usually doesn’t grow its first arm until it is about how old?",
+      answer: "Around 50–75 years old.",
+      choices: [
+        "Around 50–75 years old.",
+        "About 5 years old.",
+        "About 15 years old.",
+        "About 25 years old."
+      ]
+    },
+    {
+      id: "parks-olympic-rainforest",
+      category: "nationalparks",
+      question: "Olympic National Park contains mountains, beaches, and what unusual type of forest?",
+      answer: "Temperate rainforest.",
+      choices: [
+        "Temperate rainforest.",
+        "Mangrove forest.",
+        "Bamboo forest.",
+        "Pine savanna."
+      ]
+    },
+    {
+      id: "alaska-keyboard",
+      category: "alaska",
+      question: "Which U.S. state can be typed using one row of a standard QWERTY keyboard?",
+      answer: "Alaska.",
+      choices: [
+        "Alaska.",
+        "Texas.",
+        "Maine.",
+        "Ohio."
+      ]
+    },
+    {
+      id: "alaska-capital",
+      category: "alaska",
+      question: "What is the capital of Alaska?",
+      answer: "Juneau.",
+      choices: [
+        "Juneau.",
+        "Anchorage.",
+        "Fairbanks.",
+        "Sitka."
+      ]
+    },
+    {
+      id: "alaska-nickname",
+      category: "alaska",
+      question: "What is Alaska's state nickname?",
+      answer: "The Last Frontier.",
+      choices: [
+        "The Last Frontier.",
+        "The Evergreen State.",
+        "The Treasure State.",
+        "The North Star State."
+      ]
+    },
+    {
+      id: "alaska-largest-state",
+      category: "alaska",
+      question: "By land area, Alaska is the largest U.S. state. True or false?",
+      answer: "True.",
+      choices: [
+        "True.",
+        "False."
+      ]
+    },
+    {
+      id: "alaska-denali-height",
+      category: "alaska",
+      question: "Denali is best known for being what?",
+      answer: "The tallest mountain in North America.",
+      choices: [
+        "The tallest mountain in North America.",
+        "The deepest lake in the U.S.",
+        "The longest U.S. river.",
+        "The largest island in Hawaii."
+      ]
+    },
+    {
+      id: "alaska-aurora",
+      category: "alaska",
+      question: "The colorful lights often seen in Alaska night skies are called what?",
+      answer: "The aurora borealis.",
+      choices: [
+        "The aurora borealis.",
+        "The trade winds.",
+        "The equinox shadow.",
+        "The solar tide."
+      ]
+    },
+    {
+      id: "alaska-purchase-year",
+      category: "alaska",
+      question: "In what year did the United States purchase Alaska from Russia?",
+      answer: "1867.",
+      choices: [
+        "1867.",
+        "1776.",
+        "1901.",
+        "1945."
+      ]
+    },
+    {
+      id: "alaska-purchase-price",
+      category: "alaska",
+      question: "Approximately how much did the United States pay Russia for Alaska?",
+      answer: "$7.2 million.",
+      choices: [
+        "$7.2 million.",
+        "$72 million.",
+        "$700,000.",
+        "$27 million."
+      ]
+    },
+    {
+      id: "alaska-largest-city",
+      category: "alaska",
+      question: "What is the largest city in Alaska by population?",
+      answer: "Anchorage.",
+      choices: [
+        "Anchorage.",
+        "Juneau.",
+        "Fairbanks.",
+        "Sitka."
+      ]
+    },
+    {
+      id: "alaska-statehood",
+      category: "alaska",
+      question: "Alaska became the 49th U.S. state in what year?",
+      answer: "1959.",
+      choices: [
+        "1959.",
+        "1949.",
+        "1965.",
+        "1912."
+      ]
+    },
+    {
+      id: "alaska-russia-distance",
+      category: "alaska",
+      question: "At their closest point, Alaska and Russia are separated by about how many miles?",
+      answer: "About 55 miles.",
+      choices: [
+        "About 55 miles.",
+        "About 5 miles.",
+        "About 150 miles.",
+        "About 500 miles."
+      ]
+    },
+    {
+      id: "alaska-no-road-juneau",
+      category: "alaska",
+      question: "What is unusual about Alaska’s capital city, Juneau?",
+      answer: "It cannot be reached by road.",
+      choices: [
+        "It cannot be reached by road.",
+        "It has no airport.",
+        "It is north of the Arctic Ocean.",
+        "It is located on an island volcano."
+      ]
+    },
+    {
+      id: "alaska-midnight-sun",
+      category: "alaska",
+      question: "What is the term for the long summer days when the sun barely sets?",
+      answer: "The Midnight Sun.",
+      choices: [
+        "The Midnight Sun.",
+        "Polar Twilight.",
+        "Aurora Season.",
+        "The Long Dawn."
+      ]
+    },
+    {
+      id: "alaska-arctic-circle",
+      category: "alaska",
+      question: "What imaginary line crosses northern Alaska?",
+      answer: "The Arctic Circle.",
+      choices: [
+        "The Arctic Circle.",
+        "The Equator.",
+        "The Prime Meridian.",
+        "The Tropic of Cancer."
+      ]
+    },
+    {
+      id: "alaska-state-bird",
+      category: "alaska",
+      question: "What is Alaska’s state bird?",
+      answer: "Willow Ptarmigan.",
+      choices: [
+        "Willow Ptarmigan.",
+        "Bald Eagle.",
+        "Puffin.",
+        "Raven."
+      ]
+    },
+    {
+      id: "alaska-state-flower",
+      category: "alaska",
+      question: "What is Alaska’s state flower?",
+      answer: "Forget-me-not.",
+      choices: [
+        "Forget-me-not.",
+        "Rose.",
+        "Lupine.",
+        "Fireweed."
+      ]
+    },
+    {
+      id: "alaska-state-fish",
+      category: "alaska",
+      question: "What is Alaska’s official state fish?",
+      answer: "King Salmon.",
+      choices: [
+        "King Salmon.",
+        "Halibut.",
+        "Rainbow Trout.",
+        "Arctic Char."
+      ]
+    },
+    {
+      id: "alaska-state-mammal",
+      category: "alaska",
+      question: "What is Alaska’s official state land mammal?",
+      answer: "Moose.",
+      choices: [
+        "Moose.",
+        "Brown Bear.",
+        "Wolf.",
+        "Caribou."
+      ]
+    },
+    {
+      id: "alaska-highest-peak",
+      category: "alaska",
+      question: "What is the name of Alaska’s highest mountain?",
+      answer: "Denali.",
+      choices: [
+        "Denali.",
+        "Mount Foraker.",
+        "Mount St. Elias.",
+        "Mount Blackburn."
+      ]
+    },
+    {
+      id: "alaska-brown-bears",
+      category: "alaska",
+      question: "Alaska is home to approximately what percentage of the world’s brown bear population?",
+      answer: "About 30%.",
+      choices: [
+        "About 30%.",
+        "About 5%.",
+        "About 50%.",
+        "About 80%."
+      ]
+    },
+    {
+      id: "alaska-glacier-count",
+      category: "alaska",
+      question: "Approximately how many glaciers are found in Alaska?",
+      answer: "More than 25,000.",
+      choices: [
+        "More than 25,000.",
+        "About 500.",
+        "About 2,000.",
+        "About 10,000."
+      ]
+    },
+    {
+      id: "alaska-longest-day",
+      category: "alaska",
+      question: "Around the summer solstice, Anchorage experiences roughly how many hours of daylight?",
+      answer: "About 19 hours.",
+      choices: [
+        "About 19 hours.",
+        "About 12 hours.",
+        "About 15 hours.",
+        "About 24 hours."
+      ]
+    },
+    {
+      id: "alaska-iditarod",
+      category: "alaska",
+      question: "What famous sled dog race runs across Alaska each year?",
+      answer: "The Iditarod.",
+      choices: [
+        "The Iditarod.",
+        "The Yukon Quest.",
+        "The Iron Dog.",
+        "The Last Frontier Dash."
+      ]
+    },
+    {
+      id: "alaska-native-peoples",
+      category: "alaska",
+      question: "How many federally recognized Alaska Native tribes are there?",
+      answer: "More than 200.",
+      choices: [
+        "More than 200.",
+        "About 50.",
+        "About 100.",
+        "About 500."
+      ]
+    },
+    {
+      id: "alaska-fireweed",
+      category: "alaska",
+      question: "Which bright purple flower is often associated with Alaska summers?",
+      answer: "Fireweed.",
+      choices: [
+        "Fireweed.",
+        "Bluebell.",
+        "Lupine.",
+        "Foxglove."
+      ]
+    },
+    {
+      id: "alaska-bald-eagles",
+      category: "alaska",
+      question: "Alaska is home to one of the largest populations of which bird?",
+      answer: "Bald Eagles.",
+      choices: [
+        "Bald Eagles.",
+        "Penguins.",
+        "Flamingos.",
+        "Peacocks."
+      ]
+    },
+    {
+      id: "alaska-halibut",
+      category: "alaska",
+      question: "Which giant flatfish is a favorite catch in Alaska?",
+      answer: "Halibut.",
+      choices: [
+        "Halibut.",
+        "Tuna.",
+        "Mackerel.",
+        "Catfish."
+      ]
+    },
+    {
+      id: "alaska-gold-rush",
+      category: "alaska",
+      question: "Which precious metal brought many prospectors to Alaska in the late 1800s?",
+      answer: "Gold.",
+      choices: [
+        "Gold.",
+        "Silver.",
+        "Copper.",
+        "Platinum."
+      ]
+    },
+    {
+      id: "alaska-kodiak-bear",
+      category: "alaska",
+      question: "Kodiak Island is famous for which massive animal?",
+      answer: "Kodiak bears.",
+      choices: [
+        "Kodiak bears.",
+        "Bison.",
+        "Elk.",
+        "Wolverines."
+      ]
+    },
+    {
+      id: "alaska-marine-highway",
+      category: "alaska",
+      question: "What is the name of Alaska’s state ferry system?",
+      answer: "The Alaska Marine Highway.",
+      choices: [
+        "The Alaska Marine Highway.",
+        "The Glacier Express.",
+        "The Northern Passage.",
+        "The Arctic Connector."
+      ]
+    },
+    {
+      id: "alaska-mount-st-elias",
+      category: "alaska",
+      question: "Mount St. Elias sits on the border of Alaska and which country?",
+      answer: "Canada.",
+      choices: [
+        "Canada.",
+        "Russia.",
+        "Mexico.",
+        "Greenland."
+      ]
+    },
+    {
+      id: "alaska-arctic-animal",
+      category: "alaska",
+      question: "Which hoofed animal migrates in large herds across Alaska?",
+      answer: "Caribou.",
+      choices: [
+        "Caribou.",
+        "Bison.",
+        "Mountain goats.",
+        "Elk."
+      ]
+    },
+    {
+      id: "alaska-pipeline",
+      category: "alaska",
+      question: "What famous pipeline carries oil across much of Alaska?",
+      answer: "The Trans-Alaska Pipeline.",
+      choices: [
+        "The Trans-Alaska Pipeline.",
+        "The Yukon Pipeline.",
+        "The Northern Crude Line.",
+        "The Arctic Pipeline."
+      ]
+    },
+    {
+      id: "alaska-largest-national-park",
+      category: "alaska",
+      question: "What is the largest national park in Alaska?",
+      answer: "Wrangell–St. Elias National Park and Preserve.",
+      choices: [
+        "Wrangell–St. Elias National Park and Preserve.",
+        "Denali National Park.",
+        "Katmai National Park.",
+        "Kenai Fjords National Park."
+      ]
+    },
+    {
+      id: "alaska-fat-bear-week",
+      category: "alaska",
+      question: "What annual online competition celebrates Alaska bears preparing for winter?",
+      answer: "Fat Bear Week.",
+      choices: [
+        "Fat Bear Week.",
+        "Bear Olympics.",
+        "Salmon Season Showdown.",
+        "Grizzly Games."
+      ]
+    },
+    {
+      id: "alaska-northernmost-city",
+      category: "alaska",
+      question: "Utqiaġvik is famous for being what?",
+      answer: "The northernmost city in the United States.",
+      choices: [
+        "The northernmost city in the United States.",
+        "The oldest city in Alaska.",
+        "The largest city in Alaska.",
+        "The state capital."
+      ]
+    },
+    {
+      id: "alaskarail-main-cities",
+      category: "alaskarail",
+      question: "The Alaska Railroad is known for connecting which major Alaska cities?",
+      answer: "Seward, Anchorage, and Fairbanks.",
+      choices: [
+        "Seward, Anchorage, and Fairbanks.",
+        "Juneau, Nome, and Kodiak.",
+        "Sitka, Ketchikan, and Barrow.",
+        "Homer, Valdez, and Unalaska."
+      ]
+    },
+    {
+      id: "alaskarail-denali-park",
+      category: "alaskarail",
+      question: "Which famous national park can passengers reach by Alaska Railroad service?",
+      answer: "Denali National Park and Preserve.",
+      choices: [
+        "Denali National Park and Preserve.",
+        "Everglades National Park.",
+        "Acadia National Park.",
+        "Big Bend National Park."
+      ]
+    },
+    {
+      id: "alaskarail-viewing-cars",
+      category: "alaskarail",
+      question: "Why are dome cars popular on scenic train routes?",
+      answer: "They offer wide views of the landscape.",
+      choices: [
+        "They offer wide views of the landscape.",
+        "They make the train fly.",
+        "They store extra snow.",
+        "They replace the locomotive."
+      ]
+    },
+    {
+      id: "alaskarail-wildlife-watch",
+      category: "alaskarail",
+      question: "Which animal would be a realistic wildlife sighting on an Alaska rail trip?",
+      answer: "Moose.",
+      choices: [
+        "Moose.",
+        "Kangaroo.",
+        "Lemur.",
+        "Camel."
+      ]
+    },
+    {
+      id: "alaskarail-railroad-crossing",
+      category: "alaskarail",
+      question: "At railroad crossings, what should passengers look for as a train-safety clue?",
+      answer: "Lights, gates, and crossing signs.",
+      choices: [
+        "Lights, gates, and crossing signs.",
+        "Palm trees.",
+        "Basketball hoops.",
+        "Movie posters."
+      ]
+    },
+    {
+      id: "alaskarail-glacier-word",
+      category: "alaskarail",
+      question: "A glacier is best described as what?",
+      answer: "A large, slow-moving mass of ice.",
+      choices: [
+        "A large, slow-moving mass of ice.",
+        "A desert cactus.",
+        "A type of train ticket.",
+        "A warm ocean current."
+      ]
+    },
+    {
+      id: "alaskarail-aurora-name",
+      category: "alaskarail",
+      question: "What is another name for the northern lights seen in Alaska?",
+      answer: "Aurora borealis.",
+      choices: [
+        "Aurora borealis.",
+        "Solar eclipse.",
+        "Trade winds.",
+        "Sea breeze."
+      ]
+    },
+    {
+      id: "alaskarail-engineer-role",
+      category: "alaskarail",
+      question: "On a train, what does the engineer usually do?",
+      answer: "Operates the locomotive.",
+      choices: [
+        "Operates the locomotive.",
+        "Serves as the town mayor.",
+        "Builds the mountains.",
+        "Counts license plates."
+      ]
+    },
+    {
+      id: "alaskarail-conductor-role",
+      category: "alaskarail",
+      question: "On many passenger trains, what is a conductor responsible for?",
+      answer: "Helping manage passengers and train operations.",
+      choices: [
+        "Helping manage passengers and train operations.",
+        "Flying the train.",
+        "Painting glaciers.",
+        "Choosing every passenger’s lunch."
+      ]
+    },
+    {
+      id: "alaskarail-trestle",
+      category: "alaskarail",
+      question: "A railroad trestle is a type of what?",
+      answer: "Bridge.",
+      choices: [
+        "Bridge.",
+        "Tunnel.",
+        "Ticket.",
+        "Dining car."
+      ]
+    },
+    {
+      id: "alaskarail-spike",
+      category: "alaskarail",
+      question: "What is a railroad spike used for?",
+      answer: "Fastening rails or track parts in place.",
+      choices: [
+        "Fastening rails or track parts in place.",
+        "Measuring snowfall.",
+        "Cooking soup.",
+        "Cleaning windows."
+      ]
+    },
+    {
+      id: "alaskarail-snow-shed",
+      category: "alaskarail",
+      question: "In snowy mountain areas, a snow shed helps protect trains from what?",
+      answer: "Snow slides and avalanches.",
+      choices: [
+        "Snow slides and avalanches.",
+        "Mosquitoes.",
+        "Too much sunshine.",
+        "Radio commercials."
+      ]
+    },
+    {
+      id: "civil-alaska-permafrost",
+      category: "civil-engineering",
+      question: "What is the primary concern when constructing foundations on permafrost?",
+      answer: "Preventing the frozen ground from thawing.",
+      choices: [
+        "Preventing the frozen ground from thawing.",
+        "Increasing groundwater flow.",
+        "Reducing earthquake shaking.",
+        "Improving soil color."
+      ]
+    },
+    {
+      id: "civil-alaska-richardson-highway",
+      category: "civil-engineering",
+      question: "What was Alaska’s first major road connecting Valdez and Fairbanks?",
+      answer: "The Richardson Highway.",
+      choices: [
+        "The Richardson Highway.",
+        "The Dalton Highway.",
+        "The Seward Highway.",
+        "The Parks Highway."
+      ]
+    },
+    {
+      id: "civil-alaska-frost-heave",
+      category: "civil-engineering",
+      question: "What phenomenon causes roads to buckle and shift due to freezing and thawing soils?",
+      answer: "Frost heave.",
+      choices: [
+        "Liquefaction.",
+        "Subsidence.",
+        "Frost heave.",
+        "Scouring."
+      ]
+    },
+    {
+      id: "civil-alaska-trans-alaska-pipeline",
+      category: "civil-engineering",
+      question: "Approximately how long is the Trans-Alaska Pipeline System?",
+      answer: "About 800 miles.",
+      choices: [
+        "About 800 miles.",
+        "About 250 miles.",
+        "About 1,500 miles.",
+        "About 3,000 miles."
+      ]
+    },
+    {
+      id: "civil-alaska-pipeline-elevated",
+      category: "civil-engineering",
+      question: "Why are large sections of the Trans-Alaska Pipeline elevated above the ground?",
+      answer: "To avoid thawing permafrost.",
+      choices: [
+        "To avoid thawing permafrost.",
+        "To improve aesthetics.",
+        "To reduce wind resistance.",
+        "To allow larger trucks underneath."
+      ]
+    },
+    {
+      id: "civil-alaska-earthquake-design",
+      category: "civil-engineering",
+      question: "Which natural hazard heavily influences structural design standards in Alaska?",
+      answer: "Earthquakes.",
+      choices: [
+        "Tornadoes.",
+        "Earthquakes.",
+        "Hurricanes.",
+        "Wildfires."
+      ]
+    },
+    {
+      id: "civil-alaska-1964",
+      category: "civil-engineering",
+      question: "What major event transformed seismic engineering practices in Alaska?",
+      answer: "The 1964 Great Alaska Earthquake.",
+      choices: [
+        "The 1964 Great Alaska Earthquake.",
+        "The 1912 Novarupta eruption.",
+        "The 1989 Exxon Valdez spill.",
+        "The 2002 Denali wildfire."
+      ]
+    },
+    {
+      id: "civil-alaska-liquefaction",
+      category: "civil-engineering",
+      question: "During earthquakes, what process causes saturated soils to temporarily lose strength?",
+      answer: "Liquefaction.",
+      choices: [
+        "Erosion.",
+        "Liquefaction.",
+        "Sedimentation.",
+        "Compaction."
+      ]
+    },
+    {
+      id: "civil-alaska-dalton",
+      category: "civil-engineering",
+      question: "Which highway was originally built to support construction of the Trans-Alaska Pipeline?",
+      answer: "The Dalton Highway.",
+      choices: [
+        "The Dalton Highway.",
+        "The Glenn Highway.",
+        "The Alaska Highway.",
+        "The Sterling Highway."
+      ]
+    },
+    {
+      id: "civil-alaska-ice-roads",
+      category: "civil-engineering",
+      question: "What temporary transportation routes are sometimes used in remote Alaskan regions during winter?",
+      answer: "Ice roads.",
+      choices: [
+        "Ice roads.",
+        "Floating roads.",
+        "Magnetic roads.",
+        "Solar roads."
+      ]
+    },
+    {
+      id: "civil-alaska-scour",
+      category: "civil-engineering",
+      question: "What term describes erosion around bridge foundations caused by flowing water?",
+      answer: "Scour.",
+      choices: [
+        "Scour.",
+        "Settlement.",
+        "Heave.",
+        "Deflection."
+      ]
+    },
+    {
+      id: "civil-alaska-denali-fault",
+      category: "civil-engineering",
+      question: "Which major fault system crosses central Alaska?",
+      answer: "The Denali Fault.",
+      choices: [
+        "The Denali Fault.",
+        "The San Andreas Fault.",
+        "The New Madrid Fault.",
+        "The Hayward Fault."
+      ]
+    },
+    {
+      id: "civil-alaska-thermal-piles",
+      category: "civil-engineering",
+      question: "What devices are used to help keep permafrost frozen beneath structures?",
+      answer: "Thermosyphons.",
+      choices: [
+        "Thermosyphons.",
+        "Caissons.",
+        "Sheet piles.",
+        "Riprap."
+      ]
+    },
+    {
+      id: "civil-alaska-riprap",
+      category: "civil-engineering",
+      question: "What material is commonly placed along shorelines and embankments to reduce erosion?",
+      answer: "Riprap.",
+      choices: [
+        "Riprap.",
+        "Asphalt.",
+        "Rebar.",
+        "Plywood."
+      ]
+    },
+    {
+      id: "civil-alaska-bearing-capacity",
+      category: "civil-engineering",
+      question: "What geotechnical term describes the maximum load soil can safely support?",
+      answer: "Bearing capacity.",
+      choices: [
+        "Bearing capacity.",
+        "Elastic modulus.",
+        "Hydraulic gradient.",
+        "Flow rate."
+      ]
+    },
+    {
+      id: "civil-alaska-freeze-thaw",
+      category: "civil-engineering",
+      question: "Repeated cycles of freezing and thawing primarily affect what aspect of infrastructure?",
+      answer: "Pavement durability.",
+      choices: [
+        "Pavement durability.",
+        "Electrical voltage.",
+        "Bridge paint color.",
+        "Traffic signals."
+      ]
+    },
+    {
+      id: "civil-alaska-culvert",
+      category: "civil-engineering",
+      question: "What structure allows water to pass beneath a roadway?",
+      answer: "A culvert.",
+      choices: [
+        "A culvert.",
+        "A retaining wall.",
+        "A parapet.",
+        "A pier cap."
+      ]
+    },
+    {
+      id: "civil-alaska-seismic-joints",
+      category: "civil-engineering",
+      question: "Expansion joints in bridges help accommodate what movement?",
+      answer: "Thermal expansion and seismic movement.",
+      choices: [
+        "Thermal expansion and seismic movement.",
+        "Only vehicle loads.",
+        "Only snow accumulation.",
+        "Wind noise."
+      ]
+    },
+    {
+      id: "civil-alaska-remote-construction",
+      category: "civil-engineering",
+      question: "One of the biggest challenges of construction in rural Alaska is:",
+      answer: "Transporting materials to remote sites.",
+      choices: [
+        "Transporting materials to remote sites.",
+        "Finding limestone.",
+        "Lack of daylight year-round.",
+        "Too many toll roads."
+      ]
+    },
+    {
+      id: "civil-alaska-snow-load",
+      category: "civil-engineering",
+      question: "Roofs in many parts of Alaska must be designed for high levels of what?",
+      answer: "Snow load.",
+      choices: [
+        "Snow load.",
+        "Hail load.",
+        "Ash load.",
+        "Sand load."
+      ]
+    },
+    {
+      id: "civil-alaska-glacial-silt",
+      category: "civil-engineering",
+      question: "Fine sediment produced by glaciers is commonly called:",
+      answer: "Glacial silt.",
+      choices: [
+        "Glacial silt.",
+        "Peat.",
+        "Loess.",
+        "Tillite."
+      ]
+    },
+    {
+      id: "civil-alaska-sheet-pile",
+      category: "civil-engineering",
+      question: "What type of retaining system uses interlocking steel sections driven into the ground?",
+      answer: "Sheet piling.",
+      choices: [
+        "Sheet piling.",
+        "Gabions.",
+        "Trusses.",
+        "Tie beams."
+      ]
+    },
+    {
+      id: "civil-alaska-active-layer",
+      category: "civil-engineering",
+      question: "What is the name of the top layer of soil above permafrost that thaws each summer?",
+      answer: "The active layer.",
+      choices: [
+        "The active layer.",
+        "The caprock.",
+        "The aquifer.",
+        "The overburden."
+      ]
+    },
+    {
+      id: "civil-alaska-bridge-inspection",
+      category: "civil-engineering",
+      question: "What is a primary purpose of routine bridge inspections?",
+      answer: "Identifying structural deterioration.",
+      choices: [
+        "Identifying structural deterioration.",
+        "Increasing speed limits.",
+        "Changing paint colors.",
+        "Reducing toll costs."
+      ]
+    },
+    {
+      id: "civil-alaska-embankment",
+      category: "civil-engineering",
+      question: "Raised sections of earth supporting a roadway are called:",
+      answer: "Embankments.",
+      choices: [
+        "Embankments.",
+        "Abutments.",
+        "Lintels.",
+        "Aprons."
+      ]
+    },
+    {
+      id: "civil-alaska-denali-pipeline",
+      category: "civil-engineering",
+      question: "The Trans-Alaska Pipeline crosses approximately how many mountain ranges?",
+      answer: "Three major mountain ranges.",
+      choices: [
+        "Three major mountain ranges.",
+        "One mountain range.",
+        "Five mountain ranges.",
+        "Seven mountain ranges."
+      ]
+    },
+    {
+      id: "civil-alaska-abutment",
+      category: "civil-engineering",
+      question: "What bridge component supports the ends of the bridge span?",
+      answer: "The abutment.",
+      choices: [
+        "The abutment.",
+        "The girder.",
+        "The deck.",
+        "The parapet."
+      ]
+    },
+    {
+      id: "civil-alaska-runoff",
+      category: "civil-engineering",
+      question: "Spring snowmelt most significantly increases what concern for engineers?",
+      answer: "Stormwater runoff.",
+      choices: [
+        "Stormwater runoff.",
+        "Traffic congestion.",
+        "Air pollution.",
+        "Noise complaints."
+      ]
+    },
+    {
+      id: "civil-alaska-geotech",
+      category: "civil-engineering",
+      question: "Which branch of civil engineering focuses on soil and foundation behavior?",
+      answer: "Geotechnical engineering.",
+      choices: [
+        "Geotechnical engineering.",
+        "Environmental engineering.",
+        "Transportation engineering.",
+        "Structural drafting."
+      ]
+    },
+    {
+      id: "civil-alaska-surveying",
+      category: "civil-engineering",
+      question: "What profession is responsible for establishing precise property boundaries and site measurements?",
+      answer: "Land surveying.",
+      choices: [
+        "Land surveying.",
+        "Architecture.",
+        "Urban forestry.",
+        "Meteorology."
+      ]
+    },
+    {
+      id: "civil-kenai-sterling-highway",
+      category: "civil-engineering",
+      question: "Which major highway serves as the primary transportation corridor through much of the Kenai Peninsula?",
+      answer: "The Sterling Highway.",
+      choices: [
+        "The Sterling Highway.",
+        "The Dalton Highway.",
+        "The Richardson Highway.",
+        "The Glenn Highway."
+      ]
+    },
+    {
+      id: "civil-kenai-seward-highway",
+      category: "civil-engineering",
+      question: "What highway connects Anchorage to the Kenai Peninsula via the Turnagain Arm?",
+      answer: "The Seward Highway.",
+      choices: [
+        "The Seward Highway.",
+        "The Parks Highway.",
+        "The Elliott Highway.",
+        "The Alaska Highway."
+      ]
+    },
+    {
+      id: "civil-kenai-moose-river",
+      category: "civil-engineering",
+      question: "The Sterling Highway crosses the Kenai River near Soldotna using what type of infrastructure?",
+      answer: "A bridge.",
+      choices: [
+        "A bridge.",
+        "A tunnel.",
+        "A ferry.",
+        "A causeway."
+      ]
+    },
+    {
+      id: "civil-kenai-earthquake",
+      category: "civil-engineering",
+      question: "What major natural hazard must engineers account for on the Kenai Peninsula?",
+      answer: "Earthquakes.",
+      choices: [
+        "Earthquakes.",
+        "Hurricanes.",
+        "Tornadoes.",
+        "Dust storms."
+      ]
+    },
+    {
+      id: "civil-kenai-tsunami",
+      category: "civil-engineering",
+      question: "Coastal communities such as Seward must consider what additional hazard in infrastructure planning?",
+      answer: "Tsunamis.",
+      choices: [
+        "Tsunamis.",
+        "Wildfires.",
+        "Sinkholes.",
+        "Volcanic lava flows."
+      ]
+    },
+    {
+      id: "civil-kenai-seward-1964",
+      category: "civil-engineering",
+      question: "Which Kenai Peninsula community suffered major damage from the 1964 Great Alaska Earthquake and tsunami?",
+      answer: "Seward.",
+      choices: [
+        "Seward.",
+        "Soldotna.",
+        "Cooper Landing.",
+        "Ninilchik."
+      ]
+    },
+    {
+      id: "civil-kenai-turnagain",
+      category: "civil-engineering",
+      question: "The highway route into the Kenai Peninsula follows which body of water known for extreme tides?",
+      answer: "Turnagain Arm.",
+      choices: [
+        "Turnagain Arm.",
+        "Cook Inlet.",
+        "Prince William Sound.",
+        "Kachemak Bay."
+      ]
+    },
+    {
+      id: "civil-kenai-cook-inlet",
+      category: "civil-engineering",
+      question: "What body of water separates much of the Kenai Peninsula from mainland Alaska?",
+      answer: "Cook Inlet.",
+      choices: [
+        "Cook Inlet.",
+        "Bristol Bay.",
+        "Norton Sound.",
+        "Yakutat Bay."
+      ]
+    },
+    {
+      id: "civil-kenai-frost-heave",
+      category: "civil-engineering",
+      question: "What cold-weather process commonly damages roads on the Kenai Peninsula?",
+      answer: "Frost heave.",
+      choices: [
+        "Frost heave.",
+        "Desertification.",
+        "Salt intrusion.",
+        "Karst collapse."
+      ]
+    },
+    {
+      id: "civil-kenai-drainage",
+      category: "civil-engineering",
+      question: "Proper drainage along Kenai Peninsula roads primarily helps reduce:",
+      answer: "Freeze-thaw pavement damage.",
+      choices: [
+        "Freeze-thaw pavement damage.",
+        "Hail damage.",
+        "Traffic congestion.",
+        "Noise pollution."
+      ]
+    },
+    {
+      id: "civil-kenai-russian-river",
+      category: "civil-engineering",
+      question: "Near which famous salmon fishing destination do engineers maintain transportation infrastructure on the Sterling Highway?",
+      answer: "The Russian River.",
+      choices: [
+        "The Russian River.",
+        "The Yukon River.",
+        "The Chena River.",
+        "The Kuskokwim River."
+      ]
+    },
+    {
+      id: "civil-kenai-cooper-landing",
+      category: "civil-engineering",
+      question: "Which Kenai Peninsula community has been the focus of major Sterling Highway improvement projects?",
+      answer: "Cooper Landing.",
+      choices: [
+        "Cooper Landing.",
+        "Hope.",
+        "Homer.",
+        "Seldovia."
+      ]
+    },
+    {
+      id: "civil-kenai-soldotna",
+      category: "civil-engineering",
+      question: "Which city is often considered the transportation hub of the central Kenai Peninsula?",
+      answer: "Soldotna.",
+      choices: [
+        "Soldotna.",
+        "Seward.",
+        "Whittier.",
+        "Valdez."
+      ]
+    },
+    {
+      id: "civil-kenai-homer-spit",
+      category: "civil-engineering",
+      question: "What narrow landform extending into Kachemak Bay presents unique engineering challenges in Homer?",
+      answer: "The Homer Spit.",
+      choices: [
+        "The Homer Spit.",
+        "The Kenai Flats.",
+        "The Harding Moraine.",
+        "The Anchor Delta."
+      ]
+    },
+    {
+      id: "civil-kenai-spit-hazard",
+      category: "civil-engineering",
+      question: "Infrastructure on the Homer Spit is especially vulnerable to:",
+      answer: "Storm surge and tsunami impacts.",
+      choices: [
+        "Storm surge and tsunami impacts.",
+        "Landslides from volcanoes.",
+        "Dust storms.",
+        "Avalanches."
+      ]
+    },
+    {
+      id: "civil-kenai-airport",
+      category: "civil-engineering",
+      question: "Which Kenai Peninsula city has a commercial airport that supports regional transportation needs?",
+      answer: "Kenai.",
+      choices: [
+        "Kenai.",
+        "Moose Pass.",
+        "Anchor Point.",
+        "Nikolaevsk."
+      ]
+    },
+    {
+      id: "civil-kenai-bridge-inspection",
+      category: "civil-engineering",
+      question: "Regular inspections of Kenai Peninsula bridges primarily help identify:",
+      answer: "Structural deterioration.",
+      choices: [
+        "Structural deterioration.",
+        "Wildlife migration.",
+        "Tourism trends.",
+        "Weather forecasts."
+      ]
+    },
+    {
+      id: "civil-kenai-snow-load",
+      category: "civil-engineering",
+      question: "Buildings on the Kenai Peninsula must often be designed to withstand significant:",
+      answer: "Snow loads.",
+      choices: [
+        "Snow loads.",
+        "Sand loads.",
+        "Ash loads.",
+        "Hurricane loads."
+      ]
+    },
+    {
+      id: "civil-kenai-seldovia",
+      category: "civil-engineering",
+      question: "Which Kenai Peninsula community is inaccessible by road from the main highway system?",
+      answer: "Seldovia.",
+      choices: [
+        "Seldovia.",
+        "Soldotna.",
+        "Kenai.",
+        "Nikiski."
+      ]
+    },
+    {
+      id: "civil-kenai-logistics",
+      category: "civil-engineering",
+      question: "Supplying construction materials to communities like Seldovia often requires:",
+      answer: "Marine or air transportation.",
+      choices: [
+        "Marine or air transportation.",
+        "Subway systems.",
+        "Interstate trucking only.",
+        "Pipeline delivery."
+      ]
+    },
+    {
+      id: "civil-kenai-avalanche",
+      category: "civil-engineering",
+      question: "Mountain corridors near Seward require engineers to account for what seasonal hazard?",
+      answer: "Avalanches.",
+      choices: [
+        "Avalanches.",
+        "Dust devils.",
+        "Tornadoes.",
+        "Locust swarms."
+      ]
+    },
+    {
+      id: "civil-kenai-kenai-river",
+      category: "civil-engineering",
+      question: "The Kenai River is particularly important to engineers because transportation infrastructure must balance access with:",
+      answer: "Protection of salmon habitat.",
+      choices: [
+        "Protection of salmon habitat.",
+        "Oil refining.",
+        "Military operations.",
+        "Mining access."
+      ]
+    },
+    {
+      id: "civil-kenai-culvert-fish",
+      category: "civil-engineering",
+      question: "Modern culvert designs on the Kenai Peninsula often incorporate what environmental consideration?",
+      answer: "Fish passage.",
+      choices: [
+        "Fish passage.",
+        "Solar panels.",
+        "Bicycle lanes.",
+        "Snow fences."
+      ]
+    },
+    {
+      id: "civil-kenai-erosion",
+      category: "civil-engineering",
+      question: "Along the Kenai River, engineers frequently address problems related to:",
+      answer: "Bank erosion.",
+      choices: [
+        "Bank erosion.",
+        "Desert erosion.",
+        "Glacier calving.",
+        "Volcanic ash."
+      ]
+    },
+    {
+      id: "civil-kenai-kachemak",
+      category: "civil-engineering",
+      question: "Homer sits along which bay on the southern Kenai Peninsula?",
+      answer: "Kachemak Bay.",
+      choices: [
+        "Kachemak Bay.",
+        "Resurrection Bay.",
+        "Bristol Bay.",
+        "Yakutat Bay."
+      ]
+    },
+    {
+      id: "civil-kenai-resurrection",
+      category: "civil-engineering",
+      question: "Seward is located at the head of which bay?",
+      answer: "Resurrection Bay.",
+      choices: [
+        "Resurrection Bay.",
+        "Kachemak Bay.",
+        "Prince William Sound.",
+        "Cook Inlet."
+      ]
+    },
+    {
+      id: "civil-kenai-wetlands",
+      category: "civil-engineering",
+      question: "Projects on the Kenai Peninsula often require additional permitting due to the presence of:",
+      answer: "Wetlands.",
+      choices: [
+        "Wetlands.",
+        "Deserts.",
+        "Coral reefs.",
+        "Prairies."
+      ]
+    },
+    {
+      id: "civil-kenai-nikiski",
+      category: "civil-engineering",
+      question: "Nikiski is historically associated with which type of industrial infrastructure?",
+      answer: "Oil and gas facilities.",
+      choices: [
+        "Oil and gas facilities.",
+        "Steel mills.",
+        "Automobile factories.",
+        "Nuclear power plants."
+      ]
+    },
+    {
+      id: "civil-kenai-habitat",
+      category: "civil-engineering",
+      question: "Civil engineers working near salmon streams frequently coordinate with agencies focused on:",
+      answer: "Habitat protection.",
+      choices: [
+        "Habitat protection.",
+        "Space exploration.",
+        "Railroad privatization.",
+        "Currency exchange."
+      ]
+    },
+    {
+      id: "civil-kenai-tourism",
+      category: "civil-engineering",
+      question: "During summer, transportation infrastructure on the Kenai Peninsula experiences increased demand due largely to:",
+      answer: "Tourism and fishing activity.",
+      choices: [
+        "Tourism and fishing activity.",
+        "College football games.",
+        "Manufacturing exports.",
+        "International shipping traffic."
+      ]
+    },
+    {
+      id: "weirdlaws-arizona-donkey",
+      category: "weirdlaws",
+      question: "Which state is often linked to a strange old story about donkeys sleeping in bathtubs?",
+      answer: "Arizona.",
+      choices: [
+        "Arizona.",
+        "Texas.",
+        "Nevada.",
+        "Utah."
+      ]
+    },
+    {
+      id: "weirdlaws-alaska-bear-photo",
+      category: "weirdlaws",
+      question: "Which state is often linked to a strange rule about not waking a sleeping bear for a photo?",
+      answer: "Alaska.",
+      choices: [
+        "Alaska.",
+        "Montana.",
+        "Wyoming.",
+        "Idaho."
+      ]
+    },
+    {
+      id: "weirdlaws-hawaii-billboards",
+      category: "weirdlaws",
+      question: "Which U.S. state bans most roadside billboards?",
+      answer: "Hawaii.",
+      choices: [
+        "Hawaii.",
+        "California.",
+        "Florida.",
+        "Nevada."
+      ]
+    },
+    {
+      id: "weirdlaws-alabama-mustache",
+      category: "weirdlaws",
+      question: "Which state is often associated with a law against wearing a fake mustache that causes laughter in church?",
+      answer: "Alabama.",
+      choices: [
+        "Alabama.",
+        "Georgia.",
+        "Mississippi.",
+        "Louisiana."
+      ]
+    },
+    {
+      id: "weirdlaws-california-frog",
+      category: "weirdlaws",
+      question: "Which state reportedly says frogs that die during frog-jumping contests cannot be eaten?",
+      answer: "California.",
+      choices: [
+        "California.",
+        "Oregon.",
+        "Nevada.",
+        "Arizona."
+      ]
+    },
+    {
+      id: "weirdlaws-colorado-rocks",
+      category: "weirdlaws",
+      question: "Which state prohibits throwing rocks at cars?",
+      answer: "Colorado.",
+      choices: [
+        "Colorado.",
+        "Utah.",
+        "Wyoming.",
+        "Montana."
+      ]
+    },
+    {
+      id: "weirdlaws-connecticut-pickle",
+      category: "weirdlaws",
+      question: "Which state is famous for the claim that a pickle must bounce to officially be considered a pickle?",
+      answer: "Connecticut.",
+      choices: [
+        "Connecticut.",
+        "New York.",
+        "New Jersey.",
+        "Massachusetts."
+      ]
+    },
+    {
+      id: "weirdlaws-delaware-pants",
+      category: "weirdlaws",
+      question: "Which state reportedly had a rule against changing clothes in your car?",
+      answer: "Delaware.",
+      choices: [
+        "Delaware.",
+        "Maryland.",
+        "Pennsylvania.",
+        "New Jersey."
+      ]
+    },
+    {
+      id: "weirdlaws-florida-elephant",
+      category: "weirdlaws",
+      question: "Which state reportedly required circus elephants tied to parking meters to pay the meter fee?",
+      answer: "Florida.",
+      choices: [
+        "Florida.",
+        "Texas.",
+        "Georgia.",
+        "South Carolina."
+      ]
+    },
+    {
+      id: "weirdlaws-georgia-chicken",
+      category: "weirdlaws",
+      question: "Which state is associated with a law against eating fried chicken with a fork?",
+      answer: "Georgia.",
+      choices: [
+        "Georgia.",
+        "Kentucky.",
+        "Tennessee.",
+        "Alabama."
+      ]
+    },
+    {
+      id: "weirdlaws-idaho-cannibalism",
+      category: "weirdlaws",
+      question: "Which state specifically outlawed cannibalism except in extreme survival situations?",
+      answer: "Idaho.",
+      choices: [
+        "Idaho.",
+        "Montana.",
+        "Nevada.",
+        "Utah."
+      ]
+    },
+    {
+      id: "weirdlaws-indiana-pi",
+      category: "weirdlaws",
+      question: "Which state once considered legislation attempting to define pi?",
+      answer: "Indiana.",
+      choices: [
+        "Indiana.",
+        "Illinois.",
+        "Ohio.",
+        "Michigan."
+      ]
+    },
+    {
+      id: "weirdlaws-iowa-kiss",
+      category: "weirdlaws",
+      question: "Which state reportedly discouraged kisses lasting more than five minutes?",
+      answer: "Iowa.",
+      choices: [
+        "Iowa.",
+        "Nebraska.",
+        "Kansas.",
+        "Missouri."
+      ]
+    },
+    {
+      id: "weirdlaws-kansas-rabbits",
+      category: "weirdlaws",
+      question: "Which state reportedly prohibited catching fish with your bare hands?",
+      answer: "Kansas.",
+      choices: [
+        "Kansas.",
+        "Nebraska.",
+        "Oklahoma.",
+        "Missouri."
+      ]
+    },
+    {
+      id: "weirdlaws-kentucky-icecream",
+      category: "weirdlaws",
+      question: "Which state reportedly required people to bathe before attending public events?",
+      answer: "Kentucky.",
+      choices: [
+        "Kentucky.",
+        "Tennessee.",
+        "Virginia.",
+        "West Virginia."
+      ]
+    },
+    {
+      id: "weirdlaws-louisiana-gator",
+      category: "weirdlaws",
+      question: "Which state reportedly outlawed stealing someone else’s alligator?",
+      answer: "Louisiana.",
+      choices: [
+        "Louisiana.",
+        "Florida.",
+        "Texas.",
+        "Mississippi."
+      ]
+    },
+    {
+      id: "weirdlaws-maine-christmas",
+      category: "weirdlaws",
+      question: "Which state reportedly prohibited Christmas decorations before December 14?",
+      answer: "Maine.",
+      choices: [
+        "Maine.",
+        "Vermont.",
+        "New Hampshire.",
+        "Massachusetts."
+      ]
+    },
+    {
+      id: "weirdlaws-maryland-lions",
+      category: "weirdlaws",
+      question: "Which state reportedly made it illegal to bring a lion to the movies?",
+      answer: "Maryland.",
+      choices: [
+        "Maryland.",
+        "Virginia.",
+        "Delaware.",
+        "Pennsylvania."
+      ]
+    },
+    {
+      id: "weirdlaws-massachusetts-gorilla",
+      category: "weirdlaws",
+      question: "Which state reportedly prohibited taking a gorilla in the back seat of a car?",
+      answer: "Massachusetts.",
+      choices: [
+        "Massachusetts.",
+        "Rhode Island.",
+        "Connecticut.",
+        "New York."
+      ]
+    },
+    {
+      id: "weirdlaws-michigan-skunk",
+      category: "weirdlaws",
+      question: "Which state reportedly banned keeping a skunk as a pet without permission?",
+      answer: "Michigan.",
+      choices: [
+        "Michigan.",
+        "Wisconsin.",
+        "Minnesota.",
+        "Ohio."
+      ]
+    },
+    {
+      id: "weirdlaws-minnesota-duck",
+      category: "weirdlaws",
+      question: "Which state reportedly outlawed crossing state lines with a duck on your head?",
+      answer: "Minnesota.",
+      choices: [
+        "Minnesota.",
+        "North Dakota.",
+        "South Dakota.",
+        "Wisconsin."
+      ]
+    },
+    {
+      id: "weirdlaws-mississippi-horns",
+      category: "weirdlaws",
+      question: "Which state reportedly prohibited teaching others what polygamy is?",
+      answer: "Mississippi.",
+      choices: [
+        "Mississippi.",
+        "Alabama.",
+        "Arkansas.",
+        "Louisiana."
+      ]
+    },
+    {
+      id: "weirdlaws-missouri-bear",
+      category: "weirdlaws",
+      question: "Which state reportedly made it illegal to wrestle a bear?",
+      answer: "Missouri.",
+      choices: [
+        "Missouri.",
+        "Arkansas.",
+        "Kentucky.",
+        "Tennessee."
+      ]
+    },
+    {
+      id: "weirdlaws-montana-sheep",
+      category: "weirdlaws",
+      question: "Which state is famous for a bizarre rumor involving sheep in a truck?",
+      answer: "Montana.",
+      choices: [
+        "Montana.",
+        "Wyoming.",
+        "Idaho.",
+        "Colorado."
+      ]
+    },
+    {
+      id: "weirdlaws-nebraska-whale",
+      category: "weirdlaws",
+      question: "Which landlocked state reportedly made whale fishing illegal?",
+      answer: "Nebraska.",
+      choices: [
+        "Nebraska.",
+        "Kansas.",
+        "Iowa.",
+        "South Dakota."
+      ]
+    },
+    {
+      id: "weirdlaws-nevada-camel",
+      category: "weirdlaws",
+      question: "Which state is associated with unusual laws due to its Wild West history and once had roaming camels?",
+      answer: "Nevada.",
+      choices: [
+        "Nevada.",
+        "Arizona.",
+        "Utah.",
+        "New Mexico."
+      ]
+    },
+    {
+      id: "weirdlaws-newhampshire-seaweed",
+      category: "weirdlaws",
+      question: "Which state reportedly prohibited collecting seaweed at night?",
+      answer: "New Hampshire.",
+      choices: [
+        "New Hampshire.",
+        "Maine.",
+        "Massachusetts.",
+        "Rhode Island."
+      ]
+    },
+    {
+      id: "weirdlaws-newjersey-soup",
+      category: "weirdlaws",
+      question: "Which state reportedly made it illegal to slurp soup in public?",
+      answer: "New Jersey.",
+      choices: [
+        "New Jersey.",
+        "New York.",
+        "Pennsylvania.",
+        "Connecticut."
+      ]
+    },
+    {
+      id: "weirdlaws-newmexico-idiots",
+      category: "weirdlaws",
+      question: "Which state reportedly prohibited idiots from voting?",
+      answer: "New Mexico.",
+      choices: [
+        "New Mexico.",
+        "Arizona.",
+        "Texas.",
+        "Nevada."
+      ]
+    },
+    {
+      id: "weirdlaws-newyork-slippers",
+      category: "weirdlaws",
+      question: "Which state reportedly allowed people to walk backward only if they carried a lantern?",
+      answer: "New York.",
+      choices: [
+        "New York.",
+        "Massachusetts.",
+        "Pennsylvania.",
+        "New Jersey."
+      ]
+    },
+    {
+      id: "weirdlaws-northcarolina-bingo",
+      category: "weirdlaws",
+      question: "Which state reportedly limited how long bingo games could last?",
+      answer: "North Carolina.",
+      choices: [
+        "North Carolina.",
+        "South Carolina.",
+        "Virginia.",
+        "Georgia."
+      ]
+    },
+    {
+      id: "weirdlaws-northdakota-shoes",
+      category: "weirdlaws",
+      question: "Which state reportedly prohibited sleeping with your shoes on?",
+      answer: "North Dakota.",
+      choices: [
+        "North Dakota.",
+        "South Dakota.",
+        "Montana.",
+        "Minnesota."
+      ]
+    },
+    {
+      id: "weirdlaws-ohio-fish",
+      category: "weirdlaws",
+      question: "Which state reportedly prohibited getting a fish drunk?",
+      answer: "Ohio.",
+      choices: [
+        "Ohio.",
+        "Indiana.",
+        "Michigan.",
+        "Illinois."
+      ]
+    },
+    {
+      id: "weirdlaws-oklahoma-dogs",
+      category: "weirdlaws",
+      question: "Which state reportedly prohibited making ugly faces at dogs?",
+      answer: "Oklahoma.",
+      choices: [
+        "Oklahoma.",
+        "Texas.",
+        "Kansas.",
+        "Arkansas."
+      ]
+    },
+    {
+      id: "weirdlaws-oregon-boxing",
+      category: "weirdlaws",
+      question: "Which state reportedly prohibited boxing matches between kangaroos?",
+      answer: "Oregon.",
+      choices: [
+        "Oregon.",
+        "Washington.",
+        "California.",
+        "Nevada."
+      ]
+    },
+    {
+      id: "weirdlaws-pennsylvania-singing",
+      category: "weirdlaws",
+      question: "Which state reportedly required motorists to stop every mile at night to send off livestock with a flare?",
+      answer: "Pennsylvania.",
+      choices: [
+        "Pennsylvania.",
+        "Ohio.",
+        "West Virginia.",
+        "Maryland."
+      ]
+    },
+    {
+      id: "weirdlaws-rhodeisland-biting",
+      category: "weirdlaws",
+      question: "Which state reportedly prohibited biting off someone else’s limb?",
+      answer: "Rhode Island.",
+      choices: [
+        "Rhode Island.",
+        "Massachusetts.",
+        "Connecticut.",
+        "New York."
+      ]
+    },
+    {
+      id: "weirdlaws-southcarolina-horses",
+      category: "weirdlaws",
+      question: "Which state reportedly prohibited keeping horses in bathtubs?",
+      answer: "South Carolina.",
+      choices: [
+        "South Carolina.",
+        "Georgia.",
+        "North Carolina.",
+        "Virginia."
+      ]
+    },
+    {
+      id: "weirdlaws-southdakota-cheese",
+      category: "weirdlaws",
+      question: "Which state reportedly prohibited sleeping in a cheese factory?",
+      answer: "South Dakota.",
+      choices: [
+        "South Dakota.",
+        "North Dakota.",
+        "Wisconsin.",
+        "Minnesota."
+      ]
+    },
+    {
+      id: "weirdlaws-tennessee-skunk",
+      category: "weirdlaws",
+      question: "Which state reportedly prohibited sharing your Netflix password? Just kidding—which state reportedly banned skunks as pets?",
+      answer: "Tennessee.",
+      choices: [
+        "Tennessee.",
+        "Kentucky.",
+        "Virginia.",
+        "Arkansas."
+      ]
+    },
+    {
+      id: "weirdlaws-texas-crime",
+      category: "weirdlaws",
+      question: "Which state reportedly required criminals to give victims 24 hours notice before committing a crime?",
+      answer: "Texas.",
+      choices: [
+        "Texas.",
+        "Oklahoma.",
+        "Louisiana.",
+        "New Mexico."
+      ]
+    },
+    {
+      id: "weirdlaws-utah-violin",
+      category: "weirdlaws",
+      question: "Which state reportedly prohibited throwing violins in the street?",
+      answer: "Utah.",
+      choices: [
+        "Utah.",
+        "Nevada.",
+        "Colorado.",
+        "Idaho."
+      ]
+    },
+    {
+      id: "weirdlaws-vermont-whistle",
+      category: "weirdlaws",
+      question: "Which state reportedly prohibited whistling underwater?",
+      answer: "Vermont.",
+      choices: [
+        "Vermont.",
+        "Maine.",
+        "New Hampshire.",
+        "Massachusetts."
+      ]
+    },
+    {
+      id: "weirdlaws-virginia-tickle",
+      category: "weirdlaws",
+      question: "Which state reportedly prohibited tickling women?",
+      answer: "Virginia.",
+      choices: [
+        "Virginia.",
+        "Maryland.",
+        "North Carolina.",
+        "West Virginia."
+      ]
+    },
+    {
+      id: "history-dollar-bill",
+      category: "history",
+      question: "Which U.S. president appears on the one-dollar bill?",
+      answer: "George Washington.",
+      choices: [
+        "George Washington.",
+        "Abraham Lincoln.",
+        "Thomas Jefferson.",
+        "Theodore Roosevelt."
+      ]
+    },
+    {
+      id: "history-hundred-bill",
+      category: "history",
+      question: "Who is pictured on the U.S. hundred-dollar bill?",
+      answer: "Benjamin Franklin.",
+      choices: [
+        "Benjamin Franklin.",
+        "Alexander Hamilton.",
+        "Ulysses S. Grant.",
+        "John Adams."
+      ]
+    },
+    {
+      id: "history-two-dollar",
+      category: "history",
+      question: "Which president is pictured on the U.S. two-dollar bill?",
+      answer: "Thomas Jefferson.",
+      choices: [
+        "Thomas Jefferson.",
+        "James Madison.",
+        "Andrew Jackson.",
+        "John Quincy Adams."
+      ]
+    },
+    {
+      id: "history-earth-day-first",
+      category: "history",
+      question: "Earth Day was first celebrated in what year?",
+      answer: "1970.",
+      choices: [
+        "1970.",
+        "1962.",
+        "1984.",
+        "1991."
+      ]
+    },
+    {
+      id: "history-hiroshima",
+      category: "history",
+      question: "The first atomic bomb used in war was dropped on which Japanese city?",
+      answer: "Hiroshima.",
+      choices: [
+        "Hiroshima.",
+        "Nagasaki.",
+        "Tokyo.",
+        "Kyoto."
+      ]
+    },
+    {
+      id: "history-amelia-atlantic",
+      category: "history",
+      question: "Who was the first woman to fly solo across the Atlantic Ocean?",
+      answer: "Amelia Earhart.",
+      choices: [
+        "Amelia Earhart.",
+        "Bessie Coleman.",
+        "Sally Ride.",
+        "Jacqueline Cochran."
+      ]
+    },
+    {
+      id: "history-genghis-name",
+      category: "history",
+      question: "Temujin is better known by what historical name?",
+      answer: "Genghis Khan.",
+      choices: [
+        "Genghis Khan.",
+        "Kublai Khan.",
+        "Attila the Hun.",
+        "Tamerlane."
+      ]
+    },
+    {
+      id: "history-jfk-city",
+      category: "history",
+      question: "In which city was John F. Kennedy assassinated?",
+      answer: "Dallas.",
+      choices: [
+        "Dallas.",
+        "Austin.",
+        "Washington, D.C.",
+        "Boston."
+      ]
+    },
+    {
+      id: "history-first-state-delaware",
+      category: "history",
+      question: "Which state was the first to join the United States?",
+      answer: "Delaware.",
+      choices: [
+        "Delaware.",
+        "Virginia.",
+        "Pennsylvania.",
+        "Massachusetts."
+      ]
+    },
+    {
+      id: "history-first-moon-walker",
+      category: "history",
+      question: "Who was the first person to walk on the Moon?",
+      answer: "Neil Armstrong.",
+      choices: [
+        "Neil Armstrong.",
+        "Buzz Aldrin.",
+        "Michael Collins.",
+        "Alan Shepard."
+      ]
+    },
+    {
+      id: "history-machu-picchu-civilization",
+      category: "history",
+      question: "Which ancient civilization built Machu Picchu?",
+      answer: "Inca.",
+      choices: [
+        "Inca.",
+        "Maya.",
+        "Aztec.",
+        "Olmec."
+      ]
+    },
+    {
+      id: "history-statue-liberty-france-bonus",
+      category: "history",
+      question: "The Statue of Liberty was a gift from which country?",
+      answer: "France.",
+      choices: [
+        "France.",
+        "England.",
+        "Germany.",
+        "Italy."
+      ]
+    },
+    {
+      id: "history-maid-of-orleans",
+      category: "history",
+      question: "Who was known as the Maid of Orléans?",
+      answer: "Joan of Arc.",
+      choices: [
+        "Joan of Arc.",
+        "Marie Antoinette.",
+        "Catherine de Medici.",
+        "Eleanor of Aquitaine."
+      ]
+    },
+    {
+      id: "history-berlin-wall-fall",
+      category: "history",
+      question: "In what year did the Berlin Wall fall?",
+      answer: "1989.",
+      choices: [
+        "1989.",
+        "1985.",
+        "1991.",
+        "1979."
+      ]
+    },
+    {
+      id: "history-us-independence",
+      category: "history",
+      question: "In what year was the Declaration of Independence adopted?",
+      answer: "1776.",
+      choices: [
+        "1776.",
+        "1783.",
+        "1775.",
+        "1789."
+      ]
+    },
+    {
+      id: "history-egyptian-pyramids",
+      category: "history",
+      question: "Which civilization built the Great Pyramids of Giza?",
+      answer: "Ancient Egyptians.",
+      choices: [
+        "Ancient Egyptians.",
+        "Romans.",
+        "Greeks.",
+        "Persians."
+      ]
+    },
+    {
+      id: "history-magna-carta-country",
+      category: "history",
+      question: "The Magna Carta was first issued in which country?",
+      answer: "England.",
+      choices: [
+        "England.",
+        "France.",
+        "Scotland.",
+        "Germany."
+      ]
+    },
+    {
+      id: "history-first-president",
+      category: "history",
+      question: "Who was the first President of the United States?",
+      answer: "George Washington.",
+      choices: [
+        "George Washington.",
+        "John Adams.",
+        "Thomas Jefferson.",
+        "James Madison."
+      ]
+    },
+    {
+      id: "history-titanic-year",
+      category: "history",
+      question: "In what year did the Titanic sink?",
+      answer: "1912.",
+      choices: [
+        "1912.",
+        "1905.",
+        "1918.",
+        "1921."
+      ]
+    },
+    {
+      id: "history-world-war-two-end",
+      category: "history",
+      question: "In what year did World War II end?",
+      answer: "1945.",
+      choices: [
+        "1945.",
+        "1944.",
+        "1946.",
+        "1939."
+      ]
+    },
+    {
+      id: "history-great-wall-country",
+      category: "history",
+      question: "The Great Wall was built in which country?",
+      answer: "China.",
+      choices: [
+        "China.",
+        "Japan.",
+        "Mongolia.",
+        "India."
+      ]
+    },
+    {
+      id: "history-lincoln-assassinated-theater",
+      category: "history",
+      question: "At which theater was Abraham Lincoln assassinated?",
+      answer: "Ford’s Theatre.",
+      choices: [
+        "Ford’s Theatre.",
+        "Booth Theatre.",
+        "National Theatre.",
+        "Liberty Theatre."
+      ]
+    },
+    {
+      id: "history-rosetta-stone-discovery-country",
+      category: "history",
+      question: "In which country was the Rosetta Stone discovered?",
+      answer: "Egypt.",
+      choices: [
+        "Egypt.",
+        "Greece.",
+        "Turkey.",
+        "Italy."
+      ]
+    },
+    {
+      id: "general-area-51",
+      category: "general",
+      question: "Area 51 is located in which U.S. state?",
+      answer: "Nevada.",
+      choices: [
+        "Nevada.",
+        "New Mexico.",
+        "Arizona.",
+        "Utah."
+      ]
+    },
+    {
+      id: "general-stop-sign-shape",
+      category: "general",
+      question: "What shape is a standard stop sign?",
+      answer: "Octagon.",
+      choices: [
+        "Octagon.",
+        "Hexagon.",
+        "Diamond.",
+        "Circle."
+      ]
+    },
+    {
+      id: "general-lego-founded",
+      category: "general",
+      question: "The LEGO Group was founded in 1932. True or false?",
+      answer: "True.",
+      choices: [
+        "True.",
+        "False."
+      ]
+    },
+    {
+      id: "general-cynophobia",
+      category: "general",
+      question: "Cynophobia is the fear of what?",
+      answer: "Dogs.",
+      choices: [
+        "Dogs.",
+        "Heights.",
+        "Crowds.",
+        "Thunder."
+      ]
+    },
+    {
+      id: "general-jurassic-park-author",
+      category: "general",
+      question: "Who wrote Jurassic Park?",
+      answer: "Michael Crichton.",
+      choices: [
+        "Michael Crichton.",
+        "Stephen King.",
+        "John Grisham.",
+        "Ray Bradbury."
+      ]
+    },
+    {
+      id: "general-saffron",
+      category: "general",
+      question: "What is often called the world's most expensive spice by weight?",
+      answer: "Saffron.",
+      choices: [
+        "Saffron.",
+        "Cinnamon.",
+        "Paprika.",
+        "Nutmeg."
+      ]
+    },
+    {
+      id: "general-seconds-day",
+      category: "general",
+      question: "There are 86,400 seconds in a day. True or false?",
+      answer: "True.",
+      choices: [
+        "True.",
+        "False."
+      ]
+    },
+    {
+      id: "general-venus-rotation",
+      category: "general",
+      question: "Which planet rotates clockwise on its axis compared with most planets?",
+      answer: "Venus.",
+      choices: [
+        "Venus.",
+        "Mars.",
+        "Jupiter.",
+        "Mercury."
+      ]
+    },
+    {
+      id: "general-bond-code",
+      category: "general",
+      question: "What is James Bond's famous code number?",
+      answer: "007.",
+      choices: [
+        "007.",
+        "411.",
+        "911.",
+        "101."
+      ]
+    },
+    {
+      id: "general-muppets-creator",
+      category: "general",
+      question: "Jim Henson created which beloved cast of characters?",
+      answer: "The Muppets.",
+      choices: [
+        "The Muppets.",
+        "The Smurfs.",
+        "The Peanuts gang.",
+        "The Rugrats."
+      ]
+    },
+    {
+      id: "general-mona-lisa-museum",
+      category: "general",
+      question: "The Mona Lisa hangs in which museum?",
+      answer: "The Louvre.",
+      choices: [
+        "The Louvre.",
+        "The Prado.",
+        "The Met.",
+        "The Uffizi."
+      ]
+    },
+    {
+      id: "general-appalachian-trail-states",
+      category: "general",
+      question: "The Appalachian Trail crosses how many states?",
+      answer: "14.",
+      choices: [
+        "14.",
+        "9.",
+        "20.",
+        "6."
+      ]
+    },
+    {
+      id: "general-honey",
+      category: "general",
+      question: "What food is famous for staying edible for a very long time without spoiling?",
+      answer: "Honey.",
+      choices: [
+        "Honey.",
+        "Bread.",
+        "Milk.",
+        "Lettuce."
+      ]
+    },
+    {
+      id: "general-cloned-animal",
+      category: "general",
+      question: "What was the first mammal cloned from an adult cell?",
+      answer: "A sheep.",
+      choices: [
+        "A sheep.",
+        "A cat.",
+        "A cow.",
+        "A horse."
+      ]
+    },
+    {
+      id: "general-passport",
+      category: "general",
+      question: "What document is commonly required for international travel?",
+      answer: "A passport.",
+      choices: [
+        "A passport.",
+        "A library card.",
+        "A voter sticker.",
+        "A parking permit."
+      ]
+    },
+    {
+      id: "general-hexagon-sides-bonus",
+      category: "general",
+      question: "How many sides does a hexagon have?",
+      answer: "6.",
+      choices: [
+        "6.",
+        "5.",
+        "7.",
+        "8."
+      ]
+    },
+    {
+      id: "general-leap-year-extra-day",
+      category: "general",
+      question: "Which month has an extra day during a leap year?",
+      answer: "February.",
+      choices: [
+        "February.",
+        "January.",
+        "March.",
+        "April."
+      ]
+    },
+    {
+      id: "general-emerald-color",
+      category: "general",
+      question: "What color are emeralds?",
+      answer: "Green.",
+      choices: [
+        "Green.",
+        "Blue.",
+        "Red.",
+        "Purple."
+      ]
+    },
+    {
+      id: "general-continents-count",
+      category: "general",
+      question: "How many continents are there?",
+      answer: "7.",
+      choices: [
+        "7.",
+        "5.",
+        "6.",
+        "8."
+      ]
+    },
+    {
+      id: "general-tallest-animal-bonus",
+      category: "general",
+      question: "What is the tallest animal in the world?",
+      answer: "Giraffe.",
+      choices: [
+        "Giraffe.",
+        "Elephant.",
+        "Camel.",
+        "Moose."
+      ]
+    },
+    {
+      id: "general-spider-legs",
+      category: "general",
+      question: "How many legs does a spider have?",
+      answer: "8.",
+      choices: [
+        "8.",
+        "6.",
+        "10.",
+        "12."
+      ]
+    },
+    {
+      id: "general-rainbow-colors",
+      category: "general",
+      question: "How many colors are traditionally listed in a rainbow?",
+      answer: "7.",
+      choices: [
+        "7.",
+        "5.",
+        "6.",
+        "8."
+      ]
+    },
+    {
+      id: "general-baby-frog",
+      category: "general",
+      question: "What is a baby frog called?",
+      answer: "Tadpole.",
+      choices: [
+        "Tadpole.",
+        "Pup.",
+        "Calf.",
+        "Cub."
+      ]
+    },
+    {
+      id: "general-penguin-bird",
+      category: "general",
+      question: "What type of animal is a penguin?",
+      answer: "Bird.",
+      choices: [
+        "Bird.",
+        "Fish.",
+        "Mammal.",
+        "Reptile."
+      ]
+    },
+    {
+      id: "general-bee-honey",
+      category: "general",
+      question: "Which insect makes honey?",
+      answer: "Bee.",
+      choices: [
+        "Bee.",
+        "Butterfly.",
+        "Ant.",
+        "Beetle."
+      ]
+    },
+    {
+      id: "general-freezing-point",
+      category: "general",
+      question: "At what temperature does water freeze in Celsius?",
+      answer: "0 degrees.",
+      choices: [
+        "0 degrees.",
+        "10 degrees.",
+        "32 degrees.",
+        "100 degrees."
+      ]
+    },
+    {
+      id: "general-largest-planet",
+      category: "general",
+      question: "Which planet is the largest in our solar system?",
+      answer: "Jupiter.",
+      choices: [
+        "Jupiter.",
+        "Saturn.",
+        "Earth.",
+        "Mars."
+      ]
+    },
+    {
+      id: "general-human-teeth",
+      category: "general",
+      question: "How many teeth does a typical adult human have?",
+      answer: "32.",
+      choices: [
+        "32.",
+        "28.",
+        "30.",
+        "36."
+      ]
+    },
+    {
+      id: "general-largest-desert",
+      category: "general",
+      question: "What is the largest desert in the world?",
+      answer: "Antarctica.",
+      choices: [
+        "Antarctica.",
+        "Sahara Desert.",
+        "Gobi Desert.",
+        "Arabian Desert."
+      ]
+    },
+    {
+      id: "general-banana-berry",
+      category: "general",
+      question: "True or False: Bananas are classified as berries.",
+      answer: "True.",
+      choices: [
+        "True.",
+        "False.",
+        "Only wild bananas.",
+        "Only ripe bananas."
+      ]
+    },
+    {
+      id: "general-koala-country",
+      category: "general",
+      question: "Koalas are native to which country?",
+      answer: "Australia.",
+      choices: [
+        "Australia.",
+        "New Zealand.",
+        "South Africa.",
+        "Brazil."
+      ]
+    },
+    {
+      id: "general-shark-skeleton",
+      category: "general",
+      question: "What are shark skeletons primarily made of?",
+      answer: "Cartilage.",
+      choices: [
+        "Cartilage.",
+        "Bone.",
+        "Calcium.",
+        "Shell."
+      ]
+    },
+    {
+      id: "general-blue-whale-heart",
+      category: "general",
+      question: "Which animal has a heart that can weigh over 400 pounds?",
+      answer: "Blue whale.",
+      choices: [
+        "Blue whale.",
+        "Elephant.",
+        "Giraffe.",
+        "Hippopotamus."
+      ]
+    },
+    {
+      id: "general-venus-hottest",
+      category: "general",
+      question: "Which planet is the hottest in our solar system?",
+      answer: "Venus.",
+      choices: [
+        "Venus.",
+        "Mercury.",
+        "Mars.",
+        "Jupiter."
+      ]
+    },
+    {
+      id: "general-human-bones",
+      category: "general",
+      question: "How many bones does the average adult human body have?",
+      answer: "206.",
+      choices: [
+        "206.",
+        "212.",
+        "198.",
+        "224."
+      ]
+    },
+    {
+      id: "general-sloth-speed",
+      category: "general",
+      question: "What is considered one of the slowest mammals in the world?",
+      answer: "Sloth.",
+      choices: [
+        "Sloth.",
+        "Koala.",
+        "Panda.",
+        "Armadillo."
+      ]
+    },
+    {
+      id: "general-animal-king",
+      category: "general",
+      question: "Which animal is often called the \"King of the Jungle\"?",
+      answer: "Lion.",
+      choices: [
+        "Lion.",
+        "Tiger.",
+        "Elephant.",
+        "Bear."
+      ]
+    },
+    {
+      id: "general-mount-everest-location",
+      category: "general",
+      question: "Mount Everest lies on the border of Nepal and which country?",
+      answer: "China.",
+      choices: [
+        "China.",
+        "India.",
+        "Pakistan.",
+        "Bhutan."
+      ]
+    },
+    {
+      id: "general-polar-bear-region",
+      category: "general",
+      question: "Polar bears naturally live in which region?",
+      answer: "The Arctic.",
+      choices: [
+        "The Arctic.",
+        "Antarctica.",
+        "The Amazon.",
+        "Siberia."
+      ]
+    },
+    {
+      id: "general-longest-river",
+      category: "general",
+      question: "Which river is traditionally taught as the longest in the world?",
+      answer: "The Nile.",
+      choices: [
+        "The Nile.",
+        "The Amazon.",
+        "The Mississippi.",
+        "The Yangtze."
+      ]
+    },
+    {
+      id: "general-blood-color",
+      category: "general",
+      question: "What color is human blood inside the body?",
+      answer: "Red.",
+      choices: [
+        "Red.",
+        "Blue.",
+        "Purple.",
+        "Green."
+      ]
+    },
+    {
+      id: "general-elephant-trunk",
+      category: "general",
+      question: "What body part do elephants use like a nose and an arm?",
+      answer: "Their trunk.",
+      choices: [
+        "Their trunk.",
+        "Their tusks.",
+        "Their tail.",
+        "Their ears."
+      ]
+    },
+    {
+      id: "general-fastest-bird",
+      category: "general",
+      question: "What is the fastest animal on Earth during a dive?",
+      answer: "Peregrine falcon.",
+      choices: [
+        "Peregrine falcon.",
+        "Cheetah.",
+        "Golden eagle.",
+        "Sailfish."
+      ]
+    },
+    {
+      id: "general-honey-never-spoils",
+      category: "general",
+      question: "True or False: Honey can last for thousands of years without spoiling.",
+      answer: "True.",
+      choices: [
+        "True.",
+        "False.",
+        "Only if refrigerated.",
+        "Only if unopened."
+      ]
+    },
+    {
+      id: "general-human-brain-weight",
+      category: "general",
+      question: "About how much does the average adult human brain weigh?",
+      answer: "About 3 pounds.",
+      choices: [
+        "About 3 pounds.",
+        "About 1 pound.",
+        "About 5 pounds.",
+        "About 8 pounds."
+      ]
+    },
+    {
+      id: "geography-largest-ocean-pacific",
+      category: "geography",
+      question: "What is the largest ocean on Earth?",
+      answer: "Pacific Ocean.",
+      choices: [
+        "Pacific Ocean.",
+        "Atlantic Ocean.",
+        "Indian Ocean.",
+        "Arctic Ocean."
+      ]
+    },
+    {
+      id: "geography-most-active-volcanoes-state",
+      category: "geography",
+      question: "Which U.S. state has the most active volcanoes?",
+      answer: "Alaska.",
+      choices: [
+        "Alaska.",
+        "California.",
+        "Hawaii.",
+        "Washington."
+      ]
+    },
+    {
+      id: "geography-canada-capital-ottawa",
+      category: "geography",
+      question: "What is the capital of Canada?",
+      answer: "Ottawa.",
+      choices: [
+        "Ottawa.",
+        "Toronto.",
+        "Montreal.",
+        "Vancouver."
+      ]
+    },
+    {
+      id: "geography-sahara-northern-africa",
+      category: "geography",
+      question: "Which desert covers much of northern Africa?",
+      answer: "Sahara.",
+      choices: [
+        "Sahara.",
+        "Gobi.",
+        "Kalahari.",
+        "Mojave."
+      ]
+    },
+    {
+      id: "geography-south-america-longest-river",
+      category: "geography",
+      question: "What is the longest river in South America?",
+      answer: "Amazon.",
+      choices: [
+        "Amazon.",
+        "Paraná.",
+        "Orinoco.",
+        "Madeira."
+      ]
+    },
+    {
+      id: "geography-largest-country",
+      category: "geography",
+      question: "What is the largest country in the world by land area?",
+      answer: "Russia.",
+      choices: [
+        "Russia.",
+        "Canada.",
+        "China.",
+        "United States."
+      ]
+    },
+    {
+      id: "geography-highest-mountain",
+      category: "geography",
+      question: "What is the highest mountain above sea level?",
+      answer: "Mount Everest.",
+      choices: [
+        "Mount Everest.",
+        "K2.",
+        "Kangchenjunga.",
+        "Denali."
+      ]
+    },
+    {
+      id: "geography-smallest-country",
+      category: "geography",
+      question: "What is the smallest country in the world?",
+      answer: "Vatican City.",
+      choices: [
+        "Vatican City.",
+        "Monaco.",
+        "San Marino.",
+        "Liechtenstein."
+      ]
+    },
+    {
+      id: "geography-africa-largest-lake",
+      category: "geography",
+      question: "What is the largest lake in Africa by surface area?",
+      answer: "Lake Victoria.",
+      choices: [
+        "Lake Victoria.",
+        "Lake Tanganyika.",
+        "Lake Malawi.",
+        "Lake Chad."
+      ]
+    },
+    {
+      id: "geography-country-most-time-zones",
+      category: "geography",
+      question: "Which country has the most time zones?",
+      answer: "France.",
+      choices: [
+        "France.",
+        "Russia.",
+        "United States.",
+        "Australia."
+      ]
+    },
+    {
+      id: "geography-ring-of-fire",
+      category: "geography",
+      question: "What is the name of the earthquake- and volcano-prone region around the Pacific Ocean?",
+      answer: "Ring of Fire.",
+      choices: [
+        "Ring of Fire.",
+        "Pacific Belt.",
+        "Volcanic Arc.",
+        "Fire Circle."
+      ]
+    },
+    {
+      id: "geography-nile-flows-into",
+      category: "geography",
+      question: "Into which sea does the Nile River empty?",
+      answer: "Mediterranean Sea.",
+      choices: [
+        "Mediterranean Sea.",
+        "Red Sea.",
+        "Black Sea.",
+        "Arabian Sea."
+      ]
+    },
+    {
+      id: "geography-australia-capital",
+      category: "geography",
+      question: "What is the capital of Australia?",
+      answer: "Canberra.",
+      choices: [
+        "Canberra.",
+        "Sydney.",
+        "Melbourne.",
+        "Perth."
+      ]
+    },
+    {
+      id: "geography-largest-island",
+      category: "geography",
+      question: "What is the largest island in the world?",
+      answer: "Greenland.",
+      choices: [
+        "Greenland.",
+        "New Guinea.",
+        "Borneo.",
+        "Madagascar."
+      ]
+    },
+    {
+      id: "geography-japan-mountain",
+      category: "geography",
+      question: "What is the highest mountain in Japan?",
+      answer: "Mount Fuji.",
+      choices: [
+        "Mount Fuji.",
+        "Mount Kita.",
+        "Mount Hotaka.",
+        "Mount Tate."
+      ]
+    },
+    {
+      id: "animals-largest-shark",
+      category: "animals",
+      question: "What is the largest species of shark?",
+      answer: "Whale shark.",
+      choices: [
+        "Whale shark.",
+        "Great white shark.",
+        "Hammerhead shark.",
+        "Tiger shark."
+      ]
+    },
+    {
+      id: "animals-ship-of-the-desert",
+      category: "animals",
+      question: "Which animal is known as the \"ship of the desert\"?",
+      answer: "Camel.",
+      choices: [
+        "Camel.",
+        "Horse.",
+        "Donkey.",
+        "Llama."
+      ]
+    },
+    {
+      id: "animals-octopus-hearts",
+      category: "animals",
+      question: "How many hearts does an octopus have?",
+      answer: "Three.",
+      choices: [
+        "Three.",
+        "One.",
+        "Two.",
+        "Four."
+      ]
+    },
+    {
+      id: "animals-baby-kangaroo",
+      category: "animals",
+      question: "What is a baby kangaroo called?",
+      answer: "Joey.",
+      choices: [
+        "Joey.",
+        "Cub.",
+        "Pup.",
+        "Kit."
+      ]
+    },
+    {
+      id: "animals-black-white-stripes",
+      category: "animals",
+      question: "Which animal has black-and-white stripes?",
+      answer: "Zebra.",
+      choices: [
+        "Zebra.",
+        "Okapi.",
+        "Tapir.",
+        "Gazelle."
+      ]
+    },
+    {
+      id: "animals-fastest-land-animal",
+      category: "animals",
+      question: "What is the fastest land animal?",
+      answer: "Cheetah.",
+      choices: [
+        "Cheetah.",
+        "Lion.",
+        "Pronghorn.",
+        "Greyhound."
+      ]
+    },
+    {
+      id: "animals-largest-mammal",
+      category: "animals",
+      question: "What is the largest animal ever known to exist?",
+      answer: "Blue whale.",
+      choices: [
+        "Blue whale.",
+        "African elephant.",
+        "Whale shark.",
+        "Megalodon."
+      ]
+    },
+    {
+      id: "animals-group-of-crows",
+      category: "animals",
+      question: "What is a group of crows called?",
+      answer: "Murder.",
+      choices: [
+        "Murder.",
+        "Pack.",
+        "Pod.",
+        "Flock."
+      ]
+    },
+    {
+      id: "animals-only-mammal-true-flight",
+      category: "animals",
+      question: "Which mammals are capable of true powered flight?",
+      answer: "Bats.",
+      choices: [
+        "Bats.",
+        "Flying squirrels.",
+        "Sugar gliders.",
+        "Colugos."
+      ]
+    },
+    {
+      id: "animals-largest-cat",
+      category: "animals",
+      question: "What is the largest species of wild cat?",
+      answer: "Tiger.",
+      choices: [
+        "Tiger.",
+        "Lion.",
+        "Jaguar.",
+        "Leopard."
+      ]
+    },
+    {
+      id: "animals-koala-diet",
+      category: "animals",
+      question: "What do koalas primarily eat?",
+      answer: "Eucalyptus leaves.",
+      choices: [
+        "Eucalyptus leaves.",
+        "Bamboo.",
+        "Grass.",
+        "Fruit."
+      ]
+    },
+    {
+      id: "animals-polar-bear-color",
+      category: "animals",
+      question: "What color is a polar bear’s skin beneath its fur?",
+      answer: "Black.",
+      choices: [
+        "Black.",
+        "White.",
+        "Pink.",
+        "Gray."
+      ]
+    },
+    {
+      id: "animals-largest-bird",
+      category: "animals",
+      question: "What is the largest living bird?",
+      answer: "Ostrich.",
+      choices: [
+        "Ostrich.",
+        "Emu.",
+        "Cassowary.",
+        "Condor."
+      ]
+    },
+    {
+      id: "animals-dolphin-mammal",
+      category: "animals",
+      question: "Are dolphins fish or mammals?",
+      answer: "Mammals.",
+      choices: [
+        "Mammals.",
+        "Fish.",
+        "Amphibians.",
+        "Reptiles."
+      ]
+    },
+    {
+      id: "animals-sloth-toes",
+      category: "animals",
+      question: "How many toes do three-toed sloths have on their hind feet?",
+      answer: "Three.",
+      choices: [
+        "Three.",
+        "Two.",
+        "Four.",
+        "Five."
+      ]
+    },
+    {
+      id: "science-light-speed-fastest",
+      category: "science",
+      question: "What travels faster in a vacuum: light or sound?",
+      answer: "Light.",
+      choices: [
+        "Light.",
+        "Sound.",
+        "They travel the same speed.",
+        "Neither can travel."
+      ]
+    },
+    {
+      id: "science-ice-less-dense",
+      category: "science",
+      question: "Why does ice float on water?",
+      answer: "Ice is less dense than liquid water.",
+      choices: [
+        "Ice is less dense than liquid water.",
+        "Ice is heavier than water.",
+        "Ice has no mass.",
+        "Water pushes everything upward equally."
+      ]
+    },
+    {
+      id: "science-earth-layer-crust",
+      category: "science",
+      question: "What is the outermost solid layer of Earth called?",
+      answer: "The crust.",
+      choices: [
+        "The crust.",
+        "The core.",
+        "The mantle.",
+        "The atmosphere."
+      ]
+    },
+    {
+      id: "science-battery-energy",
+      category: "science",
+      question: "A battery stores energy mostly in what form?",
+      answer: "Chemical energy.",
+      choices: [
+        "Chemical energy.",
+        "Sound energy.",
+        "Gravitational energy.",
+        "Thermal insulation."
+      ]
+    },
+    {
+      id: "science-evaporation",
+      category: "science",
+      question: "What is the process called when liquid water changes into water vapor?",
+      answer: "Evaporation.",
+      choices: [
+        "Evaporation.",
+        "Condensation.",
+        "Freezing.",
+        "Erosion."
+      ]
+    },
+    {
+      id: "science-stars-made-mostly",
+      category: "science",
+      question: "Stars are made mostly of which two elements?",
+      answer: "Hydrogen and helium.",
+      choices: [
+        "Hydrogen and helium.",
+        "Oxygen and carbon.",
+        "Iron and nickel.",
+        "Nitrogen and argon."
+      ]
+    },
+    {
+      id: "science-magnet-poles",
+      category: "science",
+      question: "Magnets have north and what other pole?",
+      answer: "South.",
+      choices: [
+        "South.",
+        "East.",
+        "Positive.",
+        "Center."
+      ]
+    },
+    {
+      id: "science-cloud-rain-type",
+      category: "science",
+      question: "What type of cloud is commonly associated with thunderstorms?",
+      answer: "Cumulonimbus.",
+      choices: [
+        "Cumulonimbus.",
+        "Cirrus.",
+        "Stratus.",
+        "Altocumulus."
+      ]
+    },
+    {
+      id: "science-red-planet-bonus",
+      category: "science",
+      question: "What planet is known as the Red Planet?",
+      answer: "Mars.",
+      choices: [
+        "Mars.",
+        "Venus.",
+        "Jupiter.",
+        "Mercury."
+      ]
+    },
+    {
+      id: "science-adult-human-bones-bonus",
+      category: "science",
+      question: "How many bones are in the adult human body?",
+      answer: "206.",
+      choices: [
+        "206.",
+        "198.",
+        "214.",
+        "220."
+      ]
+    },
+    {
+      id: "science-water-boiling-celsius-bonus",
+      category: "science",
+      question: "What is the boiling point of water at sea level?",
+      answer: "100°C.",
+      choices: [
+        "100°C.",
+        "90°C.",
+        "95°C.",
+        "110°C."
+      ]
+    },
+    {
+      id: "science-universal-donor",
+      category: "science",
+      question: "Which blood type is known as the universal donor for red blood cell donation?",
+      answer: "O negative.",
+      choices: [
+        "O negative.",
+        "A positive.",
+        "B negative.",
+        "AB positive."
+      ]
+    },
+    {
+      id: "science-saturn-rings",
+      category: "science",
+      question: "Which planet is famous for its spectacular ring system?",
+      answer: "Saturn.",
+      choices: [
+        "Saturn.",
+        "Jupiter.",
+        "Uranus.",
+        "Neptune."
+      ]
+    },
+    {
+      id: "technology-url-stands-for",
+      category: "technology",
+      question: "What does URL stand for?",
+      answer: "Uniform Resource Locator.",
+      choices: [
+        "Uniform Resource Locator.",
+        "Universal Resource Locator.",
+        "Uniform Retrieval Link.",
+        "Universal Retrieval Locator."
+      ]
+    },
+    {
+      id: "technology-android-developer",
+      category: "technology",
+      question: "Which company developed the Android operating system?",
+      answer: "Google.",
+      choices: [
+        "Google.",
+        "Apple.",
+        "Microsoft.",
+        "Samsung."
+      ]
+    },
+    {
+      id: "technology-pdf-stands-for",
+      category: "technology",
+      question: "What does PDF stand for?",
+      answer: "Portable Document Format.",
+      choices: [
+        "Portable Document Format.",
+        "Personal Data File.",
+        "Printed Document File.",
+        "Programmed Data Format."
+      ]
+    },
+    {
+      id: "technology-apple-voice-assistant",
+      category: "technology",
+      question: "What is the name of Apple's voice assistant?",
+      answer: "Siri.",
+      choices: [
+        "Siri.",
+        "Alexa.",
+        "Cortana.",
+        "Bixby."
+      ]
+    },
+    {
+      id: "technology-minecraft-creator",
+      category: "technology",
+      question: "Which company created Minecraft?",
+      answer: "Mojang.",
+      choices: [
+        "Mojang.",
+        "Valve.",
+        "Epic Games.",
+        "Blizzard."
+      ]
+    },
+    {
+      id: "technology-html-stands-for",
+      category: "technology",
+      question: "What does HTML stand for?",
+      answer: "HyperText Markup Language.",
+      choices: [
+        "HyperText Markup Language.",
+        "HighText Machine Language.",
+        "Hyperlink Text Management Language.",
+        "Home Tool Markup Language."
+      ]
+    },
+    {
+      id: "technology-www-stands-for",
+      category: "technology",
+      question: "What does WWW stand for?",
+      answer: "World Wide Web.",
+      choices: [
+        "World Wide Web.",
+        "World Web Window.",
+        "Wide World Web.",
+        "Web World Wide."
+      ]
+    },
+    {
+      id: "technology-microsoft-founder",
+      category: "technology",
+      question: "Which person co-founded Microsoft?",
+      answer: "Bill Gates.",
+      choices: [
+        "Bill Gates.",
+        "Steve Jobs.",
+        "Mark Zuckerberg.",
+        "Elon Musk."
+      ]
+    },
+    {
+      id: "technology-google-browser",
+      category: "technology",
+      question: "What is the name of Google's web browser?",
+      answer: "Chrome.",
+      choices: [
+        "Chrome.",
+        "Safari.",
+        "Firefox.",
+        "Edge."
+      ]
+    },
+    {
+      id: "technology-computer-brain",
+      category: "technology",
+      question: "What part of a computer is often called its \"brain\"?",
+      answer: "CPU.",
+      choices: [
+        "CPU.",
+        "Monitor.",
+        "Keyboard.",
+        "Mouse."
+      ]
+    },
+    {
+      id: "technology-usb-stands-for",
+      category: "technology",
+      question: "What does USB stand for?",
+      answer: "Universal Serial Bus.",
+      choices: [
+        "Universal Serial Bus.",
+        "United System Board.",
+        "Universal Service Band.",
+        "User System Bridge."
+      ]
+    },
+    {
+      id: "technology-video-site",
+      category: "technology",
+      question: "Which website is best known for sharing videos?",
+      answer: "YouTube.",
+      choices: [
+        "YouTube.",
+        "LinkedIn.",
+        "Reddit.",
+        "Pinterest."
+      ]
+    },
+    {
+      id: "technology-playstation-maker",
+      category: "technology",
+      question: "Which company makes the PlayStation?",
+      answer: "Sony.",
+      choices: [
+        "Sony.",
+        "Nintendo.",
+        "Microsoft.",
+        "Sega."
+      ]
+    },
+    {
+      id: "technology-nintendo-mascot",
+      category: "technology",
+      question: "Who is Nintendo's famous plumber mascot?",
+      answer: "Mario.",
+      choices: [
+        "Mario.",
+        "Link.",
+        "Sonic.",
+        "Kirby."
+      ]
+    },
+    {
+      id: "technology-email-symbol",
+      category: "technology",
+      question: "Which symbol is commonly used in email addresses?",
+      answer: "@.",
+      choices: [
+        "@.",
+        "#.",
+        "&.",
+        "%."
+      ]
+    },
+    {
+      id: "technology-gps-stands-for",
+      category: "technology",
+      question: "What does GPS stand for?",
+      answer: "Global Positioning System.",
+      choices: [
+        "Global Positioning System.",
+        "General Positioning Service.",
+        "Global Path System.",
+        "General Path Service."
+      ]
+    },
+    {
+      id: "technology-amazon-assistant",
+      category: "technology",
+      question: "What is the name of Amazon's voice assistant?",
+      answer: "Alexa.",
+      choices: [
+        "Alexa.",
+        "Siri.",
+        "Cortana.",
+        "Bixby."
+      ]
+    },
+    {
+      id: "technology-bluetooth-origin",
+      category: "technology",
+      question: "Bluetooth technology is named after a king from which country?",
+      answer: "Denmark.",
+      choices: [
+        "Denmark.",
+        "Sweden.",
+        "Norway.",
+        "Germany."
+      ]
+    },
+    {
+      id: "technology-wifi-meaning",
+      category: "technology",
+      question: "True or False: Wi-Fi officially stands for \"Wireless Fidelity.\"",
+      answer: "False.",
+      choices: [
+        "True.",
+        "False.",
+        "Only in Europe.",
+        "Only in the U.S."
+      ]
+    },
+    {
+      id: "technology-linux-mascot",
+      category: "technology",
+      question: "What is the name of the Linux mascot?",
+      answer: "Tux.",
+      choices: [
+        "Tux.",
+        "Pingu.",
+        "Nibbles.",
+        "Kernel."
+      ]
+    },
+    {
+      id: "technology-iphone-first-year",
+      category: "technology",
+      question: "In what year was the first iPhone released?",
+      answer: "2007.",
+      choices: [
+        "2007.",
+        "2005.",
+        "2008.",
+        "2010."
+      ]
+    },
+    {
+      id: "technology-xbox-maker",
+      category: "technology",
+      question: "Which company makes the Xbox?",
+      answer: "Microsoft.",
+      choices: [
+        "Microsoft.",
+        "Sony.",
+        "Nintendo.",
+        "Sega."
+      ]
+    },
+    {
+      id: "technology-file-extension-jpeg",
+      category: "technology",
+      question: "JPEG files are primarily used for what?",
+      answer: "Images.",
+      choices: [
+        "Images.",
+        "Music.",
+        "Spreadsheets.",
+        "Videos."
+      ]
+    },
+    {
+      id: "technology-cloud-computing",
+      category: "technology",
+      question: "What does \"the cloud\" generally refer to?",
+      answer: "Remote servers accessed over the internet.",
+      choices: [
+        "Remote servers accessed over the internet.",
+        "Weather satellites.",
+        "Computer fans.",
+        "Local hard drives."
+      ]
+    },
+    {
+      id: "technology-spam-origin",
+      category: "technology",
+      question: "What does the term \"spam\" usually refer to in technology?",
+      answer: "Unwanted messages.",
+      choices: [
+        "Unwanted messages.",
+        "Computer memory.",
+        "Video games.",
+        "Search engines."
+      ]
+    },
+    {
+      id: "technology-email-inventor",
+      category: "technology",
+      question: "Who is credited with inventing modern email?",
+      answer: "Ray Tomlinson.",
+      choices: [
+        "Ray Tomlinson.",
+        "Bill Gates.",
+        "Steve Jobs.",
+        "Tim Berners-Lee."
+      ]
+    },
+    {
+      id: "technology-first-web-browser",
+      category: "technology",
+      question: "What was the name of the first web browser?",
+      answer: "WorldWideWeb.",
+      choices: [
+        "WorldWideWeb.",
+        "Netscape.",
+        "Internet Explorer.",
+        "Mosaic."
+      ]
+    },
+    {
+      id: "technology-internet-creator",
+      category: "technology",
+      question: "Who is known as the inventor of the World Wide Web?",
+      answer: "Tim Berners-Lee.",
+      choices: [
+        "Tim Berners-Lee.",
+        "Bill Gates.",
+        "Steve Wozniak.",
+        "Larry Page."
+      ]
+    },
+    {
+      id: "technology-mozilla-browser",
+      category: "technology",
+      question: "Which browser is developed by Mozilla?",
+      answer: "Firefox.",
+      choices: [
+        "Firefox.",
+        "Edge.",
+        "Opera.",
+        "Safari."
+      ]
+    },
+    {
+      id: "technology-png-stands-for",
+      category: "technology",
+      question: "What does PNG stand for?",
+      answer: "Portable Network Graphics.",
+      choices: [
+        "Portable Network Graphics.",
+        "Personal Network Graphics.",
+        "Public Network Graphics.",
+        "Program Network Graphics."
+      ]
+    },
+    {
+      id: "technology-qwerty-layout",
+      category: "technology",
+      question: "What is the most common keyboard layout called?",
+      answer: "QWERTY.",
+      choices: [
+        "QWERTY.",
+        "DVORAK.",
+        "AZERTY.",
+        "QWERZ."
+      ]
+    },
+    {
+      id: "technology-mac-operating-system",
+      category: "technology",
+      question: "What operating system runs on Apple Mac computers?",
+      answer: "macOS.",
+      choices: [
+        "macOS.",
+        "iOS.",
+        "Windows.",
+        "Linux."
+      ]
+    },
+    {
+      id: "technology-screenshot-purpose",
+      category: "technology",
+      question: "What is a screenshot?",
+      answer: "A picture of what is displayed on a screen.",
+      choices: [
+        "A picture of what is displayed on a screen.",
+        "A printed webpage.",
+        "A scanned document.",
+        "A video recording."
+      ]
+    },
+    {
+      id: "technology-router-purpose",
+      category: "technology",
+      question: "What device directs internet traffic between networks in many homes?",
+      answer: "Router.",
+      choices: [
+        "Router.",
+        "Monitor.",
+        "Printer.",
+        "Scanner."
+      ]
+    },
+    {
+      id: "technology-qr-code-use",
+      category: "technology",
+      question: "What can a QR code typically be scanned with?",
+      answer: "A smartphone camera.",
+      choices: [
+        "A smartphone camera.",
+        "A television remote.",
+        "A game controller.",
+        "A calculator."
+      ]
+    },
+    {
+      id: "math-prime-under-10",
+      category: "math",
+      question: "Which of these numbers is prime?",
+      answer: "7.",
+      choices: [
+        "7.",
+        "9.",
+        "12.",
+        "15."
+      ]
+    },
+    {
+      id: "math-percent-25-of-80",
+      category: "math",
+      question: "What is 25% of 80?",
+      answer: "20.",
+      choices: [
+        "20.",
+        "25.",
+        "15.",
+        "40."
+      ]
+    },
+    {
+      id: "math-area-rectangle-8-5",
+      category: "math",
+      question: "What is the area of a rectangle that is 8 units long and 5 units wide?",
+      answer: "40 square units.",
+      choices: [
+        "40 square units.",
+        "13 square units.",
+        "26 square units.",
+        "80 square units."
+      ]
+    },
+    {
+      id: "math-dozen-half",
+      category: "math",
+      question: "How many items are in half a dozen?",
+      answer: "6.",
+      choices: [
+        "6.",
+        "12.",
+        "3.",
+        "24."
+      ]
+    },
+    {
+      id: "math-pi-first-three",
+      category: "math",
+      question: "What are the first three digits of pi?",
+      answer: "3.14.",
+      choices: [
+        "3.14.",
+        "2.71.",
+        "1.62.",
+        "4.13."
+      ]
+    },
+    {
+      id: "math-triangle-angles",
+      category: "math",
+      question: "The angles inside a triangle add up to how many degrees?",
+      answer: "180 degrees.",
+      choices: [
+        "180 degrees.",
+        "90 degrees.",
+        "270 degrees.",
+        "360 degrees."
+      ]
+    },
+    {
+      id: "math-square-root-144",
+      category: "math",
+      question: "What is the square root of 144?",
+      answer: "12.",
+      choices: [
+        "12.",
+        "14.",
+        "10.",
+        "16."
+      ]
+    },
+    {
+      id: "math-roman-x",
+      category: "math",
+      question: "In Roman numerals, what number does X represent?",
+      answer: "10.",
+      choices: [
+        "10.",
+        "5.",
+        "50.",
+        "100."
+      ]
+    },
+    {
+      id: "food-gazpacho-country",
+      category: "food",
+      question: "Which country is strongly associated with gazpacho?",
+      answer: "Spain.",
+      choices: [
+        "Spain.",
+        "Italy.",
+        "Portugal.",
+        "Mexico."
+      ]
+    },
+    {
+      id: "food-singapore-sling",
+      category: "food",
+      question: "At which hotel was the Singapore Sling originally invented?",
+      answer: "Raffles Hotel.",
+      choices: [
+        "Raffles Hotel.",
+        "Marina Bay Sands.",
+        "The Ritz.",
+        "The Peninsula Hotel."
+      ]
+    },
+    {
+      id: "food-nasi-goreng",
+      category: "food",
+      question: "Which country is strongly associated with the dish \"Nasi Goreng\"?",
+      answer: "Indonesia.",
+      choices: [
+        "Indonesia.",
+        "Malaysia.",
+        "Thailand.",
+        "Vietnam."
+      ]
+    },
+    {
+      id: "food-currywurst-city",
+      category: "food",
+      question: "In which city was Currywurst invented?",
+      answer: "Berlin.",
+      choices: [
+        "Berlin.",
+        "Munich.",
+        "Vienna.",
+        "Hamburg."
+      ]
+    },
+    {
+      id: "food-jollibee-country",
+      category: "food",
+      question: "Which country is famous for the fast-food chain Jollibee?",
+      answer: "Philippines.",
+      choices: [
+        "Philippines.",
+        "Japan.",
+        "Singapore.",
+        "South Korea."
+      ]
+    },
+    {
+      id: "food-timbits-chain",
+      category: "food",
+      question: "Which Canadian coffee chain sells Timbits?",
+      answer: "Tim Hortons.",
+      choices: [
+        "Tim Hortons.",
+        "Second Cup.",
+        "Starbucks.",
+        "Coffee Time."
+      ]
+    },
+    {
+      id: "food-kimchi-origin",
+      category: "food",
+      question: "Kimchi is a popular side dish from where?",
+      answer: "Korea.",
+      choices: [
+        "Korea.",
+        "China.",
+        "Japan.",
+        "Vietnam."
+      ]
+    },
+    {
+      id: "food-guinness-origin",
+      category: "food",
+      question: "Guinness beer originated in which country?",
+      answer: "Ireland.",
+      choices: [
+        "Ireland.",
+        "Scotland.",
+        "England.",
+        "Wales."
+      ]
+    },
+    {
+      id: "food-kakigori",
+      category: "food",
+      question: "What popular Japanese summer dessert is made from shaved ice?",
+      answer: "Kakigori.",
+      choices: [
+        "Kakigori.",
+        "Mochi.",
+        "Dorayaki.",
+        "Taiyaki."
+      ]
+    },
+    {
+      id: "food-satay",
+      category: "food",
+      question: "What is the name of the popular Southeast Asian meat skewer dish?",
+      answer: "Satay.",
+      choices: [
+        "Satay.",
+        "Rendang.",
+        "Laksa.",
+        "Adobo."
+      ]
+    },
+    {
+      id: "food-peanut-butter-patent",
+      category: "food",
+      question: "Who received one of the earliest patents for peanut paste, a precursor to peanut butter?",
+      answer: "Marcellus Gilmore Edson.",
+      choices: [
+        "Marcellus Gilmore Edson.",
+        "George Washington Carver.",
+        "John Harvey Kellogg.",
+        "Milton Hershey."
+      ]
+    },
+    {
+      id: "food-tim-tam-country",
+      category: "food",
+      question: "Which country is famous for the chocolate biscuit called a Tim Tam?",
+      answer: "Australia.",
+      choices: [
+        "Australia.",
+        "New Zealand.",
+        "England.",
+        "South Africa."
+      ]
+    },
+    {
+      id: "food-georgia-peaches",
+      category: "food",
+      question: "Which U.S. state is famous for its juicy peaches?",
+      answer: "Georgia.",
+      choices: [
+        "Georgia.",
+        "South Carolina.",
+        "California.",
+        "Florida."
+      ]
+    },
+    {
+      id: "food-sushi-wrap",
+      category: "food",
+      question: "What is sushi often wrapped in?",
+      answer: "Nori seaweed.",
+      choices: [
+        "Nori seaweed.",
+        "Rice paper.",
+        "Lettuce.",
+        "Cabbage leaves."
+      ]
+    },
+    {
+      id: "food-kosher-meaning",
+      category: "food",
+      question: "In Jewish dietary law, what does kosher food mean?",
+      answer: "Food that is permitted or proper to eat.",
+      choices: [
+        "Food that is permitted or proper to eat.",
+        "Food that is always spicy.",
+        "Food that is always vegetarian.",
+        "Food that is always raw."
+      ]
+    },
+    {
+      id: "food-mince-pie",
+      category: "food",
+      question: "Modern sweet mince pies are usually filled mostly with what?",
+      answer: "Dried fruit and spices.",
+      choices: [
+        "Dried fruit and spices.",
+        "Beef and gravy.",
+        "Custard and chocolate.",
+        "Cheese and onion."
+      ]
+    },
+    {
+      id: "food-new-york-fruit",
+      category: "food",
+      question: "What is the official state fruit of New York?",
+      answer: "Apple.",
+      choices: [
+        "Apple.",
+        "Grape.",
+        "Cherry.",
+        "Peach."
+      ]
+    },
+    {
+      id: "food-americano",
+      category: "food",
+      question: "What coffee drink is made by diluting espresso with hot water?",
+      answer: "Americano.",
+      choices: [
+        "Americano.",
+        "Latte.",
+        "Cappuccino.",
+        "Macchiato."
+      ]
+    },
+    {
+      id: "food-carne-asada",
+      category: "food",
+      question: "What does \"carne asada\" mean in Spanish?",
+      answer: "Grilled meat.",
+      choices: [
+        "Grilled meat.",
+        "Spicy chicken.",
+        "Roasted pork.",
+        "Seasoned rice."
+      ]
+    },
+    {
+      id: "food-smores",
+      category: "food",
+      question: "What campfire treat is made with marshmallows, graham crackers, and chocolate?",
+      answer: "S’mores.",
+      choices: [
+        "S’mores.",
+        "Moon Pies.",
+        "Whoopie Pies.",
+        "Rice Krispie Treats."
+      ]
+    },
+    {
+      id: "food-gumbo-origin",
+      category: "food",
+      question: "Which U.S. state is most associated with the stew gumbo?",
+      answer: "Louisiana.",
+      choices: [
+        "Louisiana.",
+        "Texas.",
+        "Mississippi.",
+        "Alabama."
+      ]
+    },
+    {
+      id: "food-pina-colada",
+      category: "food",
+      question: "What cocktail is made with rum, coconut, and pineapple?",
+      answer: "Piña colada.",
+      choices: [
+        "Piña colada.",
+        "Mai Tai.",
+        "Mojito.",
+        "Daiquiri."
+      ]
+    },
+    {
+      id: "food-bond-drink",
+      category: "food",
+      question: "What drink is James Bond famously known for ordering \"shaken, not stirred\"?",
+      answer: "Martini.",
+      choices: [
+        "Martini.",
+        "Old Fashioned.",
+        "Manhattan.",
+        "Whiskey Sour."
+      ]
+    },
+    {
+      id: "food-innout-founded",
+      category: "food",
+      question: "In what year was the burger chain In-N-Out founded?",
+      answer: "1948.",
+      choices: [
+        "1948.",
+        "1955.",
+        "1962.",
+        "1971."
+      ]
+    },
+    {
+      id: "food-hawaii-coffee",
+      category: "food",
+      question: "Which U.S. state is famous for commercially growing Kona coffee?",
+      answer: "Hawaii.",
+      choices: [
+        "Hawaii.",
+        "California.",
+        "Florida.",
+        "Texas."
+      ]
+    },
+    {
+      id: "food-fanta-origin",
+      category: "food",
+      question: "Which soft drink was created in Germany during World War II?",
+      answer: "Fanta.",
+      choices: [
+        "Fanta.",
+        "Sprite.",
+        "Dr Pepper.",
+        "Mountain Dew."
+      ]
+    },
+    {
+      id: "food-tiramisu",
+      category: "food",
+      question: "What Italian dessert is made with coffee, mascarpone cheese, and ladyfingers?",
+      answer: "Tiramisu.",
+      choices: [
+        "Tiramisu.",
+        "Cannoli.",
+        "Gelato.",
+        "Panna cotta."
+      ]
+    },
+    {
+      id: "food-vitamin-c-scurvy",
+      category: "food",
+      question: "A deficiency of which vitamin causes scurvy?",
+      answer: "Vitamin C.",
+      choices: [
+        "Vitamin C.",
+        "Vitamin D.",
+        "Vitamin B12.",
+        "Vitamin A."
+      ]
+    },
+    {
+      id: "food-avocado-varieties",
+      category: "food",
+      question: "About how many varieties of avocados exist worldwide?",
+      answer: "About 500.",
+      choices: [
+        "About 500.",
+        "About 50.",
+        "About 100.",
+        "About 1,000."
+      ]
+    },
+    {
+      id: "food-macadamia",
+      category: "food",
+      question: "What type of nut is a famous Hawaiian staple?",
+      answer: "Macadamia nuts.",
+      choices: [
+        "Macadamia nuts.",
+        "Pecans.",
+        "Walnuts.",
+        "Almonds."
+      ]
+    },
+    {
+      id: "food-sauerkraut",
+      category: "food",
+      question: "What is sauerkraut made from?",
+      answer: "Cabbage.",
+      choices: [
+        "Cabbage.",
+        "Potatoes.",
+        "Turnips.",
+        "Onions."
+      ]
+    },
+    {
+      id: "food-scurvy",
+      category: "food",
+      question: "A lack of Vitamin C can cause which disease?",
+      answer: "Scurvy.",
+      choices: [
+        "Scurvy.",
+        "Rickets.",
+        "Beriberi.",
+        "Anemia."
+      ]
+    },
+    {
+      id: "food-kfc-mascot",
+      category: "food",
+      question: "Who is the mascot of the fast-food chain KFC?",
+      answer: "Colonel Sanders.",
+      choices: [
+        "Colonel Sanders.",
+        "Wendy.",
+        "Ronald McDonald.",
+        "The Burger King."
+      ]
+    },
+    {
+      id: "food-dos-equis",
+      category: "food",
+      question: "Which beverage brand featured \"The Most Interesting Man in the World\" in its ads?",
+      answer: "Dos Equis.",
+      choices: [
+        "Dos Equis.",
+        "Corona.",
+        "Heineken.",
+        "Budweiser."
+      ]
+    },
+    {
+      id: "food-elote",
+      category: "food",
+      question: "What is the name of the popular Mexican street food made from corn?",
+      answer: "Elote.",
+      choices: [
+        "Elote.",
+        "Tamale.",
+        "Empanada.",
+        "Quesadilla."
+      ]
+    },
+    {
+      id: "food-caesar-salad",
+      category: "food",
+      question: "Which famous salad was invented in Tijuana, Mexico?",
+      answer: "Caesar salad.",
+      choices: [
+        "Caesar salad.",
+        "Cobb salad.",
+        "Greek salad.",
+        "Chef salad."
+      ]
+    },
+    {
+      id: "food-tzatziki",
+      category: "food",
+      question: "Tzatziki sauce is commonly served as a topping for what?",
+      answer: "Gyros.",
+      choices: [
+        "Gyros.",
+        "Tacos.",
+        "Hot dogs.",
+        "Pizza."
+      ]
+    },
+    {
+      id: "food-halal",
+      category: "food",
+      question: "Under Muslim dietary rules, what term describes foods that are permitted to eat?",
+      answer: "Halal.",
+      choices: [
+        "Halal.",
+        "Kosher.",
+        "Haram.",
+        "Fasting."
+      ]
+    },
+    {
+      id: "food-heinz-57",
+      category: "food",
+      question: "How many varieties are advertised in Heinz Tomato Ketchup’s famous slogan?",
+      answer: "57.",
+      choices: [
+        "57.",
+        "47.",
+        "67.",
+        "77."
+      ]
+    },
+    {
+      id: "food-fry-sauce",
+      category: "food",
+      question: "What condiment is commonly made by mixing ketchup and mayonnaise?",
+      answer: "Fry sauce.",
+      choices: [
+        "Fry sauce.",
+        "Tartar sauce.",
+        "Ranch dressing.",
+        "Cocktail sauce."
+      ]
+    },
+    {
+      id: "food-pasta-shaped-like-rice",
+      category: "food",
+      question: "What kind of pasta is shaped like little rice grains?",
+      answer: "Orzo.",
+      choices: [
+        "Orzo.",
+        "Penne.",
+        "Fusilli.",
+        "Rigatoni."
+      ]
+    },
+    {
+      id: "food-marzipan-nut",
+      category: "food",
+      question: "Which nut is used to make marzipan?",
+      answer: "Almond.",
+      choices: [
+        "Almond.",
+        "Peanut.",
+        "Walnut.",
+        "Cashew."
+      ]
+    },
+    {
+      id: "food-pizza-invention-country",
+      category: "food",
+      question: "Which country is credited with inventing modern pizza?",
+      answer: "Italy.",
+      choices: [
+        "Italy.",
+        "France.",
+        "Greece.",
+        "Spain."
+      ]
+    },
+    {
+      id: "food-tofu-made-from",
+      category: "food",
+      question: "What is tofu primarily made from?",
+      answer: "Soybeans.",
+      choices: [
+        "Soybeans.",
+        "Rice.",
+        "Chickpeas.",
+        "Lentils."
+      ]
+    },
+    {
+      id: "food-honeycrisp-granny-smith",
+      category: "food",
+      question: "Which fruit has varieties called Honeycrisp and Granny Smith?",
+      answer: "Apple.",
+      choices: [
+        "Apple.",
+        "Pear.",
+        "Peach.",
+        "Plum."
+      ]
+    },
+    {
+      id: "music-tempo-speed",
+      category: "music",
+      question: "In music, tempo describes what?",
+      answer: "The speed of the music.",
+      choices: [
+        "The speed of the music.",
+        "The volume of the music.",
+        "The lyrics of a song.",
+        "The number of instruments."
+      ]
+    },
+    {
+      id: "music-bass-clef-range",
+      category: "music",
+      question: "The bass clef is usually used for notes in what range?",
+      answer: "Lower notes.",
+      choices: [
+        "Lower notes.",
+        "Higher notes.",
+        "Only drum notes.",
+        "Only vocal notes."
+      ]
+    },
+    {
+      id: "music-orchestra-leader",
+      category: "music",
+      question: "Who usually leads an orchestra during a performance?",
+      answer: "A conductor.",
+      choices: [
+        "A conductor.",
+        "A producer.",
+        "A choreographer.",
+        "A critic."
+      ]
+    },
+    {
+      id: "music-jazz-city-new-orleans",
+      category: "music",
+      question: "Which U.S. city is strongly associated with the birth of jazz?",
+      answer: "New Orleans.",
+      choices: [
+        "New Orleans.",
+        "Seattle.",
+        "Nashville.",
+        "Detroit."
+      ]
+    },
+    {
+      id: "music-country-capital",
+      category: "music",
+      question: "Which city is often called Music City and is famous for country music?",
+      answer: "Nashville.",
+      choices: [
+        "Nashville.",
+        "Memphis.",
+        "Austin.",
+        "Atlanta."
+      ]
+    },
+    {
+      id: "music-bts-country",
+      category: "music",
+      question: "The group BTS is from which country?",
+      answer: "South Korea.",
+      choices: [
+        "South Korea.",
+        "Japan.",
+        "Thailand.",
+        "China."
+      ]
+    },
+    {
+      id: "music-madonna-material-girl",
+      category: "music",
+      question: "Which singer is known as the \"Material Girl\"?",
+      answer: "Madonna.",
+      choices: [
+        "Madonna.",
+        "Cyndi Lauper.",
+        "Cher.",
+        "Janet Jackson."
+      ]
+    },
+    {
+      id: "music-eagles-hotel-california",
+      category: "music",
+      question: "Which band recorded the song \"Hotel California\"?",
+      answer: "Eagles.",
+      choices: [
+        "Eagles.",
+        "Fleetwood Mac.",
+        "Journey.",
+        "Chicago."
+      ]
+    },
+    {
+      id: "music-taylor-1989-single",
+      category: "music",
+      question: "Which Taylor Swift album shares its name with a year?",
+      answer: "1989.",
+      choices: [
+        "1989.",
+        "Red.",
+        "Lover.",
+        "Midnights."
+      ]
+    },
+    {
+      id: "music-kpop-blackpink-members",
+      category: "music",
+      question: "BLACKPINK is best known as what kind of K-pop group?",
+      answer: "A girl group.",
+      choices: [
+        "A girl group.",
+        "A boy band.",
+        "A rock band.",
+        "A classical quartet."
+      ]
+    },
+    {
+      id: "movies-frozen-kingdom-arendelle",
+      category: "movies",
+      question: "What is the name of the kingdom in Frozen?",
+      answer: "Arendelle.",
+      choices: [
+        "Arendelle.",
+        "Corona.",
+        "Andalasia.",
+        "DunBroch."
+      ]
+    },
+    {
+      id: "movies-toy-story-woody-voice",
+      category: "movies",
+      question: "Who voiced Woody in Toy Story?",
+      answer: "Tom Hanks.",
+      choices: [
+        "Tom Hanks.",
+        "Tim Allen.",
+        "Billy Crystal.",
+        "Robin Williams."
+      ]
+    },
+    {
+      id: "movies-jurassic-park-main-dinosaur",
+      category: "movies",
+      question: "Which dinosaur species is the main attraction in Jurassic Park?",
+      answer: "Tyrannosaurus rex.",
+      choices: [
+        "Tyrannosaurus rex.",
+        "Velociraptor.",
+        "Brachiosaurus.",
+        "Triceratops."
+      ]
+    },
+    {
+      id: "movies-harry-potter-owl",
+      category: "movies",
+      question: "What is the name of Harry Potter's owl?",
+      answer: "Hedwig.",
+      choices: [
+        "Hedwig.",
+        "Errol.",
+        "Crookshanks.",
+        "Pigwidgeon."
+      ]
+    },
+    {
+      id: "movies-finding-nemo-clownfish",
+      category: "movies",
+      question: "What is the name of Nemo’s father in Finding Nemo?",
+      answer: "Marlin.",
+      choices: [
+        "Marlin.",
+        "Bruce.",
+        "Gill.",
+        "Nigel."
+      ]
+    },
+    {
+      id: "movies-lion-king-simba-father",
+      category: "movies",
+      question: "What is the name of Simba’s father in The Lion King?",
+      answer: "Mufasa.",
+      choices: [
+        "Mufasa.",
+        "Scar.",
+        "Zazu.",
+        "Rafiki."
+      ]
+    },
+    {
+      id: "movies-shrek-donkey-voice",
+      category: "movies",
+      question: "Who voiced Donkey in Shrek?",
+      answer: "Eddie Murphy.",
+      choices: [
+        "Eddie Murphy.",
+        "Mike Myers.",
+        "Chris Rock.",
+        "Martin Lawrence."
+      ]
+    },
+    {
+      id: "movies-moana-pet-rooster",
+      category: "movies",
+      question: "What is the name of Moana’s pet rooster?",
+      answer: "Heihei.",
+      choices: [
+        "Heihei.",
+        "Pua.",
+        "Tamatoa.",
+        "Maui."
+      ]
+    },
+    {
+      id: "movies-aladdin-genie-voice",
+      category: "movies",
+      question: "Who voiced the Genie in Disney’s Aladdin (1992)?",
+      answer: "Robin Williams.",
+      choices: [
+        "Robin Williams.",
+        "Gilbert Gottfried.",
+        "Tom Hanks.",
+        "Danny DeVito."
+      ]
+    },
+    {
+      id: "movies-beauty-and-the-beast-candlestick",
+      category: "movies",
+      question: "What is the name of the candlestick in Beauty and the Beast?",
+      answer: "Lumière.",
+      choices: [
+        "Lumière.",
+        "Cogsworth.",
+        "Chip.",
+        "Maurice."
+      ]
+    },
+    {
+      id: "movies-up-house-destination",
+      category: "movies",
+      question: "In Up, where is Carl trying to fly his house?",
+      answer: "Paradise Falls.",
+      choices: [
+        "Paradise Falls.",
+        "Angel Falls.",
+        "Neverland.",
+        "Radiator Springs."
+      ]
+    },
+    {
+      id: "movies-cars-lightning-number",
+      category: "movies",
+      question: "What number does Lightning McQueen race with in Cars?",
+      answer: "95.",
+      choices: [
+        "95.",
+        "51.",
+        "43.",
+        "88."
+      ]
+    },
+    {
+      id: "movies-monsters-inc-green-one-eyed",
+      category: "movies",
+      question: "What is the name of the small green one-eyed monster in Monsters, Inc.?",
+      answer: "Mike Wazowski.",
+      choices: [
+        "Mike Wazowski.",
+        "Sulley.",
+        "Randall.",
+        "Roz."
+      ]
+    },
+    {
+      id: "movies-coco-main-character",
+      category: "movies",
+      question: "Who is the main character in Coco?",
+      answer: "Miguel.",
+      choices: [
+        "Miguel.",
+        "Hector.",
+        "Ernesto.",
+        "Dante."
+      ]
+    },
+    {
+      id: "movies-inside-out-emotion-blue",
+      category: "movies",
+      question: "Which emotion is represented by the color blue in Inside Out?",
+      answer: "Sadness.",
+      choices: [
+        "Sadness.",
+        "Joy.",
+        "Fear.",
+        "Disgust."
+      ]
+    },
+    {
+      id: "movies-star-wars-princess",
+      category: "movies",
+      question: "What is Princess Leia’s last name?",
+      answer: "Organa.",
+      choices: [
+        "Organa.",
+        "Skywalker.",
+        "Solo.",
+        "Amidala."
+      ]
+    },
+    {
+      id: "movies-star-wars-wookiee",
+      category: "movies",
+      question: "What is the name of Han Solo’s Wookiee co-pilot?",
+      answer: "Chewbacca.",
+      choices: [
+        "Chewbacca.",
+        "Yoda.",
+        "Jar Jar Binks.",
+        "Lando."
+      ]
+    },
+    {
+      id: "movies-et-phone-home",
+      category: "movies",
+      question: "Complete the famous E.T. quote: \"E.T. ____ home.\"",
+      answer: "phone.",
+      choices: [
+        "phone.",
+        "calls.",
+        "wants.",
+        "goes."
+      ]
+    },
+    {
+      id: "movies-wizard-of-oz-road",
+      category: "movies",
+      question: "What color is the road Dorothy follows in The Wizard of Oz?",
+      answer: "Yellow.",
+      choices: [
+        "Yellow.",
+        "Red.",
+        "Gold.",
+        "Blue."
+      ]
+    },
+    {
+      id: "movies-home-alone-burglars",
+      category: "movies",
+      question: "What nickname is given to the burglars in Home Alone?",
+      answer: "The Wet Bandits.",
+      choices: [
+        "The Wet Bandits.",
+        "The Sticky Bandits.",
+        "The Midnight Bandits.",
+        "The Sneaky Bandits."
+      ]
+    },
+    {
+      id: "movies-avengers-hammer",
+      category: "movies",
+      question: "What is the name of Thor’s hammer?",
+      answer: "Mjölnir.",
+      choices: [
+        "Mjölnir.",
+        "Stormbreaker.",
+        "Gungnir.",
+        "Excalibur."
+      ]
+    },
+    {
+      id: "movies-black-panther-country",
+      category: "movies",
+      question: "What fictional country does Black Panther rule?",
+      answer: "Wakanda.",
+      choices: [
+        "Wakanda.",
+        "Genovia.",
+        "Latveria.",
+        "Sokovia."
+      ]
+    },
+    {
+      id: "movies-avengers-purple-villain",
+      category: "movies",
+      question: "What is the name of the purple villain in Avengers: Infinity War?",
+      answer: "Thanos.",
+      choices: [
+        "Thanos.",
+        "Loki.",
+        "Ultron.",
+        "Red Skull."
+      ]
+    },
+    {
+      id: "movies-spider-man-aunt",
+      category: "movies",
+      question: "What is the name of Spider-Man’s aunt?",
+      answer: "May.",
+      choices: [
+        "May.",
+        "Anna.",
+        "June.",
+        "Rose."
+      ]
+    },
+    {
+      id: "movies-batman-city",
+      category: "movies",
+      question: "What city does Batman protect?",
+      answer: "Gotham City.",
+      choices: [
+        "Gotham City.",
+        "Metropolis.",
+        "Central City.",
+        "Star City."
+      ]
+    },
+    {
+      id: "movies-princess-bride-giant",
+      category: "movies",
+      question: "What is the name of the giant in The Princess Bride?",
+      answer: "Fezzik.",
+      choices: [
+        "Fezzik.",
+        "Inigo.",
+        "Westley.",
+        "Humperdinck."
+      ]
+    },
+    {
+      id: "movies-back-to-future-car",
+      category: "movies",
+      question: "What type of car is used as the time machine in Back to the Future?",
+      answer: "DeLorean.",
+      choices: [
+        "DeLorean.",
+        "Mustang.",
+        "Corvette.",
+        "Camaro."
+      ]
+    },
+    {
+      id: "movies-hunger-games-heroine",
+      category: "movies",
+      question: "Who is the heroine of The Hunger Games?",
+      answer: "Katniss Everdeen.",
+      choices: [
+        "Katniss Everdeen.",
+        "Primrose Everdeen.",
+        "Johanna Mason.",
+        "Rue."
+      ]
+    },
+    {
+      id: "movies-minions-villain",
+      category: "movies",
+      question: "Who is the main villain in Minions?",
+      answer: "Scarlet Overkill.",
+      choices: [
+        "Scarlet Overkill.",
+        "Gru.",
+        "Vector.",
+        "Balthazar Bratt."
+      ]
+    },
+    {
+      id: "movies-how-to-train-your-dragon",
+      category: "movies",
+      question: "What is the name of Hiccup’s dragon in How to Train Your Dragon?",
+      answer: "Toothless.",
+      choices: [
+        "Toothless.",
+        "Stormfly.",
+        "Hookfang.",
+        "Barf and Belch."
+      ]
+    },
+    {
+      id: "tv-lucy-vitameatavegamin",
+      category: "tv",
+      question: "Which classic sitcom featured Lucy Ricardo?",
+      answer: "I Love Lucy.",
+      choices: [
+        "I Love Lucy.",
+        "The Mary Tyler Moore Show.",
+        "Bewitched.",
+        "The Golden Girls."
+      ]
+    },
+    {
+      id: "tv-golden-girls-city",
+      category: "tv",
+      question: "The Golden Girls is mainly set in which city?",
+      answer: "Miami.",
+      choices: [
+        "Miami.",
+        "Phoenix.",
+        "San Diego.",
+        "Atlanta."
+      ]
+    },
+    {
+      id: "tv-fresh-prince-city",
+      category: "tv",
+      question: "The Fresh Prince of Bel-Air begins with Will moving from Philadelphia to which city?",
+      answer: "Los Angeles.",
+      choices: [
+        "Los Angeles.",
+        "New York.",
+        "Chicago.",
+        "Miami."
+      ]
+    },
+    {
+      id: "tv-seinfeld-cafe",
+      category: "tv",
+      question: "On Seinfeld, what is the name of the diner the group often visits?",
+      answer: "Monk's Cafe.",
+      choices: [
+        "Monk's Cafe.",
+        "Central Perk.",
+        "Luke's Diner.",
+        "MacLaren's Pub."
+      ]
+    },
+    {
+      id: "tv-friends-coffee-shop",
+      category: "tv",
+      question: "On Friends, what is the name of the coffee shop?",
+      answer: "Central Perk.",
+      choices: [
+        "Central Perk.",
+        "Monk's Cafe.",
+        "The Max.",
+        "Cafe Nervosa."
+      ]
+    },
+    {
+      id: "tv-rick-morty-portal",
+      category: "tv",
+      question: "Rick and Morty often travel using what kind of device?",
+      answer: "A portal gun.",
+      choices: [
+        "A portal gun.",
+        "A magic wand.",
+        "A sonic screwdriver.",
+        "A time necklace."
+      ]
+    },
+    {
+      id: "tv-southpark-state",
+      category: "tv",
+      question: "South Park is set in which U.S. state?",
+      answer: "Colorado.",
+      choices: [
+        "Colorado.",
+        "Utah.",
+        "Wyoming.",
+        "Montana."
+      ]
+    },
+    {
+      id: "tv-frasier-city",
+      category: "tv",
+      question: "Frasier is primarily set in which U.S. city?",
+      answer: "Seattle.",
+      choices: [
+        "Seattle.",
+        "Boston.",
+        "Chicago.",
+        "Denver."
+      ]
+    },
+    {
+      id: "tv-cheers-bar-city",
+      category: "tv",
+      question: "Cheers is set in which city?",
+      answer: "Boston.",
+      choices: [
+        "Boston.",
+        "New York.",
+        "Chicago.",
+        "Philadelphia."
+      ]
+    },
+    {
+      id: "tv-mash-war",
+      category: "tv",
+      question: "M*A*S*H takes place during which war?",
+      answer: "The Korean War.",
+      choices: [
+        "The Korean War.",
+        "World War II.",
+        "The Vietnam War.",
+        "The Gulf War."
+      ]
+    },
+    {
+      id: "tv-office-paper-company",
+      category: "tv",
+      question: "What is the name of the paper company in The Office?",
+      answer: "Dunder Mifflin.",
+      choices: [
+        "Dunder Mifflin.",
+        "Prestige Worldwide.",
+        "Bluth Company.",
+        "Sterling Cooper."
+      ]
+    },
+    {
+      id: "tv-office-city",
+      category: "tv",
+      question: "The Office is set in which Pennsylvania city?",
+      answer: "Scranton.",
+      choices: [
+        "Scranton.",
+        "Pittsburgh.",
+        "Philadelphia.",
+        "Allentown."
+      ]
+    },
+    {
+      id: "tv-simpsons-town",
+      category: "tv",
+      question: "What town does The Simpsons take place in?",
+      answer: "Springfield.",
+      choices: [
+        "Springfield.",
+        "Shelbyville.",
+        "Quahog.",
+        "Arlen."
+      ]
+    },
+    {
+      id: "tv-family-guy-town",
+      category: "tv",
+      question: "Family Guy is set in which fictional city?",
+      answer: "Quahog.",
+      choices: [
+        "Quahog.",
+        "Springfield.",
+        "Langley Falls.",
+        "Arlen."
+      ]
+    },
+    {
+      id: "tv-bobs-burgers-family-name",
+      category: "tv",
+      question: "What is the last name of the family in Bob's Burgers?",
+      answer: "Belcher.",
+      choices: [
+        "Belcher.",
+        "Hill.",
+        "Griffin.",
+        "Smith."
+      ]
+    },
+    {
+      id: "tv-king-of-the-hill-town",
+      category: "tv",
+      question: "King of the Hill takes place in what fictional Texas town?",
+      answer: "Arlen.",
+      choices: [
+        "Arlen.",
+        "Lubbock.",
+        "Wichita Falls.",
+        "Plano."
+      ]
+    },
+    {
+      id: "tv-american-dad-agent",
+      category: "tv",
+      question: "What is Stan Smith's occupation in American Dad!?",
+      answer: "CIA agent.",
+      choices: [
+        "CIA agent.",
+        "Police officer.",
+        "Teacher.",
+        "Lawyer."
+      ]
+    },
+    {
+      id: "tv-futurama-delivery-company",
+      category: "tv",
+      question: "What is the name of the delivery company in Futurama?",
+      answer: "Planet Express.",
+      choices: [
+        "Planet Express.",
+        "Galaxy Delivery.",
+        "Space Freight.",
+        "Cosmo Courier."
+      ]
+    },
+    {
+      id: "tv-stranger-things-town",
+      category: "tv",
+      question: "Stranger Things is set in which fictional Indiana town?",
+      answer: "Hawkins.",
+      choices: [
+        "Hawkins.",
+        "Sunnydale.",
+        "Stars Hollow.",
+        "Riverdale."
+      ]
+    },
+    {
+      id: "tv-breaking-bad-city",
+      category: "tv",
+      question: "Breaking Bad is primarily set in which city?",
+      answer: "Albuquerque.",
+      choices: [
+        "Albuquerque.",
+        "Phoenix.",
+        "El Paso.",
+        "Santa Fe."
+      ]
+    },
+    {
+      id: "tv-better-call-saul-name",
+      category: "tv",
+      question: "What is Saul Goodman's real first name?",
+      answer: "Jimmy.",
+      choices: [
+        "Jimmy.",
+        "Mike.",
+        "Howard.",
+        "Chuck."
+      ]
+    },
+    {
+      id: "tv-walking-dead-sheriff",
+      category: "tv",
+      question: "What is the first name of the sheriff in The Walking Dead?",
+      answer: "Rick.",
+      choices: [
+        "Rick.",
+        "Daryl.",
+        "Glenn.",
+        "Shane."
+      ]
+    },
+    {
+      id: "tv-game-of-thrones-throne",
+      category: "tv",
+      question: "What is the name of the throne in Game of Thrones?",
+      answer: "The Iron Throne.",
+      choices: [
+        "The Iron Throne.",
+        "The Dragon Throne.",
+        "The Golden Throne.",
+        "The King's Seat."
+      ]
+    },
+    {
+      id: "tv-gilmore-girls-town",
+      category: "tv",
+      question: "Gilmore Girls is set in which fictional Connecticut town?",
+      answer: "Stars Hollow.",
+      choices: [
+        "Stars Hollow.",
+        "Rosewood.",
+        "Mystic Falls.",
+        "Tree Hill."
+      ]
+    },
+    {
+      id: "tv-greys-anatomy-hospital",
+      category: "tv",
+      question: "What hospital is featured in Grey's Anatomy?",
+      answer: "Grey Sloan Memorial Hospital.",
+      choices: [
+        "Grey Sloan Memorial Hospital.",
+        "Seattle Grace Hospital.",
+        "Sacred Heart Hospital.",
+        "Princeton-Plainsboro Hospital."
+      ]
+    },
+    {
+      id: "tv-scrubs-hospital",
+      category: "tv",
+      question: "What is the name of the hospital in Scrubs?",
+      answer: "Sacred Heart Hospital.",
+      choices: [
+        "Sacred Heart Hospital.",
+        "Grey Sloan Memorial Hospital.",
+        "County General.",
+        "Princeton-Plainsboro Hospital."
+      ]
+    },
+    {
+      id: "tv-house-hospital",
+      category: "tv",
+      question: "What hospital does Dr. House work at?",
+      answer: "Princeton-Plainsboro Teaching Hospital.",
+      choices: [
+        "Princeton-Plainsboro Teaching Hospital.",
+        "Sacred Heart Hospital.",
+        "Seattle Grace Hospital.",
+        "County General."
+      ]
+    },
+    {
+      id: "tv-er-city",
+      category: "tv",
+      question: "ER takes place in which city?",
+      answer: "Chicago.",
+      choices: [
+        "Chicago.",
+        "Boston.",
+        "Seattle.",
+        "New York."
+      ]
+    },
+    {
+      id: "tv-big-bang-neighbor",
+      category: "tv",
+      question: "What is the name of Sheldon and Leonard's neighbor in The Big Bang Theory?",
+      answer: "Penny.",
+      choices: [
+        "Penny.",
+        "Amy.",
+        "Bernadette.",
+        "Leslie."
+      ]
+    },
+    {
+      id: "tv-how-i-met-your-mother-bar",
+      category: "tv",
+      question: "What bar do the friends often visit in How I Met Your Mother?",
+      answer: "MacLaren's Pub.",
+      choices: [
+        "MacLaren's Pub.",
+        "Central Perk.",
+        "Monk's Cafe.",
+        "Cheers."
+      ]
+    },
+    {
+      id: "tv-full-house-city",
+      category: "tv",
+      question: "Full House is set in which city?",
+      answer: "San Francisco.",
+      choices: [
+        "San Francisco.",
+        "Los Angeles.",
+        "Seattle.",
+        "Portland."
+      ]
+    },
+    {
+      id: "tv-saved-by-the-bell-school",
+      category: "tv",
+      question: "What is the name of the high school in Saved by the Bell?",
+      answer: "Bayside High.",
+      choices: [
+        "Bayside High.",
+        "West Beverly High.",
+        "Ridgemont High.",
+        "Sunnydale High."
+      ]
+    },
+    {
+      id: "tv-boy-meets-world-teacher",
+      category: "tv",
+      question: "What is the last name of Cory Matthews' beloved teacher in Boy Meets World?",
+      answer: "Feeny.",
+      choices: [
+        "Feeny.",
+        "Turner.",
+        "Hunter.",
+        "Lawrence."
+      ]
+    },
+    {
+      id: "tv-rickmorty-grandson",
+      category: "tv",
+      question: "What is the name of Rick's grandson?",
+      answer: "Morty Smith.",
+      choices: [
+        "Morty Smith.",
+        "Jerry Smith.",
+        "Summer Smith.",
+        "Birdperson."
+      ]
+    },
+    {
+      id: "tv-rickmorty-granddaughter",
+      category: "tv",
+      question: "What is the name of Morty's older sister?",
+      answer: "Summer Smith.",
+      choices: [
+        "Summer Smith.",
+        "Beth Smith.",
+        "Jessica.",
+        "Tammy."
+      ]
+    },
+    {
+      id: "tv-rickmorty-daughter",
+      category: "tv",
+      question: "What is the name of Rick's daughter?",
+      answer: "Beth Smith.",
+      choices: [
+        "Beth Smith.",
+        "Summer Smith.",
+        "Tammy.",
+        "Jessica."
+      ]
+    },
+    {
+      id: "tv-rickmorty-father",
+      category: "tv",
+      question: "What is the name of Morty's father?",
+      answer: "Jerry Smith.",
+      choices: [
+        "Jerry Smith.",
+        "Rick Sanchez.",
+        "Birdperson.",
+        "Mr. Poopybutthole."
+      ]
+    },
+    {
+      id: "tv-rickmorty-catchphrase",
+      category: "tv",
+      question: "Rick often lets out what distinctive burping sound while speaking?",
+      answer: "A burp.",
+      choices: [
+        "A burp.",
+        "A whistle.",
+        "A sneeze.",
+        "A hiccup."
+      ]
+    },
+    {
+      id: "tv-rickmorty-pickle",
+      category: "tv",
+      question: "What food item does Rick turn himself into in a famous episode?",
+      answer: "A pickle.",
+      choices: [
+        "A pickle.",
+        "A cucumber.",
+        "A hot dog.",
+        "A potato."
+      ]
+    },
+    {
+      id: "tv-rickmorty-dog",
+      category: "tv",
+      question: "What is the name of the Smith family dog?",
+      answer: "Snuffles.",
+      choices: [
+        "Snuffles.",
+        "Snowball.",
+        "Both Snuffles and Snowball.",
+        "Squanchy."
+      ]
+    },
+    {
+      id: "tv-rickmorty-catchphrase-wubba",
+      category: "tv",
+      question: "Complete the phrase: \"Wubba Lubba Dub Dub\" originally means what in Birdperson's language?",
+      answer: "I am in great pain, please help me.",
+      choices: [
+        "I am in great pain, please help me.",
+        "Let's party!",
+        "Victory is ours!",
+        "Goodbye, my friend."
+      ]
+    },
+    {
+      id: "tv-rickmorty-birdperson",
+      category: "tv",
+      question: "What species is Birdperson?",
+      answer: "Bird-Person.",
+      choices: [
+        "Bird-Person.",
+        "Human.",
+        "Cronenberg.",
+        "Gazorpian."
+      ]
+    },
+    {
+      id: "tv-rickmorty-meeseeks-box",
+      category: "tv",
+      question: "What device creates Mr. Meeseeks?",
+      answer: "The Meeseeks Box.",
+      choices: [
+        "The Meeseeks Box.",
+        "The Portal Gun.",
+        "The Butter Robot.",
+        "The Plumbus."
+      ]
+    },
+    {
+      id: "tv-rickmorty-butter-robot",
+      category: "tv",
+      question: "What is the Butter Robot's only purpose?",
+      answer: "To pass the butter.",
+      choices: [
+        "To pass the butter.",
+        "To clean the house.",
+        "To protect Morty.",
+        "To make breakfast."
+      ]
+    },
+    {
+      id: "tv-rickmorty-plumbus",
+      category: "tv",
+      question: "According to the show, everyone has what common household item?",
+      answer: "A Plumbus.",
+      choices: [
+        "A Plumbus.",
+        "A Flooble.",
+        "A Smoogle.",
+        "A Squanch."
+      ]
+    },
+    {
+      id: "tv-rickmorty-citadel",
+      category: "tv",
+      question: "What is the name of the society made up of alternate versions of Rick and Morty?",
+      answer: "The Citadel of Ricks.",
+      choices: [
+        "The Citadel of Ricks.",
+        "The Galactic Federation.",
+        "The Council of Mortys.",
+        "Planet Squanch."
+      ]
+    },
+    {
+      id: "tv-rickmorty-president",
+      category: "tv",
+      question: "Who frequently clashes with Rick on Earth?",
+      answer: "The President of the United States.",
+      choices: [
+        "The President of the United States.",
+        "Principal Vagina.",
+        "Birdperson.",
+        "Jerry Smith."
+      ]
+    },
+    {
+      id: "tv-rickmorty-jessica",
+      category: "tv",
+      question: "Who is Morty's longtime crush?",
+      answer: "Jessica.",
+      choices: [
+        "Jessica.",
+        "Tammy.",
+        "Summer.",
+        "Beth."
+      ]
+    },
+    {
+      id: "tv-rickmorty-galactic-federation",
+      category: "tv",
+      question: "What is the name of the intergalactic government Rick opposes?",
+      answer: "The Galactic Federation.",
+      choices: [
+        "The Galactic Federation.",
+        "The United Planets.",
+        "The Citadel.",
+        "The Space Senate."
+      ]
+    },
+    {
+      id: "tv-rickmorty-evil-morty",
+      category: "tv",
+      question: "What nickname is commonly used for the Morty who becomes a major antagonist?",
+      answer: "Evil Morty.",
+      choices: [
+        "Evil Morty.",
+        "Dark Morty.",
+        "President Morty.",
+        "Prime Morty."
+      ]
+    },
+    {
+      id: "tv-rickmorty-principal",
+      category: "tv",
+      question: "What is the name of Morty's school principal?",
+      answer: "Principal Vagina.",
+      choices: [
+        "Principal Vagina.",
+        "Principal Skinner.",
+        "Principal Lewis.",
+        "Principal Shepherd."
+      ]
+    },
+    {
+      id: "tv-rickmorty-squanchy",
+      category: "tv",
+      question: "What is the name of Rick's cat-like friend who loves to \"squanch\"?",
+      answer: "Squanchy.",
+      choices: [
+        "Squanchy.",
+        "Gearhead.",
+        "Abradolf Lincler.",
+        "Noob-Noob."
+      ]
+    },
+    {
+      id: "tv-rickmorty-noobnoob",
+      category: "tv",
+      question: "Which Vindicators member is praised with the line \"Who the f*** is Noob-Noob?\"",
+      answer: "Noob-Noob.",
+      choices: [
+        "Noob-Noob.",
+        "Supernova.",
+        "Million Ants.",
+        "Crocubot."
+      ]
+    },
+    {
+      id: "tv-simpsons-father",
+      category: "tv",
+      question: "What is the first name of the Simpson family father?",
+      answer: "Homer.",
+      choices: [
+        "Homer.",
+        "Herb.",
+        "Ned.",
+        "Abe."
+      ]
+    },
+    {
+      id: "tv-simpsons-mother",
+      category: "tv",
+      question: "What is the first name of Homer's wife?",
+      answer: "Marge.",
+      choices: [
+        "Marge.",
+        "Patty.",
+        "Selma.",
+        "Edna."
+      ]
+    },
+    {
+      id: "tv-simpsons-son",
+      category: "tv",
+      question: "What is the name of the Simpson family son?",
+      answer: "Bart.",
+      choices: [
+        "Bart.",
+        "Milhouse.",
+        "Nelson.",
+        "Ralph."
+      ]
+    },
+    {
+      id: "tv-simpsons-daughter",
+      category: "tv",
+      question: "What is the name of the Simpson family's older daughter?",
+      answer: "Lisa.",
+      choices: [
+        "Lisa.",
+        "Maggie.",
+        "Allison.",
+        "Janey."
+      ]
+    },
+    {
+      id: "tv-simpsons-baby",
+      category: "tv",
+      question: "What is the name of the Simpson family baby?",
+      answer: "Maggie.",
+      choices: [
+        "Maggie.",
+        "Lisa.",
+        "Ling.",
+        "Janey."
+      ]
+    },
+    {
+      id: "tv-simpsons-neighbor",
+      category: "tv",
+      question: "Who is the Simpsons' overly friendly neighbor?",
+      answer: "Ned Flanders.",
+      choices: [
+        "Ned Flanders.",
+        "Moe Szyslak.",
+        "Barney Gumble.",
+        "Lenny Leonard."
+      ]
+    },
+    {
+      id: "tv-simpsons-school",
+      category: "tv",
+      question: "What elementary school do Bart and Lisa attend?",
+      answer: "Springfield Elementary.",
+      choices: [
+        "Springfield Elementary.",
+        "Shelbyville Elementary.",
+        "West Springfield Elementary.",
+        "South Springfield Elementary."
+      ]
+    },
+    {
+      id: "tv-simpsons-principal",
+      category: "tv",
+      question: "Who is the principal of Springfield Elementary?",
+      answer: "Principal Skinner.",
+      choices: [
+        "Principal Skinner.",
+        "Superintendent Chalmers.",
+        "Otto Mann.",
+        "Groundskeeper Willie."
+      ]
+    },
+    {
+      id: "tv-simpsons-bully",
+      category: "tv",
+      question: "Who is Springfield Elementary's main bully?",
+      answer: "Nelson Muntz.",
+      choices: [
+        "Nelson Muntz.",
+        "Milhouse Van Houten.",
+        "Martin Prince.",
+        "Ralph Wiggum."
+      ]
+    },
+    {
+      id: "tv-simpsons-best-friend",
+      category: "tv",
+      question: "Who is Bart Simpson's best friend?",
+      answer: "Milhouse Van Houten.",
+      choices: [
+        "Milhouse Van Houten.",
+        "Nelson Muntz.",
+        "Martin Prince.",
+        "Ralph Wiggum."
+      ]
+    },
+    {
+      id: "tv-simpsons-bar",
+      category: "tv",
+      question: "What is the name of Moe's bar?",
+      answer: "Moe's Tavern.",
+      choices: [
+        "Moe's Tavern.",
+        "Duff's Pub.",
+        "The Frying Dutchman.",
+        "The Leftorium."
+      ]
+    },
+    {
+      id: "tv-simpsons-owner",
+      category: "tv",
+      question: "Who owns Moe's Tavern?",
+      answer: "Moe Szyslak.",
+      choices: [
+        "Moe Szyslak.",
+        "Barney Gumble.",
+        "Lenny Leonard.",
+        "Carl Carlson."
+      ]
+    },
+    {
+      id: "tv-simpsons-plant-owner",
+      category: "tv",
+      question: "Who owns the Springfield Nuclear Power Plant?",
+      answer: "Mr. Burns.",
+      choices: [
+        "Mr. Burns.",
+        "Waylon Smithers.",
+        "Homer Simpson.",
+        "Mayor Quimby."
+      ]
+    },
+    {
+      id: "tv-simpsons-assistant",
+      category: "tv",
+      question: "Who is Mr. Burns' loyal assistant?",
+      answer: "Waylon Smithers.",
+      choices: [
+        "Waylon Smithers.",
+        "Moe Szyslak.",
+        "Ned Flanders.",
+        "Principal Skinner."
+      ]
+    },
+    {
+      id: "tv-simpsons-job",
+      category: "tv",
+      question: "Where does Homer Simpson work?",
+      answer: "Springfield Nuclear Power Plant.",
+      choices: [
+        "Springfield Nuclear Power Plant.",
+        "Kwik-E-Mart.",
+        "Moe's Tavern.",
+        "Springfield Elementary."
+      ]
+    },
+    {
+      id: "tv-simpsons-store",
+      category: "tv",
+      question: "What convenience store is run by Apu?",
+      answer: "Kwik-E-Mart.",
+      choices: [
+        "Kwik-E-Mart.",
+        "Quick Stop.",
+        "Mini Mart.",
+        "Speedy Shop."
+      ]
+    },
+    {
+      id: "tv-simpsons-clown",
+      category: "tv",
+      question: "What is the name of Bart's favorite TV clown?",
+      answer: "Krusty the Clown.",
+      choices: [
+        "Krusty the Clown.",
+        "Sideshow Bob.",
+        "Itchy.",
+        "Scratchy."
+      ]
+    },
+    {
+      id: "tv-simpsons-sidekick",
+      category: "tv",
+      question: "Who is Krusty the Clown's former sidekick?",
+      answer: "Sideshow Bob.",
+      choices: [
+        "Sideshow Bob.",
+        "Troy McClure.",
+        "Disco Stu.",
+        "Comic Book Guy."
+      ]
+    },
+    {
+      id: "tv-simpsons-cartoon",
+      category: "tv",
+      question: "What cartoon do Bart and Lisa love to watch?",
+      answer: "The Itchy & Scratchy Show.",
+      choices: [
+        "The Itchy & Scratchy Show.",
+        "Poochie Time.",
+        "Worker and Parasite.",
+        "Krusty's Comedy Hour."
+      ]
+    },
+    {
+      id: "tv-simpsons-mascot",
+      category: "tv",
+      question: "What is the name of Springfield Elementary's mascot?",
+      answer: "The Fighting Hellfish.",
+      choices: [
+        "The Fighting Hellfish.",
+        "The Isotopes.",
+        "The Wildcats.",
+        "The Spartans."
+      ]
+    },
+    {
+      id: "tv-simpsons-mayor",
+      category: "tv",
+      question: "Who is the mayor of Springfield?",
+      answer: "Mayor Quimby.",
+      choices: [
+        "Mayor Quimby.",
+        "Mr. Burns.",
+        "Chief Wiggum.",
+        "Kent Brockman."
+      ]
+    },
+    {
+      id: "tv-simpsons-police-chief",
+      category: "tv",
+      question: "Who is Springfield's police chief?",
+      answer: "Chief Wiggum.",
+      choices: [
+        "Chief Wiggum.",
+        "Lou.",
+        "Eddie.",
+        "Snake."
+      ]
+    },
+    {
+      id: "tv-simpsons-news-anchor",
+      category: "tv",
+      question: "Who is Springfield's longtime news anchor?",
+      answer: "Kent Brockman.",
+      choices: [
+        "Kent Brockman.",
+        "Troy McClure.",
+        "Arnie Pye.",
+        "Rainier Wolfcastle."
+      ]
+    },
+    {
+      id: "tv-simpsons-catchphrase",
+      category: "tv",
+      question: "What is Homer Simpson's famous catchphrase?",
+      answer: "D'oh!",
+      choices: [
+        "D'oh!",
+        "Excellent.",
+        "Ay, caramba!",
+        "Woo-hoo!"
+      ]
+    },
+    {
+      id: "tv-simpsons-bart-catchphrase",
+      category: "tv",
+      question: "What catchphrase is Bart Simpson best known for?",
+      answer: "Ay, caramba!",
+      choices: [
+        "Ay, caramba!",
+        "Eat my shorts.",
+        "Cowabunga.",
+        "Both \"Ay, caramba!\" and \"Eat my shorts.\""
+      ]
+    },
+    {
+      id: "nba-court-players",
+      category: "sports",
+      question: "How many players from one NBA team are on the court during normal play?",
+      answer: "Five.",
+      choices: [
+        "Five.",
+        "Six.",
+        "Seven.",
+        "Four."
+      ]
+    },
+    {
+      id: "nba-shot-clock",
+      category: "sports",
+      question: "How many seconds are on the NBA shot clock?",
+      answer: "24 seconds.",
+      choices: [
+        "24 seconds.",
+        "30 seconds.",
+        "20 seconds.",
+        "35 seconds."
+      ]
+    },
+    {
+      id: "nba-three-pointer-line",
+      category: "sports",
+      question: "A basket made from beyond the arc is worth how many points?",
+      answer: "Three points.",
+      choices: [
+        "Three points.",
+        "Two points.",
+        "One point.",
+        "Four points."
+      ]
+    },
+    {
+      id: "nba-finals-trophy",
+      category: "sports",
+      question: "What trophy is awarded to the NBA champion?",
+      answer: "The Larry O'Brien Trophy.",
+      choices: [
+        "The Larry O'Brien Trophy.",
+        "The Stanley Cup.",
+        "The Lombardi Trophy.",
+        "The Commissioner's Trophy."
+      ]
+    },
+    {
+      id: "nfl-field-yards",
+      category: "sports",
+      question: "How long is an NFL field from goal line to goal line?",
+      answer: "100 yards.",
+      choices: [
+        "100 yards.",
+        "90 yards.",
+        "110 yards.",
+        "120 yards."
+      ]
+    },
+    {
+      id: "nfl-super-bowl-trophy",
+      category: "sports",
+      question: "What trophy is awarded to the Super Bowl winner?",
+      answer: "The Vince Lombardi Trophy.",
+      choices: [
+        "The Vince Lombardi Trophy.",
+        "The Stanley Cup.",
+        "The Heisman Trophy.",
+        "The Larry O'Brien Trophy."
+      ]
+    },
+    {
+      id: "nfl-extra-point-kick",
+      category: "sports",
+      question: "After a touchdown, a successful extra-point kick is worth how many points?",
+      answer: "One point.",
+      choices: [
+        "One point.",
+        "Two points.",
+        "Three points.",
+        "Six points."
+      ]
+    },
+    {
+      id: "nfl-quarterback-role",
+      category: "sports",
+      question: "Which football position usually throws passes and calls plays?",
+      answer: "Quarterback.",
+      choices: [
+        "Quarterback.",
+        "Kicker.",
+        "Linebacker.",
+        "Center."
+      ]
+    },
+    {
+      id: "soccer-penalty-spot",
+      category: "sports",
+      question: "A penalty kick in soccer is taken from how many yards away?",
+      answer: "12 yards.",
+      choices: [
+        "12 yards.",
+        "10 yards.",
+        "18 yards.",
+        "20 yards."
+      ]
+    },
+    {
+      id: "soccer-goalkeeper-hands",
+      category: "sports",
+      question: "Which soccer player can usually use their hands inside the penalty area?",
+      answer: "The goalkeeper.",
+      choices: [
+        "The goalkeeper.",
+        "The striker.",
+        "The captain.",
+        "The referee."
+      ]
+    },
+    {
+      id: "soccer-match-halves",
+      category: "sports",
+      question: "A standard soccer match is divided into how many halves?",
+      answer: "Two.",
+      choices: [
+        "Two.",
+        "Three.",
+        "Four.",
+        "One."
+      ]
+    },
+    {
+      id: "soccer-yellow-card",
+      category: "sports",
+      question: "In soccer, what does a yellow card usually mean?",
+      answer: "A caution.",
+      choices: [
+        "A caution.",
+        "A goal.",
+        "A substitution.",
+        "A corner kick."
+      ]
+    },
+    {
+      id: "baseball-innings",
+      category: "sports",
+      question: "How many innings are in a standard Major League Baseball game?",
+      answer: "Nine.",
+      choices: [
+        "Nine.",
+        "Seven.",
+        "Eight.",
+        "Ten."
+      ]
+    },
+    {
+      id: "baseball-home-run",
+      category: "sports",
+      question: "What is it called when a batter hits the ball out of play in fair territory and rounds all bases?",
+      answer: "A home run.",
+      choices: [
+        "A home run.",
+        "A bunt.",
+        "A double play.",
+        "A walk."
+      ]
+    },
+    {
+      id: "baseball-world-series-trophy",
+      category: "sports",
+      question: "What is the championship series of Major League Baseball called?",
+      answer: "The World Series.",
+      choices: [
+        "The World Series.",
+        "The Super Bowl.",
+        "The Stanley Cup Final.",
+        "The Finals."
+      ]
+    },
+    {
+      id: "baseball-pitcher-mound",
+      category: "sports",
+      question: "Which player throws the ball from the mound?",
+      answer: "The pitcher.",
+      choices: [
+        "The pitcher.",
+        "The catcher.",
+        "The shortstop.",
+        "The umpire."
+      ]
+    },
+    {
+      id: "sports-touchdown-points",
+      category: "sports",
+      question: "How many points is a touchdown worth in American football?",
+      answer: "6.",
+      choices: [
+        "6.",
+        "5.",
+        "7.",
+        "8."
+      ]
+    },
+    {
+      id: "sports-2019-womens-world-cup",
+      category: "sports",
+      question: "Which country won the 2019 FIFA Women's World Cup?",
+      answer: "United States.",
+      choices: [
+        "United States.",
+        "England.",
+        "Germany.",
+        "Netherlands."
+      ]
+    },
+    {
+      id: "sports-baseball-strikes-out",
+      category: "sports",
+      question: "In baseball, how many strikes make an out?",
+      answer: "Three.",
+      choices: [
+        "Three.",
+        "Two.",
+        "Four.",
+        "Five."
+      ]
+    },
+    {
+      id: "sports-auto-racing-winner-flag",
+      category: "sports",
+      question: "What color flag signals the winner in auto racing?",
+      answer: "Checkered.",
+      choices: [
+        "Checkered.",
+        "Green.",
+        "Red.",
+        "Yellow."
+      ]
+    },
+    {
+      id: "sports-slalom-giant-slalom",
+      category: "sports",
+      question: "What sport features events called slalom and giant slalom?",
+      answer: "Skiing.",
+      choices: [
+        "Skiing.",
+        "Snowboarding.",
+        "Bobsled.",
+        "Curling."
+      ]
+    },
+    {
+      id: "decades-80s-vhs",
+      category: "decades",
+      question: "In the 1980s, what home video format became widely popular?",
+      answer: "VHS.",
+      choices: [
+        "VHS.",
+        "Blu-ray.",
+        "DVD.",
+        "LaserDisc only."
+      ]
+    },
+    {
+      id: "decades-90s-beanie-babies",
+      category: "decades",
+      question: "Which small stuffed collectibles became a major craze in the 1990s?",
+      answer: "Beanie Babies.",
+      choices: [
+        "Beanie Babies.",
+        "Furbies.",
+        "Troll dolls.",
+        "Pogs."
+      ]
+    },
+    {
+      id: "decades-2000s-wii",
+      category: "decades",
+      question: "Which Nintendo console made motion-control bowling famous in the 2000s?",
+      answer: "Wii.",
+      choices: [
+        "Wii.",
+        "GameCube.",
+        "Nintendo 64.",
+        "Switch."
+      ]
+    },
+    {
+      id: "decades-2010s-instagram",
+      category: "decades",
+      question: "Which photo-sharing app launched in 2010 and became a major social platform?",
+      answer: "Instagram.",
+      choices: [
+        "Instagram.",
+        "Myspace.",
+        "AOL.",
+        "Vine."
+      ]
+    },
+    {
+      id: "decades-2020s-barbenheimer",
+      category: "decades",
+      question: "Which nickname described the same-day 2023 release buzz around Barbie and Oppenheimer?",
+      answer: "Barbenheimer.",
+      choices: [
+        "Barbenheimer.",
+        "Marvelmania.",
+        "Pink Friday.",
+        "Double Feature Day."
+      ]
+    },
+    {
+      id: "frankenstein-player-character",
+      category: "video-games",
+      question: "In Mary Shelley's original story, who creates Frankenstein's monster?",
+      answer: "Victor Frankenstein.",
+      choices: [
+        "Victor Frankenstein.",
+        "Henry Jekyll.",
+        "Dracula.",
+        "Dr. Moreau."
+      ]
+    },
+    {
+      id: "frankenstein-boris-karloff",
+      category: "video-games",
+      question: "Which actor famously portrayed Frankenstein's monster in the 1931 film?",
+      answer: "Boris Karloff.",
+      choices: [
+        "Boris Karloff.",
+        "Bela Lugosi.",
+        "Lon Chaney Jr.",
+        "Vincent Price."
+      ]
+    },
+    {
+      id: "frankenstein-author",
+      category: "video-games",
+      question: "Who wrote the novel Frankenstein?",
+      answer: "Mary Shelley.",
+      choices: [
+        "Mary Shelley.",
+        "Jane Austen.",
+        "Emily Brontë.",
+        "Bram Stoker."
+      ]
+    },
+    {
+      id: "frankenstein-subtitle",
+      category: "video-games",
+      question: "What is the subtitle of Mary Shelley's Frankenstein?",
+      answer: "The Modern Prometheus.",
+      choices: [
+        "The Modern Prometheus.",
+        "The Living Dead.",
+        "The Electric Man.",
+        "The Last Alchemist."
+      ]
+    },
+    {
+      id: "frankenstein-setting",
+      category: "video-games",
+      question: "Victor Frankenstein was a student of what field?",
+      answer: "Natural philosophy and science.",
+      choices: [
+        "Natural philosophy and science.",
+        "Law.",
+        "Astronomy.",
+        "Architecture."
+      ]
+    },
+    {
+      id: "frankenstein-switzerland",
+      category: "video-games",
+      question: "In the novel, Victor Frankenstein is originally from which country?",
+      answer: "Switzerland.",
+      choices: [
+        "Switzerland.",
+        "Germany.",
+        "England.",
+        "France."
+      ]
+    },
+    {
+      id: "frankenstein-igor",
+      category: "video-games",
+      question: "True or False: Igor appears in Mary Shelley's original novel.",
+      answer: "False.",
+      choices: [
+        "True.",
+        "False.",
+        "Only in the sequel.",
+        "Only in the stage play."
+      ]
+    },
+    {
+      id: "frankenstein-monster-name",
+      category: "video-games",
+      question: "What is the monster's actual name in the original novel?",
+      answer: "He has no name.",
+      choices: [
+        "He has no name.",
+        "Adam.",
+        "Igor.",
+        "Henry."
+      ]
+    },
+    {
+      id: "frankenstein-arctic",
+      category: "video-games",
+      question: "The novel begins and ends in what icy region?",
+      answer: "The Arctic.",
+      choices: [
+        "The Arctic.",
+        "Antarctica.",
+        "Siberia.",
+        "Greenland."
+      ]
+    },
+    {
+      id: "frankenstein-lightning",
+      category: "video-games",
+      question: "What force is commonly associated with bringing Frankenstein's monster to life in popular culture?",
+      answer: "Lightning.",
+      choices: [
+        "Lightning.",
+        "Moonlight.",
+        "Fire.",
+        "Steam."
+      ]
+    },
+    {
+      id: "frankenstein-castlevania",
+      category: "video-games",
+      question: "Frankenstein's monster appears as an enemy in which famous Konami series?",
+      answer: "Castlevania.",
+      choices: [
+        "Castlevania.",
+        "Metal Gear.",
+        "Contra.",
+        "Silent Hill."
+      ]
+    },
+    {
+      id: "frankenstein-darkstalkers",
+      category: "video-games",
+      question: "Which Darkstalkers character is inspired by Frankenstein's monster?",
+      answer: "Victor.",
+      choices: [
+        "Victor.",
+        "Demitri.",
+        "Felicia.",
+        "Morrigan."
+      ]
+    },
+    {
+      id: "frankenstein-monster-strength",
+      category: "video-games",
+      question: "Frankenstein's monster is typically depicted as having extraordinary:",
+      answer: "Strength.",
+      choices: [
+        "Strength.",
+        "Speed.",
+        "Telepathy.",
+        "Invisibility."
+      ]
+    },
+    {
+      id: "frankenstein-revenge",
+      category: "video-games",
+      question: "What motivates the monster after Victor rejects him?",
+      answer: "Revenge and loneliness.",
+      choices: [
+        "Revenge and loneliness.",
+        "Greed.",
+        "Curiosity.",
+        "Fame."
+      ]
+    },
+    {
+      id: "frankenstein-companion",
+      category: "video-games",
+      question: "What does the monster ask Victor to create?",
+      answer: "A companion.",
+      choices: [
+        "A companion.",
+        "A castle.",
+        "A laboratory.",
+        "A weapon."
+      ]
+    },
+    {
+      id: "frankenstein-destruction",
+      category: "video-games",
+      question: "What does Victor do to the unfinished companion?",
+      answer: "Destroys it.",
+      choices: [
+        "Destroys it.",
+        "Activates it.",
+        "Sells it.",
+        "Hides it underground."
+      ]
+    },
+    {
+      id: "frankenstein-walton",
+      category: "video-games",
+      question: "Which explorer records Victor Frankenstein's story?",
+      answer: "Robert Walton.",
+      choices: [
+        "Robert Walton.",
+        "Jonathan Harker.",
+        "Captain Nemo.",
+        "Ishmael."
+      ]
+    },
+    {
+      id: "frankenstein-education",
+      category: "video-games",
+      question: "How does the monster learn language and human behavior?",
+      answer: "By secretly observing a family.",
+      choices: [
+        "By secretly observing a family.",
+        "From Victor.",
+        "At school.",
+        "From books alone."
+      ]
+    },
+    {
+      id: "frankenstein-video-game-boss",
+      category: "video-games",
+      question: "In many video games, Frankenstein's monster is commonly featured as what?",
+      answer: "A boss enemy.",
+      choices: [
+        "A boss enemy.",
+        "A merchant.",
+        "A tutorial guide.",
+        "A racer."
+      ]
+    },
+    {
+      id: "frankenstein-horror-genre",
+      category: "video-games",
+      question: "Frankenstein is most closely associated with which genre?",
+      answer: "Horror.",
+      choices: [
+        "Horror.",
+        "Western.",
+        "Romance.",
+        "Sports."
+      ]
+    },
+    {
+      id: "frankenstein-villain",
+      category: "video-games",
+      question: "Who is often considered the true tragic figure of the story?",
+      answer: "The monster.",
+      choices: [
+        "The monster.",
+        "Igor.",
+        "Elizabeth.",
+        "Robert Walton."
+      ]
+    },
+    {
+      id: "frankenstein-elizabeth",
+      category: "video-games",
+      question: "What is the name of Victor Frankenstein's fiancée?",
+      answer: "Elizabeth.",
+      choices: [
+        "Elizabeth.",
+        "Catherine.",
+        "Margaret.",
+        "Lucy."
+      ]
+    },
+    {
+      id: "frankenstein-setting-era",
+      category: "video-games",
+      question: "Frankenstein was originally published during which century?",
+      answer: "The 19th century.",
+      choices: [
+        "The 19th century.",
+        "The 17th century.",
+        "The 18th century.",
+        "The 20th century."
+      ]
+    },
+    {
+      id: "frankenstein-electricity",
+      category: "video-games",
+      question: "The idea of reanimating life through electricity is linked to what scientific concept?",
+      answer: "Galvanism.",
+      choices: [
+        "Galvanism.",
+        "Alchemy.",
+        "Fusion.",
+        "Photosynthesis."
+      ]
+    },
+    {
+      id: "frankenstein-theme",
+      category: "video-games",
+      question: "A major theme of Frankenstein is the danger of:",
+      answer: "Unchecked ambition.",
+      choices: [
+        "Unchecked ambition.",
+        "Travel.",
+        "Friendship.",
+        "Competition."
+      ]
+    },
+    {
+      id: "frankenstein-creature-size",
+      category: "video-games",
+      question: "Victor intentionally creates the creature at approximately what height?",
+      answer: "About 8 feet tall.",
+      choices: [
+        "About 8 feet tall.",
+        "About 5 feet tall.",
+        "About 10 feet tall.",
+        "About 12 feet tall."
+      ]
+    },
+    {
+      id: "frankenstein-modern-games",
+      category: "video-games",
+      question: "Frankenstein-inspired enemies are especially common in which type of games?",
+      answer: "Horror games.",
+      choices: [
+        "Horror games.",
+        "Golf games.",
+        "Flight simulators.",
+        "Puzzle word games."
+      ]
+    },
+    {
+      id: "frankenstein-sympathy",
+      category: "video-games",
+      question: "Despite his appearance, the monster initially desires:",
+      answer: "Acceptance and companionship.",
+      choices: [
+        "Acceptance and companionship.",
+        "Wealth and power.",
+        "Military conquest.",
+        "Immortality."
+      ]
+    },
+    {
+      id: "frankenstein-legacy",
+      category: "video-games",
+      question: "Frankenstein is often considered one of the earliest examples of:",
+      answer: "Science fiction.",
+      choices: [
+        "Science fiction.",
+        "Cyberpunk.",
+        "Space opera.",
+        "Steampunk."
+      ]
+    },
+    {
+      id: "frankenstein-pop-culture",
+      category: "video-games",
+      question: "What misconception is common in popular culture?",
+      answer: "People call the monster \"Frankenstein.\"",
+      choices: [
+        "People call the monster \"Frankenstein.\"",
+        "Victor is a vampire.",
+        "Igor wrote the story.",
+        "The monster is invisible."
+      ]
+    }
+  ];
 })();

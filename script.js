@@ -3221,18 +3221,39 @@
       return;
     }
     if (hideSeekState.phase === HideSeekGameState.HIDER_TURN) {
-      lockHideSeekHiderPosition('button');
+      lockHideSeekHiderPosition('button', getNearbyHideSeekSpot(actor));
       return;
     }
     if (hideSeekState.phase !== HideSeekGameState.SEEKER_TURN) return;
     searchHideSeekPosition();
   }
 
-  function lockHideSeekHiderPosition(source) {
+  function lockHideSeekHiderPosition(source, preferredSpot = null) {
     if (hideSeekState.phase !== HideSeekGameState.HIDER_TURN) return;
     const actor = hideSeekState.actors.hider;
+    let nearbySpot = preferredSpot || getNearbyHideSeekSpot(actor);
     let coverQuality = getHideSeekCoverQuality(actor);
-    let nearbySpot = coverQuality.spot;
+    if (nearbySpot && (!coverQuality.spot || coverQuality.spot.id !== nearbySpot.id)) {
+      const radius = nearbySpot.interactionRadius || 42;
+      const closeness = Math.max(0, 1 - (nearbySpot.distance || 0) / radius);
+      const score = Math.max(1, Math.min(5, Math.round((nearbySpot.difficulty || 3) * 0.72 + closeness * 2.1)));
+      const label = score >= 5 ? 'Legendary cover' : score >= 4 ? 'Great cover' : score >= 3 ? 'Solid cover' : 'Risky cover';
+      const qualityNote = score >= 5
+        ? 'Hard to clear fast.'
+        : score >= 4
+          ? 'Strong line-of-sight break.'
+          : score >= 3
+            ? 'Decent, but not airtight.'
+            : 'Easy to check if the seeker gets close.';
+      coverQuality = {
+        spot: nearbySpot,
+        score,
+        label,
+        detail: `${label} near the ${nearbySpot.label}. ${qualityNote}`,
+      };
+    } else {
+      nearbySpot = coverQuality.spot;
+    }
     if (!nearbySpot && source !== 'timer') {
       setHideSeekMessage('Move next to a hiding spot first.');
       playHideSeekTone('wrong');
