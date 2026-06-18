@@ -17,7 +17,7 @@ This project was built with **no backend**, **no user accounts** and **no data c
 - **Joke Vote:** Let each player tell clean jokes and award Dad Joke or Mom Joke honors.
 - **Emoji Face-Off:** Copy emoji expressions with an optional local camera snap, then vote for the closest match. Photos are not uploaded or saved by the app.
 - **Pi Digits:** See who can recite the most digits of pi and track scores for every player.
-- **Hide & Seek Adventure:** Play a local pass-and-play canvas game with a 1-minute hiding scramble, 2-minute default search timer, best-of-5 default match, sprint stamina, stealth bonuses, real hiding spot states, listen clues, particles, lighting, cover quality, obstacles, room transitions and role swaps.
+- **Hide & Seek Adventure:** Play a local pass-and-play canvas game on a responsive 1200x675 board with a 1-minute hiding scramble, limited inspection-based searches, best-of-5 default match, sprint stamina, stealth bonuses, real hiding spot states, listen clues, particles, lighting, cover quality, obstacles, room transitions and role swaps.
 - **Dynamic adventures:** The app builds an adventure from a pool of questions and prompts.  Timed challenges show a 15 second countdown.
 - **Progress bar:** See how far along your adventure you are.
 - **Summary:** At the end, get a breakdown of how many discoveries, laughs, facts and wins you achieved.
@@ -101,7 +101,7 @@ node scripts/audit-all.js
 
 ### Adding Hide & Seek maps
 
-Hide & Seek Adventure maps live in `js/games/hide-seek-data.js`. Each map defines a start room, palette, room exits, cover objects and optional obstacles. Cover objects are real hiding spots with round states such as empty, suspicious, searched and found. The hider enters one valid spot when they tap **Hide Here** or the 1-minute hide timer expires.
+Hide & Seek Adventure maps live in `js/games/hide-seek-data.js`. Each map defines a start room, palette, room exits, cover objects and optional obstacles. Cover objects are real hiding spots with round states such as empty, suspicious, searched and found. The hider enters one valid spot when they tap **Hide Here** or the 1-minute hide timer expires. The game now renders on a larger `1200x675` canvas, but map data is still authored in the original `800x450` coordinate space and scaled automatically at runtime.
 
 ```js
 const hideSeekMaps = {
