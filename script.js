@@ -898,12 +898,12 @@
     hard: 6,
   };
   const HIDE_SEEK_DEFAULT_DIFFICULTY = 'normal';
-  const HIDE_SEEK_SEARCH_TOLERANCE = 34;
+  const HIDE_SEEK_SEARCH_TOLERANCE = 51;
   const HIDE_SEEK_INSPECT_SECONDS = 1.1;
   const HIDE_SEEK_MAX_HINTS = 3;
   const HIDE_SEEK_MAX_STAMINA = 100;
   const HIDE_SEEK_SPRINT_SPEED_MULTIPLIER = 1.45;
-  const HIDE_SEEK_SUSPICION_DISTANCE = 135;
+  const HIDE_SEEK_SUSPICION_DISTANCE = 203;
   const HIDE_SEEK_TRAIL_NOISE_THRESHOLD = 0.28;
 
   function getHideSeekSearchCount(difficulty) {
@@ -943,8 +943,8 @@
     message: '',
     hideScore: {},
     actors: {
-      hider: { x: 120, y: 300, width: 24, height: 32, speed: 150, roomId: 'lobby', visible: true, color: '#2ec7d3' },
-      seeker: { x: 120, y: 300, width: 24, height: 32, speed: 150, roomId: 'lobby', visible: false, color: '#f58220' },
+      hider: { x: 180, y: 458, width: 36, height: 48, speed: 225, roomId: 'lobby', visible: true, color: '#2ec7d3' },
+      seeker: { x: 180, y: 458, width: 36, height: 48, speed: 225, roomId: 'lobby', visible: false, color: '#f58220' },
     },
     input: { up: false, down: false, left: false, right: false, sprint: false },
     revealPulse: 0,
@@ -2502,7 +2502,75 @@
     GAME_OVER: 'GAME_OVER',
   };
 
-  const hideSeekMaps = window.RTA_HIDE_SEEK_MAPS || {};
+  const HIDE_SEEK_BASE_WIDTH = 800;
+  const HIDE_SEEK_BASE_HEIGHT = 450;
+  const HIDE_SEEK_SCALE = 1.5;
+  const HIDE_SEEK_CANVAS_WIDTH = Math.round(HIDE_SEEK_BASE_WIDTH * HIDE_SEEK_SCALE);
+  const HIDE_SEEK_CANVAS_HEIGHT = Math.round(HIDE_SEEK_BASE_HEIGHT * HIDE_SEEK_SCALE);
+  const HIDE_SEEK_GEOMETRY_KEYS = new Set([
+    'x',
+    'y',
+    'width',
+    'height',
+    'spawnX',
+    'spawnY',
+    'interactionRadius',
+    'offsetX',
+    'offsetY',
+  ]);
+
+  function scaleHideSeekGeometry(value) {
+    if (Array.isArray(value)) return value.map(scaleHideSeekGeometry);
+    if (!value || typeof value !== 'object') return value;
+    return Object.entries(value).reduce((scaled, [key, entryValue]) => {
+      if (typeof entryValue === 'number' && HIDE_SEEK_GEOMETRY_KEYS.has(key)) {
+        scaled[key] = Math.round(entryValue * HIDE_SEEK_SCALE);
+      } else {
+        scaled[key] = scaleHideSeekGeometry(entryValue);
+      }
+      return scaled;
+    }, {});
+  }
+
+  const hideSeekMaps = scaleHideSeekGeometry(window.RTA_HIDE_SEEK_MAPS || {});
+
+  function createHideSeekActor(roomId, visible, color) {
+    return {
+      x: Math.round(120 * HIDE_SEEK_SCALE),
+      y: Math.round(305 * HIDE_SEEK_SCALE),
+      width: Math.round(24 * HIDE_SEEK_SCALE),
+      height: Math.round(32 * HIDE_SEEK_SCALE),
+      speed: Math.round(150 * HIDE_SEEK_SCALE),
+      roomId,
+      visible,
+      color,
+    };
+  }
+
+  function getHideSeekCanvasSize() {
+    return {
+      width: hideSeekCanvas ? hideSeekCanvas.width : HIDE_SEEK_CANVAS_WIDTH,
+      height: hideSeekCanvas ? hideSeekCanvas.height : HIDE_SEEK_CANVAS_HEIGHT,
+    };
+  }
+
+  function getHideSeekFloorRect() {
+    const { width, height } = getHideSeekCanvasSize();
+    return {
+      x: Math.round(width * 0.0475),
+      y: Math.round(height * 0.1378),
+      width: Math.round(width * 0.905),
+      height: Math.round(height * 0.7511),
+    };
+  }
+
+  function withHideSeekBaseScale(ctx, callback) {
+    const { width, height } = getHideSeekCanvasSize();
+    ctx.save();
+    ctx.scale(width / HIDE_SEEK_BASE_WIDTH, height / HIDE_SEEK_BASE_HEIGHT);
+    callback();
+    ctx.restore();
+  }
 
   function getHideSeekMap() {
     return hideSeekMaps[hideSeekState.mode] || hideSeekMaps['roadside-lodge'] || Object.values(hideSeekMaps)[0] || null;
@@ -2600,7 +2668,7 @@
     const room = getHideSeekRoom(actor.roomId);
     return room.spots.reduce((closest, spot) => {
       if (getHideSeekSpotState(spot.id) === 'disabled') return closest;
-      const radius = spot.interactionRadius || 56;
+      const radius = spot.interactionRadius || Math.round(56 * HIDE_SEEK_SCALE);
       const distance = getHideSeekDistanceToRect(actor, spot);
       if (distance > radius) return closest;
       if (!closest || distance < closest.distance) return Object.assign({ distance, roomId: room.id }, spot);
@@ -2625,7 +2693,7 @@
         detail: 'Open floor. Bold choice, but easier to find.',
       };
     }
-    const radius = nearbySpot.interactionRadius || 42;
+    const radius = nearbySpot.interactionRadius || Math.round(42 * HIDE_SEEK_SCALE);
     const closeness = Math.max(0, 1 - (nearbySpot.distance || 0) / radius);
     const score = Math.max(1, Math.min(5, Math.round((nearbySpot.difficulty || 3) * 0.72 + closeness * 2.1)));
     const label = score >= 5 ? 'Legendary cover' : score >= 4 ? 'Great cover' : score >= 3 ? 'Solid cover' : 'Risky cover';
@@ -3008,8 +3076,8 @@
     const map = getHideSeekMap();
     const startRoom = map.startRoom;
     hideSeekState.actors = {
-      hider: { x: 120, y: 305, width: 24, height: 32, speed: 150, roomId: startRoom, visible: true, color: '#2ec7d3' },
-      seeker: { x: 120, y: 305, width: 24, height: 32, speed: 150, roomId: startRoom, visible: false, color: '#f58220' },
+      hider: createHideSeekActor(startRoom, true, '#2ec7d3'),
+      seeker: createHideSeekActor(startRoom, false, '#f58220'),
     };
     hideSeekState.activeRoomId = startRoom;
     hideSeekState.roomTrail = [startRoom];
@@ -3208,7 +3276,7 @@
     hideSeekState.phase = HideSeekGameState.SEEKER_TURN;
     hideSeekState.searchesRemaining = getHideSeekSearchCount(hideSeekState.difficulty);
     hideSeekState.lastUrgentSecond = null;
-    hideSeekState.actors.seeker = { x: 120, y: 305, width: 24, height: 32, speed: 150, roomId: map.startRoom, visible: true, color: '#f58220' };
+    hideSeekState.actors.seeker = createHideSeekActor(map.startRoom, true, '#f58220');
     hideSeekState.activeRoomId = map.startRoom;
     playHideSeekTone('door');
     renderHideSeek();
@@ -3234,7 +3302,7 @@
     let nearbySpot = preferredSpot || getNearbyHideSeekSpot(actor);
     let coverQuality = getHideSeekCoverQuality(actor);
     if (nearbySpot && (!coverQuality.spot || coverQuality.spot.id !== nearbySpot.id)) {
-      const radius = nearbySpot.interactionRadius || 42;
+      const radius = nearbySpot.interactionRadius || Math.round(42 * HIDE_SEEK_SCALE);
       const closeness = Math.max(0, 1 - (nearbySpot.distance || 0) / radius);
       const score = Math.max(1, Math.min(5, Math.round((nearbySpot.difficulty || 3) * 0.72 + closeness * 2.1)));
       const label = score >= 5 ? 'Legendary cover' : score >= 4 ? 'Great cover' : score >= 3 ? 'Solid cover' : 'Risky cover';
@@ -3413,7 +3481,7 @@
     hideSeekState.hideScore[hider.id] = (hideSeekState.hideScore[hider.id] || 0) + hideSeekState.roundHiderScore;
     hideSeekState.phase = HideSeekGameState.ROUND_RESULTS;
     hideSeekState.cameraShake = Math.max(hideSeekState.cameraShake, 0.25);
-    revealHideSeekHider(spot || { x: 120, y: 305, width: 24, height: 32 });
+    revealHideSeekHider(spot || createHideSeekActor(hideSeekState.activeRoomId, true, '#2ec7d3'));
     hideSeekRound += 1;
     hideSeekState.lastRoundText = `${hider.name} stayed hidden ${hideSeekState.hiddenSpotLabel}. Cover: ${hideSeekState.hiddenCoverLabel}. Peeks: ${hideSeekState.peekCount}. Stealth bonus: ${stealthBonus}. ${hider.name}: +${hideSeekState.roundHiderScore}.`;
     playHideSeekTone('wrong');
@@ -3470,8 +3538,8 @@
       message: '',
       hideScore: {},
       actors: {
-        hider: { x: 120, y: 305, width: 24, height: 32, speed: 150, roomId: (hideSeekMaps[hideSeekMode.value] || hideSeekMaps['roadside-lodge']).startRoom, visible: true, color: '#2ec7d3' },
-        seeker: { x: 120, y: 305, width: 24, height: 32, speed: 150, roomId: (hideSeekMaps[hideSeekMode.value] || hideSeekMaps['roadside-lodge']).startRoom, visible: false, color: '#f58220' },
+        hider: createHideSeekActor((hideSeekMaps[hideSeekMode.value] || hideSeekMaps['roadside-lodge']).startRoom, true, '#2ec7d3'),
+        seeker: createHideSeekActor((hideSeekMaps[hideSeekMode.value] || hideSeekMaps['roadside-lodge']).startRoom, false, '#f58220'),
       },
       input: { up: false, down: false, left: false, right: false, sprint: false },
       revealPulse: 0,
@@ -3590,10 +3658,9 @@
   }
 
   function getHideSeekRoomBounds(actor) {
-    const canvasWidth = hideSeekCanvas ? hideSeekCanvas.width : 800;
-    const canvasHeight = hideSeekCanvas ? hideSeekCanvas.height : 450;
-    const edgePaddingX = 18;
-    const edgePaddingY = 22;
+    const { width: canvasWidth, height: canvasHeight } = getHideSeekCanvasSize();
+    const edgePaddingX = Math.round(18 * HIDE_SEEK_SCALE);
+    const edgePaddingY = Math.round(22 * HIDE_SEEK_SCALE);
     return {
       minX: edgePaddingX,
       maxX: canvasWidth - actor.width - edgePaddingX,
@@ -3622,24 +3689,32 @@
 
   function doesHideSeekActorTouchExit(actor, exit, dx, dy) {
     const collider = getHideSeekActorCollider(actor);
-    const spanPad = 18;
-    if (exit.y <= 62 && dy < 0) {
-      return actor.y <= 76
+    const spanPad = Math.round(18 * HIDE_SEEK_SCALE);
+    const topThreshold = Math.round(62 * HIDE_SEEK_SCALE);
+    const bottomThreshold = Math.round(360 * HIDE_SEEK_SCALE);
+    const topActorThreshold = Math.round(76 * HIDE_SEEK_SCALE);
+    const bottomActorThreshold = Math.round(374 * HIDE_SEEK_SCALE);
+    const leftThreshold = Math.round(62 * HIDE_SEEK_SCALE);
+    const rightThreshold = Math.round(700 * HIDE_SEEK_SCALE);
+    const leftActorThreshold = Math.round(52 * HIDE_SEEK_SCALE);
+    const rightActorThreshold = Math.round(748 * HIDE_SEEK_SCALE);
+    if (exit.y <= topThreshold && dy < 0) {
+      return actor.y <= topActorThreshold
         && collider.x + collider.width >= exit.x - spanPad
         && collider.x <= exit.x + exit.width + spanPad;
     }
-    if (exit.y >= 360 && dy > 0) {
-      return actor.y + actor.height >= 374
+    if (exit.y >= bottomThreshold && dy > 0) {
+      return actor.y + actor.height >= bottomActorThreshold
         && collider.x + collider.width >= exit.x - spanPad
         && collider.x <= exit.x + exit.width + spanPad;
     }
-    if (exit.x <= 62 && dx < 0) {
-      return actor.x <= 52
+    if (exit.x <= leftThreshold && dx < 0) {
+      return actor.x <= leftActorThreshold
         && collider.y + collider.height >= exit.y - spanPad
         && collider.y <= exit.y + exit.height + spanPad;
     }
-    if (exit.x >= 700 && dx > 0) {
-      return actor.x + actor.width >= 748
+    if (exit.x >= rightThreshold && dx > 0) {
+      return actor.x + actor.width >= rightActorThreshold
         && collider.y + collider.height >= exit.y - spanPad
         && collider.y <= exit.y + exit.height + spanPad;
     }
@@ -3690,9 +3765,13 @@
   }
 
   function getHideSeekExitTriggerRect(exit) {
-    const pad = 38;
-    const reach = 26;
-    if (exit.y <= 62) {
+    const pad = Math.round(38 * HIDE_SEEK_SCALE);
+    const reach = Math.round(26 * HIDE_SEEK_SCALE);
+    const topThreshold = Math.round(62 * HIDE_SEEK_SCALE);
+    const bottomThreshold = Math.round(360 * HIDE_SEEK_SCALE);
+    const leftThreshold = Math.round(62 * HIDE_SEEK_SCALE);
+    const rightThreshold = Math.round(700 * HIDE_SEEK_SCALE);
+    if (exit.y <= topThreshold) {
       return {
         x: exit.x - pad,
         y: exit.y - pad,
@@ -3700,7 +3779,7 @@
         height: exit.height + pad * 2 + reach,
       };
     }
-    if (exit.y >= 360) {
+    if (exit.y >= bottomThreshold) {
       return {
         x: exit.x - pad,
         y: exit.y - pad - reach,
@@ -3708,7 +3787,7 @@
         height: exit.height + pad * 2 + reach,
       };
     }
-    if (exit.x <= 62) {
+    if (exit.x <= leftThreshold) {
       return {
         x: exit.x - pad,
         y: exit.y - pad,
@@ -3716,7 +3795,7 @@
         height: exit.height + pad * 2,
       };
     }
-    if (exit.x >= 700) {
+    if (exit.x >= rightThreshold) {
       return {
         x: exit.x - pad - reach,
         y: exit.y - pad,
@@ -3737,25 +3816,31 @@
     const spawnActor = Object.assign({}, actor, { roomId: exit.targetRoom });
     const bounds = getHideSeekRoomBounds(spawnActor);
     const base = {
-      x: typeof exit.spawnX === 'number' ? exit.spawnX : 400,
-      y: typeof exit.spawnY === 'number' ? exit.spawnY : 225,
+      x: typeof exit.spawnX === 'number' ? exit.spawnX : Math.round(HIDE_SEEK_CANVAS_WIDTH / 2),
+      y: typeof exit.spawnY === 'number' ? exit.spawnY : Math.round(HIDE_SEEK_CANVAS_HEIGHT / 2),
     };
     const nudges = [];
-    if (exit.y <= 62) {
-      for (let step = 0; step < 7; step += 1) nudges.push({ x: 0, y: step * 18 });
-    } else if (exit.y >= 360) {
-      for (let step = 0; step < 7; step += 1) nudges.push({ x: 0, y: -step * 18 });
-    } else if (exit.x <= 62) {
-      for (let step = 0; step < 7; step += 1) nudges.push({ x: step * 18, y: 0 });
-    } else if (exit.x >= 700) {
-      for (let step = 0; step < 7; step += 1) nudges.push({ x: -step * 18, y: 0 });
+    const edgeStep = Math.round(18 * HIDE_SEEK_SCALE);
+    const sideNudge = Math.round(24 * HIDE_SEEK_SCALE);
+    const topThreshold = Math.round(62 * HIDE_SEEK_SCALE);
+    const bottomThreshold = Math.round(360 * HIDE_SEEK_SCALE);
+    const leftThreshold = Math.round(62 * HIDE_SEEK_SCALE);
+    const rightThreshold = Math.round(700 * HIDE_SEEK_SCALE);
+    if (exit.y <= topThreshold) {
+      for (let step = 0; step < 7; step += 1) nudges.push({ x: 0, y: step * edgeStep });
+    } else if (exit.y >= bottomThreshold) {
+      for (let step = 0; step < 7; step += 1) nudges.push({ x: 0, y: -step * edgeStep });
+    } else if (exit.x <= leftThreshold) {
+      for (let step = 0; step < 7; step += 1) nudges.push({ x: step * edgeStep, y: 0 });
+    } else if (exit.x >= rightThreshold) {
+      for (let step = 0; step < 7; step += 1) nudges.push({ x: -step * edgeStep, y: 0 });
     } else {
       nudges.push({ x: 0, y: 0 });
     }
     const candidates = nudges.flatMap(offset => ([
       { x: base.x + offset.x, y: base.y + offset.y },
-      { x: base.x + offset.x + 24, y: base.y + offset.y },
-      { x: base.x + offset.x - 24, y: base.y + offset.y },
+      { x: base.x + offset.x + sideNudge, y: base.y + offset.y },
+      { x: base.x + offset.x - sideNudge, y: base.y + offset.y },
     ]));
     const safe = candidates.find(candidate => {
       const positioned = Object.assign({}, spawnActor, {
@@ -3772,10 +3857,10 @@
 
   function getHideSeekActorCollider(actor) {
     return {
-      x: actor.x + 4,
-      y: actor.y + 12,
-      width: Math.max(8, actor.width - 8),
-      height: Math.max(8, actor.height - 8),
+      x: actor.x + Math.round(4 * HIDE_SEEK_SCALE),
+      y: actor.y + Math.round(12 * HIDE_SEEK_SCALE),
+      width: Math.max(Math.round(8 * HIDE_SEEK_SCALE), actor.width - Math.round(8 * HIDE_SEEK_SCALE)),
+      height: Math.max(Math.round(8 * HIDE_SEEK_SCALE), actor.height - Math.round(8 * HIDE_SEEK_SCALE)),
     };
   }
 
@@ -3880,17 +3965,17 @@
   }
 
   function drawHideSeekTexture(ctx, color, alpha, spacing) {
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1;
-    for (let x = -450; x < 900; x += spacing) {
-      ctx.beginPath();
-      ctx.moveTo(x, 64);
-      ctx.lineTo(x + 450, 402);
-      ctx.stroke();
-    }
-    ctx.restore();
+    withHideSeekBaseScale(ctx, () => {
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1;
+      for (let x = -450; x < 900; x += spacing) {
+        ctx.beginPath();
+        ctx.moveTo(x, 64);
+        ctx.lineTo(x + 450, 402);
+        ctx.stroke();
+      }
+    });
   }
 
   function getHideSeekArtTools() {
@@ -3920,11 +4005,14 @@
 
   function drawHideSeekRoomBackdrop(ctx, map, room, palette) {
     if (window.RTA_HIDE_SEEK_ART && window.RTA_HIDE_SEEK_ART.drawRoomBackdrop) {
-      window.RTA_HIDE_SEEK_ART.drawRoomBackdrop(ctx, map, room, palette, getHideSeekArtTools());
+      withHideSeekBaseScale(ctx, () => {
+        window.RTA_HIDE_SEEK_ART.drawRoomBackdrop(ctx, map, room, palette, getHideSeekArtTools());
+      });
       return;
     }
     ctx.fillStyle = palette.wall;
-    ctx.fillRect(0, 0, 800, 450);
+    const { width, height } = getHideSeekCanvasSize();
+    ctx.fillRect(0, 0, width, height);
   }
 
   function drawHideSeekExitArrow(ctx, exit, isActive) {
@@ -3969,33 +4057,36 @@
 
   function drawHideSeekRoom(ctx, room, palette) {
     const map = getHideSeekMap();
+    const floorRect = getHideSeekFloorRect();
     drawHideSeekRoomBackdrop(ctx, map, room, palette);
 
-    const floorGradient = ctx.createLinearGradient(0, 62, 0, 400);
+    const floorGradient = ctx.createLinearGradient(0, floorRect.y, 0, floorRect.y + floorRect.height);
     floorGradient.addColorStop(0, shadeHideSeekColor(palette.floor, 12));
     floorGradient.addColorStop(1, shadeHideSeekColor(palette.floor, -12));
     ctx.fillStyle = floorGradient;
-    fillHideSeekRoundedRect(ctx, 38, 62, 724, 338, 18);
-    drawHideSeekTexture(ctx, 'rgba(6,21,36,0.28)', 0.25, 38);
+    fillHideSeekRoundedRect(ctx, floorRect.x, floorRect.y, floorRect.width, floorRect.height, Math.round(18 * HIDE_SEEK_SCALE));
+    drawHideSeekTexture(ctx, 'rgba(6,21,36,0.28)', 0.25, Math.round(38 * HIDE_SEEK_SCALE));
 
     if (window.RTA_HIDE_SEEK_ART && window.RTA_HIDE_SEEK_ART.drawFloorDetail) {
-      window.RTA_HIDE_SEEK_ART.drawFloorDetail(ctx, map, room, getHideSeekArtTools());
+      withHideSeekBaseScale(ctx, () => {
+        window.RTA_HIDE_SEEK_ART.drawFloorDetail(ctx, map, room, getHideSeekArtTools());
+      });
     }
 
     ctx.strokeStyle = 'rgba(255,255,255,0.24)';
     ctx.lineWidth = 1;
-    for (let y = 94; y < 382; y += 36) {
+    for (let y = floorRect.y + Math.round(32 * HIDE_SEEK_SCALE); y < floorRect.y + floorRect.height - Math.round(18 * HIDE_SEEK_SCALE); y += Math.round(36 * HIDE_SEEK_SCALE)) {
       ctx.beginPath();
-      ctx.moveTo(58, y);
-      ctx.lineTo(742, y);
+      ctx.moveTo(floorRect.x + Math.round(20 * HIDE_SEEK_SCALE), y);
+      ctx.lineTo(floorRect.x + floorRect.width - Math.round(20 * HIDE_SEEK_SCALE), y);
       ctx.stroke();
     }
 
     ctx.fillStyle = palette.trim;
-    fillHideSeekRoundedRect(ctx, 34, 58, 732, 18, 8);
-    fillHideSeekRoundedRect(ctx, 34, 386, 732, 18, 8);
-    fillHideSeekRoundedRect(ctx, 34, 58, 18, 346, 8);
-    fillHideSeekRoundedRect(ctx, 748, 58, 18, 346, 8);
+    fillHideSeekRoundedRect(ctx, floorRect.x - Math.round(4 * HIDE_SEEK_SCALE), floorRect.y - Math.round(4 * HIDE_SEEK_SCALE), floorRect.width + Math.round(8 * HIDE_SEEK_SCALE), Math.round(18 * HIDE_SEEK_SCALE), Math.round(8 * HIDE_SEEK_SCALE));
+    fillHideSeekRoundedRect(ctx, floorRect.x - Math.round(4 * HIDE_SEEK_SCALE), floorRect.y + floorRect.height - Math.round(14 * HIDE_SEEK_SCALE), floorRect.width + Math.round(8 * HIDE_SEEK_SCALE), Math.round(18 * HIDE_SEEK_SCALE), Math.round(8 * HIDE_SEEK_SCALE));
+    fillHideSeekRoundedRect(ctx, floorRect.x - Math.round(4 * HIDE_SEEK_SCALE), floorRect.y - Math.round(4 * HIDE_SEEK_SCALE), Math.round(18 * HIDE_SEEK_SCALE), floorRect.height + Math.round(8 * HIDE_SEEK_SCALE), Math.round(8 * HIDE_SEEK_SCALE));
+    fillHideSeekRoundedRect(ctx, floorRect.x + floorRect.width - Math.round(14 * HIDE_SEEK_SCALE), floorRect.y - Math.round(4 * HIDE_SEEK_SCALE), Math.round(18 * HIDE_SEEK_SCALE), floorRect.height + Math.round(8 * HIDE_SEEK_SCALE), Math.round(8 * HIDE_SEEK_SCALE));
 
     const activeActor = getHideSeekActiveActor();
     const activeActorCenter = activeActor && activeActor.roomId === room.id ? getHideSeekActorCenter(activeActor) : null;
@@ -4035,11 +4126,12 @@
       }
     });
 
-    const vignette = ctx.createRadialGradient(400, 230, 80, 400, 230, 430);
+    const { width: canvasWidth, height: canvasHeight } = getHideSeekCanvasSize();
+    const vignette = ctx.createRadialGradient(canvasWidth / 2, canvasHeight / 2, Math.round(80 * HIDE_SEEK_SCALE), canvasWidth / 2, canvasHeight / 2, Math.round(430 * HIDE_SEEK_SCALE));
     vignette.addColorStop(0, 'rgba(0,0,0,0)');
     vignette.addColorStop(1, 'rgba(0,0,0,0.22)');
     ctx.fillStyle = vignette;
-    ctx.fillRect(0, 0, 800, 450);
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
   }
 
   function drawHideSeekSpots(ctx, room) {
@@ -4128,9 +4220,10 @@
     if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
       const actor = hideSeekState.actors.seeker;
       if (actor.roomId === room.id) {
+        const floorRect = getHideSeekFloorRect();
         ctx.save();
         ctx.fillStyle = map.id === 'school-night' ? 'rgba(6, 21, 36, 0.34)' : 'rgba(6, 21, 36, 0.22)';
-        ctx.fillRect(38, 62, 724, 338);
+        ctx.fillRect(floorRect.x, floorRect.y, floorRect.width, floorRect.height);
         const light = ctx.createRadialGradient(
           actor.x + actor.width / 2,
           actor.y + actor.height / 2,
@@ -4152,38 +4245,38 @@
     }
 
     if (map.id === 'alaska-train') {
-      ctx.save();
-      ctx.strokeStyle = 'rgba(255,255,255,0.28)';
-      ctx.lineWidth = 2;
-      for (let i = 0; i < 9; i += 1) {
-        const x = (performance.now() / 28 + i * 92) % 850 - 40;
-        ctx.beginPath();
-        ctx.moveTo(x, 86);
-        ctx.lineTo(x + 28, 63);
-        ctx.stroke();
-      }
-      ctx.restore();
+      withHideSeekBaseScale(ctx, () => {
+        ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 9; i += 1) {
+          const x = (performance.now() / 28 + i * 92) % 850 - 40;
+          ctx.beginPath();
+          ctx.moveTo(x, 86);
+          ctx.lineTo(x + 28, 63);
+          ctx.stroke();
+        }
+      });
     } else if (map.id === 'campground') {
-      ctx.save();
-      for (let i = 0; i < 9; i += 1) {
-        const offset = (performance.now() / 42 + i * 61) % 760;
-        const fx = 40 + offset;
-        const fy = 88 + (i % 4) * 56 + Math.sin((performance.now() / 480) + i) * 10;
-        ctx.fillStyle = 'rgba(255, 241, 170, 0.52)';
-        ctx.beginPath();
-        ctx.arc(fx, fy, 2.2, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.restore();
+      withHideSeekBaseScale(ctx, () => {
+        for (let i = 0; i < 9; i += 1) {
+          const offset = (performance.now() / 42 + i * 61) % 760;
+          const fx = 40 + offset;
+          const fy = 88 + (i % 4) * 56 + Math.sin((performance.now() / 480) + i) * 10;
+          ctx.fillStyle = 'rgba(255, 241, 170, 0.52)';
+          ctx.beginPath();
+          ctx.arc(fx, fy, 2.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
     } else if (map.id === 'roadside-lodge' && room.id === 'courtyard') {
-      ctx.save();
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.18)';
-      for (let i = 0; i < 8; i += 1) {
-        ctx.beginPath();
-        ctx.arc(84 + i * 86, 80 + (i % 3) * 10, i % 2 ? 1.2 : 1.8, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.restore();
+      withHideSeekBaseScale(ctx, () => {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.18)';
+        for (let i = 0; i < 8; i += 1) {
+          ctx.beginPath();
+          ctx.arc(84 + i * 86, 80 + (i % 3) * 10, i % 2 ? 1.2 : 1.8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
     }
   }
 
@@ -4635,7 +4728,7 @@
     ctx.font = '800 10px Arial';
     ctx.textAlign = 'left';
 
-    drawHideSeekDebugRect(ctx, { x: 38, y: 62, width: 724, height: 338 }, '#ffffff', 'playable floor');
+    drawHideSeekDebugRect(ctx, getHideSeekFloorRect(), '#ffffff', 'playable floor');
 
     (room.exits || []).forEach(exit => {
       drawHideSeekDebugRect(ctx, getHideSeekExitTriggerRect(exit), 'rgba(46, 199, 211, 0.48)', `trigger:${exit.label}`);
@@ -4657,7 +4750,7 @@
       ctx.lineWidth = 1.5;
       ctx.setLineDash([3, 5]);
       ctx.beginPath();
-      ctx.arc(centerX, centerY, spot.interactionRadius || 42, 0, Math.PI * 2);
+      ctx.arc(centerX, centerY, spot.interactionRadius || Math.round(42 * HIDE_SEEK_SCALE), 0, Math.PI * 2);
       ctx.stroke();
       ctx.setLineDash([]);
     });
