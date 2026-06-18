@@ -6,23 +6,27 @@
      solar | cheese | animals | history | facts | lifelessons
 */
 (function () {
-  window.RTA_LEARN_TOPICS = [
-    { id: 'all', label: 'All Topics', emoji: '🎲' },
-    { id: 'facts', label: 'Random Facts', emoji: '💡' },
-    { id: 'biology', label: 'Biology', emoji: '🧬' },
-    { id: 'science', label: 'Science', emoji: '🔬' },
-    { id: 'cars', label: 'Cars', emoji: '🚗' },
-    { id: 'lifelessons', label: 'Life Lessons', emoji: '🧭' },
-    { id: 'geography', label: 'Geography', emoji: '🌍' },
-    { id: 'states', label: 'States', emoji: '🗺️' },
-    { id: 'constitution', label: 'Constitution', emoji: '📜' },
-    { id: 'government', label: 'Government', emoji: '🏛️' },
-    { id: 'solar', label: 'Solar System', emoji: '☀️' },
-    { id: 'space', label: 'Space', emoji: '🌌' },
-    { id: 'cheese', label: 'Cheese', emoji: '🧀' },
-    { id: 'animals', label: 'Animals', emoji: '🐾' },
-    { id: 'history', label: 'History', emoji: '⏳' },
-  ];
+  function buildLearnTopics(entries) {
+    return entries.map(([id, label, emoji]) => ({ id, label, emoji }));
+  }
+
+  const learnTopics = buildLearnTopics([
+    ['all', 'All Topics', '🎲'],
+    ['facts', 'Random Facts', '💡'],
+    ['biology', 'Biology', '🧬'],
+    ['science', 'Science', '🔬'],
+    ['cars', 'Cars', '🚗'],
+    ['lifelessons', 'Life Lessons', '🧭'],
+    ['geography', 'Geography', '🌍'],
+    ['states', 'States', '🗺️'],
+    ['constitution', 'Constitution', '📜'],
+    ['government', 'Government', '🏛️'],
+    ['solar', 'Solar System', '☀️'],
+    ['space', 'Space', '🌌'],
+    ['cheese', 'Cheese', '🧀'],
+    ['animals', 'Animals', '🐾'],
+    ['history', 'History', '⏳'],
+  ]);
 
   const learnPromptGroups = {
     // Random Facts
@@ -795,7 +799,7 @@
 
   const learningPrompts = buildLearnPrompts(learnPromptGroups);
 
-  window.RTA_ADVENTURE_PROMPTS = learningPrompts.concat([
+  const extraAdventurePrompts = [
     {
       id: 'look-window-snapshot',
       category: 'look',
@@ -869,5 +873,8 @@
       text: 'Tour guide challenge: invent a 15-second tour-guide intro for something local you can see.',
       points: 1,
     },
-  ]);
+  ];
+
+  window.RTA_LEARN_TOPICS = learnTopics;
+  window.RTA_ADVENTURE_PROMPTS = learningPrompts.concat(extraAdventurePrompts);
 })();
