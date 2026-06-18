@@ -1354,6 +1354,20 @@ body.large-text {
   font-size: 3rem;
 }
 
+#pong-score,
+#gorillas-score {
+  min-width: 6.5rem;
+  width: auto;
+  height: auto;
+  padding: 0.65rem 1rem;
+  border-radius: 999px;
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
 .emoji-stage {
   margin: 1rem auto;
   width: 100%;
@@ -1825,6 +1839,21 @@ body.reduce-motion .stamp.earned {
     height: 4rem;
     margin-bottom: 0.75rem;
     font-size: 2.4rem;
+  }
+
+  #pong-game .mode-header,
+  #gorillas-game .mode-header {
+    display: flex;
+    align-items: center;
+    text-align: left;
+  }
+
+  #pong-score,
+  #gorillas-score {
+    min-width: 5.5rem;
+    padding: 0.55rem 0.85rem;
+    margin-bottom: 0;
+    font-size: 1.4rem;
   }
 
   .emoji-stage {

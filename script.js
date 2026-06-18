@@ -5344,8 +5344,8 @@
 
   function createPongState() {
     const config = getPongDifficultyConfig();
-    if (window.RTA_PONG_ART && window.RTA_PONG_ART.createState) {
-      return window.RTA_PONG_ART.createState(pongCanvas, config);
+    if (window.RTA_PONG_ART && window.RTA_PONG_ART.createGameState) {
+      return window.RTA_PONG_ART.createGameState(pongCanvas, config);
     }
     const width = pongCanvas.width;
     const height = pongCanvas.height;
@@ -5354,15 +5354,25 @@
       height,
       paddleWidth: 14,
       paddleHeight: config.paddleHeight,
-      leftY: height / 2 - config.paddleHeight / 2,
-      rightY: height / 2 - config.paddleHeight / 2,
-      ballX: width / 2,
-      ballY: height / 2,
-      ballVX: config.ballSpeed * (Math.random() > 0.5 ? 1 : -1),
-      ballVY: (config.ballSpeed * 0.55) * (Math.random() > 0.5 ? 1 : -1),
-      ballSize: 12,
-      leftScore: 0,
-      rightScore: 0,
+      leftPaddle: {
+        y: height / 2 - config.paddleHeight / 2,
+        score: 0,
+        flashFrames: 0,
+      },
+      rightPaddle: {
+        y: height / 2 - config.paddleHeight / 2,
+        score: 0,
+        flashFrames: 0,
+      },
+      ball: {
+        x: width / 2,
+        y: height / 2,
+        vx: config.ballSpeed * (Math.random() > 0.5 ? 1 : -1),
+        vy: (config.ballSpeed * 0.55) * (Math.random() > 0.5 ? 1 : -1),
+        size: 12,
+      },
+      ballTrail: [],
+      shakeFrames: 0,
       targetScore: config.targetScore,
     };
   }
@@ -5374,16 +5384,16 @@
       window.RTA_PONG_ART.resetBall(pongState, config, direction);
       return;
     }
-    pongState.ballX = pongState.width / 2;
-    pongState.ballY = pongState.height / 2;
-    pongState.ballVX = config.ballSpeed * direction;
-    pongState.ballVY = (config.ballSpeed * 0.55) * (Math.random() > 0.5 ? 1 : -1);
+    pongState.ball.x = pongState.width / 2;
+    pongState.ball.y = pongState.height / 2;
+    pongState.ball.vx = config.ballSpeed * direction;
+    pongState.ball.vy = (config.ballSpeed * 0.55) * (Math.random() > 0.5 ? 1 : -1);
   }
 
   function drawPong() {
     if (!pongCanvas || !pongState) return;
     if (window.RTA_PONG_ART && window.RTA_PONG_ART.draw) {
-      window.RTA_PONG_ART.draw(pongCanvas, pongState);
+      window.RTA_PONG_ART.draw(pongState);
       return;
     }
     const ctx = pongCanvas.getContext('2d');
@@ -5391,11 +5401,16 @@
     ctx.fillStyle = '#08284a';
     ctx.fillRect(0, 0, pongState.width, pongState.height);
     ctx.fillStyle = '#f58220';
-    ctx.fillRect(22, pongState.leftY, pongState.paddleWidth, pongState.paddleHeight);
+    ctx.fillRect(22, pongState.leftPaddle.y, pongState.paddleWidth, pongState.paddleHeight);
     ctx.fillStyle = '#7c4dff';
-    ctx.fillRect(pongState.width - 36, pongState.rightY, pongState.paddleWidth, pongState.paddleHeight);
+    ctx.fillRect(pongState.width - 36, pongState.rightPaddle.y, pongState.paddleWidth, pongState.paddleHeight);
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(pongState.ballX - pongState.ballSize / 2, pongState.ballY - pongState.ballSize / 2, pongState.ballSize, pongState.ballSize);
+    ctx.fillRect(
+      pongState.ball.x - pongState.ball.size / 2,
+      pongState.ball.y - pongState.ball.size / 2,
+      pongState.ball.size,
+      pongState.ball.size
+    );
   }
 
   function updatePongScore() {
@@ -5407,7 +5422,7 @@
     const modeLabel = pongSettings.opponentMode === 'computer'
       ? `${pongSettings.difficulty} AI`
       : 'local match';
-    pongScore.textContent = `${pongState.leftScore} : ${pongState.rightScore}`;
+    pongScore.textContent = `${pongState.leftPaddle.score} : ${pongState.rightPaddle.score}`;
     pongStatus.textContent = `${leftName} controls the left paddle, ${rightName} controls the right paddle. ${modeLabel}. First to ${pongState.targetScore} wins.`;
   }
 
@@ -5419,9 +5434,9 @@
     const nextY = centerY - pongState.paddleHeight / 2;
     const maxY = pongState.height - pongState.paddleHeight;
     if (side === 'left') {
-      pongState.leftY = Math.max(0, Math.min(maxY, nextY));
+      pongState.leftPaddle.y = Math.max(0, Math.min(maxY, nextY));
     } else {
-      pongState.rightY = Math.max(0, Math.min(maxY, nextY));
+      pongState.rightPaddle.y = Math.max(0, Math.min(maxY, nextY));
     }
     drawPong();
   }
@@ -5466,36 +5481,36 @@
     const config = getPongDifficultyConfig();
     const speed = config.humanSpeed;
     const maxY = pongState.height - pongState.paddleHeight;
-    if (pongKeys.leftUp) pongState.leftY -= speed;
-    if (pongKeys.leftDown) pongState.leftY += speed;
+    if (pongKeys.leftUp) pongState.leftPaddle.y -= speed;
+    if (pongKeys.leftDown) pongState.leftPaddle.y += speed;
     if (pongSettings.opponentMode === 'local') {
-      if (pongKeys.rightUp) pongState.rightY -= speed;
-      if (pongKeys.rightDown) pongState.rightY += speed;
+      if (pongKeys.rightUp) pongState.rightPaddle.y -= speed;
+      if (pongKeys.rightDown) pongState.rightPaddle.y += speed;
     } else {
       const targetY = predictPongInterceptY() - pongState.paddleHeight / 2;
-      const delta = targetY - pongState.rightY;
+      const delta = targetY - pongState.rightPaddle.y;
       if (config.aiPerfect) {
-        pongState.rightY = targetY;
+        pongState.rightPaddle.y = targetY;
       } else if (Math.abs(delta) > config.aiError) {
-        pongState.rightY += Math.sign(delta) * Math.min(config.aiSpeed, Math.abs(delta));
+        pongState.rightPaddle.y += Math.sign(delta) * Math.min(config.aiSpeed, Math.abs(delta));
       } else {
-        pongState.rightY += Math.sign(delta) * Math.min(2.5, Math.abs(delta));
+        pongState.rightPaddle.y += Math.sign(delta) * Math.min(2.5, Math.abs(delta));
       }
     }
 
-    pongState.leftY = Math.max(0, Math.min(maxY, pongState.leftY));
-    pongState.rightY = Math.max(0, Math.min(maxY, pongState.rightY));
+    pongState.leftPaddle.y = Math.max(0, Math.min(maxY, pongState.leftPaddle.y));
+    pongState.rightPaddle.y = Math.max(0, Math.min(maxY, pongState.rightPaddle.y));
   }
 
   function predictPongInterceptY() {
     if (!pongState) return 0;
-    if (pongState.ballVX <= 0) return pongState.height / 2;
-    const boundsMin = pongState.ballSize / 2;
-    const boundsMax = pongState.height - pongState.ballSize / 2;
-    const targetX = pongState.width - 36 - pongState.ballSize / 2;
-    const timeToTarget = (targetX - pongState.ballX) / pongState.ballVX;
-    if (!Number.isFinite(timeToTarget) || timeToTarget < 0) return pongState.ballY;
-    let predicted = pongState.ballY + pongState.ballVY * timeToTarget;
+    if (pongState.ball.vx <= 0) return pongState.height / 2;
+    const boundsMin = pongState.ball.size / 2;
+    const boundsMax = pongState.height - pongState.ball.size / 2;
+    const targetX = pongState.width - 36 - pongState.ball.size / 2;
+    const timeToTarget = (targetX - pongState.ball.x) / pongState.ball.vx;
+    if (!Number.isFinite(timeToTarget) || timeToTarget < 0) return pongState.ball.y;
+    let predicted = pongState.ball.y + pongState.ball.vy * timeToTarget;
     while (predicted < boundsMin || predicted > boundsMax) {
       if (predicted < boundsMin) {
         predicted = boundsMin + (boundsMin - predicted);
@@ -5509,41 +5524,51 @@
   function tickPong() {
     if (!pongRunning || !pongState) return;
     movePongPaddles();
-    pongState.ballX += pongState.ballVX;
-    pongState.ballY += pongState.ballVY;
+    pongState.ball.x += pongState.ball.vx;
+    pongState.ball.y += pongState.ball.vy;
 
-    if (pongState.ballY <= pongState.ballSize / 2 || pongState.ballY >= pongState.height - pongState.ballSize / 2) {
-      pongState.ballVY *= -1;
+    if (pongState.ball.y <= pongState.ball.size / 2 || pongState.ball.y >= pongState.height - pongState.ball.size / 2) {
+      pongState.ball.vy *= -1;
     }
 
-    const leftHit = pongState.ballX <= 36 + pongState.ballSize / 2
-      && pongState.ballY >= pongState.leftY
-      && pongState.ballY <= pongState.leftY + pongState.paddleHeight;
-    const rightHit = pongState.ballX >= pongState.width - 36 - pongState.ballSize / 2
-      && pongState.ballY >= pongState.rightY
-      && pongState.ballY <= pongState.rightY + pongState.paddleHeight;
+    const leftHit = pongState.ball.x <= 36 + pongState.ball.size / 2
+      && pongState.ball.y >= pongState.leftPaddle.y
+      && pongState.ball.y <= pongState.leftPaddle.y + pongState.paddleHeight;
+    const rightHit = pongState.ball.x >= pongState.width - 36 - pongState.ball.size / 2
+      && pongState.ball.y >= pongState.rightPaddle.y
+      && pongState.ball.y <= pongState.rightPaddle.y + pongState.paddleHeight;
     if (leftHit || rightHit) {
-      const paddleY = leftHit ? pongState.leftY : pongState.rightY;
-      const offset = (pongState.ballY - (paddleY + pongState.paddleHeight / 2)) / (pongState.paddleHeight / 2);
-      pongState.ballVX *= -1.06;
-      pongState.ballVY = offset * 5;
+      const paddle = leftHit ? pongState.leftPaddle : pongState.rightPaddle;
+      const paddleY = paddle.y;
+      const offset = (pongState.ball.y - (paddleY + pongState.paddleHeight / 2)) / (pongState.paddleHeight / 2);
+      pongState.ball.vx *= -1.06;
+      pongState.ball.vy = offset * 5;
+      paddle.flashFrames = 8;
+      pongState.shakeFrames = 4;
     }
 
-    if (pongState.ballX < 0) {
-      pongState.rightScore++;
+    if (pongState.ball.x < 0) {
+      pongState.rightPaddle.score++;
       resetPongBall(-1);
       updatePongScore();
-    } else if (pongState.ballX > pongState.width) {
-      pongState.leftScore++;
+    } else if (pongState.ball.x > pongState.width) {
+      pongState.leftPaddle.score++;
       resetPongBall(1);
       updatePongScore();
     }
 
-    if (pongState.leftScore >= pongState.targetScore || pongState.rightScore >= pongState.targetScore) {
+    if (window.RTA_PONG_ART && window.RTA_PONG_ART.updateEffects) {
+      window.RTA_PONG_ART.updateEffects(pongState);
+    }
+
+    if (pongState.leftPaddle.score >= pongState.targetScore || pongState.rightPaddle.score >= pongState.targetScore) {
       stopPong();
-      const winner = pongState.leftScore > pongState.rightScore
-        ? (players[0] ? players[0].name : 'Left player')
+      const rightName = pongSettings.opponentMode === 'computer'
+        ? (pongSettings.difficulty === 'deathmatch' ? 'Death Match AI' : 'Computer')
         : (players[1] ? players[1].name : 'Right player');
+      const winner = pongState.leftPaddle.score > pongState.rightPaddle.score
+        ? (players[0] ? players[0].name : 'Left player')
+        : rightName;
       pongStatus.textContent = `${winner} wins Road Pong. Winner gets first pick in the next road-trip game.`;
       drawPong();
       return;
@@ -6041,12 +6066,12 @@
     const rightName = pongSettings.opponentMode === 'computer'
       ? (pongSettings.difficulty === 'deathmatch' ? 'Death Match AI' : 'Computer')
       : (players[1] ? players[1].name : 'P2');
-    const leaders = pongState.leftScore === pongState.rightScore
+    const leaders = pongState.leftPaddle.score === pongState.rightPaddle.score
       ? []
-      : [pongState.leftScore > pongState.rightScore ? leftName : rightName];
+      : [pongState.leftPaddle.score > pongState.rightPaddle.score ? leftName : rightName];
     summaryText.textContent = leaders.length
-      ? `${leaders[0]} wins Road Pong, ${pongState.leftScore} to ${pongState.rightScore}.`
-      : `Road Pong ends in a tie, ${pongState.leftScore} to ${pongState.rightScore}.`;
+      ? `${leaders[0]} wins Road Pong, ${pongState.leftPaddle.score} to ${pongState.rightPaddle.score}.`
+      : `Road Pong ends in a tie, ${pongState.leftPaddle.score} to ${pongState.rightPaddle.score}.`;
     summaryList.innerHTML = '';
     const li = document.createElement('li');
     li.textContent = `Mode: ${pongSettings.opponentMode === 'computer' ? `${pongSettings.difficulty} AI` : 'local player'}. Prize idea: winner chooses the next mini-game or gets one song veto.`;
