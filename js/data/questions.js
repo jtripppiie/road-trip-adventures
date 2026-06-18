@@ -424,16 +424,16 @@
     { id: 'learn-geography-permafrost', learnTopic: 'geography', text: 'Geography fact: Permafrost is ground that stays frozen for at least two years in a row.' },
 
     // States
-    { id: 'learn-states-alaska', learnTopic: 'states', text: 'State fact: Alaska is the largest U.S. state by land area.' },
     { id: 'learn-states-rhode-island', learnTopic: 'states', text: 'State fact: Rhode Island is the smallest U.S. state by land area.' },
-    { id: 'learn-states-hawaii', learnTopic: 'states', text: 'State fact: Hawaii is the only U.S. state made entirely of islands.' },
-    { id: 'learn-states-california', learnTopic: 'states', text: 'State fact: California is nicknamed the Golden State.' },
-    { id: 'learn-states-maine', learnTopic: 'states', text: 'State fact: Maine is home to Acadia National Park.' },
-    { id: 'learn-states-arizona', learnTopic: 'states', text: 'State fact: Arizona is home to Grand Canyon National Park.' },
-    { id: 'learn-states-florida', learnTopic: 'states', text: 'State fact: Florida is known as the Sunshine State.' },
     { id: 'learn-states-new-york', learnTopic: 'states', text: 'State fact: New York is nicknamed the Empire State.' },
-    { id: 'learn-states-texas', learnTopic: 'states', text: 'State fact: Texas is nicknamed the Lone Star State.' },
-    { id: 'learn-states-wyoming', learnTopic: 'states', text: 'State fact: Wyoming was the first U.S. state to grant women the right to vote.' },
+    { id: 'learn-states-ohio', learnTopic: 'states', text: 'State fact: Ohio is known as the Birthplace of Aviation because the Wright brothers were from there.' },
+    { id: 'learn-states-oklahoma', learnTopic: 'states', text: 'State fact: Oklahoma has more man-made lakes than any other U.S. state.' },
+    { id: 'learn-states-pennsylvania', learnTopic: 'states', text: 'State fact: The Liberty Bell is located in Pennsylvania.' },
+    { id: 'learn-states-south-dakota', learnTopic: 'states', text: 'State fact: Mount Rushmore is located in South Dakota.' },
+    { id: 'learn-states-utah', learnTopic: 'states', text: 'State fact: Utah is home to five national parks, often called the Mighty 5.' },
+    { id: 'learn-states-virginia', learnTopic: 'states', text: 'State fact: Eight U.S. presidents were born in Virginia, more than any other state.' },
+    { id: 'learn-states-washington', learnTopic: 'states', text: 'State fact: Washington is the nation’s leading producer of apples.' },
+    { id: 'learn-states-west-virginia', learnTopic: 'states', text: 'State fact: West Virginia is the only state located entirely within the Appalachian Mountains.' },
 
     // Constitution
     { id: 'learn-constitution-preamble', learnTopic: 'constitution', text: 'Constitution fact: The Preamble begins with the words "We the People."' },
@@ -530,8 +530,6 @@
     { id: 'learn-cheese-brie', learnTopic: 'cheese', text: 'Cheese fact: Brie is a soft cheese with an edible rind.' },
 
     // Animals
-    { id: 'learn-animals-cheetah', learnTopic: 'animals', text: 'Animal fact: The cheetah is the fastest land animal.' },
-    { id: 'learn-animals-giraffe', learnTopic: 'animals', text: 'Animal fact: Giraffes are the tallest land animals.' },
     { id: 'learn-animals-flamingos', learnTopic: 'animals', text: 'Animal fact: A group of flamingos can be called a flamboyance.' },
     { id: 'learn-animals-porcupine', learnTopic: 'animals', text: 'Animal fact: Porcupines are covered in sharp quills for defense.' },
     { id: 'learn-animals-lizards', learnTopic: 'animals', text: 'Animal fact: Some lizards can detach their tails to escape predators.' },
@@ -610,77 +608,34 @@
     { id: 'learn-states-tennessee', learnTopic: 'states', text: 'State fact: Tennessee is nicknamed the Volunteer State.' },
     { id: 'learn-states-vermont', learnTopic: 'states', text: 'State fact: Vermont is nicknamed the Green Mountain State.' },
     { id: 'learn-states-wisconsin', learnTopic: 'states', text: 'State fact: Wisconsin is nicknamed America\'s Dairyland.' },
-// More States
-
-{ id: 'learn-states-alabama', learnTopic: 'states', text: 'State fact: Alabama is nicknamed the Yellowhammer State.' },
-
-{ id: 'learn-states-alaska', learnTopic: 'states', text: 'State fact: Alaska is the largest U.S. state by land area and is nicknamed the Last Frontier.' },
-
-{ id: 'learn-states-arizona', learnTopic: 'states', text: 'State fact: Arizona is home to the Grand Canyon, one of the world’s most famous natural wonders.' },
-
-{ id: 'learn-states-arkansas', learnTopic: 'states', text: 'State fact: Arkansas is nicknamed the Natural State.' },
-
-{ id: 'learn-states-california', learnTopic: 'states', text: 'State fact: California is home to both the tallest trees and the highest point in the contiguous United States.' },
-
-{ id: 'learn-states-colorado', learnTopic: 'states', text: 'State fact: Colorado is nicknamed the Centennial State because it became a state in 1876, 100 years after the Declaration of Independence.' },
-
-{ id: 'learn-states-connecticut', learnTopic: 'states', text: 'State fact: Connecticut is known as the Constitution State.' },
-
-{ id: 'learn-states-florida', learnTopic: 'states', text: 'State fact: Florida is the only state that borders both the Atlantic Ocean and the Gulf of Mexico.' },
-
-{ id: 'learn-states-hawaii', learnTopic: 'states', text: 'State fact: Hawaii is the only U.S. state made entirely of islands.' },
-
-{ id: 'learn-states-idaho', learnTopic: 'states', text: 'State fact: Idaho is famous for its potatoes and is nicknamed the Gem State.' },
-
-{ id: 'learn-states-illinois', learnTopic: 'states', text: 'State fact: Illinois is nicknamed the Prairie State.' },
-
-{ id: 'learn-states-indiana', learnTopic: 'states', text: 'State fact: Indiana is known as the Hoosier State.' },
-
-{ id: 'learn-states-iowa', learnTopic: 'states', text: 'State fact: Iowa produces more corn than any other U.S. state.' },
-
-{ id: 'learn-states-kansas', learnTopic: 'states', text: 'State fact: Kansas is nicknamed the Sunflower State.' },
-
-{ id: 'learn-states-kentucky', learnTopic: 'states', text: 'State fact: Kentucky is home to the famous Kentucky Derby horse race.' },
-
-{ id: 'learn-states-maine', learnTopic: 'states', text: 'State fact: Maine is the only U.S. state with a one-syllable name.' },
-
-{ id: 'learn-states-maryland', learnTopic: 'states', text: 'State fact: Maryland is known for its blue crabs and Chesapeake Bay.' },
-
-{ id: 'learn-states-massachusetts', learnTopic: 'states', text: 'State fact: Massachusetts was home to the first Thanksgiving celebrated by the Pilgrims.' },
-
-{ id: 'learn-states-mississippi', learnTopic: 'states', text: 'State fact: Mississippi gets its name from the Mississippi River, meaning "great river." ' },
-
-{ id: 'learn-states-missouri', learnTopic: 'states', text: 'State fact: Missouri is nicknamed the Show-Me State.' },
-
-{ id: 'learn-states-montana', learnTopic: 'states', text: 'State fact: Montana is nicknamed Big Sky Country because of its wide-open landscapes.' },
-
-{ id: 'learn-states-nebraska', learnTopic: 'states', text: 'State fact: Nebraska is home to Chimney Rock, a famous landmark on the Oregon Trail.' },
-
-{ id: 'learn-states-new-hampshire', learnTopic: 'states', text: 'State fact: New Hampshire’s state motto is "Live Free or Die." ' },
-{ id: 'learn-states-new-jersey', learnTopic: 'states', text: 'State fact: New Jersey is nicknamed the Garden State.' },
-{ id: 'learn-states-new-mexico', learnTopic: 'states', text: 'State fact: New Mexico’s official state question is "Red or green?" referring to chile peppers.' },
-{ id: 'learn-states-ohio', learnTopic: 'states', text: 'State fact: Ohio is known as the Birthplace of Aviation because the Wright brothers were from there.' },
-{ id: 'learn-states-oklahoma', learnTopic: 'states', text: 'State fact: Oklahoma has more man-made lakes than any other U.S. state.' },
-{ id: 'learn-states-pennsylvania', learnTopic: 'states', text: 'State fact: The Liberty Bell is located in Pennsylvania.' },
-{ id: 'learn-states-rhode-island', learnTopic: 'states', text: 'State fact: Rhode Island is the smallest U.S. state by land area.' },
-{ id: 'learn-states-south-dakota', learnTopic: 'states', text: 'State fact: Mount Rushmore is located in South Dakota.' },
-{ id: 'learn-states-texas', learnTopic: 'states', text: 'State fact: Texas is the second-largest U.S. state by land area.' },
-{ id: 'learn-states-utah', learnTopic: 'states', text: 'State fact: Utah is home to five national parks, often called the Mighty 5.' },
-{ id: 'learn-states-virginia', learnTopic: 'states', text: 'State fact: Eight U.S. presidents were born in Virginia, more than any other state.' },
-{ id: 'learn-states-washington', learnTopic: 'states', text: 'State fact: Washington is the nation’s leading producer of apples.' },
-{ id: 'learn-states-west-virginia', learnTopic: 'states', text: 'State fact: West Virginia is the only state located entirely within the Appalachian Mountains.' },
-{ id: 'learn-states-wyoming', learnTopic: 'states', text: 'State fact: Wyoming was the first state to grant women the right to vote.' },
-{ id: 'learn-states-ohio', learnTopic: 'states', text: 'State fact: Ohio is known as the Birthplace of Aviation because the Wright brothers were from there.' },
-{ id: 'learn-states-oklahoma', learnTopic: 'states', text: 'State fact: Oklahoma has more man-made lakes than any other U.S. state.' },
-{ id: 'learn-states-pennsylvania', learnTopic: 'states', text: 'State fact: The Liberty Bell is located in Pennsylvania.' },
-{ id: 'learn-states-rhode-island', learnTopic: 'states', text: 'State fact: Rhode Island is the smallest U.S. state by land area.' },
-{ id: 'learn-states-south-dakota', learnTopic: 'states', text: 'State fact: Mount Rushmore is located in South Dakota.' },
-{ id: 'learn-states-texas', learnTopic: 'states', text: 'State fact: Texas is the second-largest U.S. state by land area.' },
-{ id: 'learn-states-utah', learnTopic: 'states', text: 'State fact: Utah is home to five national parks, often called the Mighty 5.' },
-{ id: 'learn-states-virginia', learnTopic: 'states', text: 'State fact: Eight U.S. presidents were born in Virginia, more than any other state.' },
-{ id: 'learn-states-washington', learnTopic: 'states', text: 'State fact: Washington is the nation’s leading producer of apples.' },
-{ id: 'learn-states-west-virginia', learnTopic: 'states', text: 'State fact: West Virginia is the only state located entirely within the Appalachian Mountains.' },
-{ id: 'learn-states-wyoming', learnTopic: 'states', text: 'State fact: Wyoming was the first state to grant women the right to vote.' },   
+    // More States
+    { id: 'learn-states-alabama', learnTopic: 'states', text: 'State fact: Alabama is nicknamed the Yellowhammer State.' },
+    { id: 'learn-states-alaska', learnTopic: 'states', text: 'State fact: Alaska is the largest U.S. state by land area and is nicknamed the Last Frontier.' },
+    { id: 'learn-states-arizona', learnTopic: 'states', text: 'State fact: Arizona is home to the Grand Canyon, one of the world’s most famous natural wonders.' },
+    { id: 'learn-states-arkansas', learnTopic: 'states', text: 'State fact: Arkansas is nicknamed the Natural State.' },
+    { id: 'learn-states-california', learnTopic: 'states', text: 'State fact: California is home to both the tallest trees and the highest point in the contiguous United States.' },
+    { id: 'learn-states-colorado', learnTopic: 'states', text: 'State fact: Colorado is nicknamed the Centennial State because it became a state in 1876, 100 years after the Declaration of Independence.' },
+    { id: 'learn-states-connecticut', learnTopic: 'states', text: 'State fact: Connecticut is known as the Constitution State.' },
+    { id: 'learn-states-florida', learnTopic: 'states', text: 'State fact: Florida is the only state that borders both the Atlantic Ocean and the Gulf of Mexico.' },
+    { id: 'learn-states-hawaii', learnTopic: 'states', text: 'State fact: Hawaii is the only U.S. state made entirely of islands.' },
+    { id: 'learn-states-idaho', learnTopic: 'states', text: 'State fact: Idaho is famous for its potatoes and is nicknamed the Gem State.' },
+    { id: 'learn-states-illinois', learnTopic: 'states', text: 'State fact: Illinois is nicknamed the Prairie State.' },
+    { id: 'learn-states-indiana', learnTopic: 'states', text: 'State fact: Indiana is known as the Hoosier State.' },
+    { id: 'learn-states-iowa', learnTopic: 'states', text: 'State fact: Iowa produces more corn than any other U.S. state.' },
+    { id: 'learn-states-kansas', learnTopic: 'states', text: 'State fact: Kansas is nicknamed the Sunflower State.' },
+    { id: 'learn-states-kentucky', learnTopic: 'states', text: 'State fact: Kentucky is home to the famous Kentucky Derby horse race.' },
+    { id: 'learn-states-maine', learnTopic: 'states', text: 'State fact: Maine is the only U.S. state with a one-syllable name.' },
+    { id: 'learn-states-maryland', learnTopic: 'states', text: 'State fact: Maryland is known for its blue crabs and Chesapeake Bay.' },
+    { id: 'learn-states-massachusetts', learnTopic: 'states', text: 'State fact: Massachusetts was home to the first Thanksgiving celebrated by the Pilgrims.' },
+    { id: 'learn-states-mississippi', learnTopic: 'states', text: 'State fact: Mississippi gets its name from the Mississippi River, meaning "great river."' },
+    { id: 'learn-states-missouri', learnTopic: 'states', text: 'State fact: Missouri is nicknamed the Show-Me State.' },
+    { id: 'learn-states-montana', learnTopic: 'states', text: 'State fact: Montana is nicknamed Big Sky Country because of its wide-open landscapes.' },
+    { id: 'learn-states-nebraska', learnTopic: 'states', text: 'State fact: Nebraska is home to Chimney Rock, a famous landmark on the Oregon Trail.' },
+    { id: 'learn-states-new-hampshire', learnTopic: 'states', text: 'State fact: New Hampshire’s state motto is "Live Free or Die."' },
+    { id: 'learn-states-new-jersey', learnTopic: 'states', text: 'State fact: New Jersey is nicknamed the Garden State.' },
+    { id: 'learn-states-new-mexico', learnTopic: 'states', text: 'State fact: New Mexico’s official state question is "Red or green?" referring to chile peppers.' },
+    { id: 'learn-states-texas', learnTopic: 'states', text: 'State fact: Texas is the second-largest U.S. state by land area.' },
+    { id: 'learn-states-wyoming', learnTopic: 'states', text: 'State fact: Wyoming was the first state to grant women the right to vote.' },
 
     // More Constitution
     { id: 'learn-constitution-second', learnTopic: 'constitution', text: 'Constitution fact: The Second Amendment concerns the right to keep and bear arms.' },
@@ -781,80 +736,47 @@
     { id: 'learn-animals-butterfly', learnTopic: 'animals', text: 'Animal fact: Butterflies begin life as caterpillars before transforming through metamorphosis.' },
     { id: 'learn-animals-wolf', learnTopic: 'animals', text: 'Animal fact: Wolves are social animals that often live and hunt in packs.' },
     { id: 'learn-animals-dolphin', learnTopic: 'animals', text: 'Animal fact: Dolphins are mammals and must come to the surface to breathe air.' },
-// More Animals
+    // More Animals
+    { id: 'learn-animals-sloth', learnTopic: 'animals', text: 'Animal fact: Sloths move so slowly that algae can grow on their fur.' },
+    { id: 'learn-animals-cheetah', learnTopic: 'animals', text: 'Animal fact: Cheetahs are the fastest land animals and can reach speeds of about 60–70 miles per hour.' },
+    { id: 'learn-animals-giraffe', learnTopic: 'animals', text: 'Animal fact: Giraffes have the same number of neck bones as humans—just seven.' },
+    { id: 'learn-animals-koala', learnTopic: 'animals', text: 'Animal fact: Koalas sleep up to 20 hours a day to conserve energy from their eucalyptus diet.' },
+    { id: 'learn-animals-owl', learnTopic: 'animals', text: 'Animal fact: Owls can rotate their heads up to 270 degrees.' },
+    { id: 'learn-animals-beaver', learnTopic: 'animals', text: 'Animal fact: Beavers use their teeth to cut down trees and build dams.' },
+    { id: 'learn-animals-seahorse', learnTopic: 'animals', text: 'Animal fact: Male seahorses carry and give birth to their babies.' },
+    { id: 'learn-animals-bat', learnTopic: 'animals', text: 'Animal fact: Bats are the only mammals capable of true powered flight.' },
+    { id: 'learn-animals-kangaroo', learnTopic: 'animals', text: 'Animal fact: Baby kangaroos are called joeys and grow inside their mother’s pouch.' },
+    { id: 'learn-animals-platypus', learnTopic: 'animals', text: 'Animal fact: Platypuses are mammals that lay eggs instead of giving birth to live young.' },
+    { id: 'learn-animals-jellyfish', learnTopic: 'animals', text: 'Animal fact: Jellyfish do not have brains, hearts, or bones.' },
+    { id: 'learn-animals-ant', learnTopic: 'animals', text: 'Animal fact: Ants can carry objects many times heavier than their own body weight.' },
+    { id: 'learn-animals-polar-bear', learnTopic: 'animals', text: 'Animal fact: Polar bears have black skin beneath their white-looking fur.' },
+    { id: 'learn-animals-raven', learnTopic: 'animals', text: 'Animal fact: Ravens are highly intelligent birds that can solve problems and use tools.' },
+    { id: 'learn-animals-starfish', learnTopic: 'animals', text: 'Animal fact: Many starfish can regrow lost arms.' },
+    { id: 'learn-animals-snail', learnTopic: 'animals', text: 'Animal fact: Some snails can sleep for months at a time during harsh conditions.' },
+    { id: 'learn-animals-tiger', learnTopic: 'animals', text: 'Animal fact: Every tiger has a unique pattern of stripes, much like human fingerprints.' },
+    { id: 'learn-animals-zebra', learnTopic: 'animals', text: 'Animal fact: Every zebra has its own unique stripe pattern.' },
+    { id: 'learn-animals-blue-whale', learnTopic: 'animals', text: 'Animal fact: Blue whales are the largest animals known to have ever lived on Earth.' },
+    { id: 'learn-animals-chameleon', learnTopic: 'animals', text: 'Animal fact: Chameleons can move their eyes independently of each other.' },
+    { id: 'learn-animals-peacock', learnTopic: 'animals', text: 'Animal fact: Only male peafowl are called peacocks and display the large colorful tail feathers.' },
+    { id: 'learn-animals-lobster', learnTopic: 'animals', text: 'Animal fact: Lobsters taste with sensory hairs located on their legs and feet.' },
+    { id: 'learn-animals-crocodile', learnTopic: 'animals', text: 'Animal fact: Crocodiles cannot stick out their tongues.' },
+    { id: 'learn-animals-woodpecker', learnTopic: 'animals', text: 'Animal fact: Woodpeckers have specialized skulls that help protect their brains while pecking trees.' },
+    { id: 'learn-animals-snow-leopard', learnTopic: 'animals', text: 'Animal fact: Snow leopards use their long tails for balance and warmth.' },
+    { id: 'learn-animals-meerkat', learnTopic: 'animals', text: 'Animal fact: Meerkats often take turns standing guard to watch for predators.' },
+    { id: 'learn-animals-firefly', learnTopic: 'animals', text: 'Animal fact: Fireflies produce light through a chemical reaction called bioluminescence.' },
+    { id: 'learn-animals-armadillo', learnTopic: 'animals', text: 'Animal fact: Armadillos are the only mammals with a hard protective shell.' },
+    { id: 'learn-animals-otter', learnTopic: 'animals', text: 'Animal fact: Sea otters sometimes hold hands while sleeping so they do not drift apart.' },
+    { id: 'learn-animals-honeybee', learnTopic: 'animals', text: 'Animal fact: Honeybees communicate the location of food by performing a waggle dance.' },
+    { id: 'learn-animals-axolotl', learnTopic: 'animals', text: 'Animal fact: Axolotls can regrow entire limbs and parts of their heart and spinal cord.' },
+    { id: 'learn-animals-mantis-shrimp', learnTopic: 'animals', text: 'Animal fact: Mantis shrimp can punch with the speed of a bullet and see more colors than humans.' },
+    { id: 'learn-animals-pistol-shrimp', learnTopic: 'animals', text: 'Animal fact: Pistol shrimp snap their claws so fast that they create tiny underwater shockwaves.' },
+    { id: 'learn-animals-tardigrade', learnTopic: 'animals', text: 'Animal fact: Tardigrades can survive extreme conditions, including the vacuum of space.' },
+    { id: 'learn-animals-lyrebird', learnTopic: 'animals', text: 'Animal fact: Lyrebirds can mimic chainsaws, camera shutters, and many other sounds they hear.' },
 
-{ id: 'learn-animals-sloth', learnTopic: 'animals', text: 'Animal fact: Sloths move so slowly that algae can grow on their fur.' },
-
-{ id: 'learn-animals-cheetah', learnTopic: 'animals', text: 'Animal fact: Cheetahs are the fastest land animals and can reach speeds of about 60–70 miles per hour.' },
-
-{ id: 'learn-animals-giraffe', learnTopic: 'animals', text: 'Animal fact: Giraffes have the same number of neck bones as humans—just seven.' },
-
-{ id: 'learn-animals-koala', learnTopic: 'animals', text: 'Animal fact: Koalas sleep up to 20 hours a day to conserve energy from their eucalyptus diet.' },
-
-{ id: 'learn-animals-owl', learnTopic: 'animals', text: 'Animal fact: Owls can rotate their heads up to 270 degrees.' },
-
-{ id: 'learn-animals-beaver', learnTopic: 'animals', text: 'Animal fact: Beavers use their teeth to cut down trees and build dams.' },
-
-{ id: 'learn-animals-seahorse', learnTopic: 'animals', text: 'Animal fact: Male seahorses carry and give birth to their babies.' },
-
-{ id: 'learn-animals-bat', learnTopic: 'animals', text: 'Animal fact: Bats are the only mammals capable of true powered flight.' },
-
-{ id: 'learn-animals-kangaroo', learnTopic: 'animals', text: 'Animal fact: Baby kangaroos are called joeys and grow inside their mother’s pouch.' },
-
-{ id: 'learn-animals-platypus', learnTopic: 'animals', text: 'Animal fact: Platypuses are mammals that lay eggs instead of giving birth to live young.' },
-
-{ id: 'learn-animals-jellyfish', learnTopic: 'animals', text: 'Animal fact: Jellyfish do not have brains, hearts, or bones.' },
-
-{ id: 'learn-animals-ant', learnTopic: 'animals', text: 'Animal fact: Ants can carry objects many times heavier than their own body weight.' },
-
-{ id: 'learn-animals-polar-bear', learnTopic: 'animals', text: 'Animal fact: Polar bears have black skin beneath their white-looking fur.' },
-
-{ id: 'learn-animals-raven', learnTopic: 'animals', text: 'Animal fact: Ravens are highly intelligent birds that can solve problems and use tools.' },
-
-{ id: 'learn-animals-starfish', learnTopic: 'animals', text: 'Animal fact: Many starfish can regrow lost arms.' },
-
-{ id: 'learn-animals-snail', learnTopic: 'animals', text: 'Animal fact: Some snails can sleep for months at a time during harsh conditions.' },
-
-{ id: 'learn-animals-tiger', learnTopic: 'animals', text: 'Animal fact: Every tiger has a unique pattern of stripes, much like human fingerprints.' },
-
-{ id: 'learn-animals-zebra', learnTopic: 'animals', text: 'Animal fact: Every zebra has its own unique stripe pattern.' },
-
-{ id: 'learn-animals-blue-whale', learnTopic: 'animals', text: 'Animal fact: Blue whales are the largest animals known to have ever lived on Earth.' },
-
-{ id: 'learn-animals-chameleon', learnTopic: 'animals', text: 'Animal fact: Chameleons can move their eyes independently of each other.' },
-
-{ id: 'learn-animals-peacock', learnTopic: 'animals', text: 'Animal fact: Only male peafowl are called peacocks and display the large colorful tail feathers.' },
-
-{ id: 'learn-animals-lobster', learnTopic: 'animals', text: 'Animal fact: Lobsters taste with sensory hairs located on their legs and feet.' },
-
-{ id: 'learn-animals-crocodile', learnTopic: 'animals', text: 'Animal fact: Crocodiles cannot stick out their tongues.' },
-
-{ id: 'learn-animals-woodpecker', learnTopic: 'animals', text: 'Animal fact: Woodpeckers have specialized skulls that help protect their brains while pecking trees.' },
-
-{ id: 'learn-animals-snow-leopard', learnTopic: 'animals', text: 'Animal fact: Snow leopards use their long tails for balance and warmth.' },
-
-{ id: 'learn-animals-meerkat', learnTopic: 'animals', text: 'Animal fact: Meerkats often take turns standing guard to watch for predators.' },
-
-{ id: 'learn-animals-firefly', learnTopic: 'animals', text: 'Animal fact: Fireflies produce light through a chemical reaction called bioluminescence.' },
-
-{ id: 'learn-animals-armadillo', learnTopic: 'animals', text: 'Animal fact: Armadillos are the only mammals with a hard protective shell.' },
-
-{ id: 'learn-animals-otter', learnTopic: 'animals', text: 'Animal fact: Sea otters sometimes hold hands while sleeping so they do not drift apart.' },
-
-{ id: 'learn-animals-honeybee', learnTopic: 'animals', text: 'Animal fact: Honeybees communicate the location of food by performing a waggle dance.' },
-{ id: 'learn-animals-axolotl', learnTopic: 'animals', text: 'Animal fact: Axolotls can regrow entire limbs and parts of their heart and spinal cord.' },
-
-{ id: 'learn-animals-mantis-shrimp', learnTopic: 'animals', text: 'Animal fact: Mantis shrimp can punch with the speed of a bullet and see more colors than humans.' },
-
-{ id: 'learn-animals-pistol-shrimp', learnTopic: 'animals', text: 'Animal fact: Pistol shrimp snap their claws so fast that they create tiny underwater shockwaves.' },
-
-{ id: 'learn-animals-tardigrade', learnTopic: 'animals', text: 'Animal fact: Tardigrades can survive extreme conditions, including the vacuum of space.' },
-
-{ id: 'learn-animals-lyrebird', learnTopic: 'animals', text: 'Animal fact: Lyrebirds can mimic chainsaws, camera shutters, and many other sounds they hear.' }, 
-// More History
-{ id: 'learn-history-printing-press', learnTopic: 'history', text: 'History fact: Johannes Gutenberg helped popularize movable-type printing in Europe in the 1400s.' },
-{ id: 'learn-history-magna-carta', learnTopic: 'history', text: 'History fact: Magna Carta was sealed in England in 1215.' },
-{ id: 'learn-history-declaration', learnTopic: 'history', text: 'History fact: The Declaration of Independence was adopted on July 4, 1776.' },
+    // More History
+    { id: 'learn-history-printing-press', learnTopic: 'history', text: 'History fact: Johannes Gutenberg helped popularize movable-type printing in Europe in the 1400s.' },
+    { id: 'learn-history-magna-carta', learnTopic: 'history', text: 'History fact: Magna Carta was sealed in England in 1215.' },
+    { id: 'learn-history-declaration', learnTopic: 'history', text: 'History fact: The Declaration of Independence was adopted on July 4, 1776.' },
     { id: 'learn-history-constitution-convention', learnTopic: 'history', text: 'History fact: The Constitutional Convention met in Philadelphia in 1787.' },
     { id: 'learn-history-louisiana-purchase', learnTopic: 'history', text: 'History fact: The Louisiana Purchase nearly doubled the size of the United States in 1803.' },
     { id: 'learn-history-civil-war', learnTopic: 'history', text: 'History fact: The U.S. Civil War lasted from 1861 to 1865.' },
