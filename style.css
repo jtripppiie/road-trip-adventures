@@ -1179,18 +1179,17 @@ body.large-text {
 
 #pong-game:fullscreen {
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
-  align-content: center;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  align-content: stretch;
   max-width: none;
   width: 100vw;
   height: 100vh;
-  padding: 0.9rem;
-  overflow: auto;
+  padding: 0.75rem;
+  overflow: hidden;
   background: var(--color-background);
 }
 
 #pong-game:fullscreen .mode-header,
-#pong-game:fullscreen .pong-setup,
 #pong-game:fullscreen .hunt-status,
 #pong-game:fullscreen .adventure-actions {
   width: min(100%, 1200px);
@@ -1198,18 +1197,32 @@ body.large-text {
   margin-right: auto;
 }
 
-#pong-game:fullscreen .pong-canvas {
-  width: min(100%, 1320px);
-  max-height: 72vh;
-  margin: 0.75rem auto;
+#pong-game:fullscreen .pong-setup,
+#pong-game:fullscreen .hunt-status {
+  display: none;
 }
 
-#pong-game:fullscreen .pong-setup {
-  max-width: 1200px;
+#pong-game:fullscreen .pong-canvas {
+  align-self: center;
+  width: min(calc(100vw - 1.5rem), calc((100vh - 8.75rem) * 12 / 7), 1320px);
+  max-height: calc(100vh - 8.75rem);
+  margin: 0.5rem auto;
 }
 
 #pong-game:fullscreen #pong-score {
   opacity: 0.72;
+}
+
+#pong-game:fullscreen .adventure-actions {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin-top: 0;
+}
+
+#pong-game:fullscreen .adventure-actions .primary-button,
+#pong-game:fullscreen .adventure-actions .secondary-button {
+  min-height: 2.35rem;
+  padding: 0.5rem 0.65rem;
 }
 
 #gorillas-game:fullscreen {
