@@ -832,6 +832,7 @@
   const emojiPrompts = ['😜', '😮', '🤨', '😎', '😭', '😡', '🤯', '🥳', '😴', '😬', '🤠', '😇'];
   const triviaDatabase = buildTriviaDatabase();
   let triviaHistory = getStoredJson('rtaTriviaHistory', {});
+  let scavengerHistory = getStoredJson('rtaScavengerHistory', {});
   let adventureHistory = getStoredJson('rtaAdventureHistory', {});
   const defaultTripSettings = {
     gameLength: 'long',
@@ -2016,13 +2017,46 @@
     return preset.themes.some(theme => huntItemMatchesTheme(item, theme));
   }
 
+  function getScavengerTrackingKey() {
+    const theme = activeHuntTheme || 'mixed';
+    const preset = tripSettings.tripPreset || 'any';
+    return `${preset}:${theme}`;
+  }
+
+  function isScavengerItemSeen(item) {
+    const key = getScavengerTrackingKey();
+    return Array.isArray(scavengerHistory[key]) && scavengerHistory[key].includes(item.id);
+  }
+
+  function clearScavengerHistoryForCandidates(candidates) {
+    const key = getScavengerTrackingKey();
+    if (!Array.isArray(scavengerHistory[key]) || !scavengerHistory[key].length) return;
+    const candidateIds = new Set(candidates.map(item => item.id));
+    scavengerHistory[key] = scavengerHistory[key].filter(id => !candidateIds.has(id));
+    setStoredJson('rtaScavengerHistory', scavengerHistory);
+  }
+
+  function markScavengerSeen(item) {
+    if (!item || !item.id) return;
+    const key = getScavengerTrackingKey();
+    if (!scavengerHistory[key]) scavengerHistory[key] = [];
+    if (scavengerHistory[key].includes(item.id)) return;
+    scavengerHistory[key].push(item.id);
+    setStoredJson('rtaScavengerHistory', scavengerHistory);
+  }
+
   function buildHuntDeck() {
     const unclaimedItems = activeScavengerItems.filter(item => !item.claimedBy);
     const themedItems = activeHuntTheme === 'mixed'
       ? unclaimedItems.filter(huntItemMatchesTripPreset)
       : unclaimedItems.filter(item => huntItemMatchesTheme(item, activeHuntTheme) && huntItemMatchesTripPreset(item));
     const deckItems = themedItems.length ? themedItems : unclaimedItems;
-    huntDeck = shuffle(deckItems.map(item => item.id));
+    let availableItems = deckItems.filter(item => !isScavengerItemSeen(item));
+    if (!availableItems.length) {
+      clearScavengerHistoryForCandidates(deckItems);
+      availableItems = deckItems.slice();
+    }
+    huntDeck = shuffle(availableItems.map(item => item.id));
   }
 
   function getHuntBatchSize() {
@@ -2043,6 +2077,7 @@
       const item = activeScavengerItems.find(entry => entry.id === nextId);
       if (item && !item.claimedBy && !activeHuntIds.includes(nextId)) {
         activeHuntIds.push(nextId);
+        markScavengerSeen(item);
       }
     }
     renderHunt();

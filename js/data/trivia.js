@@ -4223,12 +4223,12 @@
       id: "technology-email-symbol",
       category: "technology",
       question: "Which symbol is commonly used in email addresses?",
-      answer: "@.",
+      answer: "At sign.",
       choices: [
-        "@.",
-        "#.",
-        "&.",
-        "%."
+        "At sign.",
+        "Hash sign.",
+        "Ampersand.",
+        "Percent sign."
       ]
     },
     {
