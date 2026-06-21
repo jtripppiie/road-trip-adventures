@@ -1039,6 +1039,7 @@
     pi: document.getElementById('pi-game'),
     pong: document.getElementById('pong-game'),
     gorillas: document.getElementById('gorillas-game'),
+    puns: document.getElementById('pun-game'),
     admin: document.getElementById('admin-mode'),
     secret: document.getElementById('secret-mode'),
     summary: document.getElementById('summary'),
@@ -1112,6 +1113,10 @@
   const momJokeAwardButton = document.getElementById('mom-joke-award');
   const nextJokesButton = document.getElementById('next-jokes');
   const finishJokesButton = document.getElementById('finish-jokes');
+  const punInput = document.getElementById('pun-input');
+  const punGenerateButton = document.getElementById('pun-generate');
+  const punMoreButton = document.getElementById('pun-more');
+  const punOutput = document.getElementById('pun-output');
   const emojiIntro = document.getElementById('emoji-intro');
   const emojiTarget = document.getElementById('emoji-target');
   const emojiVideo = document.getElementById('emoji-video');
@@ -1306,14 +1311,25 @@
       ],
     },
     jokes: {
-      title: 'Joke Vote',
-      type: 'Scored Game',
-      scored: true,
-      summary: 'Players tell clean jokes and vote for the round winner.',
+      title: 'Dad Jokes vs Mom Jokes',
+      type: 'Just for fun',
+      scored: false,
+      summary: 'Read a Dad joke and a Mom joke each round and rate the laughs.',
       rules: [
-        'Each round has a joke prompt.',
-        'Tap the player who wins the round.',
-        'Dad Joke and Mom Joke awards are separate style awards.',
+        'Read both jokes out loud.',
+        'Tap Laugh for Dad or Laugh for Mom.',
+        'It always ends in a tie \u2014 everybody wins the laugh.',
+      ],
+    },
+    puns: {
+      title: 'Pun Generator',
+      type: 'Tool',
+      scored: false,
+      summary: 'Type any word and get a batch of silly puns to read aloud.',
+      rules: [
+        'Type a word into the box.',
+        'Tap Make Puns to get a fresh batch.',
+        'Tap More Puns for another round of groaners.',
       ],
     },
     emoji: {
@@ -5016,6 +5032,47 @@
     });
   }
 
+  const punTemplates = [
+    word => `When in doubt, just add more ${word}.`,
+    word => `I\u2019m ${word}-believably good at road trips.`,
+    word => `That idea is ${word}-tastic!`,
+    word => `Let\u2019s taco \u2019bout ${word}.`,
+    word => `You had me at ${word}.`,
+    word => `Can you ${word}-lieve how fun this is?`,
+    word => `This trip is ${word}-solutely the best.`,
+    word => `Stay ${word}-some out there, everyone.`,
+    word => `We\u2019re totally ${word}-ward bound!`,
+    word => `Don\u2019t ${word}-er around, let\u2019s roll.`,
+    word => `I\u2019m a big ${word}-thusiast, honestly.`,
+    word => `Keep calm and ${word} on.`,
+    word => `That\u2019s how I ${word} and roll.`,
+    word => `Sorry, I\u2019m too ${word} to function.`,
+    word => `Every road leads back to ${word}.`,
+  ];
+
+  function startPunGenerator() {
+    resetGame();
+    punInput.value = '';
+    punOutput.innerHTML = '';
+    punMoreButton.hidden = true;
+    showSection('puns');
+    punInput.focus();
+  }
+
+  function renderPuns() {
+    const raw = (punInput.value || '').trim();
+    const word = raw || 'road trip';
+    const safeWord = word.replace(/\s+/g, ' ');
+    const picks = shuffle(punTemplates.slice()).slice(0, 5);
+    punOutput.innerHTML = '';
+    picks.forEach(template => {
+      const li = document.createElement('li');
+      li.textContent = template(safeWord);
+      punOutput.appendChild(li);
+    });
+    punMoreButton.hidden = false;
+  }
+
   function renderEmojiGame() {
     emojiIntro.textContent = `Copy the emoji face, snap an attempt, then vote for the closest match. Round ${emojiIndex + 1}/${getEmojiRoundLimit()}.`;
     emojiTarget.textContent = emojiPrompts[emojiIndex % emojiPrompts.length];
@@ -6242,6 +6299,8 @@
       startPongGame();
     } else if (selectedCategory === 'gorillas') {
       startGorillasGame();
+    } else if (selectedCategory === 'puns') {
+      startPunGenerator();
     } else if (selectedCategory === 'hideSeek') {
       startHideSeekGame();
     } else {
@@ -6482,6 +6541,14 @@
   });
   nextJokesButton.addEventListener('click', nextJokeRound);
   finishJokesButton.addEventListener('click', showJokeSummary);
+  punGenerateButton.addEventListener('click', renderPuns);
+  punMoreButton.addEventListener('click', renderPuns);
+  punInput.addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      renderPuns();
+    }
+  });
   startCameraButton.addEventListener('click', startEmojiCamera);
   captureEmojiButton.addEventListener('click', captureEmojiFace);
   nextEmojiButton.addEventListener('click', nextEmojiPrompt);

@@ -204,8 +204,11 @@
               <span class="option-emoji" aria-hidden="true">🍌</span>
               <span class="option-title">Banana Towers</span>
               <span class="mode-pill scored">Scored</span>
-            </button>
-          </div>
+            </button>            <button class="option-card" data-category="puns">
+              <span class="option-emoji" aria-hidden="true">🤪</span>
+              <span class="option-title">Pun Generator</span>
+              <span class="mode-pill">Tool</span>
+            </button>          </div>
         </section>
       </div>
     </section>
@@ -437,6 +440,23 @@
         <button id="next-jokes" class="secondary-button">New Jokes</button>
         <button id="finish-jokes" class="primary-button">Finish Joke Vote</button>
       </div>
+    </section>
+
+    <!-- Pun generator screen: type a word, get puns -->
+    <section id="pun-game" hidden>
+      <div class="mode-header">
+        <div>
+          <h2 id="pun-heading">Pun Generator</h2>
+          <p>Type any word and get a fresh batch of groan-worthy puns to read aloud.</p>
+        </div>
+        <div class="hunt-route" aria-label="Pun lab">Pun Lab</div>
+      </div>
+      <div class="adventure-actions">
+        <input id="pun-input" type="text" inputmode="text" maxlength="24" placeholder="Type a word (like banana)" aria-label="Word for puns" autocomplete="off" />
+        <button id="pun-generate" class="primary-button">Make Puns</button>
+        <button id="pun-more" class="secondary-button" hidden>More Puns</button>
+      </div>
+      <ul id="pun-output" class="mode-rules-list" aria-live="polite"></ul>
     </section>
 
     <!-- Emoji face-off screen: local camera party game -->
