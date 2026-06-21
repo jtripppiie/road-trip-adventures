@@ -5937,6 +5937,41 @@
     return gorillasBuildingLayer;
   }
 
+  function drawGorillasAimPreview(ctx) {
+    if (!gorillasState || gorillasState.projectile || gorillasState.winner) return;
+    const angle = Math.max(10, Math.min(80, Number(gorillasAngle.value) || 45));
+    const power = Math.max(20, Math.min(100, Number(gorillasPower.value) || 70));
+    const side = getGorillasSide(gorillasTurn);
+    const shooterBuilding = side === 'left'
+      ? gorillasState.buildings[0]
+      : gorillasState.buildings[gorillasState.buildings.length - 1];
+    const direction = side === 'left' ? 1 : -1;
+    const radians = angle * Math.PI / 180;
+    const speed = power * 10.2;
+    let x = side === 'left' ? shooterBuilding.x + shooterBuilding.width + 6 : shooterBuilding.x - 6;
+    let y = shooterBuilding.roofY - 12;
+    let vx = Math.cos(radians) * speed * direction;
+    let vy = -Math.sin(radians) * speed;
+    const dt = 0.016;
+    const steps = 30;
+    ctx.save();
+    for (let i = 0; i < steps; i++) {
+      vx += gorillasState.wind * dt;
+      vy += gorillasState.gravity * dt;
+      x += vx * dt;
+      y += vy * dt;
+      if (x < 0 || x > gorillasState.width || y > gorillasState.height - 36) break;
+      if (i % 3 === 0) {
+        ctx.globalAlpha = 0.55 * (1 - i / steps);
+        ctx.fillStyle = '#ffd74a';
+        ctx.beginPath();
+        ctx.arc(x, y, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    ctx.restore();
+  }
+
   function drawGorillas() {
     if (!gorillasCanvas || !gorillasState) return;
     const ctx = gorillasCanvas.getContext('2d');
@@ -6003,6 +6038,8 @@
     }
     if (gorillasState.projectile) {
       drawBananaSprite(ctx, gorillasState.projectile.x, gorillasState.projectile.y, Math.atan2(gorillasState.projectile.vy, gorillasState.projectile.vx));
+    } else {
+      drawGorillasAimPreview(ctx);
     }
     if (gorillasState.explosion) {
       ctx.fillStyle = 'rgba(245,130,32,0.85)';
@@ -6896,6 +6933,7 @@
   [gorillasAngle, gorillasPower].forEach(input => {
     input.addEventListener('input', () => {
       normalizeGorillasInputs();
+      if (gorillasState && !gorillasState.projectile && !gorillasState.winner) drawGorillas();
     });
   });
   secretSubmitButton.addEventListener('click', submitSecretAnswer);
