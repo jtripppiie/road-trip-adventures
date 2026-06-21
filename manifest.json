@@ -1,0 +1,19 @@
+{
+  "name": "Road Trip Adventures",
+  "short_name": "Road Trip",
+  "description": "Tiny adventures for passengers — look outside, laugh together, learn, and play, all offline and ad-free.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f7fbff",
+  "theme_color": "#1f7a8c",
+  "icons": [
+    {
+      "src": "assets/roadside-logo.png",
+      "sizes": "200x200",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
