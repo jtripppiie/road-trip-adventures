@@ -5418,8 +5418,22 @@
       { label: 'Symbol Mind Reader', primary: true, onClick: mentalistSymbolStart },
       { label: 'Birthday Mind Reader', onClick: mentalistBirthdayStart },
       { label: 'Missing Card Trick', onClick: mentalistMissingStart },
+      { label: 'Magic Number 1089', onClick: mentalistMagic1089Start },
+      { label: 'Gray Elephant Trick', onClick: mentalistElephantStart },
+      { label: 'Always Lands on 5', onClick: mentalistForceFiveStart },
+      { label: 'Red Hammer Guess', onClick: mentalistRedHammerStart },
       { label: 'Road Trip Prediction', onClick: mentalistPredictionStart },
     ]);
+  }
+
+  function mentalistRevealValue(title, line, value, restart) {
+    const big = document.createElement('p');
+    big.className = 'mentalist-reveal';
+    big.textContent = value;
+    mentalistShow(title, [line], [
+      { label: 'Do It Again', primary: true, onClick: restart || mentalistMenu },
+      { label: 'Back to Tricks', onClick: mentalistMenu },
+    ], big);
   }
 
   function mentalistSymbolStart() {
@@ -5559,6 +5573,80 @@
         { label: 'Back to Tricks', onClick: mentalistMenu },
       ]);
     });
+  }
+
+  function mentalistMagic1089Start() {
+    mentalistShow('Magic Number 1089', [
+      'Think of a three-digit number whose first and last digits differ by at least 2, like 532.',
+      'Reverse your number and subtract the smaller from the larger.',
+      'Reverse that answer, then add those two numbers together.',
+      'Remember your final total.',
+    ], [
+      { label: 'I have my total', primary: true, onClick: () => mentalistThinking(() => mentalistRevealValue('Magic Number 1089', 'Your total is...', '1089', mentalistMagic1089Start)) },
+      { label: 'Back to Tricks', onClick: mentalistMenu },
+    ]);
+  }
+
+  function mentalistForceFiveStart() {
+    mentalistShow('Always Lands on 5', [
+      'Think of any number.',
+      'Double it.',
+      'Add 10.',
+      'Divide the answer by 2.',
+      'Subtract the number you started with.',
+      'Remember your answer.',
+    ], [
+      { label: 'Read my mind', primary: true, onClick: () => mentalistThinking(() => mentalistRevealValue('Always Lands on 5', 'Your answer is...', '5', mentalistForceFiveStart)) },
+      { label: 'Back to Tricks', onClick: mentalistMenu },
+    ]);
+  }
+
+  function mentalistElephantStart() {
+    mentalistShow('Gray Elephant Trick', [
+      'Think of a number from 1 to 10.',
+      'Multiply it by 9.',
+      'If you get two digits, add them together.',
+      'Subtract 5.',
+      'Turn it into a letter: 1 is A, 2 is B, 3 is C, 4 is D, and so on.',
+      'Think of a country that starts with your letter.',
+      'Take the last letter of that country and think of an animal that starts with it.',
+      'Now picture that animal\u2019s color.',
+    ], [
+      { label: 'Reveal my thought', primary: true, onClick: () => mentalistThinking(mentalistElephantReveal) },
+      { label: 'Back to Tricks', onClick: mentalistMenu },
+    ]);
+  }
+
+  function mentalistElephantReveal() {
+    mentalistShow('I See It...', [
+      'You are picturing a gray elephant from Denmark!',
+      'There are not many elephants in Denmark, so keep yours warm.',
+    ], [
+      { label: 'Do It Again', primary: true, onClick: mentalistElephantStart },
+      { label: 'Back to Tricks', onClick: mentalistMenu },
+    ]);
+  }
+
+  function mentalistRedHammerStart() {
+    mentalistShow('Red Hammer Guess', [
+      'Quick, do not overthink it!',
+      'Picture a simple hand tool.',
+      'Now picture a bright, bold color.',
+      'Hold both clearly in your mind.',
+    ], [
+      { label: 'Guess my thought', primary: true, onClick: () => mentalistThinking(mentalistRedHammerReveal) },
+      { label: 'Back to Tricks', onClick: mentalistMenu },
+    ]);
+  }
+
+  function mentalistRedHammerReveal() {
+    mentalistShow('My Guess Is...', [
+      'You are thinking of a red hammer!',
+      'Most brains jump straight to it. If I missed, you are a true original.',
+    ], [
+      { label: 'Do It Again', primary: true, onClick: mentalistRedHammerStart },
+      { label: 'Back to Tricks', onClick: mentalistMenu },
+    ]);
   }
 
   function renderEmojiGame() {
