@@ -2296,6 +2296,37 @@
     ]);
   }
 
+  const TWENTY_QUESTIONS_TAGS = [
+    'alive', 'holdable', 'indoors', 'biggerThanBackpack', 'manmade', 'fun', 'food',
+    'movesSelf', 'famous', 'roadtrip', 'place', 'person', 'electricity', 'oneColor',
+    'kidsKnow', 'nature', 'expensive', 'sound', 'everyday', 'smallerThanPhone',
+  ];
+
+  function twentyQuestionsAnswerCategory(answer) {
+    if (answer === 'Yes') return 'yes';
+    if (answer === 'No') return 'no';
+    return 'mixed';
+  }
+
+  function twentyQuestionsShouldSkip(item, answered) {
+    switch (item.tag) {
+      case 'person':
+        return answered.alive === 'no';
+      case 'place':
+        return answered.alive === 'yes';
+      case 'nature':
+        return answered.manmade === 'yes';
+      case 'manmade':
+        return answered.nature === 'yes';
+      case 'smallerThanPhone':
+        return answered.biggerThanBackpack === 'yes';
+      case 'biggerThanBackpack':
+        return answered.smallerThanPhone === 'yes';
+      default:
+        return false;
+    }
+  }
+
   function startTwentyQuestions() {
     twentyQuestionsCount = 0;
     twentyQuestionsAnswers = [];
@@ -2421,6 +2452,9 @@
         mixed: 'That suggests it comes in different forms, so make the best final guess from all clues.',
       },
     ];
+    twentyQuestionsDeck.forEach((question, index) => {
+      question.tag = TWENTY_QUESTIONS_TAGS[index] || `q${index}`;
+    });
     showHuntSideGame(
       '20 Questions',
       'Secret Thing',
@@ -2438,13 +2472,27 @@
       return;
     }
 
-    const item = twentyQuestionsDeck[twentyQuestionsCount] || twentyQuestionsDeck[twentyQuestionsDeck.length - 1];
+    const answered = {};
+    const askedTags = new Set();
+    twentyQuestionsAnswers.forEach(entry => {
+      if (entry.tag) {
+        answered[entry.tag] = entry.category;
+        askedTags.add(entry.tag);
+      }
+    });
+    const item = twentyQuestionsDeck.find(question => (
+      !askedTags.has(question.tag) && !twentyQuestionsShouldSkip(question, answered)
+    ));
+    if (!item) {
+      showTwentyQuestionsFinalGuess('No more useful questions remain. Make your final group guess from the clues.');
+      return;
+    }
     const history = formatTwentyQuestionsHistory();
     const intro = `${reasoning}\n\nTurn ${twentyQuestionsCount + 1}/20 question: ${item.question}${history}`;
     const responseActions = ['Yes', 'No', 'Usually', 'Sometimes', 'Don\'t Know'].map(answer => ({
       label: answer,
       onClick: () => {
-        twentyQuestionsAnswers.push({ question: item.question, answer });
+        twentyQuestionsAnswers.push({ question: item.question, tag: item.tag, answer, category: twentyQuestionsAnswerCategory(answer) });
         twentyQuestionsCount++;
         showTwentyQuestionsPrompt(getTwentyQuestionsReasoning(item, answer));
       },
