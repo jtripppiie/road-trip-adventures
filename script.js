@@ -6087,11 +6087,19 @@
       height: target.height,
     };
     const inCrater = isPointInGorillasCrater(projectile.x, projectile.y);
-    const hitTarget = !inCrater
+    const targetGorillaX = targetIndex === 0
+      ? target.x + target.width * 0.62
+      : target.x + target.width * 0.38;
+    const targetGorillaY = target.roofY - 2;
+    const hitGorilla = projectile.x >= targetGorillaX - 18
+      && projectile.x <= targetGorillaX + 18
+      && projectile.y >= targetGorillaY - 30
+      && projectile.y <= targetGorillaY + 18;
+    const hitTarget = hitGorilla || (!inCrater
       && projectile.x >= targetRect.x
       && projectile.x <= targetRect.x + targetRect.width
       && projectile.y >= targetRect.y - 10
-      && projectile.y <= targetRect.y + targetRect.height;
+      && projectile.y <= targetRect.y + targetRect.height);
     const hitBuildingIndex = inCrater ? -1 : gorillasState.buildings.findIndex(building => {
       const rect = {
         x: building.x + 4,
