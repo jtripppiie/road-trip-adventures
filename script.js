@@ -5421,6 +5421,10 @@
       { label: 'Magic Number 1089', onClick: mentalistMagic1089Start },
       { label: 'Gray Elephant Trick', onClick: mentalistElephantStart },
       { label: 'Always Lands on 5', onClick: mentalistForceFiveStart },
+      { label: 'Crystal Ball Number', onClick: mentalistCrystalNumberStart },
+      { label: 'Lucky 37', onClick: mentalistLucky37Start },
+      { label: 'Quick Seven', onClick: mentalistQuickSevenStart },
+      { label: 'Shape in a Shape', onClick: mentalistShapeStart },
       { label: 'Red Hammer Guess', onClick: mentalistRedHammerStart },
       { label: 'Road Trip Prediction', onClick: mentalistPredictionStart },
     ]);
@@ -5645,6 +5649,65 @@
       'Most brains jump straight to it. If I missed, you are a true original.',
     ], [
       { label: 'Do It Again', primary: true, onClick: mentalistRedHammerStart },
+      { label: 'Back to Tricks', onClick: mentalistMenu },
+    ]);
+  }
+
+  function mentalistCrystalNumberStart() {
+    mentalistShow('Crystal Ball Number', [
+      'Think of any number.',
+      'Add 5.',
+      'Double the answer.',
+      'Subtract 4.',
+      'Divide by 2.',
+      'Subtract the number you started with.',
+      'Remember your answer.',
+    ], [
+      { label: 'Gaze into the ball', primary: true, onClick: () => mentalistThinking(() => mentalistRevealValue('Crystal Ball Number', 'The crystal ball shows...', '3', mentalistCrystalNumberStart)) },
+      { label: 'Back to Tricks', onClick: mentalistMenu },
+    ]);
+  }
+
+  function mentalistLucky37Start() {
+    mentalistShow('Lucky 37', [
+      'Think of a two-digit number between 1 and 50.',
+      'Make both digits odd.',
+      'The two digits must be different from each other.',
+      'Lock it in your mind.',
+    ], [
+      { label: 'Read my mind', primary: true, onClick: () => mentalistThinking(() => mentalistRevealValue('Lucky 37', 'Most brains land on...', '37', mentalistLucky37Start)) },
+      { label: 'Back to Tricks', onClick: mentalistMenu },
+    ]);
+  }
+
+  function mentalistQuickSevenStart() {
+    mentalistShow('Quick Seven', [
+      'Quick, do not think too hard!',
+      'Pick a number between 1 and 10.',
+      'Picture it glowing in your mind.',
+    ], [
+      { label: 'Guess my number', primary: true, onClick: () => mentalistThinking(() => mentalistRevealValue('Quick Seven', 'You are thinking of...', '7', mentalistQuickSevenStart)) },
+      { label: 'Back to Tricks', onClick: mentalistMenu },
+    ]);
+  }
+
+  function mentalistShapeStart() {
+    mentalistShow('Shape in a Shape', [
+      'Picture one simple shape.',
+      'Now picture a different simple shape inside the first one.',
+      'Hold the whole picture in your mind.',
+    ], [
+      { label: 'Reveal my shapes', primary: true, onClick: () => mentalistThinking(mentalistShapeReveal) },
+      { label: 'Back to Tricks', onClick: mentalistMenu },
+    ]);
+  }
+
+  function mentalistShapeReveal() {
+    mentalistShow('My Guess Is...', [
+      'You are picturing a triangle inside a circle!',
+      'It is the combo most brains reach for. Spooky, right?',
+    ], [
+      { label: 'Do It Again', primary: true, onClick: mentalistShapeStart },
       { label: 'Back to Tricks', onClick: mentalistMenu },
     ]);
   }
