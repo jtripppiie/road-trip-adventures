@@ -2086,3 +2086,47 @@ body.reduce-motion .stamp.earned {
 [hidden] {
   display: none !important;
 }
+
+/* Road Trip Mentalist */
+.mentalist-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin: 12px 0;
+}
+.mentalist-cell {
+  display: inline-block;
+  min-width: 40px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: rgba(31, 122, 140, 0.12);
+  font-size: 1rem;
+  text-align: center;
+}
+.mentalist-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: 14px 0;
+}
+.mentalist-card {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 54px;
+  min-height: 74px;
+  padding: 8px;
+  border-radius: 10px;
+  background: #fff;
+  border: 2px solid #1f7a8c;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #14323b;
+}
+.mentalist-reveal {
+  font-size: 3rem;
+  text-align: center;
+  margin: 14px 0;
+}

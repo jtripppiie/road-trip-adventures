@@ -1045,6 +1045,7 @@
     pong: document.getElementById('pong-game'),
     gorillas: document.getElementById('gorillas-game'),
     puns: document.getElementById('pun-game'),
+    mentalist: document.getElementById('mentalist'),
     admin: document.getElementById('admin-mode'),
     secret: document.getElementById('secret-mode'),
     summary: document.getElementById('summary'),
@@ -1126,6 +1127,7 @@
   const punGenerateButton = document.getElementById('pun-generate');
   const punMoreButton = document.getElementById('pun-more');
   const punOutput = document.getElementById('pun-output');
+  const mentalistStage = document.getElementById('mentalist-stage');
   const emojiIntro = document.getElementById('emoji-intro');
   const emojiTarget = document.getElementById('emoji-target');
   const emojiVideo = document.getElementById('emoji-video');
@@ -1350,6 +1352,17 @@
         'Pick who hides the secret thing.',
         'Answer each question Yes, No, Sometimes, Maybe, or Unknown.',
         'The guesser gets up to 20 questions to figure it out.',
+      ],
+    },
+    mentalist: {
+      title: 'Road Trip Mentalist',
+      type: 'Just for fun',
+      scored: false,
+      summary: 'Magic-style mind tricks powered by sneaky math, not real psychic powers.',
+      rules: [
+        'Pick a trick and follow the steps.',
+        'Think of your secret number, card, or choice.',
+        'Let the app reveal what is in your head.',
       ],
     },
     emoji: {
@@ -5345,6 +5358,209 @@
     punMoreButton.hidden = false;
   }
 
+  const MENTALIST_SYMBOLS = ['\u2605', '\u2663', '\u263c', '\u273f', '\u263e', '\u26a1', '\u2618', '\u266b', '\u272a', '\u2744', '\u263b', '\u2693', '\u271a', '\u2726'];
+  const MENTALIST_STATUS = [
+    'Scanning brain waves...',
+    'Checking snack energy...',
+    'Aligning the crystal ball...',
+    'Reading your road-trip vibes...',
+    'Counting invisible sheep...',
+    'Tuning the mind antenna...',
+  ];
+  const MENTALIST_CARDS = ['A\u2660', '7\u2665', 'Q\u2663', '9\u2666', 'K\u2660', '3\u2665', 'J\u2663', '5\u2666', '10\u2660', '2\u2665', '8\u2663', '6\u2666', '4\u2660', 'Q\u2665'];
+  const MENTALIST_PREDICTIONS = {
+    Moose: 'I knew it! A moose. I even saw it wearing tiny sunglasses. Classic road-trip moose energy.',
+    Pizza: 'Pizza, obviously. My crystal ball is 90 percent mozzarella. We are basically the same.',
+    UFO: 'A UFO! I predicted you would think big. Beam me up a snack while you are out there.',
+    'Giant Peanut': 'The Giant Peanut. Bold. Legendary. I wrote this down before you were even hungry.',
+  };
+
+  function mentalistShow(title, lines, actions, extraNode) {
+    if (!mentalistStage) return;
+    mentalistStage.innerHTML = '';
+    const heading = document.createElement('h3');
+    heading.textContent = title;
+    mentalistStage.appendChild(heading);
+    (Array.isArray(lines) ? lines : [lines]).forEach(line => {
+      if (!line) return;
+      const paragraph = document.createElement('p');
+      paragraph.textContent = line;
+      mentalistStage.appendChild(paragraph);
+    });
+    if (extraNode) mentalistStage.appendChild(extraNode);
+    const wrap = document.createElement('div');
+    wrap.className = 'adventure-actions';
+    (actions || []).forEach(action => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = action.primary ? 'primary-button' : 'secondary-button';
+      button.textContent = action.label;
+      button.addEventListener('click', action.onClick);
+      wrap.appendChild(button);
+    });
+    mentalistStage.appendChild(wrap);
+  }
+
+  function mentalistThinking(onDone) {
+    const message = MENTALIST_STATUS[Math.floor(Math.random() * MENTALIST_STATUS.length)];
+    mentalistShow(message, ['Hold very still and think hard...'], []);
+    window.setTimeout(onDone, 1100);
+  }
+
+  function startMentalist() {
+    resetGame();
+    showSection('mentalist');
+    mentalistMenu();
+  }
+
+  function mentalistMenu() {
+    mentalistShow('Road Trip Mentalist', ['Pick a mind trick. Remember: it is magic-style fun, not real mind reading.'], [
+      { label: 'Symbol Mind Reader', primary: true, onClick: mentalistSymbolStart },
+      { label: 'Birthday Mind Reader', onClick: mentalistBirthdayStart },
+      { label: 'Missing Card Trick', onClick: mentalistMissingStart },
+      { label: 'Road Trip Prediction', onClick: mentalistPredictionStart },
+    ]);
+  }
+
+  function mentalistSymbolStart() {
+    mentalistShow('Symbol Mind Reader', [
+      'Think of any two-digit number, like 10 to 99.',
+      'Add its two digits together.',
+      'Subtract that total from your original number.',
+      'Remember the answer.',
+    ], [
+      { label: 'I have my answer', primary: true, onClick: () => mentalistThinking(mentalistSymbolChart) },
+      { label: 'Back to Tricks', onClick: mentalistMenu },
+    ]);
+  }
+
+  function mentalistSymbolChart() {
+    const secret = MENTALIST_SYMBOLS[Math.floor(Math.random() * MENTALIST_SYMBOLS.length)];
+    const others = MENTALIST_SYMBOLS.filter(symbol => symbol !== secret);
+    const grid = document.createElement('div');
+    grid.className = 'mentalist-grid';
+    for (let number = 1; number <= 99; number++) {
+      const symbol = number % 9 === 0 ? secret : others[Math.floor(Math.random() * others.length)];
+      const cell = document.createElement('span');
+      cell.className = 'mentalist-cell';
+      cell.textContent = `${number} ${symbol}`;
+      grid.appendChild(cell);
+    }
+    mentalistShow('Find Your Number', ['Find your answer in the chart and stare at the symbol next to it.'], [
+      { label: 'Read my mind', primary: true, onClick: () => mentalistThinking(() => mentalistSymbolReveal(secret)) },
+      { label: 'Back to Tricks', onClick: mentalistMenu },
+    ], grid);
+  }
+
+  function mentalistSymbolReveal(secret) {
+    const big = document.createElement('p');
+    big.className = 'mentalist-reveal';
+    big.textContent = secret;
+    mentalistShow('Your Symbol Is...', ['I see it clearly in your mind. It is this one:'], [
+      { label: 'Do It Again', primary: true, onClick: mentalistSymbolStart },
+      { label: 'Back to Tricks', onClick: mentalistMenu },
+    ], big);
+  }
+
+  function mentalistBirthdayStart() {
+    mentalistShow('Birthday Mind Reader', [
+      'Think of the day of the month you were born, from 1 to 31.',
+      'I will show five cards. Just tell me if your day is on each one.',
+    ], [
+      { label: 'Start', primary: true, onClick: () => mentalistBirthdayCard(0, 0) },
+      { label: 'Back to Tricks', onClick: mentalistMenu },
+    ]);
+  }
+
+  function mentalistBirthdayCard(index, total) {
+    const values = [1, 2, 4, 8, 16];
+    if (index >= values.length) {
+      mentalistThinking(() => mentalistBirthdayReveal(total));
+      return;
+    }
+    const value = values[index];
+    const grid = document.createElement('div');
+    grid.className = 'mentalist-grid';
+    for (let number = 1; number <= 31; number++) {
+      if (number & value) {
+        const cell = document.createElement('span');
+        cell.className = 'mentalist-cell';
+        cell.textContent = String(number);
+        grid.appendChild(cell);
+      }
+    }
+    mentalistShow(`Card ${index + 1} of 5`, ['Is your birthday day somewhere on this card?'], [
+      { label: 'Yes', primary: true, onClick: () => mentalistBirthdayCard(index + 1, total + value) },
+      { label: 'No', onClick: () => mentalistBirthdayCard(index + 1, total) },
+      { label: 'Back to Tricks', onClick: mentalistMenu },
+    ], grid);
+  }
+
+  function mentalistBirthdayReveal(total) {
+    const valid = total >= 1 && total <= 31;
+    const big = document.createElement('p');
+    big.className = 'mentalist-reveal';
+    big.textContent = valid ? String(total) : '???';
+    mentalistShow('Your Birthday Day', [valid ? 'You were born on the...' : 'The brain waves got fuzzy. Try again and answer carefully.'], [
+      { label: 'Do It Again', primary: true, onClick: mentalistBirthdayStart },
+      { label: 'Back to Tricks', onClick: mentalistMenu },
+    ], valid ? big : null);
+  }
+
+  function mentalistCardGrid(cards) {
+    const grid = document.createElement('div');
+    grid.className = 'mentalist-cards';
+    cards.forEach(card => {
+      const cell = document.createElement('span');
+      cell.className = 'mentalist-card';
+      cell.textContent = card;
+      grid.appendChild(cell);
+    });
+    return grid;
+  }
+
+  function mentalistMissingStart() {
+    const deck = shuffle(MENTALIST_CARDS.slice());
+    const firstSet = deck.slice(0, 5);
+    const secondSet = deck.slice(5, 10);
+    mentalistShow('Missing Card Trick', [
+      'Look at these five cards and silently pick one.',
+      'Stare at it. Burn it into your memory. Do not say it out loud.',
+    ], [
+      { label: 'Make it vanish', primary: true, onClick: () => mentalistThinking(() => mentalistMissingReveal(secondSet)) },
+      { label: 'Back to Tricks', onClick: mentalistMenu },
+    ], mentalistCardGrid(firstSet));
+  }
+
+  function mentalistMissingReveal(secondSet) {
+    mentalistShow('Your Card Is Gone!', [
+      'I reached into your mind and pulled your card right out of the deck.',
+      'See? Your card is not here anymore. Spooky.',
+    ], [
+      { label: 'Do It Again', primary: true, onClick: mentalistMissingStart },
+      { label: 'Back to Tricks', onClick: mentalistMenu },
+    ], mentalistCardGrid(secondSet));
+  }
+
+  function mentalistPredictionStart() {
+    mentalistShow('Road Trip Prediction', ['I already wrote down what you will pick. Choose one:'], [
+      { label: '\ud83e\udd8c Moose', primary: true, onClick: () => mentalistPredictionReveal('Moose') },
+      { label: '\ud83c\udf55 Pizza', onClick: () => mentalistPredictionReveal('Pizza') },
+      { label: '\ud83d\udef8 UFO', onClick: () => mentalistPredictionReveal('UFO') },
+      { label: '\ud83e\udd5c Giant Peanut', onClick: () => mentalistPredictionReveal('Giant Peanut') },
+      { label: 'Back to Tricks', onClick: mentalistMenu },
+    ]);
+  }
+
+  function mentalistPredictionReveal(choice) {
+    mentalistThinking(() => {
+      mentalistShow('My Prediction Said...', [MENTALIST_PREDICTIONS[choice] || 'I knew it all along.'], [
+        { label: 'Do It Again', primary: true, onClick: mentalistPredictionStart },
+        { label: 'Back to Tricks', onClick: mentalistMenu },
+      ]);
+    });
+  }
+
   function renderEmojiGame() {
     emojiIntro.textContent = `Copy the emoji face, snap an attempt, then vote for the closest match. Round ${emojiIndex + 1}/${getEmojiRoundLimit()}.`;
     emojiTarget.textContent = emojiPrompts[emojiIndex % emojiPrompts.length];
@@ -6671,6 +6887,8 @@
       startGorillasGame();
     } else if (selectedCategory === 'puns') {
       startPunGenerator();
+    } else if (selectedCategory === 'mentalist') {
+      startMentalist();
     } else if (selectedCategory === 'twenty') {
       resetGame();
       showSection('scavenger');
