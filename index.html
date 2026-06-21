@@ -420,21 +420,21 @@
     <section id="jokes" hidden>
       <div class="mode-header">
         <div>
-          <h2 id="jokes-heading">Joke Vote</h2>
-          <p>Each player tells a clean joke. Vote for the winner, then award the style.</p>
+          <h2 id="jokes-heading">Dad Jokes vs Mom Jokes</h2>
+          <p>Read the Dad joke and the Mom joke out loud, then tap whoever got the bigger laugh.</p>
         </div>
         <div class="hunt-route" aria-label="Joke stage">Car Karaoke Mic</div>
       </div>
-      <div id="joke-scoreboard" class="team-scoreboard" aria-live="polite"></div>
       <article class="trivia-card">
         <span class="challenge-badge">Round <span id="joke-round">1</span></span>
-        <h3 id="joke-prompt">Tell your best road-trip joke.</h3>
-        <p id="joke-award">Award style: Dad Joke Crown or Mom Joke Mic.</p>
+        <p class="joke-line"><strong>Dad joke:</strong> <span id="joke-dad"></span></p>
+        <p class="joke-line"><strong>Mom joke:</strong> <span id="joke-mom"></span></p>
+        <p id="joke-award">Laughs so far: Dad 0, Mom 0.</p>
       </article>
       <div class="adventure-actions">
-        <div id="joke-award-buttons" class="player-award-grid"></div>
-        <button id="dad-joke-award" class="secondary-button">Dad Joke Award</button>
-        <button id="mom-joke-award" class="secondary-button">Mom Joke Award</button>
+        <button id="dad-joke-award" class="secondary-button">Laugh for Dad</button>
+        <button id="mom-joke-award" class="secondary-button">Laugh for Mom</button>
+        <button id="next-jokes" class="secondary-button">New Jokes</button>
         <button id="finish-jokes" class="primary-button">Finish Joke Vote</button>
       </div>
     </section>

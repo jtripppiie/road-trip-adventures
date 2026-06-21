@@ -877,9 +877,10 @@
   let activeTriviaCategory = getStoredJson('rtaLastTriviaCategory', 'mixed');
   let activeTriviaDifficulty = getStoredJson('rtaLastTriviaDifficulty', 'medium');
   let triviaQuestionAwarded = false;
-  let jokePlayerScores = {};
   let jokeAwards = { dad: 0, mom: 0 };
   let jokeRound = 1;
+  let jokeDadDeck = [];
+  let jokeMomDeck = [];
   let twentyQuestionsCount = 0;
   let twentyQuestionsDeck = [];
   let twentyQuestionsAnswers = [];
@@ -1103,13 +1104,13 @@
   const triviaAwardButtons = document.getElementById('trivia-award-buttons');
   const nextTriviaButton = document.getElementById('next-trivia');
   const finishTriviaButton = document.getElementById('finish-trivia');
-  const jokeScoreboard = document.getElementById('joke-scoreboard');
   const jokeRoundElement = document.getElementById('joke-round');
-  const jokePrompt = document.getElementById('joke-prompt');
+  const jokeDad = document.getElementById('joke-dad');
+  const jokeMom = document.getElementById('joke-mom');
   const jokeAward = document.getElementById('joke-award');
-  const jokeAwardButtons = document.getElementById('joke-award-buttons');
   const dadJokeAwardButton = document.getElementById('dad-joke-award');
   const momJokeAwardButton = document.getElementById('mom-joke-award');
+  const nextJokesButton = document.getElementById('next-jokes');
   const finishJokesButton = document.getElementById('finish-jokes');
   const emojiIntro = document.getElementById('emoji-intro');
   const emojiTarget = document.getElementById('emoji-target');
@@ -4956,53 +4957,58 @@
     });
   }
 
+  const dadJokesPack = [
+    'I\u2019m afraid for the calendar. Its days are numbered.',
+    'Why did the scarecrow win an award? He was outstanding in his field.',
+    'I only know 25 letters of the alphabet. I don\u2019t know y.',
+    'What do you call a fake noodle? An impasta.',
+    'Why don\u2019t eggs tell jokes? They\u2019d crack each other up.',
+    'I used to hate facial hair, but then it grew on me.',
+    'What do you call cheese that isn\u2019t yours? Nacho cheese.',
+    'Why did the bicycle fall over? It was two tired.',
+  ];
+
+  const momJokesPack = [
+    'Why did the cookie go to the doctor? Because it was feeling crumby.',
+    'What do you call a bear with no teeth? A gummy bear.',
+    'Why did the banana go to the party? Because it was a-peeling.',
+    'What did the ocean say to the beach? Nothing, it just waved.',
+    'Why don\u2019t scientists trust atoms? Because they make up everything.',
+    'What do you call a sleeping dinosaur? A dino-snore.',
+    'Why did the math book look sad? It had too many problems.',
+    'What do you call a pile of cats? A meow-ntain.',
+  ];
+
   function startJokeVote() {
     resetGame();
-    jokePlayerScores = createScoreMap();
     jokeAwards = { dad: 0, mom: 0 };
     jokeRound = 1;
+    jokeDadDeck = shuffle(dadJokesPack.slice());
+    jokeMomDeck = shuffle(momJokesPack.slice());
     renderJokeVote();
     showSection('jokes');
   }
 
   function renderJokeVote() {
-    const prompts = [
-      'Tell your best road-trip joke.',
-      'Make up a joke about something you just passed.',
-      'Tell a joke that starts with "Why did the car..."',
-      'Make a clean joke using a state name.',
-      'Tell a joke that would make a GPS laugh.',
-    ];
-    renderScoreboard(jokeScoreboard, jokePlayerScores);
-    renderAwardButtons(jokeAwardButtons, 'Wins Round', awardJokeRound);
-    jokeRoundElement.textContent = `${jokeRound}/${getJokeRoundLimit()}`;
-    jokePrompt.textContent = prompts[(jokeRound - 1) % prompts.length];
-    jokeAward.textContent = `Awards so far: Dad Joke ${jokeAwards.dad}, Mom Joke ${jokeAwards.mom}.`;
+    jokeRoundElement.textContent = String(jokeRound);
+    jokeDad.textContent = jokeDadDeck[(jokeRound - 1) % jokeDadDeck.length];
+    jokeMom.textContent = jokeMomDeck[(jokeRound - 1) % jokeMomDeck.length];
+    jokeAward.textContent = `Laughs so far: Dad ${jokeAwards.dad}, Mom ${jokeAwards.mom}.`;
   }
 
-  function awardJokeRound(playerId) {
-    jokePlayerScores[playerId] = (jokePlayerScores[playerId] || 0) + 1;
+  function nextJokeRound() {
     jokeRound++;
-    if (jokeRound > getJokeRoundLimit()) {
-      showJokeSummary();
-      return;
-    }
     renderJokeVote();
   }
 
   function showJokeSummary() {
     showSection('summary');
-    const leaders = getWinningPlayers(jokePlayerScores);
-    const winner = formatWinner(leaders, leader => `${leader.name} wins Joke Vote`, 'Joke Vote ends in a tie');
-    const scoreText = players.map(player => `${player.name}: ${jokePlayerScores[player.id] || 0}`).join(', ');
-    summaryText.textContent = leaders.length
-      ? `${winner}. ${scoreText}.`
-      : `No joke rounds were awarded yet. ${scoreText}.`;
+    summaryText.textContent = `It\u2019s a tie! Dad jokes and Mom jokes are equally great.`;
     summaryList.innerHTML = '';
     [
-      `Dad Joke Awards: ${jokeAwards.dad}`,
-      `Mom Joke Awards: ${jokeAwards.mom}`,
-      'Prize idea: winner picks the next car karaoke song.',
+      `Dad laughs: ${jokeAwards.dad}`,
+      `Mom laughs: ${jokeAwards.mom}`,
+      'Official ruling: always a tie \u2014 everybody wins the laugh.',
     ].forEach(text => {
       const li = document.createElement('li');
       li.textContent = text;
@@ -6468,12 +6474,13 @@
   finishTriviaButton.addEventListener('click', showTriviaSummary);
   dadJokeAwardButton.addEventListener('click', () => {
     jokeAwards.dad++;
-    renderJokeVote();
+    nextJokeRound();
   });
   momJokeAwardButton.addEventListener('click', () => {
     jokeAwards.mom++;
-    renderJokeVote();
+    nextJokeRound();
   });
+  nextJokesButton.addEventListener('click', nextJokeRound);
   finishJokesButton.addEventListener('click', showJokeSummary);
   startCameraButton.addEventListener('click', startEmojiCamera);
   captureEmojiButton.addEventListener('click', captureEmojiFace);
