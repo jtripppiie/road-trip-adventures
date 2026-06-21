@@ -1389,7 +1389,8 @@
         'Each player chooses an angle and power on their turn.',
         'The banana arcs over the buildings and can hit the opponent.',
         'Wait for the banana to land before the next player throws.',
-        'Bananas blast a crater out of whatever building they hit.',
+        'Bananas blast a crater out of a building and can fly through gaps they made.',
+        'Clip your own tower and the point goes to your opponent.',
         'Direct hits score a point and start the next turn.',
         'First to 5 wins the round.',
       ],
@@ -5946,7 +5947,7 @@
     drawGorillas();
   }
 
-  function advanceGorillasTurn(scored) {
+  function advanceGorillasTurn(scored, options = {}) {
     if (!gorillasState) return;
     const impact = gorillasState.projectile ? { x: gorillasState.projectile.x, y: gorillasState.projectile.y } : null;
     gorillasRunning = false;
@@ -5956,15 +5957,19 @@
       gorillasAnimationFrame = null;
     }
     const shooterName = getGorillasPlayerName(gorillasTurn);
+    const scorerSide = options.scorerSide || getGorillasSide(gorillasTurn);
     if (scored) {
-      const scorer = getGorillasSide(gorillasTurn) === 'left' ? 'scoreLeft' : 'scoreRight';
+      const scorer = scorerSide === 'left' ? 'scoreLeft' : 'scoreRight';
       gorillasState[scorer] += 1;
       renderGorillasScore();
+      const winnerName = scorerSide === getGorillasSide(gorillasTurn)
+        ? shooterName
+        : getGorillasPlayerName(gorillasTurn + 1);
       if (gorillasState[scorer] >= 5) {
         gorillasState.winner = scorer;
         gorillasState.explosion = impact;
         gorillasState.sparks = impact ? createGorillasSparks(impact.x, impact.y) : [];
-        gorillasStatus.textContent = `${shooterName} wins Banana Towers!`;
+        gorillasStatus.textContent = `${winnerName} wins Banana Towers!`;
         stopGorillas();
         renderGorillasControls();
         drawGorillas();
@@ -5972,16 +5977,22 @@
       }
       gorillasState.explosion = impact;
       gorillasState.sparks = impact ? createGorillasSparks(impact.x, impact.y) : [];
-      gorillasStatus.textContent = `${shooterName} scored!`;
+      gorillasStatus.textContent = options.statusText || `${shooterName} scored!`;
     } else {
       gorillasState.explosion = impact && impact.y < gorillasState.height - 40 ? impact : null;
       gorillasState.sparks = gorillasState.explosion ? createGorillasSparks(gorillasState.explosion.x, gorillasState.explosion.y) : [];
-      gorillasStatus.textContent = `${shooterName} missed.`;
+      gorillasStatus.textContent = options.statusText || `${shooterName} missed.`;
     }
     gorillasTurn += 1;
     gorillasState.projectile = null;
     renderGorillasControls();
     drawGorillas();
+  }
+
+  function isPointInGorillasCrater(x, y) {
+    const craters = gorillasState && gorillasState.craters;
+    if (!Array.isArray(craters)) return false;
+    return craters.some(crater => Math.hypot(x - crater.x, y - crater.y) <= crater.radius);
   }
 
   function fireGorillasShot() {
@@ -6021,20 +6032,24 @@
     if (gorillasState.trail.length > 42) gorillasState.trail.shift();
 
     const groundY = gorillasState.height - 36;
-    const target = getGorillasSide(gorillasTurn) === 'left'
-      ? gorillasState.buildings[gorillasState.buildings.length - 1]
-      : gorillasState.buildings[0];
+    const shooterSide = getGorillasSide(gorillasTurn);
+    const lastBuildingIndex = gorillasState.buildings.length - 1;
+    const targetIndex = shooterSide === 'left' ? lastBuildingIndex : 0;
+    const shooterIndex = shooterSide === 'left' ? 0 : lastBuildingIndex;
+    const target = gorillasState.buildings[targetIndex];
     const targetRect = {
       x: target.x + 4,
       y: target.roofY,
       width: target.width,
       height: target.height,
     };
-    const hitTarget = projectile.x >= targetRect.x
+    const inCrater = isPointInGorillasCrater(projectile.x, projectile.y);
+    const hitTarget = !inCrater
+      && projectile.x >= targetRect.x
       && projectile.x <= targetRect.x + targetRect.width
       && projectile.y >= targetRect.y - 10
       && projectile.y <= targetRect.y + targetRect.height;
-    const hitAnyBuilding = gorillasState.buildings.some(building => {
+    const hitBuildingIndex = inCrater ? -1 : gorillasState.buildings.findIndex(building => {
       const rect = {
         x: building.x + 4,
         y: building.roofY,
@@ -6046,6 +6061,8 @@
         && projectile.y >= rect.y
         && projectile.y <= rect.y + rect.height;
     });
+    const hitAnyBuilding = hitBuildingIndex !== -1;
+    const hitSelf = hitAnyBuilding && hitBuildingIndex === shooterIndex && shooterIndex !== targetIndex;
     const hitGround = projectile.y >= groundY;
     const outOfBounds = projectile.x < 0 || projectile.x > gorillasState.width;
 
@@ -6054,6 +6071,16 @@
     if (hitTarget) {
       addGorillasCrater(projectile.x, projectile.y);
       advanceGorillasTurn(true);
+      return;
+    }
+    if (hitSelf) {
+      addGorillasCrater(projectile.x, projectile.y);
+      const shooterName = getGorillasPlayerName(gorillasTurn);
+      const opponentSide = shooterSide === 'left' ? 'right' : 'left';
+      advanceGorillasTurn(true, {
+        scorerSide: opponentSide,
+        statusText: `${shooterName} clipped their own tower — the point goes the other way!`,
+      });
       return;
     }
     if (hitAnyBuilding) {
