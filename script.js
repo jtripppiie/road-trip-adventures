@@ -11,7 +11,7 @@
 (() => {
   // Visible build version. Bump this (and CACHE_VERSION in sw.js) on every
   // deploy so the on-screen badge confirms which build is actually live.
-  const APP_VERSION = 'v14 · 2026-06-21';
+  const APP_VERSION = 'v15 · 2026-06-21';
   const versionBadge = document.getElementById('app-version');
   if (versionBadge) {
     versionBadge.textContent = APP_VERSION;
@@ -3244,8 +3244,9 @@
 
     if (hideSeekState.phase === HideSeekGameState.HIDER_TURN) {
       hideSeekFoundButton.textContent = 'Hide Here';
+      hideSeekFoundButton.textContent = nearbySpot ? 'Hide Here' : 'Hide (find cover)';
       hideSeekFoundButton.setAttribute('aria-label', 'Enter this hiding spot');
-      hideSeekFoundButton.disabled = !nearbySpot;
+      hideSeekFoundButton.disabled = false;
       hideSeekSpecialButton.textContent = 'Peek';
       hideSeekSpecialButton.setAttribute('aria-label', 'Peek and risk making noise');
       const coverQuality = getHideSeekCoverQuality(hideSeekState.actors.hider);
@@ -3261,9 +3262,9 @@
       hideSeekRoundText.textContent = `Pass the phone to ${seekerName}. The map resets to the start room, and each wrong unique inspection uses one search.`;
       setHideSeekMessage(`${seekerName}, no peeking until you tap start searching.`);
     } else if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
-      hideSeekFoundButton.textContent = 'Inspect Spot';
+      hideSeekFoundButton.textContent = nearbySpot ? 'Inspect Spot' : 'Inspect (find cover)';
       hideSeekFoundButton.setAttribute('aria-label', 'Inspect this hiding spot');
-      hideSeekFoundButton.disabled = !nearbySpot || hideSeekState.inspectTime > 0;
+      hideSeekFoundButton.disabled = hideSeekState.inspectTime > 0;
       hideSeekRoundTitle.textContent = `${seekerName}, find the hider.`;
       hideSeekRoundText.textContent = nearbySpot
         ? `You are close to the ${nearbySpot.label}. Inspect it when you are ready.`
@@ -3413,9 +3414,10 @@
       nearbySpot = coverQuality.spot;
     }
     if (!nearbySpot && source !== 'timer') {
-      setHideSeekMessage('Move next to a hiding spot first.');
+      // Mirror the inspect warning: do NOT re-render here, or the default
+      // hider-turn status text overwrites this warning.
       playHideSeekTone('wrong');
-      renderHideSeek();
+      setHideSeekMessage('Not a hiding spot — move right next to cover. Spots glow when you are close enough to hide.');
       return;
     }
     if (!nearbySpot) {
@@ -3469,7 +3471,7 @@
     const hiddenPosition = hideSeekState.hiddenPosition;
     if (!hiddenPosition) return;
     if (!inspectedSpot) {
-      setHideSeekMessage('Stand next to a hiding spot before inspecting.');
+      setHideSeekMessage('No hiding spot in reach — move right next to cover, then inspect. Spots glow when you are close enough.');
       playHideSeekTone('wrong');
       return;
     }
@@ -4455,6 +4457,23 @@
       const glow = 0.45 + Math.sin(hideSeekState.coverGlowPulse) * 0.12;
       ctx.save();
       ctx.strokeStyle = quality.spot ? `rgba(46, 199, 211, ${glow})` : `rgba(245, 130, 32, ${glow})`;
+      ctx.lineWidth = 3;
+      ctx.setLineDash([8, 8]);
+      ctx.beginPath();
+      ctx.arc(actor.x + actor.width / 2, actor.y + actor.height / 2, HIDE_SEEK_SEARCH_TOLERANCE + 7, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
+
+    // Seeker gets the same "in range" ring so they know when Inspect will work:
+    // green when standing next to a spot, dim orange when not.
+    if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
+      const actor = hideSeekState.actors.seeker;
+      const inRange = !!getNearbyHideSeekSpot(actor);
+      const glow = 0.42 + Math.sin(hideSeekState.coverGlowPulse) * 0.12;
+      ctx.save();
+      ctx.strokeStyle = inRange ? `rgba(140, 255, 102, ${glow + 0.18})` : `rgba(245, 130, 32, ${glow})`;
       ctx.lineWidth = 3;
       ctx.setLineDash([8, 8]);
       ctx.beginPath();
