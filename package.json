@@ -1,0 +1,15 @@
+{
+  "name": "road-trip-adventures",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tiny adventures for passengers — a static, offline, ad-free road trip web app.",
+  "scripts": {
+    "audit": "node scripts/audit-all.js",
+    "lint": "eslint .",
+    "test": "node scripts/audit-all.js && eslint ."
+  },
+  "devDependencies": {
+    "eslint": "^9.13.0",
+    "globals": "^15.11.0"
+  }
+}
