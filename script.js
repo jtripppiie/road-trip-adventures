@@ -9,6 +9,14 @@
  */
 
 (() => {
+  // Visible build version. Bump this (and CACHE_VERSION in sw.js) on every
+  // deploy so the on-screen badge confirms which build is actually live.
+  const APP_VERSION = 'v10 · 2026-06-21';
+  const versionBadge = document.getElementById('app-version');
+  if (versionBadge) {
+    versionBadge.textContent = APP_VERSION;
+  }
+
   // Utility functions
   /**
    * Shuffle an array in place using Fisher–Yates.  Returns the same array.

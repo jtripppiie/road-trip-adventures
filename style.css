@@ -1280,6 +1280,24 @@ body.immersive-lock {
   overflow: hidden;
 }
 
+/* Build version badge — small, unobtrusive, always visible for QA. */
+.app-version {
+  position: fixed;
+  left: max(0.45rem, env(safe-area-inset-left));
+  bottom: max(0.45rem, env(safe-area-inset-bottom));
+  z-index: 80;
+  padding: 0.15rem 0.45rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(8, 18, 32, 0.55);
+  border-radius: 999px;
+  pointer-events: none;
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
 /* Floating exit button shown only in full screen / immersive mode. */
 .immersive-exit {
   display: none;

@@ -858,6 +858,9 @@
     </div>
   </div>
 
+  <!-- Build version badge — confirms which deployed build is live. -->
+  <div id="app-version" class="app-version" aria-hidden="true"></div>
+
   <script src="js/data/trivia.js"></script>
   <script src="js/data/community-trivia.js"></script>
   <script src="js/data/scavenger.js"></script>
@@ -875,8 +878,31 @@
   <script src="script.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
+      // Reload once when a new service worker takes control, so a fresh deploy
+      // is picked up automatically instead of serving a stale cached build.
+      var rtaRefreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        if (rtaRefreshing) return;
+        rtaRefreshing = true;
+        window.location.reload();
+      });
       window.addEventListener('load', function () {
-        navigator.serviceWorker.register('sw.js').catch(function () {});
+        navigator.serviceWorker.register('sw.js').then(function (reg) {
+          // Proactively check for an updated worker on each load.
+          reg.update();
+          if (reg.waiting) {
+            reg.waiting.postMessage('skipWaiting');
+          }
+          reg.addEventListener('updatefound', function () {
+            var next = reg.installing;
+            if (!next) return;
+            next.addEventListener('statechange', function () {
+              if (next.state === 'installed' && navigator.serviceWorker.controller) {
+                next.postMessage('skipWaiting');
+              }
+            });
+          });
+        }).catch(function () {});
       });
     }
   </script>
