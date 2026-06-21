@@ -11,7 +11,7 @@
 (() => {
   // Visible build version. Bump this (and CACHE_VERSION in sw.js) on every
   // deploy so the on-screen badge confirms which build is actually live.
-  const APP_VERSION = 'v10 · 2026-06-21';
+  const APP_VERSION = 'v11 · 2026-06-21';
   const versionBadge = document.getElementById('app-version');
   if (versionBadge) {
     versionBadge.textContent = APP_VERSION;
@@ -982,6 +982,8 @@
   let pongKeys = {};
   let pongState = null;
   let pongPointerSides = {};
+  let pongDebugEnabled = getStoredJson('rtaPongDebug', false);
+  let pongPointerDebug = null;
   let gorillasAnimationFrame = null;
   let gorillasRunning = false;
   let gorillasState = null;
@@ -1188,6 +1190,7 @@
   const pongStartButton = document.getElementById('pong-start');
   const pongFullscreenButton = document.getElementById('pong-fullscreen');
   const pongImmersiveExitButton = document.getElementById('pong-immersive-exit');
+  const pongDebugButton = document.getElementById('pong-debug');
   const pongResetButton = document.getElementById('pong-reset');
   const pongFinishButton = document.getElementById('pong-finish');
   const gorillasCanvas = document.getElementById('gorillas-canvas');
@@ -6066,6 +6069,7 @@
     if (!pongCanvas || !pongState) return;
     if (window.RTA_PONG_ART && window.RTA_PONG_ART.draw) {
       window.RTA_PONG_ART.draw(pongState);
+      if (pongDebugEnabled) drawPongDebug();
       return;
     }
     const ctx = pongCanvas.getContext('2d');
@@ -6083,6 +6087,97 @@
       pongState.ball.size,
       pongState.ball.size
     );
+    if (pongDebugEnabled) drawPongDebug();
+  }
+
+  // Debug / "computer mode" overlay: shows paddle hitboxes, the ball collider,
+  // the collision planes used by tickPong, the live canvas coordinates, and the
+  // last touch/drag point — so hitboxes and coordinates can be verified without
+  // guessing (especially handy for checking pointer mapping in full screen).
+  function drawPongDebug() {
+    if (!pongState) return;
+    const ctx = pongState.ctx || pongCanvas.getContext('2d');
+    const w = pongState.width;
+    const h = pongState.height;
+    const pw = pongState.paddleWidth;
+    const ph = pongState.paddleHeight;
+    const r = pongState.ball.size / 2;
+
+    ctx.save();
+
+    // Paddle hitboxes (must match the collision maths in tickPong).
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = '#8cff66';
+    ctx.strokeRect(22, pongState.leftPaddle.y, pw, ph);
+    ctx.strokeRect(w - 36, pongState.rightPaddle.y, pw, ph);
+
+    // Collision planes the ball is tested against.
+    ctx.strokeStyle = 'rgba(255, 77, 77, 0.7)';
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(36 + r, 0);
+    ctx.lineTo(36 + r, h);
+    ctx.moveTo(w - 36 - r, 0);
+    ctx.lineTo(w - 36 - r, h);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Ball collider.
+    ctx.strokeStyle = '#ffd166';
+    ctx.strokeRect(pongState.ball.x - r, pongState.ball.y - r, pongState.ball.size, pongState.ball.size);
+
+    // Last pointer position in canvas coordinates.
+    if (pongPointerDebug) {
+      ctx.fillStyle = '#ff4df0';
+      ctx.beginPath();
+      ctx.arc(pongPointerDebug.x, pongPointerDebug.y, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255, 77, 240, 0.5)';
+      ctx.beginPath();
+      ctx.moveTo(pongPointerDebug.x, 0);
+      ctx.lineTo(pongPointerDebug.x, h);
+      ctx.moveTo(0, pongPointerDebug.y);
+      ctx.lineTo(w, pongPointerDebug.y);
+      ctx.stroke();
+    }
+
+    const lines = [
+      'DEBUG MODE  ( ` toggles )',
+      `canvas ${w}x${h}  dpr=${pongState.dpr || 1}`,
+      `ball x=${Math.round(pongState.ball.x)} y=${Math.round(pongState.ball.y)} vx=${pongState.ball.vx.toFixed(2)} vy=${pongState.ball.vy.toFixed(2)}`,
+      `paddle L y=${Math.round(pongState.leftPaddle.y)}  R y=${Math.round(pongState.rightPaddle.y)}`,
+      pongPointerDebug
+        ? `pointer ${pongPointerDebug.side} x=${Math.round(pongPointerDebug.x)} y=${Math.round(pongPointerDebug.y)}`
+        : 'pointer: (none)',
+    ];
+
+    ctx.fillStyle = 'rgba(6, 21, 36, 0.86)';
+    ctx.fillRect(12, 12, 286, lines.length * 14 + 12);
+    ctx.fillStyle = '#bdeff4';
+    ctx.font = '800 11px monospace';
+    ctx.textBaseline = 'top';
+    ctx.textAlign = 'left';
+    lines.forEach((line, index) => {
+      ctx.fillStyle = index === 0 ? '#f7fbff' : '#bdeff4';
+      ctx.fillText(line, 22, 20 + index * 14);
+    });
+
+    ctx.restore();
+  }
+
+  function updatePongDebugButton() {
+    if (!pongDebugButton) return;
+    pongDebugButton.textContent = pongDebugEnabled ? 'Debug: On' : 'Debug: Off';
+    pongDebugButton.setAttribute('aria-pressed', pongDebugEnabled ? 'true' : 'false');
+    pongDebugButton.classList.toggle('is-active', pongDebugEnabled);
+  }
+
+  function togglePongDebug() {
+    pongDebugEnabled = !pongDebugEnabled;
+    setStoredJson('rtaPongDebug', pongDebugEnabled);
+    updatePongDebugButton();
+    if (!pongDebugEnabled) pongPointerDebug = null;
+    drawPong();
   }
 
   function updatePongScore() {
@@ -6124,6 +6219,16 @@
     if (!pongCanvas) return;
     event.preventDefault();
     const side = pongPointerSides[event.pointerId] || getPongPointerSide(event.clientX);
+    if (pongDebugEnabled) {
+      const rect = pongCanvas.getBoundingClientRect();
+      if (rect.width && rect.height) {
+        pongPointerDebug = {
+          side,
+          x: ((event.clientX - rect.left) / rect.width) * pongState.width,
+          y: ((event.clientY - rect.top) / rect.height) * pongState.height,
+        };
+      }
+    }
     if (pongSettings.opponentMode === 'computer' && side === 'right') return;
     pongPointerSides[event.pointerId] = side;
     movePongPaddleTo(side, event.clientY);
@@ -7525,6 +7630,10 @@
   if (pongImmersiveExitButton) {
     pongImmersiveExitButton.addEventListener('click', togglePongFullscreen);
   }
+  if (pongDebugButton) {
+    pongDebugButton.addEventListener('click', togglePongDebug);
+    updatePongDebugButton();
+  }
   pongResetButton.addEventListener('click', resetPongGame);
   pongFinishButton.addEventListener('click', showPongSummary);
   if (pongCanvas) {
@@ -7538,6 +7647,11 @@
   }
   document.addEventListener('keydown', event => {
     if (currentSectionKey !== 'pong') return;
+    if (event.key === '`') {
+      event.preventDefault();
+      togglePongDebug();
+      return;
+    }
     if (event.key === 'w' || event.key === 'W') pongKeys.leftUp = true;
     if (event.key === 's' || event.key === 'S') pongKeys.leftDown = true;
     if (pongSettings.opponentMode === 'local') {
