@@ -5021,7 +5021,7 @@
     });
   }
 
-  const dadJokesPack = [
+  const dadJokesFallback = [
     'I\u2019m afraid for the calendar. Its days are numbered.',
     'Why did the scarecrow win an award? He was outstanding in his field.',
     'I only know 25 letters of the alphabet. I don\u2019t know y.',
@@ -5032,7 +5032,7 @@
     'Why did the bicycle fall over? It was two tired.',
   ];
 
-  const momJokesPack = [
+  const momJokesFallback = [
     'Why did the cookie go to the doctor? Because it was feeling crumby.',
     'What do you call a bear with no teeth? A gummy bear.',
     'Why did the banana go to the party? Because it was a-peeling.',
@@ -5042,6 +5042,13 @@
     'Why did the math book look sad? It had too many problems.',
     'What do you call a pile of cats? A meow-ntain.',
   ];
+
+  const dadJokesPack = Array.isArray(window.RTA_DAD_JOKES) && window.RTA_DAD_JOKES.length
+    ? window.RTA_DAD_JOKES
+    : dadJokesFallback;
+  const momJokesPack = Array.isArray(window.RTA_MOM_JOKES) && window.RTA_MOM_JOKES.length
+    ? window.RTA_MOM_JOKES
+    : momJokesFallback;
 
   function startJokeVote() {
     resetGame();
