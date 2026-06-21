@@ -1336,6 +1336,17 @@
         'Tap More Puns for another round of groaners.',
       ],
     },
+    twenty: {
+      title: '20 Questions',
+      type: 'Just for fun',
+      scored: false,
+      summary: 'One person thinks of a secret thing and the car narrows it down in 20 questions.',
+      rules: [
+        'One person secretly thinks of any thing.',
+        'The app asks a question each turn; answer Yes, No, or Sometimes.',
+        'The car gets 20 total turns to question and guess.',
+      ],
+    },
     emoji: {
       title: 'Emoji Face-Off',
       type: 'Scored Game',
@@ -2415,7 +2426,7 @@
       'Secret Thing',
       'Think of anything you would like. Do not tell anyone what it is. The guessers get 20 total turns for questions and guesses. Example secret: sand.',
       [
-        { label: 'Start Asking', primary: true, onClick: () => showTwentyQuestionsPrompt('Start broad, then narrow down from the answers.') },
+        { label: 'Start Asking', primary: true, onClick: () => { twentyQuestionsDeck = shuffle(twentyQuestionsDeck); showTwentyQuestionsPrompt('Start broad, then narrow down from the answers.'); } },
         { label: 'Close', onClick: hideHuntSideGame },
       ]
     );
@@ -6535,6 +6546,10 @@
       startGorillasGame();
     } else if (selectedCategory === 'puns') {
       startPunGenerator();
+    } else if (selectedCategory === 'twenty') {
+      resetGame();
+      showSection('scavenger');
+      startTwentyQuestions();
     } else if (selectedCategory === 'hideSeek') {
       startHideSeekGame();
     } else {
