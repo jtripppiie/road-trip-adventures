@@ -1544,6 +1544,7 @@
     if (currentSectionKey === 'pong' && key !== 'pong') stopPong();
     if (currentSectionKey === 'gorillas' && key !== 'gorillas') stopGorillas();
     if (currentSectionKey === 'hideSeek' && key !== 'hideSeek') stopHideSeekTimer();
+    if (currentSectionKey && currentSectionKey !== key) clearPseudoFullscreen();
     if (!options.replace && currentSectionKey && currentSectionKey !== key) {
       sectionHistory.push(currentSectionKey);
     }
@@ -6121,22 +6122,99 @@
     delete pongPointerSides[event.pointerId];
   }
 
+  // Immersive ("full screen means full screen") helper. Uses the native
+  // Fullscreen API where available (Android Chrome, desktop). iOS Safari does
+  // not support the Fullscreen API for non-video elements, so we fall back to a
+  // CSS class that fills the entire viewport edge to edge. We also attempt to
+  // lock to landscape, which is a best-effort no-op on platforms that disallow
+  // it (such as iOS).
+  const PSEUDO_FULLSCREEN_CLASS = 'is-immersive';
+
+  function nativeFullscreenElement() {
+    return document.fullscreenElement || document.webkitFullscreenElement || null;
+  }
+
+  function isImmersive(el) {
+    if (!el) return false;
+    return nativeFullscreenElement() === el || el.classList.contains(PSEUDO_FULLSCREEN_CLASS);
+  }
+
+  async function lockLandscapeOrientation() {
+    try {
+      if (screen.orientation && typeof screen.orientation.lock === 'function') {
+        await screen.orientation.lock('landscape');
+      }
+    } catch (error) {
+      // Orientation lock is unsupported or blocked (e.g. iOS) — safe to ignore.
+    }
+  }
+
+  function unlockOrientation() {
+    try {
+      if (screen.orientation && typeof screen.orientation.unlock === 'function') {
+        screen.orientation.unlock();
+      }
+    } catch (error) {
+      // Ignore — not all browsers expose unlock.
+    }
+  }
+
+  async function enterImmersive(el) {
+    if (!el) return;
+    if (typeof el.requestFullscreen === 'function') {
+      await el.requestFullscreen();
+    } else if (typeof el.webkitRequestFullscreen === 'function') {
+      el.webkitRequestFullscreen();
+    } else {
+      // No Fullscreen API (notably iPhone Safari): fill the viewport with CSS.
+      el.classList.add(PSEUDO_FULLSCREEN_CLASS);
+      document.body.classList.add('immersive-lock');
+    }
+    await lockLandscapeOrientation();
+  }
+
+  async function exitImmersive(el) {
+    unlockOrientation();
+    if (nativeFullscreenElement()) {
+      if (typeof document.exitFullscreen === 'function') {
+        await document.exitFullscreen();
+      } else if (typeof document.webkitExitFullscreen === 'function') {
+        document.webkitExitFullscreen();
+      }
+      return;
+    }
+    if (el && el.classList.contains(PSEUDO_FULLSCREEN_CLASS)) {
+      el.classList.remove(PSEUDO_FULLSCREEN_CLASS);
+      document.body.classList.remove('immersive-lock');
+    }
+  }
+
+  // Clears any CSS-based immersive state (used when navigating away from a game).
+  function clearPseudoFullscreen() {
+    document.querySelectorAll('.' + PSEUDO_FULLSCREEN_CLASS).forEach(el => {
+      el.classList.remove(PSEUDO_FULLSCREEN_CLASS);
+    });
+    document.body.classList.remove('immersive-lock');
+    unlockOrientation();
+  }
+
   async function togglePongFullscreen() {
     const target = sections.pong || pongCanvas;
     try {
-      if (!document.fullscreenElement && target && target.requestFullscreen) {
-        await target.requestFullscreen();
-      } else if (document.fullscreenElement && document.exitFullscreen) {
-        await document.exitFullscreen();
+      if (!isImmersive(target)) {
+        await enterImmersive(target);
+      } else {
+        await exitImmersive(target);
       }
     } catch (error) {
       pongStatus.textContent = 'Full screen is not available in this browser.';
     }
+    updatePongFullscreenButton();
   }
 
   function updatePongFullscreenButton() {
     if (!pongFullscreenButton) return;
-    pongFullscreenButton.textContent = document.fullscreenElement ? 'Exit Full Screen' : 'Full Screen';
+    pongFullscreenButton.textContent = isImmersive(sections.pong) ? 'Exit Full Screen' : 'Full Screen';
   }
 
   function movePongPaddles() {
@@ -6336,20 +6414,20 @@
   async function toggleGorillasFullscreen() {
     const target = sections.gorillas || gorillasCanvas;
     try {
-      if (!document.fullscreenElement && target && target.requestFullscreen) {
-        await target.requestFullscreen();
-      } else if (document.fullscreenElement && document.exitFullscreen) {
-        await document.exitFullscreen();
+      if (!isImmersive(target)) {
+        await enterImmersive(target);
+      } else {
+        await exitImmersive(target);
       }
     } catch (error) {
       gorillasStatus.textContent = 'Full screen is not available in this browser.';
     }
+    updateGorillasFullscreenButton();
   }
 
   function updateGorillasFullscreenButton() {
     if (!gorillasFullscreenButton) return;
-    const active = document.fullscreenElement === sections.gorillas;
-    gorillasFullscreenButton.textContent = active ? 'Exit Full Screen' : 'Full Screen';
+    gorillasFullscreenButton.textContent = isImmersive(sections.gorillas) ? 'Exit Full Screen' : 'Full Screen';
   }
 
   function drawPixelGorilla(ctx, x, y, facing) {
@@ -7463,6 +7541,8 @@
   });
   document.addEventListener('fullscreenchange', updatePongFullscreenButton);
   document.addEventListener('fullscreenchange', updateGorillasFullscreenButton);
+  document.addEventListener('webkitfullscreenchange', updatePongFullscreenButton);
+  document.addEventListener('webkitfullscreenchange', updateGorillasFullscreenButton);
   if (appLogo) appLogo.addEventListener('click', handleLogoClick);
   if (closeLogoPrankButton) {
     closeLogoPrankButton.addEventListener('click', () => {
