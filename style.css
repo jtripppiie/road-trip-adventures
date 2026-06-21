@@ -1183,52 +1183,51 @@ body.large-text {
   touch-action: none;
 }
 
-#pong-game:fullscreen {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
-  align-content: stretch;
+/* Pong full screen = the canvas play area only. Pong is fully playable by
+   dragging on the canvas, so in full screen we hide the header, setup and
+   buttons and let the board fill the whole screen (letterboxed to keep its
+   aspect ratio). A small floating exit button is the only chrome. */
+#pong-game:fullscreen,
+#pong-game.is-immersive {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   max-width: none;
   width: 100vw;
+  width: 100dvw;
   height: 100vh;
-  padding: 0.75rem;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
-  background: var(--color-background);
+  background: #000;
 }
 
-#pong-game:fullscreen .mode-header,
-#pong-game:fullscreen .hunt-status,
-#pong-game:fullscreen .adventure-actions {
-  width: min(100%, 1200px);
-  margin-left: auto;
-  margin-right: auto;
+/* Hide every child except the canvas and the floating exit button. */
+#pong-game:fullscreen > *:not(.pong-canvas):not(.immersive-exit),
+#pong-game.is-immersive > *:not(.pong-canvas):not(.immersive-exit) {
+  display: none !important;
 }
 
-#pong-game:fullscreen .pong-setup,
-#pong-game:fullscreen .hunt-status {
-  display: none;
+#pong-game:fullscreen .pong-canvas,
+#pong-game.is-immersive .pong-canvas {
+  width: 100dvw;
+  height: 100dvh;
+  max-width: 100dvw;
+  max-height: 100dvh;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  object-fit: contain;
+  touch-action: none;
 }
 
-#pong-game:fullscreen .pong-canvas {
-  align-self: center;
-  width: min(calc(100vw - 1.5rem), calc((100vh - 8.75rem) * 12 / 7), 1320px);
-  max-height: calc(100vh - 8.75rem);
-  margin: 0.5rem auto;
-}
-
-#pong-game:fullscreen #pong-score {
-  opacity: 0.72;
-}
-
-#pong-game:fullscreen .adventure-actions {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.4rem;
-  margin-top: 0;
-}
-
-#pong-game:fullscreen .adventure-actions .primary-button,
-#pong-game:fullscreen .adventure-actions .secondary-button {
-  min-height: 2.35rem;
-  padding: 0.5rem 0.65rem;
+#pong-game:fullscreen .immersive-exit,
+#pong-game.is-immersive .immersive-exit {
+  display: flex;
 }
 
 #gorillas-game:fullscreen {
@@ -1275,12 +1274,39 @@ body.large-text {
    (notably iPhone Safari). The .is-immersive class is toggled in script.js and
    mirrors the native :fullscreen layout, filling the entire viewport edge to
    edge using the dynamic viewport height (100dvh) so mobile browser chrome is
-   accounted for. */
+   accounted for. Pong is handled by the canvas-only rules above; the rules
+   below cover Banana Towers, which still needs its aiming controls on screen. */
 body.immersive-lock {
   overflow: hidden;
 }
 
-#pong-game.is-immersive,
+/* Floating exit button shown only in full screen / immersive mode. */
+.immersive-exit {
+  display: none;
+  position: fixed;
+  top: max(0.6rem, env(safe-area-inset-top));
+  right: max(0.6rem, env(safe-area-inset-right));
+  z-index: 70;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: #fff;
+  background: rgba(8, 18, 32, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.immersive-exit:hover,
+.immersive-exit:focus-visible {
+  background: rgba(8, 18, 32, 0.85);
+}
+
 #gorillas-game.is-immersive {
   position: fixed;
   inset: 0;
@@ -1291,57 +1317,11 @@ body.immersive-lock {
   height: 100vh;
   height: 100dvh;
   padding: 0.75rem;
-  overflow: hidden;
+  overflow: auto;
   background: var(--color-background);
-}
-
-#pong-game.is-immersive {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
-  align-content: stretch;
-}
-
-#pong-game.is-immersive .mode-header,
-#pong-game.is-immersive .hunt-status,
-#pong-game.is-immersive .adventure-actions {
-  width: min(100%, 1200px);
-  margin-left: auto;
-  margin-right: auto;
-}
-
-#pong-game.is-immersive .pong-setup,
-#pong-game.is-immersive .hunt-status {
-  display: none;
-}
-
-#pong-game.is-immersive .pong-canvas {
-  align-self: center;
-  width: min(calc(100vw - 1.5rem), calc((100dvh - 8.75rem) * 12 / 7), 1320px);
-  max-height: calc(100dvh - 8.75rem);
-  margin: 0.5rem auto;
-}
-
-#pong-game.is-immersive #pong-score {
-  opacity: 0.72;
-}
-
-#pong-game.is-immersive .adventure-actions {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.4rem;
-  margin-top: 0;
-}
-
-#pong-game.is-immersive .adventure-actions .primary-button,
-#pong-game.is-immersive .adventure-actions .secondary-button {
-  min-height: 2.35rem;
-  padding: 0.5rem 0.65rem;
-}
-
-#gorillas-game.is-immersive {
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr) auto auto;
   align-content: start;
-  overflow: auto;
 }
 
 #gorillas-game.is-immersive .mode-header {

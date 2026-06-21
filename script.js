@@ -1179,6 +1179,7 @@
   const pongDifficultyButtons = document.getElementById('pong-difficulty-buttons');
   const pongStartButton = document.getElementById('pong-start');
   const pongFullscreenButton = document.getElementById('pong-fullscreen');
+  const pongImmersiveExitButton = document.getElementById('pong-immersive-exit');
   const pongResetButton = document.getElementById('pong-reset');
   const pongFinishButton = document.getElementById('pong-finish');
   const gorillasCanvas = document.getElementById('gorillas-canvas');
@@ -7513,6 +7514,9 @@
   }
   pongStartButton.addEventListener('click', startPongRound);
   pongFullscreenButton.addEventListener('click', togglePongFullscreen);
+  if (pongImmersiveExitButton) {
+    pongImmersiveExitButton.addEventListener('click', togglePongFullscreen);
+  }
   pongResetButton.addEventListener('click', resetPongGame);
   pongFinishButton.addEventListener('click', showPongSummary);
   if (pongCanvas) {
