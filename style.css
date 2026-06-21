@@ -2140,3 +2140,10 @@ body.reduce-motion .stamp.earned {
   text-align: center;
   margin: 14px 0;
 }
+.mentalist-guess {
+  font-size: 1.6rem;
+  font-weight: 800;
+  text-align: center;
+  color: #14323b;
+  margin: 12px 0;
+}

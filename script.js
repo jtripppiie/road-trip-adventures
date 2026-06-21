@@ -5369,10 +5369,12 @@
   ];
   const MENTALIST_CARDS = ['A\u2660', '7\u2665', 'Q\u2663', '9\u2666', 'K\u2660', '3\u2665', 'J\u2663', '5\u2666', '10\u2660', '2\u2665', '8\u2663', '6\u2666', '4\u2660', 'Q\u2665'];
   const MENTALIST_PREDICTIONS = {
-    Moose: 'I knew it! A moose. I even saw it wearing tiny sunglasses. Classic road-trip moose energy.',
-    Pizza: 'Pizza, obviously. My crystal ball is 90 percent mozzarella. We are basically the same.',
-    UFO: 'A UFO! I predicted you would think big. Beam me up a snack while you are out there.',
-    'Giant Peanut': 'The Giant Peanut. Bold. Legendary. I wrote this down before you were even hungry.',
+    Moose: 'My sealed envelope says: MOOSE. I even drew it wearing tiny sunglasses. Classic road-trip moose energy.',
+    Pizza: 'My sealed envelope says: PIZZA. My crystal ball is 90 percent mozzarella, so we are basically related.',
+    UFO: 'My sealed envelope says: UFO. I predicted you would think big. Beam me up a snack while you are out there.',
+    'Giant Peanut': 'My sealed envelope says: GIANT PEANUT. Bold. Legendary. I wrote it down before you were even hungry.',
+    Bigfoot: 'My sealed envelope says: BIGFOOT. Blurry, mysterious, and somehow always nearby. Just like my predictions.',
+    Taco: 'My sealed envelope says: TACO. The universe folds toward deliciousness, and so did your brain.',
   };
 
   function mentalistShow(title, lines, actions, extraNode) {
@@ -5430,14 +5432,37 @@
     ]);
   }
 
-  function mentalistRevealValue(title, line, value, restart) {
+  function mentalistRevealValue(title, lines, value, restart) {
     const big = document.createElement('p');
     big.className = 'mentalist-reveal';
     big.textContent = value;
-    mentalistShow(title, [line], [
+    mentalistShow(title, lines, [
       { label: 'Do It Again', primary: true, onClick: restart || mentalistMenu },
       { label: 'Back to Tricks', onClick: mentalistMenu },
     ], big);
+  }
+
+  function mentalistGuessConfirm(options) {
+    const node = document.createElement('p');
+    node.className = options.isBig ? 'mentalist-reveal' : 'mentalist-guess';
+    node.textContent = options.guess;
+    mentalistShow(options.title, options.setup || ['I am locking in my guess...'], [
+      {
+        label: 'Yes! How?!',
+        primary: true,
+        onClick: () => mentalistShow(options.title, options.hitLines, [
+          { label: 'Do It Again', primary: true, onClick: options.restart },
+          { label: 'Back to Tricks', onClick: mentalistMenu },
+        ]),
+      },
+      {
+        label: 'Nope, missed it',
+        onClick: () => mentalistShow(options.title, options.missLines, [
+          { label: 'Try Again', primary: true, onClick: options.restart },
+          { label: 'Back to Tricks', onClick: mentalistMenu },
+        ]),
+      },
+    ], node);
   }
 
   function mentalistSymbolStart() {
@@ -5561,11 +5586,13 @@
   }
 
   function mentalistPredictionStart() {
-    mentalistShow('Road Trip Prediction', ['I already wrote down what you will pick. Choose one:'], [
+    mentalistShow('Road Trip Prediction', ['I already sealed my prediction in an envelope. Now pick one:'], [
       { label: '\ud83e\udd8c Moose', primary: true, onClick: () => mentalistPredictionReveal('Moose') },
       { label: '\ud83c\udf55 Pizza', onClick: () => mentalistPredictionReveal('Pizza') },
       { label: '\ud83d\udef8 UFO', onClick: () => mentalistPredictionReveal('UFO') },
       { label: '\ud83e\udd5c Giant Peanut', onClick: () => mentalistPredictionReveal('Giant Peanut') },
+      { label: '\ud83e\uddb6 Bigfoot', onClick: () => mentalistPredictionReveal('Bigfoot') },
+      { label: '\ud83c\udf2e Taco', onClick: () => mentalistPredictionReveal('Taco') },
       { label: 'Back to Tricks', onClick: mentalistMenu },
     ]);
   }
@@ -5586,7 +5613,7 @@
       'Reverse that answer, then add those two numbers together.',
       'Remember your final total.',
     ], [
-      { label: 'I have my total', primary: true, onClick: () => mentalistThinking(() => mentalistRevealValue('Magic Number 1089', 'Your total is...', '1089', mentalistMagic1089Start)) },
+      { label: 'I have my total', primary: true, onClick: () => mentalistThinking(() => mentalistRevealValue('Magic Number 1089', ['It does not matter which number you started with...', 'the answer is ALWAYS the same. Behold:'], '1089', mentalistMagic1089Start)) },
       { label: 'Back to Tricks', onClick: mentalistMenu },
     ]);
   }
@@ -5600,7 +5627,7 @@
       'Subtract the number you started with.',
       'Remember your answer.',
     ], [
-      { label: 'Read my mind', primary: true, onClick: () => mentalistThinking(() => mentalistRevealValue('Always Lands on 5', 'Your answer is...', '5', mentalistForceFiveStart)) },
+      { label: 'Read my mind', primary: true, onClick: () => mentalistThinking(() => mentalistRevealValue('Always Lands on 5', ['Any number, any time, same ending.', 'Your answer is...'], '5', mentalistForceFiveStart)) },
       { label: 'Back to Tricks', onClick: mentalistMenu },
     ]);
   }
@@ -5644,13 +5671,14 @@
   }
 
   function mentalistRedHammerReveal() {
-    mentalistShow('My Guess Is...', [
-      'You are thinking of a red hammer!',
-      'Most brains jump straight to it. If I missed, you are a true original.',
-    ], [
-      { label: 'Do It Again', primary: true, onClick: mentalistRedHammerStart },
-      { label: 'Back to Tricks', onClick: mentalistMenu },
-    ]);
+    mentalistGuessConfirm({
+      title: 'Red Hammer Guess',
+      guess: 'a red hammer',
+      setup: ['A simple tool and a bold color... most minds smash them into one picture. I see...'],
+      hitLines: ['A red hammer! Called it. Brains love that exact combo.', 'You are gloriously normal, and I respect it completely.'],
+      missLines: ['No red hammer? You magnificent weirdo.', 'A green wrench? A blue saw? Whatever it was, you beat me this round.'],
+      restart: mentalistRedHammerStart,
+    });
   }
 
   function mentalistCrystalNumberStart() {
@@ -5663,7 +5691,7 @@
       'Subtract the number you started with.',
       'Remember your answer.',
     ], [
-      { label: 'Gaze into the ball', primary: true, onClick: () => mentalistThinking(() => mentalistRevealValue('Crystal Ball Number', 'The crystal ball shows...', '3', mentalistCrystalNumberStart)) },
+      { label: 'Gaze into the ball', primary: true, onClick: () => mentalistThinking(() => mentalistRevealValue('Crystal Ball Number', ['The mist swirls in my crystal ball...', 'and a single number glows:'], '3', mentalistCrystalNumberStart)) },
       { label: 'Back to Tricks', onClick: mentalistMenu },
     ]);
   }
@@ -5675,7 +5703,15 @@
       'The two digits must be different from each other.',
       'Lock it in your mind.',
     ], [
-      { label: 'Read my mind', primary: true, onClick: () => mentalistThinking(() => mentalistRevealValue('Lucky 37', 'Most brains land on...', '37', mentalistLucky37Start)) },
+      { label: 'Read my mind', primary: true, onClick: () => mentalistThinking(() => mentalistGuessConfirm({
+        title: 'Lucky 37',
+        guess: '37',
+        isBig: true,
+        setup: ['Two odd digits, both different... the brain almost always sprints to one spot. I see...'],
+        hitLines: ['37! The number people choose when they try to be random but cannot.', 'You walked right into my trap. Beautifully done.'],
+        missLines: ['Ooh, you dodged it! Most folks land on 37 (or 35).', 'Your brain refused to be ordinary. I tip my top hat to you.'],
+        restart: mentalistLucky37Start,
+      })) },
       { label: 'Back to Tricks', onClick: mentalistMenu },
     ]);
   }
@@ -5686,7 +5722,15 @@
       'Pick a number between 1 and 10.',
       'Picture it glowing in your mind.',
     ], [
-      { label: 'Guess my number', primary: true, onClick: () => mentalistThinking(() => mentalistRevealValue('Quick Seven', 'You are thinking of...', '7', mentalistQuickSevenStart)) },
+      { label: 'Guess my number', primary: true, onClick: () => mentalistThinking(() => mentalistGuessConfirm({
+        title: 'Quick Seven',
+        guess: '7',
+        isBig: true,
+        setup: ['You picked fast, so I read fast. The number burning in your mind is...'],
+        hitLines: ['Seven! I knew it. It is the number almost everyone grabs when they hurry.', 'Your brain is wonderfully predictable. I mean that as a compliment.'],
+        missLines: ['Whoa, a true original! Most people blurt out 7 without thinking.', 'You broke the pattern. Are you sure you are not the mentalist here?'],
+        restart: mentalistQuickSevenStart,
+      })) },
       { label: 'Back to Tricks', onClick: mentalistMenu },
     ]);
   }
@@ -5703,13 +5747,14 @@
   }
 
   function mentalistShapeReveal() {
-    mentalistShow('My Guess Is...', [
-      'You are picturing a triangle inside a circle!',
-      'It is the combo most brains reach for. Spooky, right?',
-    ], [
-      { label: 'Do It Again', primary: true, onClick: mentalistShapeStart },
-      { label: 'Back to Tricks', onClick: mentalistMenu },
-    ]);
+    mentalistGuessConfirm({
+      title: 'Shape in a Shape',
+      guess: 'a triangle inside a circle',
+      setup: ['One shape hugging another... the mind has a clear favorite. I see...'],
+      hitLines: ['A triangle inside a circle! The all-time most-picked combo.', 'Your imagination runs on the house special.'],
+      missLines: ['Not the classic triangle-in-a-circle? Bold artist!', 'You colored outside the lines, and honestly, I love that for you.'],
+      restart: mentalistShapeStart,
+    });
   }
 
   function renderEmojiGame() {
