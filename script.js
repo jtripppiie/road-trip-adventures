@@ -901,11 +901,8 @@
   const HIDE_SEEK_DEFAULT_DIFFICULTY = 'normal';
   const HIDE_SEEK_SEARCH_TOLERANCE = 51;
   const HIDE_SEEK_INSPECT_SECONDS = 1.1;
-  const HIDE_SEEK_MAX_HINTS = 3;
   const HIDE_SEEK_MAX_STAMINA = 100;
   const HIDE_SEEK_SPRINT_SPEED_MULTIPLIER = 1.45;
-  const HIDE_SEEK_SUSPICION_DISTANCE = 203;
-  const HIDE_SEEK_TRAIL_NOISE_THRESHOLD = 0.28;
 
   function getHideSeekSearchCount(difficulty) {
     return HIDE_SEEK_SEARCH_COUNTS[difficulty] || HIDE_SEEK_SEARCH_COUNTS[HIDE_SEEK_DEFAULT_DIFFICULTY];
@@ -924,11 +921,8 @@
     hiddenCoverQuality: 1,
     hiddenCoverLabel: 'Risky',
     spotStates: {},
-    hintsRemaining: HIDE_SEEK_MAX_HINTS,
     noiseLevel: 0,
     stamina: HIDE_SEEK_MAX_STAMINA,
-    suspicionSpotId: null,
-    suspicionLevel: 0,
     inspectedSpotId: null,
     inspectTime: 0,
     inspectionCount: 0,
@@ -950,10 +944,7 @@
     input: { up: false, down: false, left: false, right: false, sprint: false },
     revealPulse: 0,
     searchPulse: null,
-    listenPulse: null,
-    listenHint: null,
     roomTrail: [],
-    lastTrailClue: '',
     particles: [],
     cameraShake: 0,
     coverGlowPulse: 0,
@@ -2754,35 +2745,11 @@
     hideSeekState.roomTrail = trail.slice(-5);
   }
 
-  function getHideSeekTrailClue() {
-    const trail = hideSeekState.roomTrail || [];
-    if (trail.length <= 1 || hideSeekState.noiseLevel < HIDE_SEEK_TRAIL_NOISE_THRESHOLD) return null;
-    const lastRoomId = trail[trail.length - 1];
-    const previousRoomId = trail[trail.length - 2];
-    if (!lastRoomId) return null;
-    return {
-      lastRoomId,
-      previousRoomId,
-      room: getHideSeekRoom(lastRoomId),
-      previousRoom: previousRoomId ? getHideSeekRoom(previousRoomId) : null,
-      movedRooms: new Set(trail).size,
-    };
-  }
-
   function getHideSeekSearchFeedback(sameRoom, distance) {
-    if (!sameRoom) {
-      return { text: 'Wrong room. Keep moving.', tone: 'cold' };
-    }
-    if (distance <= HIDE_SEEK_SEARCH_TOLERANCE) {
+    if (sameRoom && distance <= HIDE_SEEK_SEARCH_TOLERANCE) {
       return { text: 'Found!', tone: 'found' };
     }
-    if (distance <= HIDE_SEEK_SEARCH_TOLERANCE * 1.65) {
-      return { text: 'Very close. Search the exact spot.', tone: 'hot' };
-    }
-    if (distance <= HIDE_SEEK_SEARCH_TOLERANCE * 2.8) {
-      return { text: 'Warm. You are in the neighborhood.', tone: 'warm' };
-    }
-    return { text: 'Cold. Try another piece of cover.', tone: 'cold' };
+    return { text: 'Not there.', tone: 'cold' };
   }
 
   function setHideSeekSearchPulse(actor, tone) {
@@ -2794,32 +2761,6 @@
       time: 0.9,
       maxTime: 0.9,
       tone,
-    };
-  }
-
-  function setHideSeekListenPulse(actor, tone) {
-    const center = getHideSeekActorCenter(actor);
-    hideSeekState.listenPulse = {
-      x: center.x,
-      y: center.y,
-      roomId: actor.roomId,
-      time: 1.1,
-      maxTime: 1.1,
-      tone,
-    };
-  }
-
-  function setHideSeekListenHint(actor, targetSpot) {
-    if (!targetSpot) return;
-    const actorCenter = getHideSeekActorCenter(actor);
-    const targetCenter = getHideSeekSpotCenter(targetSpot);
-    hideSeekState.listenHint = {
-      x: actorCenter.x,
-      y: actorCenter.y,
-      angle: Math.atan2(targetCenter.y - actorCenter.y, targetCenter.x - actorCenter.x),
-      roomId: actor.roomId,
-      time: 1.8,
-      maxTime: 1.8,
     };
   }
 
@@ -2865,10 +2806,6 @@
   function useHideSeekSpecialAction() {
     if (hideSeekState.phase === HideSeekGameState.HIDER_TURN) {
       peekHideSeekHider();
-      return;
-    }
-    if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
-      listenHideSeekSeeker();
     }
   }
 
@@ -2898,58 +2835,11 @@
     renderHideSeek();
   }
 
-  function listenHideSeekSeeker() {
-    if (hideSeekState.hintsRemaining <= 0) {
-      setHideSeekMessage('No listens left this round.');
-      playHideSeekTone('wrong');
-      return;
-    }
-    if (hideSeekState.searchesRemaining <= 0) {
-      setHideSeekMessage('No searches left this round.');
-      playHideSeekTone('wrong');
-      return;
-    }
-    const actor = hideSeekState.actors.seeker;
-    const hiddenSpot = getHideSeekSpotById(hideSeekState.hiddenSpotId);
-    if (!hiddenSpot) return;
-    hideSeekState.hintsRemaining -= 1;
-    hideSeekState.searchesRemaining = Math.max(0, hideSeekState.searchesRemaining - 1);
-    const sameRoom = actor.roomId === hiddenSpot.roomId;
-    const trailClue = getHideSeekTrailClue();
-    const clue = hideSeekState.noiseLevel >= 0.5
-      ? `You hear a rustle near the ${hiddenSpot.label}.`
-      : sameRoom
-        ? `The sound is in this room. Check cover carefully.`
-        : trailClue && trailClue.room
-          ? trailClue.movedRooms >= 3
-            ? `You catch a trail through ${trailClue.previousRoom ? `${trailClue.previousRoom.name} into ` : ''}${trailClue.room.name}.`
-            : `You catch a clue near the way to ${trailClue.room.name}.`
-          : `The sound seems to come from ${getHideSeekRoom(hiddenSpot.roomId).name}.`;
-    hideSeekState.suspicionSpotId = hideSeekState.noiseLevel >= 0.5 || sameRoom ? hiddenSpot.id : null;
-    if (hideSeekState.suspicionSpotId) setHideSeekSpotState(hideSeekState.suspicionSpotId, 'suspicious');
-    setHideSeekListenPulse(actor, sameRoom ? 'warm' : 'cold');
-    setHideSeekListenHint(actor, sameRoom || hideSeekState.noiseLevel >= 0.5 ? hiddenSpot : null);
-    hideSeekState.lastTrailClue = clue;
-    spawnHideSeekParticles(actor.x + actor.width / 2, actor.y + actor.height / 2, actor.roomId, {
-      color: 'rgba(189, 239, 244, 0.8)',
-      count: 10,
-      speed: 52,
-      size: 2,
-      life: 0.9,
-    });
-    setHideSeekMessage(`${clue} Listen costs 1 search. ${hideSeekState.searchesRemaining} searches left.`);
-    playHideSeekTone('listen');
-    renderHideSeek();
-    if (hideSeekState.searchesRemaining <= 0) hideSeekSeekerFailed();
-  }
-
   function addHideSeekNoise(actor, amount) {
     hideSeekState.noiseLevel = Math.min(1, hideSeekState.noiseLevel + amount);
     const nearbySpot = getNearbyHideSeekSpot(actor);
     if (!nearbySpot) return;
-    hideSeekState.suspicionSpotId = nearbySpot.id;
     if (hideSeekState.noiseLevel >= 0.55) {
-      setHideSeekSpotState(nearbySpot.id, 'suspicious');
       hideSeekState.shakingSpotId = nearbySpot.id;
       hideSeekState.shakeTime = Math.max(hideSeekState.shakeTime || 0, 0.28);
       spawnHideSeekParticles(nearbySpot.x + nearbySpot.width / 2, nearbySpot.y + nearbySpot.height / 2, nearbySpot.roomId || actor.roomId, {
@@ -2959,32 +2849,6 @@
         size: 2,
         life: 0.45,
       });
-    }
-  }
-
-  function updateHideSeekSuspicion(delta) {
-    if (hideSeekState.phase !== HideSeekGameState.SEEKER_TURN || !hideSeekState.hiddenPosition) return;
-    const seeker = hideSeekState.actors.seeker;
-    if (seeker.roomId !== hideSeekState.hiddenPosition.roomId) {
-      hideSeekState.suspicionLevel = Math.max(0, hideSeekState.suspicionLevel - delta * 7);
-      return;
-    }
-    const seekerCenter = getHideSeekActorCenter(seeker);
-    const hiddenCenter = {
-      x: hideSeekState.hiddenPosition.x + hideSeekState.actors.hider.width / 2,
-      y: hideSeekState.hiddenPosition.y + hideSeekState.actors.hider.height / 2,
-    };
-    const distance = Math.hypot(seekerCenter.x - hiddenCenter.x, seekerCenter.y - hiddenCenter.y);
-    const isClose = distance <= HIDE_SEEK_SUSPICION_DISTANCE;
-    const pressure = Math.max(0, 1 - distance / HIDE_SEEK_SUSPICION_DISTANCE);
-    hideSeekState.suspicionLevel = isClose
-      ? Math.min(100, hideSeekState.suspicionLevel + delta * (10 + pressure * 22 + hideSeekState.noiseLevel * 18))
-      : Math.max(0, hideSeekState.suspicionLevel - delta * 5);
-    if (hideSeekState.suspicionLevel >= 70 && hideSeekState.hiddenSpotId && getHideSeekSpotState(hideSeekState.hiddenSpotId) !== 'found') {
-      setHideSeekSpotState(hideSeekState.hiddenSpotId, 'suspicious');
-      hideSeekState.suspicionSpotId = hideSeekState.hiddenSpotId;
-      hideSeekState.shakingSpotId = hideSeekState.hiddenSpotId;
-      hideSeekState.shakeTime = Math.max(hideSeekState.shakeTime || 0, 0.22);
     }
   }
 
@@ -3085,9 +2949,8 @@
       cards.push(['Noise', `${Math.round(hideSeekState.noiseLevel * 100)}%`]);
       cards.push(['Sprint', `${Math.round(hideSeekState.stamina)}%`]);
     } else if (isSeekerTurn) {
-      cards.push(['Listen Uses', String(hideSeekState.hintsRemaining)]);
       cards.push(['Wrong Checks', String(hideSeekState.wrongGuesses)]);
-      cards.push(['Suspicion', `${Math.round(hideSeekState.suspicionLevel)}%`]);
+      cards.push(['Sprint', `${Math.round(hideSeekState.stamina)}%`]);
     }
 
     hideSeekMeta.innerHTML = '';
@@ -3127,11 +2990,8 @@
     hideSeekState.hiddenCoverQuality = 1;
     hideSeekState.hiddenCoverLabel = 'Risky';
     hideSeekState.spotStates = buildHideSeekSpotStates();
-    hideSeekState.hintsRemaining = HIDE_SEEK_MAX_HINTS;
     hideSeekState.noiseLevel = 0;
     hideSeekState.stamina = HIDE_SEEK_MAX_STAMINA;
-    hideSeekState.suspicionSpotId = null;
-    hideSeekState.suspicionLevel = 0;
     hideSeekState.inspectedSpotId = null;
     hideSeekState.inspectTime = 0;
     hideSeekState.inspectionCount = 0;
@@ -3144,10 +3004,7 @@
     hideSeekState.roundSeekerScore = 0;
     hideSeekState.revealPulse = 0;
     hideSeekState.searchPulse = null;
-    hideSeekState.listenPulse = null;
-    hideSeekState.listenHint = null;
     hideSeekState.roomTrail = [hideSeekState.activeRoomId];
-    hideSeekState.lastTrailClue = '';
     hideSeekState.particles = [];
     hideSeekState.cameraShake = 0;
     hideSeekState.coverGlowPulse = 0;
@@ -3183,7 +3040,7 @@
 
     hideSeekStartButton.hidden = ![HideSeekGameState.TITLE, HideSeekGameState.ROUND_START, HideSeekGameState.GAME_OVER].includes(hideSeekState.phase);
     hideSeekFoundButton.hidden = ![HideSeekGameState.HIDER_TURN, HideSeekGameState.SEEKER_LOOK_AWAY, HideSeekGameState.SEEKER_TURN].includes(hideSeekState.phase);
-    hideSeekSpecialButton.hidden = ![HideSeekGameState.HIDER_TURN, HideSeekGameState.SEEKER_TURN].includes(hideSeekState.phase);
+    hideSeekSpecialButton.hidden = hideSeekState.phase !== HideSeekGameState.HIDER_TURN;
     hideSeekSprintButton.hidden = ![HideSeekGameState.HIDER_TURN, HideSeekGameState.SEEKER_TURN].includes(hideSeekState.phase);
     hideSeekNextButton.hidden = ![HideSeekGameState.FOUND, HideSeekGameState.ROUND_RESULTS].includes(hideSeekState.phase);
     hideSeekFoundButton.disabled = false;
@@ -3223,14 +3080,11 @@
       hideSeekFoundButton.textContent = 'Inspect Spot';
       hideSeekFoundButton.setAttribute('aria-label', 'Inspect this hiding spot');
       hideSeekFoundButton.disabled = !nearbySpot || hideSeekState.inspectTime > 0;
-      hideSeekSpecialButton.textContent = `Listen (${hideSeekState.hintsRemaining})`;
-      hideSeekSpecialButton.setAttribute('aria-label', 'Listen for a clue');
-      hideSeekSpecialButton.disabled = hideSeekState.hintsRemaining <= 0;
       hideSeekRoundTitle.textContent = `${seekerName}, find the hider.`;
       hideSeekRoundText.textContent = nearbySpot
-        ? `You are close to the ${nearbySpot.label}. Inspect it now, or spend a search on Listen for a clue.`
+        ? `You are close to the ${nearbySpot.label}. Inspect it when you are ready.`
         : `Walk room to room, stop beside cover, and inspect carefully. Every wrong new check costs one search.`;
-      setHideSeekMessage(hideSeekState.lastTrailClue || `${seekerName} is searching ${room.name}. Searches left: ${hideSeekState.searchesRemaining}.`);
+      setHideSeekMessage(`${seekerName} is searching ${room.name}. Searches left: ${hideSeekState.searchesRemaining}.`);
     } else if (hideSeekState.phase === HideSeekGameState.FOUND || hideSeekState.phase === HideSeekGameState.ROUND_RESULTS) {
       hideSeekRoundTitle.textContent = hideSeekState.phase === HideSeekGameState.FOUND ? 'Found!' : 'Round over.';
       hideSeekRoundText.textContent = hideSeekState.lastRoundText || `${hiderName} was hidden ${hideSeekState.hiddenSpotLabel}.`;
@@ -3413,7 +3267,7 @@
       return;
     }
     const inspectedState = getHideSeekSpotState(inspectedSpot.id);
-    const isDuplicateWrongSearch = inspectedSpot.id !== hideSeekState.hiddenSpotId && (inspectedState === 'searched' || inspectedState === 'suspicious');
+    const isDuplicateWrongSearch = inspectedSpot.id !== hideSeekState.hiddenSpotId && inspectedState === 'searched';
     if (isDuplicateWrongSearch) {
       setHideSeekMessage('You already checked there.');
       playHideSeekTone('wrong');
@@ -3435,11 +3289,11 @@
     if (inspectedSpot.id !== hideSeekState.hiddenSpotId) {
       hideSeekState.wrongGuesses += 1;
       hideSeekState.searchesRemaining = Math.max(0, hideSeekState.searchesRemaining - 1);
-      setHideSeekSpotState(inspectedSpot.id, distance <= HIDE_SEEK_SEARCH_TOLERANCE * 2.8 ? 'suspicious' : 'searched');
+      setHideSeekSpotState(inspectedSpot.id, 'searched');
       hideSeekState.shakingSpotId = inspectedSpot.id;
       hideSeekState.shakeTime = 0.55;
       spawnHideSeekParticles(inspectedCenter.x, inspectedCenter.y, actor.roomId, {
-        color: distance <= HIDE_SEEK_SEARCH_TOLERANCE * 2.8 ? 'rgba(255, 209, 102, 0.85)' : 'rgba(154, 164, 178, 0.75)',
+        color: 'rgba(154, 164, 178, 0.75)',
         count: 9,
         speed: 34,
         size: 3,
@@ -3552,11 +3406,8 @@
       hiddenCoverQuality: 1,
       hiddenCoverLabel: 'Risky',
       spotStates: buildHideSeekSpotStates(),
-      hintsRemaining: HIDE_SEEK_MAX_HINTS,
       noiseLevel: 0,
       stamina: HIDE_SEEK_MAX_STAMINA,
-      suspicionSpotId: null,
-      suspicionLevel: 0,
       inspectedSpotId: null,
       inspectTime: 0,
       inspectionCount: 0,
@@ -3579,10 +3430,7 @@
       input: { up: false, down: false, left: false, right: false, sprint: false },
       revealPulse: 0,
       searchPulse: null,
-      listenPulse: null,
-      listenHint: null,
       roomTrail: [((hideSeekMaps[hideSeekMode.value] || hideSeekMaps['roadside-lodge']).startRoom)],
-      lastTrailClue: '',
       particles: [],
       cameraShake: 0,
       coverGlowPulse: 0,
@@ -3615,19 +3463,10 @@
       hideSeekState.searchPulse.time = Math.max(0, hideSeekState.searchPulse.time - delta);
       if (hideSeekState.searchPulse.time <= 0) hideSeekState.searchPulse = null;
     }
-    if (hideSeekState.listenPulse) {
-      hideSeekState.listenPulse.time = Math.max(0, hideSeekState.listenPulse.time - delta);
-      if (hideSeekState.listenPulse.time <= 0) hideSeekState.listenPulse = null;
-    }
-    if (hideSeekState.listenHint) {
-      hideSeekState.listenHint.time = Math.max(0, hideSeekState.listenHint.time - delta);
-      if (hideSeekState.listenHint.time <= 0) hideSeekState.listenHint = null;
-    }
     if (hideSeekState.cameraShake > 0) hideSeekState.cameraShake = Math.max(0, hideSeekState.cameraShake - delta * 1.8);
     updateHideSeekParticles(delta);
     if (hideSeekState.inspectTime > 0) hideSeekState.inspectTime = Math.max(0, hideSeekState.inspectTime - delta);
     if (hideSeekState.noiseLevel > 0) hideSeekState.noiseLevel = Math.max(0, hideSeekState.noiseLevel - delta * 0.025);
-    updateHideSeekSuspicion(delta);
     hideSeekState.coverGlowPulse = (hideSeekState.coverGlowPulse + delta * 2.2) % (Math.PI * 2);
     if (hideSeekState.shakeTime > 0) hideSeekState.shakeTime = Math.max(0, hideSeekState.shakeTime - delta);
     updateHideSeekTimerText();
@@ -3756,6 +3595,18 @@
     return false;
   }
 
+  function isHideSeekMovingTowardExit(exit, dx, dy) {
+    const topThreshold = Math.round(62 * HIDE_SEEK_SCALE);
+    const bottomThreshold = Math.round(360 * HIDE_SEEK_SCALE);
+    const leftThreshold = Math.round(62 * HIDE_SEEK_SCALE);
+    const rightThreshold = Math.round(700 * HIDE_SEEK_SCALE);
+    if (exit.y <= topThreshold) return dy < 0;
+    if (exit.y >= bottomThreshold) return dy > 0;
+    if (exit.x <= leftThreshold) return dx < 0;
+    if (exit.x >= rightThreshold) return dx > 0;
+    return false;
+  }
+
   function checkHideSeekExits(actor, room, dx = 0, dy = 0) {
     const actorCenter = getHideSeekActorCenter(actor);
     const actorCollider = getHideSeekActorCollider(actor);
@@ -3767,7 +3618,9 @@
     };
     if (actor.exitIgnoreRoom) {
       const ignoredExit = room.exits.find(item => item.targetRoom === actor.exitIgnoreRoom);
-      if (!ignoredExit || !isInsideExit(ignoredExit)) actor.exitIgnoreRoom = '';
+      if (!ignoredExit || !isInsideExit(ignoredExit) || isHideSeekMovingTowardExit(ignoredExit, dx, dy)) {
+        actor.exitIgnoreRoom = '';
+      }
     }
     if ((actor.exitCooldown || 0) > 0) return;
     const exit = room.exits.find(item => {
@@ -3952,7 +3805,6 @@
     drawHideSeekActionEffects(ctx, room);
     drawHideSeekParticles(ctx, room);
     drawHideSeekAtmosphere(ctx, room, map);
-    drawHideSeekListenHint(ctx, room);
     ctx.restore();
     if (hideSeekDebugEnabled) drawHideSeekDebug(ctx, room, map);
   }
@@ -4207,20 +4059,6 @@
       ctx.restore();
     }
 
-    const listenPulse = hideSeekState.listenPulse;
-    if (listenPulse && listenPulse.roomId === room.id) {
-      const progress = 1 - (listenPulse.time / listenPulse.maxTime);
-      ctx.save();
-      ctx.strokeStyle = `rgba(189, 239, 244, ${Math.max(0, 0.75 - progress * 0.55)})`;
-      ctx.lineWidth = 3;
-      for (let ring = 0; ring < 3; ring += 1) {
-        ctx.beginPath();
-        ctx.arc(listenPulse.x, listenPulse.y, 26 + progress * 82 + ring * 22, 0, Math.PI * 2);
-        ctx.stroke();
-      }
-      ctx.restore();
-    }
-
     if (hideSeekState.phase === HideSeekGameState.HIDER_TURN) {
       const actor = hideSeekState.actors.hider;
       const quality = getHideSeekCoverQuality(actor);
@@ -4315,31 +4153,6 @@
     }
   }
 
-  function drawHideSeekListenHint(ctx, room) {
-    const hint = hideSeekState.listenHint;
-    if (!hint || hint.roomId !== room.id) return;
-    const progress = 1 - hint.time / hint.maxTime;
-    const alpha = Math.max(0, 0.9 - progress * 0.65);
-    ctx.save();
-    ctx.translate(hint.x, hint.y);
-    ctx.rotate(hint.angle);
-    ctx.fillStyle = `rgba(255, 209, 102, ${alpha})`;
-    ctx.strokeStyle = `rgba(6, 21, 36, ${alpha})`;
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(52 + progress * 14, 0);
-    ctx.lineTo(24, -13);
-    ctx.lineTo(29, -4);
-    ctx.lineTo(4, -4);
-    ctx.lineTo(4, 4);
-    ctx.lineTo(29, 4);
-    ctx.lineTo(24, 13);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
-  }
-
   function drawHideSeekObject(ctx, spot, isNearby, state) {
     const x = spot.x;
     const y = spot.y;
@@ -4353,7 +4166,6 @@
     const stateColors = {
       disabled: '#4b5563',
       searched: '#9aa4b2',
-      suspicious: '#ffd166',
       found: '#2ec7d3',
     };
     const highlight = isNearby ? '#f58220' : stateColors[visibleState] || 'rgba(255,255,255,0.26)';
@@ -4508,7 +4320,7 @@
       ctx.lineTo(x + 12, y + h - 12);
       ctx.stroke();
     }
-    if (visibleState === 'disabled' || visibleState === 'searched' || visibleState === 'suspicious' || visibleState === 'found') {
+    if (visibleState === 'disabled' || visibleState === 'searched' || visibleState === 'found') {
       ctx.fillStyle = visibleState === 'searched' ? 'rgba(6,21,36,0.78)' : 'rgba(6,21,36,0.88)';
       fillHideSeekRoundedRect(ctx, x + 8, y + 8, 86, 20, 10);
       ctx.fillStyle = visibleState === 'searched' ? '#d7dce4' : visibleState === 'found' ? '#bdeff4' : '#fff2d8';
@@ -4683,9 +4495,8 @@
       ctx.fillStyle = '#fff2d8';
       ctx.font = '900 10px Arial';
       ctx.fillText(`Miss: -1 search`, 472, 25);
-      ctx.fillText(`Listen: ${hideSeekState.hintsRemaining}`, 472, 42);
+      ctx.fillText(`Inspect cover`, 472, 42);
       drawHideSeekMeter(ctx, 544, 31, 38, hideSeekState.stamina, '#2ec7d3', '');
-      drawHideSeekMeter(ctx, 544, 47, 38, hideSeekState.suspicionLevel, '#ffd166', '');
     }
 
     ctx.textAlign = 'right';
@@ -5659,10 +5470,12 @@
       pongState.ball.vy *= -1;
     }
 
-    const leftHit = pongState.ball.x <= 36 + pongState.ball.size / 2
+    const leftHit = pongState.ball.vx < 0
+      && pongState.ball.x <= 36 + pongState.ball.size / 2
       && pongState.ball.y >= pongState.leftPaddle.y
       && pongState.ball.y <= pongState.leftPaddle.y + pongState.paddleHeight;
-    const rightHit = pongState.ball.x >= pongState.width - 36 - pongState.ball.size / 2
+    const rightHit = pongState.ball.vx > 0
+      && pongState.ball.x >= pongState.width - 36 - pongState.ball.size / 2
       && pongState.ball.y >= pongState.rightPaddle.y
       && pongState.ball.y <= pongState.rightPaddle.y + pongState.paddleHeight;
     if (leftHit || rightHit) {
