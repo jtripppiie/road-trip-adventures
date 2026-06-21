@@ -1393,9 +1393,8 @@
         'The banana arcs over the buildings and can hit the opponent.',
         'Wait for the banana to land before the next player throws.',
         'Bananas blast a crater out of a building and can fly through gaps they made.',
-        'Clip your own tower and the point goes to your opponent.',
-        'Direct hits score a point and start the next turn.',
-        'First to 5 wins the round.',
+        'Clip your own tower and your opponent wins.',
+        'Hit the other gorilla directly to win the match instantly.',
       ],
     },
   };
@@ -6008,7 +6007,7 @@
       const winnerName = scorerSide === getGorillasSide(gorillasTurn)
         ? shooterName
         : getGorillasPlayerName(gorillasTurn + 1);
-      if (gorillasState[scorer] >= 5) {
+      if (options.instantWin || gorillasState[scorer] >= 5) {
         gorillasState.winner = scorer;
         gorillasState.explosion = impact;
         gorillasState.sparks = impact ? createGorillasSparks(impact.x, impact.y) : [];
@@ -6080,12 +6079,6 @@
     const targetIndex = shooterSide === 'left' ? lastBuildingIndex : 0;
     const shooterIndex = shooterSide === 'left' ? 0 : lastBuildingIndex;
     const target = gorillasState.buildings[targetIndex];
-    const targetRect = {
-      x: target.x + 4,
-      y: target.roofY,
-      width: target.width,
-      height: target.height,
-    };
     const inCrater = isPointInGorillasCrater(projectile.x, projectile.y);
     const targetGorillaX = targetIndex === 0
       ? target.x + target.width * 0.62
@@ -6095,11 +6088,7 @@
       && projectile.x <= targetGorillaX + 18
       && projectile.y >= targetGorillaY - 30
       && projectile.y <= targetGorillaY + 18;
-    const hitTarget = hitGorilla || (!inCrater
-      && projectile.x >= targetRect.x
-      && projectile.x <= targetRect.x + targetRect.width
-      && projectile.y >= targetRect.y - 10
-      && projectile.y <= targetRect.y + targetRect.height);
+    const hitTarget = hitGorilla;
     const hitBuildingIndex = inCrater ? -1 : gorillasState.buildings.findIndex(building => {
       const rect = {
         x: building.x + 4,
@@ -6121,7 +6110,7 @@
 
     if (hitTarget) {
       addGorillasCrater(projectile.x, projectile.y);
-      advanceGorillasTurn(true);
+      advanceGorillasTurn(true, { instantWin: true });
       return;
     }
     if (hitSelf) {
@@ -6130,6 +6119,7 @@
       const opponentSide = shooterSide === 'left' ? 'right' : 'left';
       advanceGorillasTurn(true, {
         scorerSide: opponentSide,
+        instantWin: true,
         statusText: `${shooterName} clipped their own tower — the point goes the other way!`,
       });
       return;
