@@ -844,5 +844,12 @@
   <script src="js/games/pong-data.js"></script>
   <script src="js/games/pong-art.js"></script>
   <script src="script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').catch(function () {});
+      });
+    }
+  </script>
 </body>
 </html>

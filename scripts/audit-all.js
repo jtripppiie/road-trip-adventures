@@ -6,6 +6,7 @@ const scripts = [
   'audit-content.js',
   'audit-trivia.js',
   'audit-game-quality.js',
+  'audit-jokes.js',
 ];
 
 let failed = false;
