@@ -11,7 +11,7 @@
 (() => {
   // Visible build version. Bump this (and CACHE_VERSION in sw.js) on every
   // deploy so the on-screen badge confirms which build is actually live.
-  const APP_VERSION = 'v11 · 2026-06-21';
+  const APP_VERSION = 'v12 · 2026-06-21';
   const versionBadge = document.getElementById('app-version');
   if (versionBadge) {
     versionBadge.textContent = APP_VERSION;
@@ -905,6 +905,11 @@
   let hideSeekLastFrame = 0;
   let hideSeekAudioContext = null;
   let hideSeekDebugEnabled = getStoredJson('rtaHideSeekDebug', false);
+  // Computer Mode / Debug Mode working data (kept module-scoped so round resets
+  // do not wipe it; cleared explicitly on navigation or via "Clear Debug").
+  let hideSeekSelectedSpotId = null;
+  let hideSeekRevealHidden = false;
+  const hideSeekDebug = { lastTapRaw: null, lastTapCanvas: null, cycleIndex: -1, lastInspect: null, log: [] };
   const HIDE_SEEK_HIDE_SECONDS = 60;
   const HIDE_SEEK_SEARCH_COUNTS = {
     easy: 10,
@@ -1169,6 +1174,16 @@
   const hideSeekSprintButton = document.getElementById('hide-seek-sprint');
   const hideSeekNextButton = document.getElementById('hide-seek-next');
   const hideSeekDebugButton = document.getElementById('hide-seek-debug');
+  const hideSeekDebugPanel = document.getElementById('hide-seek-debug-panel');
+  const hideSeekDebugReadout = document.getElementById('hide-seek-debug-readout');
+  const hideSeekDebugLogEl = document.getElementById('hide-seek-debug-log');
+  const hideSeekAutoHideButton = document.getElementById('hide-seek-auto-hide');
+  const hideSeekRevealButton = document.getElementById('hide-seek-reveal');
+  const hideSeekNextSpotButton = document.getElementById('hide-seek-next-spot');
+  const hideSeekTestSpotsButton = document.getElementById('hide-seek-test-spots');
+  const hideSeekClearDebugButton = document.getElementById('hide-seek-clear-debug');
+  const hideSeekFullscreenButton = document.getElementById('hide-seek-fullscreen');
+  const hideSeekRotateOverlay = document.getElementById('hide-seek-rotate');
   const hideSeekResetButton = document.getElementById('hide-seek-reset');
   const hideSeekFinishButton = document.getElementById('hide-seek-finish');
   const calcMiles = document.getElementById('calc-miles');
@@ -3208,10 +3223,11 @@
     hideSeekSpecialButton.disabled = false;
     hideSeekSprintButton.disabled = hideSeekState.stamina <= 1 || hideSeekState.inspectTime > 0;
     hideSeekSprintButton.textContent = `Sprint ${Math.round(hideSeekState.stamina)}%`;
-    hideSeekDebugButton.textContent = hideSeekDebugEnabled ? 'Debug: On' : 'Debug: Off';
+    hideSeekDebugButton.textContent = hideSeekDebugEnabled ? 'Computer Mode: On' : 'Computer Mode: Off';
     hideSeekDebugButton.setAttribute('aria-pressed', hideSeekDebugEnabled ? 'true' : 'false');
     hideSeekDebugButton.classList.toggle('is-active', hideSeekDebugEnabled);
     hideSeekNextButton.textContent = hideSeekRound >= maxRounds ? 'See Winner' : 'Next Round';
+    renderHideSeekDebugPanel();
 
     if (hideSeekState.phase === HideSeekGameState.TITLE || hideSeekState.phase === HideSeekGameState.GAME_OVER) {
       hideSeekStartButton.textContent = hideSeekState.phase === HideSeekGameState.GAME_OVER ? 'Play Again' : 'Start Match';
@@ -3445,6 +3461,19 @@
       y: hiddenPosition.y + hideSeekState.actors.hider.height / 2,
     };
     const distance = Math.hypot(inspectedCenter.x - hiddenCenter.x, inspectedCenter.y - hiddenCenter.y);
+    hideSeekDebug.lastInspect = {
+      inspectedId: inspectedSpot.id,
+      hiddenId: hideSeekState.hiddenSpotId,
+      distance,
+      match: inspectedSpot.id === hideSeekState.hiddenSpotId,
+    };
+    if (hideSeekDebugEnabled) {
+      hideSeekDebugLog(
+        `Inspect ${inspectedSpot.id}: ` +
+        `${inspectedSpot.id === hideSeekState.hiddenSpotId ? 'FOUND (exact spot match)' : 'not there'} ` +
+        `dist=${Math.round(distance)} tol=${HIDE_SEEK_SEARCH_TOLERANCE}`
+      );
+    }
     const feedback = getHideSeekSearchFeedback(sameRoom, distance);
     setHideSeekSearchPulse(actor, feedback.tone);
     if (inspectedSpot.id !== hideSeekState.hiddenSpotId) {
@@ -4837,15 +4866,48 @@
       );
     }
 
+    // Highlight the currently selected hide spot (tap / cycle / auto-hide).
+    if (hideSeekSelectedSpotId) {
+      const selected = getHideSeekSpotById(hideSeekSelectedSpotId);
+      if (selected && selected.roomId === room.id) {
+        ctx.save();
+        ctx.strokeStyle = '#ffe066';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(selected.x, selected.y, selected.width, selected.height);
+        ctx.restore();
+        drawHideSeekDebugPoint(ctx, selected.x + selected.width / 2, selected.y + selected.height / 2, '#ffe066', `selected:${selected.id}`);
+      }
+    }
+
+    // Emphasise the actual hidden spot when "Reveal Hidden Spot" is toggled.
+    if (hideSeekRevealHidden && hideSeekState.hiddenSpotId) {
+      const hiddenSpot = getHideSeekSpotById(hideSeekState.hiddenSpotId);
+      if (hiddenSpot && hiddenSpot.roomId === room.id) {
+        ctx.save();
+        ctx.strokeStyle = '#ff4df0';
+        ctx.lineWidth = 4;
+        ctx.setLineDash([6, 4]);
+        ctx.strokeRect(hiddenSpot.x - 4, hiddenSpot.y - 4, hiddenSpot.width + 8, hiddenSpot.height + 8);
+        ctx.restore();
+      }
+    }
+
+    // Last tapped point in canvas coordinates.
+    if (hideSeekDebug.lastTapCanvas) {
+      drawHideSeekDebugPoint(ctx, hideSeekDebug.lastTapCanvas.x, hideSeekDebug.lastTapCanvas.y, '#9af0ff', 'last tap');
+    }
+
     ctx.fillStyle = 'rgba(6, 21, 36, 0.9)';
-    fillHideSeekRoundedRect(ctx, 14, 64, 276, 62, 8);
+    fillHideSeekRoundedRect(ctx, 14, 64, 300, 92, 8);
     ctx.fillStyle = '#f7fbff';
     ctx.font = '900 12px Arial';
-    ctx.fillText('DEBUG MODE', 26, 82);
+    ctx.fillText('COMPUTER MODE', 26, 82);
     ctx.font = '800 10px Arial';
     ctx.fillStyle = '#bdeff4';
     ctx.fillText(`map=${map.id} room=${room.id} phase=${hideSeekState.phase}`, 26, 99);
     ctx.fillText(`spots=${room.spots.length} exits=${room.exits.length} obstacles=${(room.obstacles || []).length}`, 26, 114);
+    ctx.fillText(`selected=${hideSeekSelectedSpotId || '-'}  hidden=${hideSeekState.hiddenSpotId || '-'}`, 26, 129);
+    ctx.fillText(`inspected=${hideSeekState.inspectedSpotId || '-'}`, 26, 144);
     ctx.restore();
   }
 
@@ -4876,6 +4938,18 @@
     if (!point) return;
     event.preventDefault();
     hideSeekState.touchTarget = point;
+    if (hideSeekDebugEnabled) {
+      hideSeekDebug.lastTapRaw = { x: event.clientX, y: event.clientY };
+      hideSeekDebug.lastTapCanvas = point;
+      const spot = getHideSeekSpotAtPoint(point);
+      if (spot) {
+        hideSeekSelectedSpotId = spot.id;
+        hideSeekDebugLog(`Tap hit spot ${spot.id} (${spot.label}) @cvs ${Math.round(point.x)},${Math.round(point.y)}`);
+      } else {
+        hideSeekDebugLog(`Tap on floor @cvs ${Math.round(point.x)},${Math.round(point.y)} (no spot)`);
+      }
+      renderHideSeekDebugPanel();
+    }
   }
 
   function releaseHideSeekPointer() {
@@ -4885,7 +4959,206 @@
   function toggleHideSeekDebug() {
     hideSeekDebugEnabled = !hideSeekDebugEnabled;
     setStoredJson('rtaHideSeekDebug', hideSeekDebugEnabled);
+    hideSeekDebugLog(`Computer Mode ${hideSeekDebugEnabled ? 'ON' : 'OFF'}.`);
+    renderHideSeekDebugPanel();
     renderHideSeek();
+  }
+
+  // ---- Computer Mode / Debug Mode helpers -----------------------------------
+
+  function getAllHideSeekSpots() {
+    const map = getHideSeekMap();
+    const out = [];
+    if (map && map.rooms) {
+      Object.values(map.rooms).forEach(room => {
+        (room.spots || []).forEach(spot => out.push(Object.assign({ roomId: room.id }, spot)));
+      });
+    }
+    return out;
+  }
+
+  // Returns the visible hide spot whose drawn rectangle contains the given
+  // canvas-space point (small padding so the tap hitbox matches the art).
+  function getHideSeekSpotAtPoint(point) {
+    if (!point) return null;
+    const room = getHideSeekRoom(hideSeekState.activeRoomId);
+    if (!room) return null;
+    const pad = Math.round(6 * HIDE_SEEK_SCALE);
+    let best = null;
+    (room.spots || []).forEach(spot => {
+      if (
+        point.x >= spot.x - pad && point.x <= spot.x + spot.width + pad &&
+        point.y >= spot.y - pad && point.y <= spot.y + spot.height + pad
+      ) {
+        const center = getHideSeekSpotCenter(spot);
+        const distance = Math.hypot(point.x - center.x, point.y - center.y);
+        if (!best || distance < best.distance) {
+          best = { spot: Object.assign({ roomId: room.id }, spot), distance };
+        }
+      }
+    });
+    return best ? best.spot : null;
+  }
+
+  function hideSeekDebugLog(message) {
+    const stamp = new Date().toLocaleTimeString();
+    hideSeekDebug.log.unshift(`[${stamp}] ${message}`);
+    if (hideSeekDebug.log.length > 8) hideSeekDebug.log.length = 8;
+    if (typeof console !== 'undefined' && console.log) console.log('[HideSeek] ' + message);
+    renderHideSeekDebugPanel();
+  }
+
+  function renderHideSeekDebugPanel() {
+    if (!hideSeekDebugPanel) return;
+    hideSeekDebugPanel.hidden = !hideSeekDebugEnabled;
+    if (!hideSeekDebugEnabled) return;
+    const tapRaw = hideSeekDebug.lastTapRaw
+      ? `${Math.round(hideSeekDebug.lastTapRaw.x)}, ${Math.round(hideSeekDebug.lastTapRaw.y)}`
+      : '—';
+    const tapCanvas = hideSeekDebug.lastTapCanvas
+      ? `${Math.round(hideSeekDebug.lastTapCanvas.x)}, ${Math.round(hideSeekDebug.lastTapCanvas.y)}`
+      : '—';
+    const lines = [
+      `phase:     ${hideSeekState.phase}`,
+      `selected:  ${hideSeekSelectedSpotId || '(none)'}`,
+      `hidden:    ${hideSeekState.hiddenSpotId || '(none)'}`,
+      `inspected: ${hideSeekState.inspectedSpotId || '(none)'}`,
+      `tap (css): ${tapRaw}`,
+      `tap (cvs): ${tapCanvas}`,
+    ];
+    if (hideSeekDebug.lastInspect) {
+      const li = hideSeekDebug.lastInspect;
+      lines.push(`find: ${li.match ? 'EXACT MATCH' : 'no match'} dist=${Math.round(li.distance)} tol=${HIDE_SEEK_SEARCH_TOLERANCE}`);
+    }
+    if (hideSeekDebugReadout) hideSeekDebugReadout.textContent = lines.join('\n');
+    if (hideSeekDebugLogEl) hideSeekDebugLogEl.textContent = hideSeekDebug.log.join('\n');
+  }
+
+  // Auto-hide the hider in a random valid spot in the current room.
+  function hideSeekAutoHide() {
+    if (hideSeekState.phase !== HideSeekGameState.HIDER_TURN) {
+      hideSeekDebugLog('Auto Hide ignored — not the hider movement turn.');
+      return;
+    }
+    const room = getHideSeekRoom(hideSeekState.actors.hider.roomId);
+    const spots = ((room && room.spots) || []).filter(spot => getHideSeekSpotState(spot.id) !== 'disabled');
+    if (!spots.length) {
+      hideSeekDebugLog('Auto Hide: no valid spots in this room.');
+      return;
+    }
+    const picked = spots[Math.floor(Math.random() * spots.length)];
+    const spot = Object.assign({ roomId: room.id }, picked);
+    placeHideSeekActorAtSpot(hideSeekState.actors.hider, spot);
+    hideSeekSelectedSpotId = spot.id;
+    hideSeekDebugLog(`Auto Hide → ${spot.id} (${spot.label}).`);
+    lockHideSeekHiderPosition('button', spot);
+  }
+
+  function hideSeekRevealHiddenSpot() {
+    hideSeekRevealHidden = !hideSeekRevealHidden;
+    if (hideSeekState.hiddenSpotId) {
+      const p = hideSeekState.hiddenPosition;
+      hideSeekDebugLog(
+        `Hidden spot: ${hideSeekState.hiddenSpotId} @ ${p ? Math.round(p.x) + ',' + Math.round(p.y) : '?'} ` +
+        `(reveal ${hideSeekRevealHidden ? 'ON' : 'OFF'}).`
+      );
+    } else {
+      hideSeekDebugLog('No hider hidden yet — nothing to reveal.');
+    }
+    renderHideSeek();
+  }
+
+  // Cycle through every defined hide spot, moving the active actor onto it so
+  // each spot can be visually verified one by one.
+  function hideSeekCycleSpot() {
+    const spots = getAllHideSeekSpots();
+    if (!spots.length) {
+      hideSeekDebugLog('Next Spot: no spots defined.');
+      return;
+    }
+    hideSeekDebug.cycleIndex = (hideSeekDebug.cycleIndex + 1) % spots.length;
+    const spot = spots[hideSeekDebug.cycleIndex];
+    hideSeekSelectedSpotId = spot.id;
+    const actor = getHideSeekActiveActor() || hideSeekState.actors.hider;
+    if (actor && isHideSeekMovementPhase()) {
+      hideSeekState.activeRoomId = spot.roomId;
+      actor.roomId = spot.roomId;
+      placeHideSeekActorAtSpot(actor, spot);
+    }
+    hideSeekDebugLog(
+      `Next spot [${hideSeekDebug.cycleIndex + 1}/${spots.length}]: ${spot.id} ` +
+      `room=${spot.roomId} @${spot.x},${spot.y} ${spot.width}x${spot.height}`
+    );
+    renderHideSeek();
+  }
+
+  // Validate every defined hide spot: id, numeric geometry, usable collider,
+  // and on-canvas placement. Reports a pass/fail summary to the debug log.
+  function hideSeekTestAllSpots() {
+    const spots = getAllHideSeekSpots();
+    const size = getHideSeekCanvasSize();
+    let pass = 0;
+    const fails = [];
+    spots.forEach(spot => {
+      const problems = [];
+      if (!spot.id) problems.push('missing id');
+      ['x', 'y', 'width', 'height'].forEach(key => {
+        if (typeof spot[key] !== 'number' || Number.isNaN(spot[key])) problems.push('bad ' + key);
+      });
+      const collision = getHideSeekSpotCollisionRect(spot);
+      if (!collision || collision.width <= 0 || collision.height <= 0) problems.push('bad collider');
+      const center = getHideSeekSpotCenter(spot);
+      if (center.x < 0 || center.x > size.width || center.y < 0 || center.y > size.height) {
+        problems.push('off-canvas');
+      }
+      if (problems.length) fails.push(`${spot.id || '???'} (${spot.roomId}): ${problems.join(', ')}`);
+      else pass += 1;
+    });
+    hideSeekDebugLog(
+      `Test All Spots: ${pass}/${spots.length} OK` +
+      (fails.length ? ` — issues: ${fails.join(' | ')}` : ' — every spot is valid.')
+    );
+  }
+
+  function hideSeekClearDebug() {
+    hideSeekDebug.log.length = 0;
+    hideSeekDebug.lastTapRaw = null;
+    hideSeekDebug.lastTapCanvas = null;
+    hideSeekDebug.lastInspect = null;
+    hideSeekSelectedSpotId = null;
+    hideSeekRevealHidden = false;
+    renderHideSeekDebugPanel();
+    renderHideSeek();
+  }
+
+  async function toggleHideSeekFullscreen() {
+    const target = sections.hideSeek || hideSeekCanvas;
+    try {
+      if (!isImmersive(target)) {
+        await enterImmersive(target);
+      } else {
+        await exitImmersive(target);
+      }
+    } catch (error) {
+      setHideSeekMessage('Full screen is not available in this browser.');
+    }
+    updateHideSeekFullscreenButton();
+    updateHideSeekOrientationOverlay();
+  }
+
+  function updateHideSeekFullscreenButton() {
+    if (!hideSeekFullscreenButton) return;
+    hideSeekFullscreenButton.textContent = isImmersive(sections.hideSeek) ? 'Exit Full Screen' : 'Full Screen';
+  }
+
+  // Shows a "rotate your device" nudge when playing Hide & Seek full screen in
+  // portrait, where the wide room map is cramped.
+  function updateHideSeekOrientationOverlay() {
+    if (!hideSeekRotateOverlay) return;
+    const immersive = isImmersive(sections.hideSeek);
+    const portrait = window.matchMedia ? window.matchMedia('(orientation: portrait)').matches : false;
+    const show = immersive && portrait && currentSectionKey === 'hideSeek';
+    hideSeekRotateOverlay.hidden = !show;
   }
 
   function handleHideSeekKey(event, active) {
@@ -6312,6 +6585,7 @@
     });
     document.body.classList.remove('immersive-lock');
     unlockOrientation();
+    if (hideSeekRotateOverlay) hideSeekRotateOverlay.hidden = true;
   }
 
   async function togglePongFullscreen() {
@@ -7559,6 +7833,18 @@
   hideSeekSprintButton.addEventListener('lostpointercapture', () => setHideSeekInput('sprint', false));
   hideSeekNextButton.addEventListener('click', nextHideSeekRound);
   hideSeekDebugButton.addEventListener('click', toggleHideSeekDebug);
+  if (hideSeekAutoHideButton) hideSeekAutoHideButton.addEventListener('click', hideSeekAutoHide);
+  if (hideSeekRevealButton) hideSeekRevealButton.addEventListener('click', hideSeekRevealHiddenSpot);
+  if (hideSeekNextSpotButton) hideSeekNextSpotButton.addEventListener('click', hideSeekCycleSpot);
+  if (hideSeekTestSpotsButton) hideSeekTestSpotsButton.addEventListener('click', hideSeekTestAllSpots);
+  if (hideSeekClearDebugButton) hideSeekClearDebugButton.addEventListener('click', hideSeekClearDebug);
+  if (hideSeekFullscreenButton) {
+    hideSeekFullscreenButton.addEventListener('click', toggleHideSeekFullscreen);
+  }
+  renderHideSeekDebugPanel();
+  updateHideSeekOrientationOverlay();
+  window.addEventListener('orientationchange', updateHideSeekOrientationOverlay);
+  window.addEventListener('resize', updateHideSeekOrientationOverlay);
   hideSeekResetButton.addEventListener('click', resetHideSeek);
   hideSeekFinishButton.addEventListener('click', showHideSeekSummary);
   hideSeekMode.addEventListener('change', () => {
@@ -7669,8 +7955,11 @@
   });
   document.addEventListener('fullscreenchange', updatePongFullscreenButton);
   document.addEventListener('fullscreenchange', updateGorillasFullscreenButton);
+  document.addEventListener('fullscreenchange', updateHideSeekFullscreenButton);
+  document.addEventListener('fullscreenchange', updateHideSeekOrientationOverlay);
   document.addEventListener('webkitfullscreenchange', updatePongFullscreenButton);
   document.addEventListener('webkitfullscreenchange', updateGorillasFullscreenButton);
+  document.addEventListener('webkitfullscreenchange', updateHideSeekFullscreenButton);
   if (appLogo) appLogo.addEventListener('click', handleLogoClick);
   if (closeLogoPrankButton) {
     closeLogoPrankButton.addEventListener('click', () => {

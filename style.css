@@ -1370,6 +1370,138 @@ body.immersive-lock {
   margin-top: 0.5rem;
 }
 
+/* Hide & Seek full screen keeps its movement pad and action buttons (it needs
+   them to play), so it uses the same full-layout immersive treatment as Banana
+   Towers rather than the canvas-only Pong treatment. */
+#hide-seek-game:fullscreen,
+#hide-seek-game.is-immersive {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  max-width: none;
+  width: 100vw;
+  width: 100dvw;
+  height: 100vh;
+  height: 100dvh;
+  padding: 0.5rem;
+  overflow: auto;
+  background: var(--color-background);
+}
+
+#hide-seek-game:fullscreen .hide-seek-stage,
+#hide-seek-game.is-immersive .hide-seek-stage {
+  margin: 0.25rem auto;
+}
+
+#hide-seek-game:fullscreen .hide-seek-canvas,
+#hide-seek-game.is-immersive .hide-seek-canvas {
+  max-width: min(100%, calc((100dvh - 11rem) * 16 / 9));
+}
+
+/* Computer Mode / Debug overlay panel — compact, corner-anchored, scrollable. */
+.hide-seek-debug-panel {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 6;
+  width: min(248px, 46%);
+  max-height: 78%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.5rem;
+  font-size: 0.66rem;
+  color: #d8f6fb;
+  background: rgba(6, 21, 36, 0.86);
+  border: 1px solid rgba(154, 240, 255, 0.4);
+  border-radius: 8px;
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  pointer-events: auto;
+}
+
+.hide-seek-debug-panel[hidden] {
+  display: none;
+}
+
+.hide-seek-debug-title {
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #9af0ff;
+}
+
+.hide-seek-debug-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3rem;
+}
+
+.hide-seek-debug-btn {
+  padding: 0.3rem 0.35rem;
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: #061524;
+  background: #9af0ff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.hide-seek-debug-btn:hover,
+.hide-seek-debug-btn:focus-visible {
+  background: #c7f7ff;
+}
+
+.hide-seek-debug-readout,
+.hide-seek-debug-log {
+  margin: 0;
+  padding: 0.35rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.62rem;
+  line-height: 1.35;
+  color: #bdeff4;
+  background: rgba(2, 10, 20, 0.6);
+  border-radius: 5px;
+}
+
+.hide-seek-debug-log {
+  color: #8fd9a8;
+  max-height: 9rem;
+  overflow: auto;
+}
+
+/* Rotate-your-device nudge for portrait full screen. */
+.hide-seek-rotate {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  display: grid;
+  place-content: center;
+  gap: 0.4rem;
+  padding: 1rem;
+  text-align: center;
+  color: #ffffff;
+  background: rgba(6, 21, 36, 0.94);
+}
+
+.hide-seek-rotate[hidden] {
+  display: none;
+}
+
+.hide-seek-rotate-icon {
+  font-size: 2.4rem;
+  animation: hide-seek-rotate-spin 2.4s ease-in-out infinite;
+}
+
+@keyframes hide-seek-rotate-spin {
+  0%, 100% { transform: rotate(-12deg); }
+  50% { transform: rotate(78deg); }
+}
+
+
 .logo-prank {
   position: fixed;
   inset: 0;

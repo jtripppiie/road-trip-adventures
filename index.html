@@ -568,6 +568,25 @@
           <strong>Ready?</strong>
           <span>Start the match, then pass the phone when the app says to.</span>
         </div>
+        <!-- Computer Mode / Debug overlay panel (toggled by the Computer Mode button). -->
+        <div id="hide-seek-debug-panel" class="hide-seek-debug-panel" hidden aria-label="Computer Mode panel">
+          <div class="hide-seek-debug-title">Computer Mode</div>
+          <div class="hide-seek-debug-buttons">
+            <button id="hide-seek-auto-hide" type="button" class="hide-seek-debug-btn">Auto Hide</button>
+            <button id="hide-seek-reveal" type="button" class="hide-seek-debug-btn">Reveal Hidden</button>
+            <button id="hide-seek-next-spot" type="button" class="hide-seek-debug-btn">Next Spot</button>
+            <button id="hide-seek-test-spots" type="button" class="hide-seek-debug-btn">Test All Spots</button>
+            <button id="hide-seek-clear-debug" type="button" class="hide-seek-debug-btn">Clear</button>
+          </div>
+          <pre id="hide-seek-debug-readout" class="hide-seek-debug-readout"></pre>
+          <pre id="hide-seek-debug-log" class="hide-seek-debug-log"></pre>
+        </div>
+        <!-- Rotate-to-landscape nudge shown in portrait full screen. -->
+        <div id="hide-seek-rotate" class="hide-seek-rotate" hidden role="alert">
+          <div class="hide-seek-rotate-icon">⟳</div>
+          <strong>Rotate your device</strong>
+          <span>Hide &amp; Seek plays best in landscape.</span>
+        </div>
       </div>
       <div class="hide-seek-controls" aria-label="Hide and Seek movement controls">
         <button class="hide-seek-pad" data-hide-seek-move="up" aria-label="Move up">▲</button>
@@ -581,7 +600,8 @@
         <button id="hide-seek-special" class="secondary-button" hidden>Listen</button>
         <button id="hide-seek-sprint" class="secondary-button" hidden>Sprint</button>
         <button id="hide-seek-next" class="secondary-button" hidden>Next Round</button>
-        <button id="hide-seek-debug" class="secondary-button" aria-pressed="false">Debug: Off</button>
+        <button id="hide-seek-fullscreen" class="secondary-button">Full Screen</button>
+        <button id="hide-seek-debug" class="secondary-button" aria-pressed="false">Computer Mode: Off</button>
         <button id="hide-seek-reset" class="secondary-button">Reset Game</button>
         <button id="hide-seek-finish" class="secondary-button">Finish Hide &amp; Seek</button>
       </div>
