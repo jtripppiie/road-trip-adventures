@@ -880,9 +880,11 @@
   let jokeAwards = { dad: 0, mom: 0, brother: 0, sister: 0 };
   let jokeRound = 1;
   let jokeDecks = { dad: [], mom: [], brother: [], sister: [] };
-  let twentyQuestionsCount = 0;
-  let twentyQuestionsDeck = [];
-  let twentyQuestionsAnswers = [];
+  let twentyGuessAnswers = {};
+  let twentyGuessAsked = new Set();
+  let twentyGuessLog = [];
+  let twentyGuessTurns = 0;
+  let twentyGuessRejected = [];
   let twentyComputerObject = null;
   let twentyComputerTurns = 0;
   let twentyComputerAsked = [];
@@ -1343,11 +1345,11 @@
       title: '20 Questions',
       type: 'Just for fun',
       scored: false,
-      summary: 'One person thinks of a secret thing and the car narrows it down in 20 questions.',
+      summary: 'Think of any thing and the app tries to guess it, or let the computer hide a secret for you to guess.',
       rules: [
-        'One person secretly thinks of any thing.',
-        'The app asks a question each turn; answer Yes, No, or Sometimes.',
-        'The car gets 20 total turns to question and guess.',
+        'Pick who hides the secret thing.',
+        'Answer each question Yes, No, Sometimes, Maybe, or Unknown.',
+        'The guesser gets up to 20 questions to figure it out.',
       ],
     },
     emoji: {
@@ -2299,37 +2301,6 @@
     ]);
   }
 
-  const TWENTY_QUESTIONS_TAGS = [
-    'alive', 'holdable', 'indoors', 'biggerThanBackpack', 'manmade', 'fun', 'food',
-    'movesSelf', 'famous', 'roadtrip', 'place', 'person', 'electricity', 'oneColor',
-    'kidsKnow', 'nature', 'expensive', 'sound', 'everyday', 'smallerThanPhone',
-  ];
-
-  function twentyQuestionsAnswerCategory(answer) {
-    if (answer === 'Yes') return 'yes';
-    if (answer === 'No') return 'no';
-    return 'mixed';
-  }
-
-  function twentyQuestionsShouldSkip(item, answered) {
-    switch (item.tag) {
-      case 'person':
-        return answered.alive === 'no';
-      case 'place':
-        return answered.alive === 'yes';
-      case 'nature':
-        return answered.manmade === 'yes';
-      case 'manmade':
-        return answered.nature === 'yes';
-      case 'smallerThanPhone':
-        return answered.biggerThanBackpack === 'yes';
-      case 'biggerThanBackpack':
-        return answered.smallerThanPhone === 'yes';
-      default:
-        return false;
-    }
-  }
-
   const TWENTY_QUESTIONS_LIST = [
     { tag: 'alive', question: 'Is it alive?' },
     { tag: 'holdable', question: 'Can a person hold it?' },
@@ -2370,6 +2341,25 @@
     { name: 'an elephant', attrs: { alive: 'yes', holdable: 'no', indoors: 'no', biggerThanBackpack: 'yes', manmade: 'no', fun: 'sometimes', food: 'no', movesSelf: 'yes', famous: 'no', roadtrip: 'no', place: 'no', person: 'no', electricity: 'no', oneColor: 'yes', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'yes', everyday: 'no', smallerThanPhone: 'no' } },
     { name: 'ice cream', attrs: { alive: 'no', holdable: 'yes', indoors: 'yes', biggerThanBackpack: 'no', manmade: 'yes', fun: 'yes', food: 'yes', movesSelf: 'no', famous: 'no', roadtrip: 'sometimes', place: 'no', person: 'no', electricity: 'no', oneColor: 'no', kidsKnow: 'yes', nature: 'no', expensive: 'no', sound: 'no', everyday: 'sometimes', smallerThanPhone: 'yes' } },
     { name: 'a river', attrs: { alive: 'no', holdable: 'no', indoors: 'no', biggerThanBackpack: 'yes', manmade: 'no', fun: 'sometimes', food: 'no', movesSelf: 'yes', famous: 'sometimes', roadtrip: 'yes', place: 'yes', person: 'no', electricity: 'no', oneColor: 'no', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'yes', everyday: 'no', smallerThanPhone: 'no' } },
+    { name: 'a horse', attrs: { alive: 'yes', holdable: 'no', indoors: 'no', biggerThanBackpack: 'yes', manmade: 'no', fun: 'sometimes', food: 'no', movesSelf: 'yes', famous: 'no', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'no', oneColor: 'sometimes', kidsKnow: 'yes', nature: 'yes', expensive: 'sometimes', sound: 'yes', everyday: 'no', smallerThanPhone: 'no' } },
+    { name: 'a bird', attrs: { alive: 'yes', holdable: 'sometimes', indoors: 'sometimes', biggerThanBackpack: 'no', manmade: 'no', fun: 'no', food: 'no', movesSelf: 'yes', famous: 'no', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'no', oneColor: 'sometimes', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'yes', everyday: 'yes', smallerThanPhone: 'sometimes' } },
+    { name: 'a fish', attrs: { alive: 'yes', holdable: 'sometimes', indoors: 'sometimes', biggerThanBackpack: 'no', manmade: 'no', fun: 'no', food: 'sometimes', movesSelf: 'yes', famous: 'no', roadtrip: 'no', place: 'no', person: 'no', electricity: 'no', oneColor: 'sometimes', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'no', everyday: 'no', smallerThanPhone: 'sometimes' } },
+    { name: 'a spider', attrs: { alive: 'yes', holdable: 'no', indoors: 'sometimes', biggerThanBackpack: 'no', manmade: 'no', fun: 'no', food: 'no', movesSelf: 'yes', famous: 'no', roadtrip: 'no', place: 'no', person: 'no', electricity: 'no', oneColor: 'sometimes', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'no', everyday: 'sometimes', smallerThanPhone: 'yes' } },
+    { name: 'an apple', attrs: { alive: 'no', holdable: 'yes', indoors: 'yes', biggerThanBackpack: 'no', manmade: 'no', fun: 'no', food: 'yes', movesSelf: 'no', famous: 'no', roadtrip: 'sometimes', place: 'no', person: 'no', electricity: 'no', oneColor: 'sometimes', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'no', everyday: 'yes', smallerThanPhone: 'no' } },
+    { name: 'a chair', attrs: { alive: 'no', holdable: 'sometimes', indoors: 'yes', biggerThanBackpack: 'yes', manmade: 'yes', fun: 'no', food: 'no', movesSelf: 'no', famous: 'no', roadtrip: 'no', place: 'no', person: 'no', electricity: 'no', oneColor: 'sometimes', kidsKnow: 'yes', nature: 'no', expensive: 'no', sound: 'no', everyday: 'yes', smallerThanPhone: 'no' } },
+    { name: 'a toothbrush', attrs: { alive: 'no', holdable: 'yes', indoors: 'yes', biggerThanBackpack: 'no', manmade: 'yes', fun: 'no', food: 'no', movesSelf: 'no', famous: 'no', roadtrip: 'sometimes', place: 'no', person: 'no', electricity: 'sometimes', oneColor: 'sometimes', kidsKnow: 'yes', nature: 'no', expensive: 'no', sound: 'no', everyday: 'yes', smallerThanPhone: 'yes' } },
+    { name: 'a television', attrs: { alive: 'no', holdable: 'no', indoors: 'yes', biggerThanBackpack: 'yes', manmade: 'yes', fun: 'yes', food: 'no', movesSelf: 'no', famous: 'no', roadtrip: 'no', place: 'no', person: 'no', electricity: 'yes', oneColor: 'yes', kidsKnow: 'yes', nature: 'no', expensive: 'sometimes', sound: 'yes', everyday: 'yes', smallerThanPhone: 'no' } },
+    { name: 'a bicycle', attrs: { alive: 'no', holdable: 'no', indoors: 'sometimes', biggerThanBackpack: 'yes', manmade: 'yes', fun: 'yes', food: 'no', movesSelf: 'no', famous: 'no', roadtrip: 'sometimes', place: 'no', person: 'no', electricity: 'no', oneColor: 'sometimes', kidsKnow: 'yes', nature: 'no', expensive: 'sometimes', sound: 'no', everyday: 'sometimes', smallerThanPhone: 'no' } },
+    { name: 'a clock', attrs: { alive: 'no', holdable: 'sometimes', indoors: 'yes', biggerThanBackpack: 'no', manmade: 'yes', fun: 'no', food: 'no', movesSelf: 'no', famous: 'no', roadtrip: 'no', place: 'no', person: 'no', electricity: 'sometimes', oneColor: 'sometimes', kidsKnow: 'yes', nature: 'no', expensive: 'no', sound: 'yes', everyday: 'yes', smallerThanPhone: 'no' } },
+    { name: 'a shoe', attrs: { alive: 'no', holdable: 'yes', indoors: 'yes', biggerThanBackpack: 'no', manmade: 'yes', fun: 'no', food: 'no', movesSelf: 'no', famous: 'no', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'no', oneColor: 'sometimes', kidsKnow: 'yes', nature: 'no', expensive: 'sometimes', sound: 'no', everyday: 'yes', smallerThanPhone: 'no' } },
+    { name: 'the Moon', attrs: { alive: 'no', holdable: 'no', indoors: 'no', biggerThanBackpack: 'yes', manmade: 'no', fun: 'no', food: 'no', movesSelf: 'no', famous: 'yes', roadtrip: 'yes', place: 'sometimes', person: 'no', electricity: 'no', oneColor: 'yes', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'no', everyday: 'sometimes', smallerThanPhone: 'no' } },
+    { name: 'a beach', attrs: { alive: 'no', holdable: 'no', indoors: 'no', biggerThanBackpack: 'yes', manmade: 'no', fun: 'yes', food: 'no', movesSelf: 'no', famous: 'sometimes', roadtrip: 'yes', place: 'yes', person: 'no', electricity: 'no', oneColor: 'sometimes', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'yes', everyday: 'no', smallerThanPhone: 'no' } },
+    { name: 'a robot', attrs: { alive: 'no', holdable: 'sometimes', indoors: 'sometimes', biggerThanBackpack: 'sometimes', manmade: 'yes', fun: 'yes', food: 'no', movesSelf: 'yes', famous: 'no', roadtrip: 'no', place: 'no', person: 'no', electricity: 'yes', oneColor: 'sometimes', kidsKnow: 'yes', nature: 'no', expensive: 'yes', sound: 'yes', everyday: 'no', smallerThanPhone: 'no' } },
+    { name: 'a butterfly', attrs: { alive: 'yes', holdable: 'no', indoors: 'no', biggerThanBackpack: 'no', manmade: 'no', fun: 'no', food: 'no', movesSelf: 'yes', famous: 'no', roadtrip: 'sometimes', place: 'no', person: 'no', electricity: 'no', oneColor: 'no', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'no', everyday: 'no', smallerThanPhone: 'yes' } },
+    { name: 'a soccer ball', attrs: { alive: 'no', holdable: 'yes', indoors: 'sometimes', biggerThanBackpack: 'no', manmade: 'yes', fun: 'yes', food: 'no', movesSelf: 'no', famous: 'no', roadtrip: 'no', place: 'no', person: 'no', electricity: 'no', oneColor: 'no', kidsKnow: 'yes', nature: 'no', expensive: 'no', sound: 'no', everyday: 'sometimes', smallerThanPhone: 'no' } },
+    { name: 'a cloud', attrs: { alive: 'no', holdable: 'no', indoors: 'no', biggerThanBackpack: 'yes', manmade: 'no', fun: 'no', food: 'no', movesSelf: 'yes', famous: 'no', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'no', oneColor: 'yes', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'no', everyday: 'yes', smallerThanPhone: 'no' } },
+    { name: 'a cow', attrs: { alive: 'yes', holdable: 'no', indoors: 'no', biggerThanBackpack: 'yes', manmade: 'no', fun: 'no', food: 'no', movesSelf: 'yes', famous: 'no', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'no', oneColor: 'no', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'yes', everyday: 'no', smallerThanPhone: 'no' } },
+    { name: 'a backpack', attrs: { alive: 'no', holdable: 'yes', indoors: 'yes', biggerThanBackpack: 'no', manmade: 'yes', fun: 'no', food: 'no', movesSelf: 'no', famous: 'no', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'no', oneColor: 'sometimes', kidsKnow: 'yes', nature: 'no', expensive: 'no', sound: 'no', everyday: 'yes', smallerThanPhone: 'no' } },
   ];
 
   function twentyComputerAnswer(object, tag) {
@@ -2394,7 +2384,7 @@
       'Who Hides the Secret?',
       'Pick who thinks of the secret thing. The other side gets 20 questions to figure it out.',
       [
-        { label: 'We think of it (app asks us)', primary: true, onClick: startTwentyQuestions },
+        { label: 'We think of it (app guesses)', primary: true, onClick: startTwentyQuestions },
         { label: 'Computer thinks of it (we guess)', onClick: startTwentyQuestionsComputer },
         { label: 'Close', onClick: hideHuntSideGame },
       ]
@@ -2465,240 +2455,189 @@
     );
   }
 
-  function startTwentyQuestions() {
-    twentyQuestionsCount = 0;
-    twentyQuestionsAnswers = [];
-    twentyQuestionsDeck = [
-      {
-        question: 'Is it alive?',
-        yes: 'That points toward an animal, plant, person, or character.',
-        no: 'That pushes the guessers toward objects, places, materials, ideas, or events.',
-        mixed: 'That means it may depend on the example, so keep both living and non-living options open.',
-      },
-      {
-        question: 'Is it something a person can hold?',
-        yes: 'That narrows it toward smaller objects, foods, tools, toys, or materials.',
-        no: 'That points toward places, large objects, natural features, vehicles, events, or ideas.',
-        mixed: 'That suggests size or form changes, so ask about where it is found next.',
-      },
-      {
-        question: 'Would you usually find it indoors?',
-        yes: 'That leans toward household objects, foods, technology, furniture, or entertainment.',
-        no: 'That leans toward nature, places, vehicles, buildings, weather, or roadside things.',
-        mixed: 'That means location will not solve it alone, so move to use or material.',
-      },
-      {
-        question: 'Is it bigger than a backpack?',
-        yes: 'That removes many handheld items and points toward large objects, places, animals, or vehicles.',
-        no: 'That keeps small objects, foods, tools, toys, and body-sized things in play.',
-        mixed: 'That suggests it comes in different sizes, so ask what it is made of or used for.',
-      },
-      {
-        question: 'Is it made by humans?',
-        yes: 'That points toward inventions, buildings, vehicles, tools, foods, media, or household objects.',
-        no: 'That points toward animals, plants, natural materials, weather, space, or landforms.',
-        mixed: 'That suggests it can be natural or manufactured, so ask about its usual use.',
-      },
-      {
-        question: 'Is it used for fun?',
-        yes: 'That points toward games, toys, sports, music, movies, shows, or vacation things.',
-        no: 'That points toward practical objects, places, natural things, jobs, or facts.',
-        mixed: 'That means it may be both useful and fun, so ask about daily use.',
-      },
-      {
-        question: 'Is it connected to food or drinks?',
-        yes: 'That narrows the field to foods, ingredients, restaurants, kitchen items, or farming.',
-        no: 'That removes a big category and helps the guessers focus elsewhere.',
-        mixed: 'That may mean it is a place, container, ingredient, or brand connected to food.',
-      },
-      {
-        question: 'Can it move by itself?',
-        yes: 'That points toward living things, vehicles, machines, robots, or natural forces.',
-        no: 'That points toward still objects, places, materials, ideas, and most foods.',
-        mixed: 'That suggests it can move in some situations, so ask whether it needs power or a person.',
-      },
-      {
-        question: 'Is it famous or well known?',
-        yes: 'That points toward landmarks, celebrities, characters, major brands, movies, events, or famous places.',
-        no: 'That points toward ordinary objects, local things, materials, or everyday categories.',
-        mixed: 'That may depend on the person, so ask whether kids or adults would know it.',
-      },
-      {
-        question: 'Would you see it on a road trip?',
-        yes: 'That points toward vehicles, signs, places, scenery, weather, roadside stops, or travel objects.',
-        no: 'That points away from the road and toward indoor, imaginary, historical, or specialized things.',
-        mixed: 'That means it can appear on trips but is not mainly a road-trip thing.',
-      },
-      {
-        question: 'Is it a place?',
-        yes: 'That shifts the hunt toward cities, landmarks, parks, buildings, states, countries, or imaginary worlds.',
-        no: 'That keeps objects, living things, foods, people, events, technologies, and ideas in play.',
-        mixed: 'That may mean it is both a place and a thing, such as a brand, ride, or fictional setting.',
-      },
-      {
-        question: 'Is it a person or character?',
-        yes: 'That points toward real people, fictional characters, occupations, mascots, or historical figures.',
-        no: 'That removes people and characters, so focus on objects, places, foods, nature, or inventions.',
-        mixed: 'That suggests it may be represented as a mascot, brand character, statue, or role.',
-      },
-      {
-        question: 'Does it use electricity?',
-        yes: 'That points toward technology, appliances, vehicles, devices, lights, or entertainment.',
-        no: 'That points toward natural things, simple objects, foods, places, or older inventions.',
-        mixed: 'That means some versions use electricity and some do not, so ask about common examples.',
-      },
-      {
-        question: 'Is it mostly one color?',
-        yes: 'That makes color a useful clue. Ask which color family next if the group needs it.',
-        no: 'That means shape, use, place, or material will be better clues than color.',
-        mixed: 'That suggests it can appear in many versions, so avoid guessing by color alone.',
-      },
-      {
-        question: 'Would most kids know what it is?',
-        yes: 'That points toward common objects, animals, foods, characters, places, or school topics.',
-        no: 'That points toward specialized knowledge, history, jobs, obscure places, or adult categories.',
-        mixed: 'That depends on experience, so ask whether it is common at home, school, or outside.',
-      },
-      {
-        question: 'Is it something from nature?',
-        yes: 'That points toward animals, plants, rocks, weather, water, space, landforms, or materials like sand.',
-        no: 'That points toward human-made objects, places, technology, media, occupations, or events.',
-        mixed: 'That may mean humans use or shape a natural material, so ask if it is made by humans too.',
-      },
-      {
-        question: 'Is it expensive?',
-        yes: 'That points toward vehicles, technology, jewelry, travel, buildings, collectibles, or rare things.',
-        no: 'That points toward common objects, foods, natural materials, ideas, or everyday items.',
-        mixed: 'That means price varies, so cost probably will not identify it by itself.',
-      },
-      {
-        question: 'Can it make sound?',
-        yes: 'That points toward animals, people, machines, instruments, vehicles, media, or alarms.',
-        no: 'That points toward silent objects, places, materials, foods, and many natural features.',
-        mixed: 'That suggests it may make sound only when used, moved, or powered.',
-      },
-      {
-        question: 'Is it used every day?',
-        yes: 'That points toward common household objects, foods, clothing, tools, devices, or routines.',
-        no: 'That points toward special events, landmarks, rare objects, vacation things, or unusual categories.',
-        mixed: 'That depends on the person, so think about who would use or see it often.',
-      },
-      {
-        question: 'Is it smaller than a phone?',
-        yes: 'That points toward tiny objects, ingredients, parts, toys, tools, insects, or materials.',
-        no: 'That points toward larger objects, places, people, animals, vehicles, or natural features.',
-        mixed: 'That suggests it comes in different forms, so make the best final guess from all clues.',
-      },
-    ];
-    twentyQuestionsDeck.forEach((question, index) => {
-      question.tag = TWENTY_QUESTIONS_TAGS[index] || `q${index}`;
-    });
-    showHuntSideGame(
-      '20 Questions',
-      'Secret Thing',
-      'Think of anything you would like. Do not tell anyone what it is. The guessers get 20 total turns for questions and guesses. Example secret: sand.',
-      [
-        { label: 'Start Asking', primary: true, onClick: () => { twentyQuestionsDeck = shuffle(twentyQuestionsDeck); showTwentyQuestionsPrompt('Start broad, then narrow down from the answers.'); } },
-        { label: 'Close', onClick: hideHuntSideGame },
-      ]
-    );
+  function twentyTraitValue(trait) {
+    if (trait === 'yes') return 1;
+    if (trait === 'no') return -1;
+    if (trait === 'sometimes') return 0.5;
+    return 0;
   }
 
-  function showTwentyQuestionsPrompt(reasoning) {
-    if (twentyQuestionsCount >= 20) {
-      showTwentyQuestionsFinalGuess('You used all 20 turns. Make one final group guess from the clues.');
-      return;
+  function twentyPlayerValue(answer) {
+    switch (answer) {
+      case 'Yes': return 1;
+      case 'No': return -1;
+      case 'Sometimes': return 0.5;
+      case 'Maybe': return 0.25;
+      default: return 0;
     }
+  }
 
-    const answered = {};
-    const askedTags = new Set();
-    twentyQuestionsAnswers.forEach(entry => {
-      if (entry.tag) {
-        answered[entry.tag] = entry.category;
-        askedTags.add(entry.tag);
+  function twentyGuessPool() {
+    const learned = getStoredJson('rtaTwentyLearned', []) || [];
+    const pool = TWENTY_QUESTIONS_OBJECTS.concat(Array.isArray(learned) ? learned : []);
+    return pool.filter(object => !twentyGuessRejected.includes(object.name));
+  }
+
+  function twentyScoreCandidate(object) {
+    let score = 0;
+    Object.keys(twentyGuessAnswers).forEach(tag => {
+      const playerValue = twentyGuessAnswers[tag];
+      const traitValue = twentyTraitValue(object.attrs ? object.attrs[tag] : undefined);
+      score += 1 - Math.abs(playerValue - traitValue);
+    });
+    return score;
+  }
+
+  function twentyRankCandidates() {
+    return twentyGuessPool()
+      .map(object => ({ object, score: twentyScoreCandidate(object) }))
+      .sort((a, b) => b.score - a.score);
+  }
+
+  function twentyPickQuestion(topCandidates) {
+    const unasked = TWENTY_QUESTIONS_LIST.filter(item => !twentyGuessAsked.has(item.tag));
+    if (!unasked.length) return null;
+    if (!topCandidates.length) return unasked[0];
+    let best = unasked[0];
+    let bestSplit = Infinity;
+    unasked.forEach(item => {
+      const average = topCandidates.reduce((sum, entry) => (
+        sum + twentyTraitValue(entry.object.attrs ? entry.object.attrs[item.tag] : undefined)
+      ), 0) / topCandidates.length;
+      const split = Math.abs(average);
+      if (split < bestSplit) {
+        bestSplit = split;
+        best = item;
       }
     });
-    const item = twentyQuestionsDeck.find(question => (
-      !askedTags.has(question.tag) && !twentyQuestionsShouldSkip(question, answered)
+    return best;
+  }
+
+  function twentyGuessReady(ranked, unaskedCount) {
+    if (!ranked.length) return false;
+    if (twentyGuessTurns >= 20 || unaskedCount === 0) return true;
+    if (ranked.length === 1) return true;
+    if (twentyGuessTurns >= 6 && (ranked[0].score - ranked[1].score) >= 2) return true;
+    if (twentyGuessTurns >= 14) return true;
+    return false;
+  }
+
+  function formatTwentyGuessHistory() {
+    if (!twentyGuessLog.length) return '';
+    const start = Math.max(0, twentyGuessLog.length - 5);
+    const recent = twentyGuessLog.slice(start).map((entry, index) => (
+      `${start + index + 1}. ${entry.question} ${entry.answer}`
     ));
-    if (!item) {
-      showTwentyQuestionsFinalGuess('No more useful questions remain. Make your final group guess from the clues.');
+    return `\n\nWhat I know:\n${recent.join('\n')}`;
+  }
+
+  function startTwentyQuestions() {
+    twentyGuessAnswers = {};
+    twentyGuessAsked = new Set();
+    twentyGuessLog = [];
+    twentyGuessTurns = 0;
+    twentyGuessRejected = [];
+    twentyGuessStep('Think of any person, place, animal, food, or object. Do not tell me what it is, and I will try to guess it.');
+  }
+
+  function twentyGuessStep(resultLine) {
+    const ranked = twentyRankCandidates();
+    const unasked = TWENTY_QUESTIONS_LIST.filter(item => !twentyGuessAsked.has(item.tag));
+    if (twentyGuessReady(ranked, unasked.length)) {
+      twentyShowGuess(ranked[0].object, resultLine);
       return;
     }
-    const history = formatTwentyQuestionsHistory();
-    const intro = `${reasoning}\n\nTurn ${twentyQuestionsCount + 1}/20 question: ${item.question}${history}`;
-    const responseActions = ['Yes', 'No', 'Usually', 'Sometimes', 'Don\'t Know'].map(answer => ({
+    const next = twentyPickQuestion(ranked.slice(0, 6));
+    if (!next) {
+      if (ranked.length) twentyShowGuess(ranked[0].object, resultLine);
+      else twentyGuessStumped(resultLine);
+      return;
+    }
+    twentyAskGuessQuestion(next, resultLine);
+  }
+
+  function twentyAskGuessQuestion(item, resultLine) {
+    const intro = `${resultLine}\n\nTurn ${Math.min(twentyGuessTurns + 1, 20)}/20\nQuestion: ${item.question}${formatTwentyGuessHistory()}`;
+    const actions = ['Yes', 'No', 'Sometimes', 'Maybe', 'Unknown'].map(answer => ({
       label: answer,
       onClick: () => {
-        twentyQuestionsAnswers.push({ question: item.question, tag: item.tag, answer, category: twentyQuestionsAnswerCategory(answer) });
-        twentyQuestionsCount++;
-        showTwentyQuestionsPrompt(getTwentyQuestionsReasoning(item, answer));
+        twentyGuessAnswers[item.tag] = twentyPlayerValue(answer);
+        twentyGuessAsked.add(item.tag);
+        twentyGuessLog.push({ question: item.question, answer });
+        twentyGuessTurns++;
+        twentyGuessStep('Got it.');
       },
     }));
-    showHuntSideGame('20 Questions', 'Guess What I Am', intro, responseActions.concat([
-      { label: 'Make a Guess', primary: true, onClick: showTwentyQuestionsGuess },
-      { label: 'Start Over', onClick: startTwentyQuestions },
-      { label: 'Close', onClick: hideHuntSideGame },
-    ]));
+    actions.push({ label: 'Start Over', onClick: startTwentyQuestions });
+    actions.push({ label: 'Close', onClick: hideHuntSideGame });
+    showHuntSideGame('20 Questions', 'I am Guessing', intro, actions);
   }
 
-  function getTwentyQuestionsReasoning(item, answer) {
-    if (answer === 'Yes') return `Reasoning: ${item.yes}`;
-    if (answer === 'No') return `Reasoning: ${item.no}`;
-    return `Reasoning: ${item.mixed}`;
-  }
-
-  function formatTwentyQuestionsHistory() {
-    if (!twentyQuestionsAnswers.length) return '';
-    const start = Math.max(0, twentyQuestionsAnswers.length - 4);
-    const recent = twentyQuestionsAnswers.slice(start).map((entry, index) => {
-      const turn = start + index + 1;
-      return `${turn}. ${entry.question} ${entry.answer}`;
-    });
-    return `\n\nRecent clues:\n${recent.join('\n')}`;
-  }
-
-  function showTwentyQuestionsGuess() {
-    if (twentyQuestionsCount >= 20) {
-      showTwentyQuestionsFinalGuess('No turns remain. Make the final guess now.');
-      return;
-    }
-
+  function twentyShowGuess(object, resultLine) {
+    const name = object ? object.name : 'something';
+    twentyGuessTurns++;
     showHuntSideGame(
       '20 Questions',
-      `Guess Turn ${twentyQuestionsCount + 1}/20`,
-      `Say one specific guess out loud. For example: "Is it sand?" The thinker answers only correct or wrong.${formatTwentyQuestionsHistory()}`,
+      'My Guess',
+      `${resultLine}\n\nI think you are thinking of ${name}. Am I right?${formatTwentyGuessHistory()}`,
       [
-        { label: 'Correct Guess', primary: true, onClick: () => showTwentyQuestionsResult(true) },
-        { label: 'Wrong Guess', onClick: () => {
-          twentyQuestionsAnswers.push({ question: 'Guess attempt', answer: 'Wrong' });
-          twentyQuestionsCount++;
-          showTwentyQuestionsPrompt('Reasoning: that guess is ruled out, so use the remaining clues to narrow the next question.');
+        { label: 'Yes, you got it!', primary: true, onClick: () => twentyGuessWin(object) },
+        { label: 'No, keep going', onClick: () => {
+          if (object) twentyGuessRejected.push(object.name);
+          twentyGuessStep('Hmm, not that. Let me narrow it down more.');
         } },
-        { label: 'Ask More', onClick: () => showTwentyQuestionsPrompt('Ask another narrowing question before guessing.') },
-      ]
-    );
-  }
-
-  function showTwentyQuestionsFinalGuess(message) {
-    showHuntSideGame(
-      '20 Questions',
-      'Final Guess',
-      `${message}${formatTwentyQuestionsHistory()}`,
-      [
-        { label: 'Correct', primary: true, onClick: () => showTwentyQuestionsResult(true) },
-        { label: 'Missed It', onClick: () => showTwentyQuestionsResult(false) },
         { label: 'Start Over', onClick: startTwentyQuestions },
       ]
     );
   }
 
-  function showTwentyQuestionsResult(solved) {
-    const turnsUsed = Math.min(20, Math.max(1, twentyQuestionsCount + 1));
-    const summary = solved
-      ? `Solved in ${turnsUsed} turn${turnsUsed === 1 ? '' : 's'}. The guessers used the clues to identify the secret thing.`
-      : 'The secret survived all 20 questions. The thinker reveals it and explains which clues mattered most.';
-    showHuntSideGame('20 Questions', solved ? 'Solved' : 'Stumped', `${summary}${formatTwentyQuestionsHistory()}`, [
+  function twentyGuessWin(object) {
+    const name = object ? object.name : 'it';
+    const turns = Math.min(20, twentyGuessTurns);
+    showHuntSideGame('20 Questions', 'I Got It!', `I guessed it: ${name}! That took ${turns} turn${turns === 1 ? '' : 's'}.`, [
+      { label: 'Play Again', primary: true, onClick: startTwentyQuestions },
+      { label: 'Switch Mode', onClick: startTwentyQuestionsChooser },
+      { label: 'Close', onClick: hideHuntSideGame },
+    ]);
+  }
+
+  function twentyGuessStumped(resultLine) {
+    showHuntSideGame(
+      '20 Questions',
+      'You Stumped Me!',
+      `${resultLine}\n\nYou win this round. Want to teach me so I can guess it next time?${formatTwentyGuessHistory()}`,
+      [
+        { label: 'Teach Me', primary: true, onClick: twentyTeachAnswer },
+        { label: 'Play Again', onClick: startTwentyQuestions },
+        { label: 'Close', onClick: hideHuntSideGame },
+      ]
+    );
+  }
+
+  function twentyTeachAnswer() {
+    let name = '';
+    if (typeof window !== 'undefined' && typeof window.prompt === 'function') {
+      name = (window.prompt('What were you thinking of?') || '').trim();
+    }
+    if (!name) {
+      twentyGuessStumped('No worries.');
+      return;
+    }
+    const attrs = {};
+    Object.keys(twentyGuessAnswers).forEach(tag => {
+      const value = twentyGuessAnswers[tag];
+      if (value >= 0.75) attrs[tag] = 'yes';
+      else if (value <= -0.75) attrs[tag] = 'no';
+      else if (value > 0) attrs[tag] = 'sometimes';
+    });
+    const learned = getStoredJson('rtaTwentyLearned', []) || [];
+    const list = Array.isArray(learned) ? learned : [];
+    const existingIndex = list.findIndex(entry => entry.name && entry.name.toLowerCase() === name.toLowerCase());
+    const record = { name, attrs };
+    if (existingIndex >= 0) list[existingIndex] = record;
+    else list.push(record);
+    setStoredJson('rtaTwentyLearned', list.slice(-50));
+    showHuntSideGame('20 Questions', 'Thanks!', `Good one. I will remember ${name} for next time by linking it with your clues.`, [
       { label: 'Play Again', primary: true, onClick: startTwentyQuestions },
       { label: 'Close', onClick: hideHuntSideGame },
     ]);
