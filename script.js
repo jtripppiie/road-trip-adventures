@@ -3443,6 +3443,9 @@
 
   function updateHideSeek(delta) {
     if (!delta) return;
+    if (!isHideSeekMovementPhase() && hideSeekState.touchTarget) {
+      hideSeekState.touchTarget = null;
+    }
     if (hideSeekState.phase === HideSeekGameState.HIDER_TURN) {
       updateHideSeekActor(hideSeekState.actors.hider, delta);
       hideSeekState.hiderTimeRemaining = Math.max(0, hideSeekState.hiderTimeRemaining - delta);
@@ -3482,8 +3485,21 @@
   function updateHideSeekActor(actor, delta) {
     const input = hideSeekState.input;
     actor.exitCooldown = Math.max(0, (actor.exitCooldown || 0) - delta);
-    const dx = (input.right ? 1 : 0) - (input.left ? 1 : 0);
-    const dy = (input.down ? 1 : 0) - (input.up ? 1 : 0);
+    let dx = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+    let dy = (input.down ? 1 : 0) - (input.up ? 1 : 0);
+    const target = hideSeekState.touchTarget;
+    if (target && !dx && !dy) {
+      const actorCenterX = actor.x + actor.width / 2;
+      const actorCenterY = actor.y + actor.height / 2;
+      const tdx = target.x - actorCenterX;
+      const tdy = target.y - actorCenterY;
+      const targetDistance = Math.hypot(tdx, tdy);
+      const deadzone = Math.max(actor.width, actor.height) * 0.45;
+      if (targetDistance > deadzone) {
+        dx = tdx / targetDistance;
+        dy = tdy / targetDistance;
+      }
+    }
     if (!dx && !dy) {
       hideSeekState.stamina = Math.min(HIDE_SEEK_MAX_STAMINA, hideSeekState.stamina + delta * 24);
       hideSeekState.activeRoomId = actor.roomId;
@@ -4638,6 +4654,34 @@
   function setHideSeekInput(direction, active) {
     if (!hideSeekState.input || !direction) return;
     hideSeekState.input[direction] = active;
+  }
+
+  function isHideSeekMovementPhase() {
+    return hideSeekState.phase === HideSeekGameState.HIDER_TURN
+      || hideSeekState.phase === HideSeekGameState.SEEKER_TURN;
+  }
+
+  function getHideSeekCanvasPoint(event) {
+    const rect = hideSeekCanvas.getBoundingClientRect();
+    const { width, height } = getHideSeekCanvasSize();
+    if (!rect.width || !rect.height) return null;
+    return {
+      x: ((event.clientX - rect.left) / rect.width) * width,
+      y: ((event.clientY - rect.top) / rect.height) * height,
+    };
+  }
+
+  function handleHideSeekPointer(event) {
+    if (!hideSeekCanvas || !hideSeekState.input) return;
+    if (!isHideSeekMovementPhase()) return;
+    const point = getHideSeekCanvasPoint(event);
+    if (!point) return;
+    event.preventDefault();
+    hideSeekState.touchTarget = point;
+  }
+
+  function releaseHideSeekPointer() {
+    hideSeekState.touchTarget = null;
   }
 
   function toggleHideSeekDebug() {
@@ -6600,6 +6644,16 @@
     button.addEventListener('pointercancel', () => setHideSeekInput(direction, false));
     button.addEventListener('lostpointercapture', () => setHideSeekInput(direction, false));
   });
+  if (hideSeekCanvas) {
+    hideSeekCanvas.addEventListener('pointerdown', event => {
+      hideSeekCanvas.setPointerCapture(event.pointerId);
+      handleHideSeekPointer(event);
+    });
+    hideSeekCanvas.addEventListener('pointermove', handleHideSeekPointer);
+    hideSeekCanvas.addEventListener('pointerup', releaseHideSeekPointer);
+    hideSeekCanvas.addEventListener('pointercancel', releaseHideSeekPointer);
+    hideSeekCanvas.addEventListener('lostpointercapture', releaseHideSeekPointer);
+  }
   calculateTripButton.addEventListener('click', calculateTripTime);
   calculatorSwapButton.addEventListener('click', swapCalculatorSpeeds);
   [calcMiles, calcSpeedA, calcSpeedB].forEach(input => {
