@@ -547,6 +547,8 @@ body.large-text {
   text-align: left;
   box-sizing: border-box;
   width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
   margin-bottom: 1rem;
 }
 
