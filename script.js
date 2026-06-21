@@ -877,10 +877,9 @@
   let activeTriviaCategory = getStoredJson('rtaLastTriviaCategory', 'mixed');
   let activeTriviaDifficulty = getStoredJson('rtaLastTriviaDifficulty', 'medium');
   let triviaQuestionAwarded = false;
-  let jokeAwards = { dad: 0, mom: 0 };
+  let jokeAwards = { dad: 0, mom: 0, brother: 0, sister: 0 };
   let jokeRound = 1;
-  let jokeDadDeck = [];
-  let jokeMomDeck = [];
+  let jokeDecks = { dad: [], mom: [], brother: [], sister: [] };
   let twentyQuestionsCount = 0;
   let twentyQuestionsDeck = [];
   let twentyQuestionsAnswers = [];
@@ -1109,9 +1108,13 @@
   const jokeRoundElement = document.getElementById('joke-round');
   const jokeDad = document.getElementById('joke-dad');
   const jokeMom = document.getElementById('joke-mom');
+  const jokeBrother = document.getElementById('joke-brother');
+  const jokeSister = document.getElementById('joke-sister');
   const jokeAward = document.getElementById('joke-award');
   const dadJokeAwardButton = document.getElementById('dad-joke-award');
   const momJokeAwardButton = document.getElementById('mom-joke-award');
+  const brotherJokeAwardButton = document.getElementById('brother-joke-award');
+  const sisterJokeAwardButton = document.getElementById('sister-joke-award');
   const nextJokesButton = document.getElementById('next-jokes');
   const finishJokesButton = document.getElementById('finish-jokes');
   const punInput = document.getElementById('pun-input');
@@ -1312,13 +1315,13 @@
       ],
     },
     jokes: {
-      title: 'Dad Jokes vs Mom Jokes',
+      title: 'Family Joke Vote',
       type: 'Just for fun',
       scored: false,
-      summary: 'Read a Dad joke and a Mom joke each round and rate the laughs.',
+      summary: 'Read a Dad, Mom, Brother, and Sister joke each round and rate the laughs.',
       rules: [
-        'Read both jokes out loud.',
-        'Tap Laugh for Dad or Laugh for Mom.',
+        'Read each joke out loud.',
+        'Tap whoever got the bigger laugh.',
         'It always ends in a tie \u2014 everybody wins the laugh.',
       ],
     },
@@ -5043,28 +5046,59 @@
     'What do you call a pile of cats? A meow-ntain.',
   ];
 
+  const brotherJokesFallback = [
+    'My brother thinks cleaning means moving things from the floor to the bed.',
+    'My brother has two moods: hungry and somehow still hungry.',
+    'My brother can hear a chip bag open from three rooms away.',
+    'Brothers don\u2019t grow up. They just get taller and louder.',
+  ];
+
+  const sisterJokesFallback = [
+    'Brothers are why sisters develop patience, sarcasm, and strong door locks.',
+    'My brother\u2019s laundry pile has its own climate system.',
+    'My brother is brave until there\u2019s a spider.',
+    'Having a brother is like owning a dog that talks back.',
+  ];
+
   const dadJokesPack = Array.isArray(window.RTA_DAD_JOKES) && window.RTA_DAD_JOKES.length
     ? window.RTA_DAD_JOKES
     : dadJokesFallback;
   const momJokesPack = Array.isArray(window.RTA_MOM_JOKES) && window.RTA_MOM_JOKES.length
     ? window.RTA_MOM_JOKES
     : momJokesFallback;
+  const brotherJokesPack = Array.isArray(window.RTA_BROTHER_JOKES) && window.RTA_BROTHER_JOKES.length
+    ? window.RTA_BROTHER_JOKES
+    : brotherJokesFallback;
+  const sisterJokesPack = Array.isArray(window.RTA_SISTER_JOKES) && window.RTA_SISTER_JOKES.length
+    ? window.RTA_SISTER_JOKES
+    : sisterJokesFallback;
 
   function startJokeVote() {
     resetGame();
-    jokeAwards = { dad: 0, mom: 0 };
+    jokeAwards = { dad: 0, mom: 0, brother: 0, sister: 0 };
     jokeRound = 1;
-    jokeDadDeck = shuffle(dadJokesPack.slice());
-    jokeMomDeck = shuffle(momJokesPack.slice());
+    jokeDecks = {
+      dad: shuffle(dadJokesPack.slice()),
+      mom: shuffle(momJokesPack.slice()),
+      brother: shuffle(brotherJokesPack.slice()),
+      sister: shuffle(sisterJokesPack.slice()),
+    };
     renderJokeVote();
     showSection('jokes');
   }
 
+  function getJokeForRound(deck) {
+    if (!deck || !deck.length) return '';
+    return deck[(jokeRound - 1) % deck.length];
+  }
+
   function renderJokeVote() {
     jokeRoundElement.textContent = String(jokeRound);
-    jokeDad.textContent = jokeDadDeck[(jokeRound - 1) % jokeDadDeck.length];
-    jokeMom.textContent = jokeMomDeck[(jokeRound - 1) % jokeMomDeck.length];
-    jokeAward.textContent = `Laughs so far: Dad ${jokeAwards.dad}, Mom ${jokeAwards.mom}.`;
+    jokeDad.textContent = getJokeForRound(jokeDecks.dad);
+    jokeMom.textContent = getJokeForRound(jokeDecks.mom);
+    jokeBrother.textContent = getJokeForRound(jokeDecks.brother);
+    jokeSister.textContent = getJokeForRound(jokeDecks.sister);
+    jokeAward.textContent = `Laughs so far: Dad ${jokeAwards.dad}, Mom ${jokeAwards.mom}, Brother ${jokeAwards.brother}, Sister ${jokeAwards.sister}.`;
   }
 
   function nextJokeRound() {
@@ -5074,11 +5108,13 @@
 
   function showJokeSummary() {
     showSection('summary');
-    summaryText.textContent = `It\u2019s a tie! Dad jokes and Mom jokes are equally great.`;
+    summaryText.textContent = `It\u2019s a tie! Dad, Mom, Brother, and Sister jokes are all equally great.`;
     summaryList.innerHTML = '';
     [
       `Dad laughs: ${jokeAwards.dad}`,
       `Mom laughs: ${jokeAwards.mom}`,
+      `Brother laughs: ${jokeAwards.brother}`,
+      `Sister laughs: ${jokeAwards.sister}`,
       'Official ruling: always a tie \u2014 everybody wins the laugh.',
     ].forEach(text => {
       const li = document.createElement('li');
@@ -6654,6 +6690,14 @@
   });
   momJokeAwardButton.addEventListener('click', () => {
     jokeAwards.mom++;
+    nextJokeRound();
+  });
+  brotherJokeAwardButton.addEventListener('click', () => {
+    jokeAwards.brother++;
+    nextJokeRound();
+  });
+  sisterJokeAwardButton.addEventListener('click', () => {
+    jokeAwards.sister++;
     nextJokeRound();
   });
   nextJokesButton.addEventListener('click', nextJokeRound);
