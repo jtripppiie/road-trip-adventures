@@ -11,7 +11,7 @@
 (() => {
   // Visible build version. Bump this (and CACHE_VERSION in sw.js) on every
   // deploy so the on-screen badge confirms which build is actually live.
-  const APP_VERSION = 'v12 · 2026-06-21';
+  const APP_VERSION = 'v14 · 2026-06-21';
   const versionBadge = document.getElementById('app-version');
   if (versionBadge) {
     versionBadge.textContent = APP_VERSION;
@@ -910,6 +910,11 @@
   let hideSeekSelectedSpotId = null;
   let hideSeekRevealHidden = false;
   const hideSeekDebug = { lastTapRaw: null, lastTapCanvas: null, cycleIndex: -1, lastInspect: null, log: [] };
+  // Solo vs Computer (single-player AI). The human is always player index 0; the
+  // computer plays whichever role the human is not, alternating each round.
+  let hideSeekSoloEnabled = getStoredJson('rtaHideSeekSolo', false);
+  const HIDE_SEEK_HUMAN_INDEX = 0;
+  const hideSeekAI = { thinkTimer: 0, lastRoom: null };
   const HIDE_SEEK_HIDE_SECONDS = 60;
   const HIDE_SEEK_SEARCH_COUNTS = {
     easy: 10,
@@ -1174,6 +1179,8 @@
   const hideSeekSprintButton = document.getElementById('hide-seek-sprint');
   const hideSeekNextButton = document.getElementById('hide-seek-next');
   const hideSeekDebugButton = document.getElementById('hide-seek-debug');
+  const hideSeekSoloButton = document.getElementById('hide-seek-solo');
+  const hideSeekControls = document.querySelector('.hide-seek-controls');
   const hideSeekDebugPanel = document.getElementById('hide-seek-debug-panel');
   const hideSeekDebugReadout = document.getElementById('hide-seek-debug-readout');
   const hideSeekDebugLogEl = document.getElementById('hide-seek-debug-log');
@@ -3188,8 +3195,8 @@
   }
 
   function renderHideSeek() {
-    const hiderName = getHideSeekPlayerName(hideSeekState.hiderIndex);
-    const seekerName = getHideSeekPlayerName(hideSeekState.seekerIndex);
+    const hiderName = getHideSeekDisplayName(hideSeekState.hiderIndex);
+    const seekerName = getHideSeekDisplayName(hideSeekState.seekerIndex);
     const maxRounds = getHideSeekMaxRounds();
     const nearbySpot = getNearbyHideSeekSpot(getHideSeekActiveActor());
     const room = getHideSeekRoom(hideSeekState.activeRoomId);
@@ -3223,7 +3230,7 @@
     hideSeekSpecialButton.disabled = false;
     hideSeekSprintButton.disabled = hideSeekState.stamina <= 1 || hideSeekState.inspectTime > 0;
     hideSeekSprintButton.textContent = `Sprint ${Math.round(hideSeekState.stamina)}%`;
-    hideSeekDebugButton.textContent = hideSeekDebugEnabled ? 'Computer Mode: On' : 'Computer Mode: Off';
+    hideSeekDebugButton.textContent = hideSeekDebugEnabled ? 'Debug: On' : 'Debug: Off';
     hideSeekDebugButton.setAttribute('aria-pressed', hideSeekDebugEnabled ? 'true' : 'false');
     hideSeekDebugButton.classList.toggle('is-active', hideSeekDebugEnabled);
     hideSeekNextButton.textContent = hideSeekRound >= maxRounds ? 'See Winner' : 'Next Round';
@@ -3276,8 +3283,24 @@
       setHideSeekMessage(`Ready for round ${hideSeekRound + 1}.`);
     }
 
+    applyHideSeekAIControlVisibility();
     renderHideSeekOverlay();
     drawHideSeek();
+  }
+
+  // Hides the human movement pad and action buttons while the computer is
+  // driving the current turn, and shows a short status instead.
+  function applyHideSeekAIControlVisibility() {
+    const aiControlling = isHideSeekAIControlling();
+    if (hideSeekControls) hideSeekControls.hidden = aiControlling;
+    if (aiControlling) {
+      hideSeekFoundButton.hidden = true;
+      hideSeekSpecialButton.hidden = true;
+      hideSeekSprintButton.hidden = true;
+      if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
+        setHideSeekMessage(`Computer is searching… Searches left: ${hideSeekState.searchesRemaining}.`);
+      }
+    }
   }
 
   function renderHideSeekOverlay() {
@@ -3335,6 +3358,7 @@
     startHideSeekLoop();
     playHideSeekTone('door');
     renderHideSeek();
+    maybeStartHideSeekComputerTurn();
   }
 
   function beginHideSeekSeekerTurn() {
@@ -3429,6 +3453,12 @@
     playHideSeekTone('hide');
     setHideSeekMessage(`${coverQuality.label}. Phone pass time.`);
     renderHideSeek();
+    // Solo: when the computer is the seeker, no phone pass is needed — let the
+    // AI start searching right away.
+    if (hideSeekSoloEnabled && isHideSeekComputerSeeker()) {
+      hideSeekAI.lastRoom = null;
+      beginHideSeekSeekerTurn();
+    }
   }
 
   function searchHideSeekPosition() {
@@ -3519,7 +3549,7 @@
     hideSeekState.cameraShake = Math.max(hideSeekState.cameraShake, 0.45);
     revealHideSeekHider(foundSpot);
     hideSeekRound += 1;
-    hideSeekState.lastRoundText = `${seeker.name} found ${hider.name} ${hideSeekState.hiddenSpotLabel}. Cover: ${hideSeekState.hiddenCoverLabel}. ${seeker.name}: +${hideSeekState.roundSeekerScore}. ${hider.name}: +${hideSeekState.roundHiderScore}. Searches used: ${hideSeekState.inspectionCount}. Stealth bonus: ${stealthBonus}.`;
+    hideSeekState.lastRoundText = `${getHideSeekDisplayName(hideSeekState.seekerIndex)} found ${getHideSeekDisplayName(hideSeekState.hiderIndex)} ${hideSeekState.hiddenSpotLabel}. Cover: ${hideSeekState.hiddenCoverLabel}. ${getHideSeekDisplayName(hideSeekState.seekerIndex)}: +${hideSeekState.roundSeekerScore}. ${getHideSeekDisplayName(hideSeekState.hiderIndex)}: +${hideSeekState.roundHiderScore}. Searches used: ${hideSeekState.inspectionCount}. Stealth bonus: ${stealthBonus}.`;
     playHideSeekTone('found');
     renderHideSeek();
   }
@@ -3562,7 +3592,7 @@
     hideSeekState.cameraShake = Math.max(hideSeekState.cameraShake, 0.25);
     revealHideSeekHider(spot || createHideSeekActor(hideSeekState.activeRoomId, true, '#2ec7d3'));
     hideSeekRound += 1;
-    hideSeekState.lastRoundText = `${hider.name} stayed hidden ${hideSeekState.hiddenSpotLabel}. Cover: ${hideSeekState.hiddenCoverLabel}. Peeks: ${hideSeekState.peekCount}. Stealth bonus: ${stealthBonus}. ${hider.name}: +${hideSeekState.roundHiderScore}.`;
+    hideSeekState.lastRoundText = `${getHideSeekDisplayName(hideSeekState.hiderIndex)} stayed hidden ${hideSeekState.hiddenSpotLabel}. Cover: ${hideSeekState.hiddenCoverLabel}. Peeks: ${hideSeekState.peekCount}. Stealth bonus: ${stealthBonus}. ${getHideSeekDisplayName(hideSeekState.hiderIndex)}: +${hideSeekState.roundHiderScore}.`;
     playHideSeekTone('wrong');
     renderHideSeek();
   }
@@ -3578,6 +3608,126 @@
     resetHideSeekRoundState(HideSeekGameState.HIDER_TURN);
     playHideSeekTone('door');
     renderHideSeek();
+    maybeStartHideSeekComputerTurn();
+  }
+
+  // ---- Solo vs Computer (single-player AI) ----------------------------------
+
+  function isHideSeekComputerHider() {
+    return hideSeekSoloEnabled && hideSeekState.hiderIndex !== HIDE_SEEK_HUMAN_INDEX;
+  }
+
+  function isHideSeekComputerSeeker() {
+    return hideSeekSoloEnabled && hideSeekState.seekerIndex !== HIDE_SEEK_HUMAN_INDEX;
+  }
+
+  // True while the computer is actively driving the current turn (used to hide
+  // the human controls so the player does not fight the AI).
+  function isHideSeekAIControlling() {
+    return (hideSeekState.phase === HideSeekGameState.HIDER_TURN && isHideSeekComputerHider())
+      || (hideSeekState.phase === HideSeekGameState.SEEKER_TURN && isHideSeekComputerSeeker());
+  }
+
+  function getHideSeekDisplayName(index) {
+    if (hideSeekSoloEnabled && index !== HIDE_SEEK_HUMAN_INDEX) return 'Computer';
+    return getHideSeekPlayerName(index);
+  }
+
+  // If it is the computer's turn to hide, pick a random valid spot in the start
+  // room and lock it in, then hand the seeker turn to the human.
+  function maybeStartHideSeekComputerTurn() {
+    if (!hideSeekSoloEnabled) return;
+    if (hideSeekState.phase === HideSeekGameState.HIDER_TURN && isHideSeekComputerHider()) {
+      hideSeekComputerHide();
+    }
+  }
+
+  function hideSeekComputerHide() {
+    if (hideSeekState.phase !== HideSeekGameState.HIDER_TURN) return;
+    const map = getHideSeekMap();
+    const startRoom = getHideSeekRoom(map.startRoom);
+    if (!startRoom) return;
+    const hider = hideSeekState.actors.hider;
+    hider.roomId = startRoom.id;
+    hideSeekState.activeRoomId = startRoom.id;
+    const spots = (startRoom.spots || []).filter(spot => getHideSeekSpotState(spot.id) !== 'disabled');
+    if (!spots.length) return;
+    const spot = Object.assign({ roomId: startRoom.id }, spots[Math.floor(Math.random() * spots.length)]);
+    placeHideSeekActorAtSpot(hider, spot);
+    hideSeekSelectedSpotId = spot.id;
+    if (hideSeekDebugEnabled) hideSeekDebugLog(`Computer hid at ${spot.id} (${spot.label}).`);
+    lockHideSeekHiderPosition('button', spot);
+    // Single player: no phone pass needed — start the human's seeker turn.
+    if (hideSeekState.phase === HideSeekGameState.SEEKER_LOOK_AWAY) {
+      beginHideSeekSeekerTurn();
+    }
+  }
+
+  // Simple, fair AI seeker: walk to the nearest unsearched spot in the room and
+  // inspect it; once a room is cleared, head through an exit toward a room that
+  // still has unsearched spots.
+  function roomHasUnsearchedHideSeekSpots(roomId) {
+    const room = getHideSeekRoom(roomId);
+    return ((room && room.spots) || []).some(spot => {
+      const state = getHideSeekSpotState(spot.id);
+      return state !== 'disabled' && state !== 'searched' && state !== 'found';
+    });
+  }
+
+  function updateHideSeekAISeeker(delta) {
+    const seeker = hideSeekState.actors.seeker;
+    const room = getHideSeekRoom(seeker.roomId);
+    if (!room) return;
+    hideSeekAI.thinkTimer = Math.max(0, hideSeekAI.thinkTimer - delta);
+
+    let target = null;
+    (room.spots || []).forEach(spot => {
+      const state = getHideSeekSpotState(spot.id);
+      if (state === 'disabled' || state === 'searched' || state === 'found') return;
+      const distance = getHideSeekDistanceToRect(seeker, spot);
+      if (!target || distance < target.distance) target = { spot, distance };
+    });
+
+    if (target) {
+      const near = getNearbyHideSeekSpot(seeker);
+      if (near && near.id === target.spot.id) {
+        hideSeekState.touchTarget = null;
+        if (hideSeekState.inspectTime <= 0 && hideSeekAI.thinkTimer <= 0) {
+          searchHideSeekPosition();
+          hideSeekAI.thinkTimer = 0.7;
+        }
+      } else {
+        const center = getHideSeekSpotCenter(target.spot);
+        hideSeekState.touchTarget = { x: center.x, y: center.y };
+      }
+      return;
+    }
+
+    // Room cleared — steer toward an exit leading somewhere still worth checking.
+    const exits = room.exits || [];
+    if (!exits.length) return;
+    const chosen = exits.find(exit => exit.targetRoom !== hideSeekAI.lastRoom && roomHasUnsearchedHideSeekSpots(exit.targetRoom))
+      || exits.find(exit => roomHasUnsearchedHideSeekSpots(exit.targetRoom))
+      || exits[0];
+    const trigger = getHideSeekExitTriggerRect(chosen);
+    hideSeekState.touchTarget = { x: trigger.x + trigger.width / 2, y: trigger.y + trigger.height / 2 };
+    hideSeekAI.lastRoom = room.id;
+  }
+
+  function toggleHideSeekSolo() {
+    hideSeekSoloEnabled = !hideSeekSoloEnabled;
+    setStoredJson('rtaHideSeekSolo', hideSeekSoloEnabled);
+    hideSeekAI.lastRoom = null;
+    updateHideSeekSoloButton();
+    renderHideSeek();
+    maybeStartHideSeekComputerTurn();
+  }
+
+  function updateHideSeekSoloButton() {
+    if (!hideSeekSoloButton) return;
+    hideSeekSoloButton.textContent = hideSeekSoloEnabled ? 'Solo vs Computer: On' : 'Solo vs Computer: Off';
+    hideSeekSoloButton.setAttribute('aria-pressed', hideSeekSoloEnabled ? 'true' : 'false');
+    hideSeekSoloButton.classList.toggle('is-active', hideSeekSoloEnabled);
   }
 
   function resetHideSeek() {
@@ -3648,6 +3798,7 @@
       hideSeekState.hiderTimeRemaining = Math.max(0, hideSeekState.hiderTimeRemaining - delta);
       if (hideSeekState.hiderTimeRemaining <= 0) lockHideSeekHiderPosition('timer');
     } else if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
+      if (isHideSeekComputerSeeker()) updateHideSeekAISeeker(delta);
       if (hideSeekState.inspectTime <= 0) updateHideSeekActor(hideSeekState.actors.seeker, delta);
       // Searches are discrete; seeker phase no longer drains continuously over time.
     }
@@ -3738,14 +3889,17 @@
   }
 
   function getHideSeekRoomBounds(actor) {
-    const { width: canvasWidth, height: canvasHeight } = getHideSeekCanvasSize();
-    const edgePaddingX = Math.round(18 * HIDE_SEEK_SCALE);
-    const edgePaddingY = Math.round(22 * HIDE_SEEK_SCALE);
+    // Constrain the whole sprite to the visible play-area floor so players can
+    // neither move nor hide in the wall band around the room. Exits sit at the
+    // floor edges and use generously padded trigger rects, so they remain
+    // reachable from within these bounds.
+    const floor = getHideSeekFloorRect();
+    const margin = Math.round(2 * HIDE_SEEK_SCALE);
     return {
-      minX: edgePaddingX,
-      maxX: canvasWidth - actor.width - edgePaddingX,
-      minY: edgePaddingY,
-      maxY: canvasHeight - actor.height - edgePaddingY,
+      minX: floor.x + margin,
+      maxX: floor.x + floor.width - actor.width - margin,
+      minY: floor.y + margin,
+      maxY: floor.y + floor.height - actor.height - margin,
     };
   }
 
@@ -4901,7 +5055,7 @@
     fillHideSeekRoundedRect(ctx, 14, 64, 300, 92, 8);
     ctx.fillStyle = '#f7fbff';
     ctx.font = '900 12px Arial';
-    ctx.fillText('COMPUTER MODE', 26, 82);
+    ctx.fillText('DEBUG', 26, 82);
     ctx.font = '800 10px Arial';
     ctx.fillStyle = '#bdeff4';
     ctx.fillText(`map=${map.id} room=${room.id} phase=${hideSeekState.phase}`, 26, 99);
@@ -4959,7 +5113,7 @@
   function toggleHideSeekDebug() {
     hideSeekDebugEnabled = !hideSeekDebugEnabled;
     setStoredJson('rtaHideSeekDebug', hideSeekDebugEnabled);
-    hideSeekDebugLog(`Computer Mode ${hideSeekDebugEnabled ? 'ON' : 'OFF'}.`);
+    hideSeekDebugLog(`Debug overlay ${hideSeekDebugEnabled ? 'ON' : 'OFF'}.`);
     renderHideSeekDebugPanel();
     renderHideSeek();
   }
@@ -7833,6 +7987,10 @@
   hideSeekSprintButton.addEventListener('lostpointercapture', () => setHideSeekInput('sprint', false));
   hideSeekNextButton.addEventListener('click', nextHideSeekRound);
   hideSeekDebugButton.addEventListener('click', toggleHideSeekDebug);
+  if (hideSeekSoloButton) {
+    hideSeekSoloButton.addEventListener('click', toggleHideSeekSolo);
+    updateHideSeekSoloButton();
+  }
   if (hideSeekAutoHideButton) hideSeekAutoHideButton.addEventListener('click', hideSeekAutoHide);
   if (hideSeekRevealButton) hideSeekRevealButton.addEventListener('click', hideSeekRevealHiddenSpot);
   if (hideSeekNextSpotButton) hideSeekNextSpotButton.addEventListener('click', hideSeekCycleSpot);

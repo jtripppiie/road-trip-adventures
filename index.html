@@ -569,8 +569,8 @@
           <span>Start the match, then pass the phone when the app says to.</span>
         </div>
         <!-- Computer Mode / Debug overlay panel (toggled by the Computer Mode button). -->
-        <div id="hide-seek-debug-panel" class="hide-seek-debug-panel" hidden aria-label="Computer Mode panel">
-          <div class="hide-seek-debug-title">Computer Mode</div>
+        <div id="hide-seek-debug-panel" class="hide-seek-debug-panel" hidden aria-label="Debug panel">
+          <div class="hide-seek-debug-title">Debug</div>
           <div class="hide-seek-debug-buttons">
             <button id="hide-seek-auto-hide" type="button" class="hide-seek-debug-btn">Auto Hide</button>
             <button id="hide-seek-reveal" type="button" class="hide-seek-debug-btn">Reveal Hidden</button>
@@ -600,8 +600,9 @@
         <button id="hide-seek-special" class="secondary-button" hidden>Listen</button>
         <button id="hide-seek-sprint" class="secondary-button" hidden>Sprint</button>
         <button id="hide-seek-next" class="secondary-button" hidden>Next Round</button>
+        <button id="hide-seek-solo" class="secondary-button" aria-pressed="false">Solo vs Computer: Off</button>
         <button id="hide-seek-fullscreen" class="secondary-button">Full Screen</button>
-        <button id="hide-seek-debug" class="secondary-button" aria-pressed="false">Computer Mode: Off</button>
+        <button id="hide-seek-debug" class="secondary-button" aria-pressed="false">Debug: Off</button>
         <button id="hide-seek-reset" class="secondary-button">Reset Game</button>
         <button id="hide-seek-finish" class="secondary-button">Finish Hide &amp; Seek</button>
       </div>
