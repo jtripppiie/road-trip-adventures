@@ -5138,6 +5138,22 @@
     word => `That\u2019s how I ${word} and roll.`,
     word => `Sorry, I\u2019m too ${word} to function.`,
     word => `Every road leads back to ${word}.`,
+    word => `Wherever you go, there you ${word}.`,
+    word => `I\u2019m ${word}-mitted to this bit.`,
+    word => `Let\u2019s ${word} and roll, baby.`,
+    word => `That\u2019s a ${word}-derful idea.`,
+    word => `I\u2019ve got a ${word}-derlust for adventure.`,
+    word => `Hold on to your ${word}, it\u2019s gonna be wild.`,
+    word => `You\u2019re ${word}-ing me crazy, in a good way.`,
+    word => `Resistance is ${word}-tile.`,
+    word => `It\u2019s all fun and ${word} until someone naps.`,
+    word => `Frankly, my dear, I don\u2019t give a ${word}.`,
+    word => `${word}? In this economy?`,
+    word => `One does not simply ${word} into a road trip.`,
+    word => `May the ${word} be with you.`,
+    word => `Life is short, eat the ${word}.`,
+    word => `Born to ${word}, forced to navigate.`,
+    word => `I came, I saw, I ${word}-quered.`,
   ];
 
   function startPunGenerator() {
