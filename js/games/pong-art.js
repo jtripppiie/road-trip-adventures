@@ -37,9 +37,40 @@
     };
   }
 
+  // Scale the canvas backing store to the device pixel ratio so graphics stay
+  // crisp on high-DPI phones, while keeping a fixed logical coordinate space so
+  // all game physics and layout maths remain unchanged.
+  function setupHiDpiCanvas(canvas) {
+    const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 3));
+
+    // Capture the original design size once, before we rescale the backing
+    // store (otherwise repeated setups would compound the scale factor).
+    if (!canvas.dataset.logicalWidth) {
+      canvas.dataset.logicalWidth = String(canvas.width);
+      canvas.dataset.logicalHeight = String(canvas.height);
+    }
+
+    const logicalWidth = Number(canvas.dataset.logicalWidth);
+    const logicalHeight = Number(canvas.dataset.logicalHeight);
+
+    canvas.width = Math.round(logicalWidth * dpr);
+    canvas.height = Math.round(logicalHeight * dpr);
+
+    const ctx = canvas.getContext('2d');
+
+    // Draw in logical coordinates; the transform maps them to real pixels.
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    return { ctx, logicalWidth, logicalHeight, dpr };
+  }
+
   function createGameState(canvas, config) {
-    const width = canvas.width;
-    const height = canvas.height;
+    const setup = setupHiDpiCanvas(canvas);
+
+    const width = setup.logicalWidth;
+    const height = setup.logicalHeight;
 
     const serve = randomServeVelocity(
       config.ballSpeed,
@@ -48,7 +79,8 @@
 
     return {
       canvas,
-      ctx: canvas.getContext('2d'),
+      ctx: setup.ctx,
+      dpr: setup.dpr,
 
       width,
       height,
@@ -84,10 +116,12 @@
   }
 
   function resizeState(state) {
-    const { canvas } = state;
+    const setup = setupHiDpiCanvas(state.canvas);
 
-    state.width = canvas.width;
-    state.height = canvas.height;
+    state.ctx = setup.ctx;
+    state.dpr = setup.dpr;
+    state.width = setup.logicalWidth;
+    state.height = setup.logicalHeight;
   }
 
   function resetBall(state, config, direction) {
@@ -120,7 +154,7 @@
       y: state.ball.y,
     });
 
-    if (state.ballTrail.length > 8) {
+    if (state.ballTrail.length > 14) {
       state.ballTrail.shift();
     }
   }
@@ -219,6 +253,22 @@
     );
 
     ctx.stroke();
+
+    // Soft vignette to focus the eye toward the centre of play.
+    const vignette = ctx.createRadialGradient(
+      state.width / 2,
+      state.height / 2,
+      Math.min(state.width, state.height) * 0.25,
+      state.width / 2,
+      state.height / 2,
+      Math.max(state.width, state.height) * 0.72
+    );
+
+    vignette.addColorStop(0, 'rgba(0,0,0,0)');
+    vignette.addColorStop(1, 'rgba(0,0,0,0.38)');
+
+    ctx.fillStyle = vignette;
+    ctx.fillRect(0, 0, state.width, state.height);
   }
 
   function drawScoreHud(ctx, state) {
@@ -373,15 +423,16 @@
     ctx.save();
 
     state.ballTrail.forEach((point, index) => {
-      ctx.globalAlpha =
-        (index + 1) / state.ballTrail.length * 0.25;
+      const fraction = (index + 1) / state.ballTrail.length;
+
+      ctx.globalAlpha = fraction * 0.32;
 
       ctx.beginPath();
 
       ctx.arc(
         point.x,
         point.y,
-        radius,
+        radius * (0.35 + fraction * 0.65),
         0,
         Math.PI * 2
       );

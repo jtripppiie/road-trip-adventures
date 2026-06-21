@@ -1,7 +1,7 @@
 /* Offline cache for Road Trip Adventures.
    Static, no backend — caches the app shell so it keeps working after the
    first load even with no signal. Bump CACHE_VERSION when assets change. */
-const CACHE_VERSION = 'rta-v5';
+const CACHE_VERSION = 'rta-v6';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -19,6 +19,8 @@ const CORE_ASSETS = [
   './js/games/hide-seek-art.js',
   './js/games/pong-data.js',
   './js/games/pong-art.js',
+  // Vendored offline graphics engine, available for future games.
+  './vendor/kontra.min.js',
 ];
 
 self.addEventListener('install', event => {
