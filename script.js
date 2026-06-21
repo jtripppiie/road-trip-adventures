@@ -975,6 +975,7 @@
   let gorillasState = null;
   let gorillasTurn = 0;
   let gorillasLastFrameTs = 0;
+  let gorillasBuildingLayer = null;
   let logoClickCount = 0;
   let logoClickTimer = null;
   let secretUnlockStep = 0;
@@ -1387,6 +1388,8 @@
       rules: [
         'Each player chooses an angle and power on their turn.',
         'The banana arcs over the buildings and can hit the opponent.',
+        'Wait for the banana to land before the next player throws.',
+        'Bananas blast a crater out of whatever building they hit.',
         'Direct hits score a point and start the next turn.',
         'First to 5 wins the round.',
       ],
@@ -5647,6 +5650,7 @@
       width,
       height,
       buildings,
+      craters: [],
       scoreLeft: 0,
       scoreRight: 0,
       projectile: null,
@@ -5837,6 +5841,13 @@
     });
   }
 
+  function getGorillasBuildingLayer(width, height) {
+    if (!gorillasBuildingLayer) gorillasBuildingLayer = document.createElement('canvas');
+    if (gorillasBuildingLayer.width !== width) gorillasBuildingLayer.width = width;
+    if (gorillasBuildingLayer.height !== height) gorillasBuildingLayer.height = height;
+    return gorillasBuildingLayer;
+  }
+
   function drawGorillas() {
     if (!gorillasCanvas || !gorillasState) return;
     const ctx = gorillasCanvas.getContext('2d');
@@ -5849,27 +5860,41 @@
     for (let x = 0; x < gorillasState.width; x += 38) {
       ctx.fillRect(x, gorillasState.height - 24, 20, 4);
     }
+    const layer = getGorillasBuildingLayer(gorillasState.width, gorillasState.height);
+    const lctx = layer.getContext('2d');
+    lctx.clearRect(0, 0, layer.width, layer.height);
     gorillasState.buildings.forEach((building, index) => {
       const x = building.x + 4;
       const y = building.roofY;
-      const buildingGradient = ctx.createLinearGradient(x, y, x, gorillasState.height - 36);
+      const buildingGradient = lctx.createLinearGradient(x, y, x, gorillasState.height - 36);
       buildingGradient.addColorStop(0, index % 2 === 0 ? '#203b60' : '#2a4c76');
       buildingGradient.addColorStop(1, index % 2 === 0 ? '#10243f' : '#173453');
-      ctx.fillStyle = buildingGradient;
-      ctx.fillRect(x, y, building.width, building.height);
-      ctx.fillStyle = 'rgba(255,255,255,0.78)';
+      lctx.fillStyle = buildingGradient;
+      lctx.fillRect(x, y, building.width, building.height);
+      lctx.fillStyle = 'rgba(255,255,255,0.78)';
       for (let row = 0; row < Math.max(2, Math.floor(building.height / 44)); row++) {
         for (let col = 0; col < Math.max(2, Math.floor(building.width / 28)); col++) {
           const wx = x + 10 + col * 18;
           const wy = y + 14 + row * 22;
           if (wx + 8 < x + building.width - 8 && wy + 12 < gorillasState.height - 40) {
-            ctx.fillRect(wx, wy, 9, 12);
+            lctx.fillRect(wx, wy, 9, 12);
           }
         }
       }
-      ctx.fillStyle = 'rgba(255,255,255,0.18)';
-      ctx.fillRect(x, y, building.width, 4);
+      lctx.fillStyle = 'rgba(255,255,255,0.18)';
+      lctx.fillRect(x, y, building.width, 4);
     });
+    if (Array.isArray(gorillasState.craters) && gorillasState.craters.length) {
+      lctx.save();
+      lctx.globalCompositeOperation = 'destination-out';
+      gorillasState.craters.forEach(crater => {
+        lctx.beginPath();
+        lctx.arc(crater.x, crater.y, crater.radius, 0, Math.PI * 2);
+        lctx.fill();
+      });
+      lctx.restore();
+    }
+    ctx.drawImage(layer, 0, 0);
     const leftGorilla = gorillasState.buildings[0];
     const rightGorilla = gorillasState.buildings[gorillasState.buildings.length - 1];
     drawPixelGorilla(ctx, leftGorilla.x + leftGorilla.width * 0.62, leftGorilla.roofY - 2, 1);
@@ -6027,15 +6052,29 @@
     drawGorillas();
 
     if (hitTarget) {
+      addGorillasCrater(projectile.x, projectile.y);
       advanceGorillasTurn(true);
       return;
     }
-    if (hitAnyBuilding || hitGround || outOfBounds) {
+    if (hitAnyBuilding) {
+      addGorillasCrater(projectile.x, projectile.y);
+      advanceGorillasTurn(false);
+      return;
+    }
+    if (hitGround || outOfBounds) {
       advanceGorillasTurn(false);
       return;
     }
 
     gorillasAnimationFrame = window.requestAnimationFrame(tickGorillas);
+  }
+
+  function addGorillasCrater(x, y) {
+    if (!gorillasState) return;
+    if (!Array.isArray(gorillasState.craters)) gorillasState.craters = [];
+    const radius = Math.max(18, Math.round(gorillasState.width * 0.028));
+    gorillasState.craters.push({ x, y, radius });
+    if (gorillasState.craters.length > 60) gorillasState.craters.shift();
   }
 
   function resetGorillasGame() {
