@@ -6085,7 +6085,9 @@
     const modeLabel = pongSettings.opponentMode === 'computer'
       ? `${pongSettings.difficulty} AI`
       : 'local match';
-    pongScore.textContent = `${pongState.leftPaddle.score} : ${pongState.rightPaddle.score}`;
+    if (pongScore) {
+      pongScore.textContent = `${pongState.leftPaddle.score} : ${pongState.rightPaddle.score}`;
+    }
     pongStatus.textContent = `${leftName} controls the left paddle, ${rightName} controls the right paddle. ${modeLabel}. First to ${pongState.targetScore} wins.`;
   }
 
