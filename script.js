@@ -883,6 +883,9 @@
   let twentyQuestionsCount = 0;
   let twentyQuestionsDeck = [];
   let twentyQuestionsAnswers = [];
+  let twentyComputerObject = null;
+  let twentyComputerTurns = 0;
+  let twentyComputerAsked = [];
   let lightningDeck = [];
   let alphabetTheme = null;
   let alphabetIndex = 0;
@@ -2325,6 +2328,141 @@
       default:
         return false;
     }
+  }
+
+  const TWENTY_QUESTIONS_LIST = [
+    { tag: 'alive', question: 'Is it alive?' },
+    { tag: 'holdable', question: 'Can a person hold it?' },
+    { tag: 'indoors', question: 'Is it usually found indoors?' },
+    { tag: 'biggerThanBackpack', question: 'Is it bigger than a backpack?' },
+    { tag: 'manmade', question: 'Is it made by humans?' },
+    { tag: 'fun', question: 'Is it used for fun?' },
+    { tag: 'food', question: 'Is it connected to food or drinks?' },
+    { tag: 'movesSelf', question: 'Can it move by itself?' },
+    { tag: 'famous', question: 'Is it famous or well known?' },
+    { tag: 'roadtrip', question: 'Would you see it on a road trip?' },
+    { tag: 'place', question: 'Is it a place?' },
+    { tag: 'person', question: 'Is it a person or character?' },
+    { tag: 'electricity', question: 'Does it use electricity?' },
+    { tag: 'oneColor', question: 'Is it mostly one color?' },
+    { tag: 'kidsKnow', question: 'Would most kids know it?' },
+    { tag: 'nature', question: 'Is it something from nature?' },
+    { tag: 'expensive', question: 'Is it expensive?' },
+    { tag: 'sound', question: 'Can it make sound?' },
+    { tag: 'everyday', question: 'Is it used every day?' },
+    { tag: 'smallerThanPhone', question: 'Is it smaller than a phone?' },
+  ];
+
+  const TWENTY_QUESTIONS_OBJECTS = [
+    { name: 'a dog', attrs: { alive: 'yes', holdable: 'sometimes', indoors: 'sometimes', biggerThanBackpack: 'sometimes', manmade: 'no', fun: 'yes', food: 'no', movesSelf: 'yes', famous: 'no', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'no', oneColor: 'no', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'yes', everyday: 'yes', smallerThanPhone: 'no' } },
+    { name: 'a cat', attrs: { alive: 'yes', holdable: 'yes', indoors: 'yes', biggerThanBackpack: 'no', manmade: 'no', fun: 'yes', food: 'no', movesSelf: 'yes', famous: 'no', roadtrip: 'no', place: 'no', person: 'no', electricity: 'no', oneColor: 'no', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'yes', everyday: 'yes', smallerThanPhone: 'no' } },
+    { name: 'a banana', attrs: { alive: 'no', holdable: 'yes', indoors: 'yes', biggerThanBackpack: 'no', manmade: 'no', fun: 'no', food: 'yes', movesSelf: 'no', famous: 'no', roadtrip: 'sometimes', place: 'no', person: 'no', electricity: 'no', oneColor: 'yes', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'no', everyday: 'yes', smallerThanPhone: 'no' } },
+    { name: 'a car', attrs: { alive: 'no', holdable: 'no', indoors: 'no', biggerThanBackpack: 'yes', manmade: 'yes', fun: 'sometimes', food: 'no', movesSelf: 'yes', famous: 'no', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'sometimes', oneColor: 'no', kidsKnow: 'yes', nature: 'no', expensive: 'yes', sound: 'yes', everyday: 'yes', smallerThanPhone: 'no' } },
+    { name: 'a smartphone', attrs: { alive: 'no', holdable: 'yes', indoors: 'yes', biggerThanBackpack: 'no', manmade: 'yes', fun: 'yes', food: 'no', movesSelf: 'no', famous: 'no', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'yes', oneColor: 'no', kidsKnow: 'yes', nature: 'no', expensive: 'yes', sound: 'yes', everyday: 'yes', smallerThanPhone: 'yes' } },
+    { name: 'a mountain', attrs: { alive: 'no', holdable: 'no', indoors: 'no', biggerThanBackpack: 'yes', manmade: 'no', fun: 'sometimes', food: 'no', movesSelf: 'no', famous: 'sometimes', roadtrip: 'yes', place: 'yes', person: 'no', electricity: 'no', oneColor: 'no', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'no', everyday: 'no', smallerThanPhone: 'no' } },
+    { name: 'the Sun', attrs: { alive: 'no', holdable: 'no', indoors: 'no', biggerThanBackpack: 'yes', manmade: 'no', fun: 'no', food: 'no', movesSelf: 'no', famous: 'yes', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'no', oneColor: 'yes', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'no', everyday: 'yes', smallerThanPhone: 'no' } },
+    { name: 'a pizza', attrs: { alive: 'no', holdable: 'yes', indoors: 'yes', biggerThanBackpack: 'no', manmade: 'yes', fun: 'yes', food: 'yes', movesSelf: 'no', famous: 'no', roadtrip: 'sometimes', place: 'no', person: 'no', electricity: 'no', oneColor: 'no', kidsKnow: 'yes', nature: 'no', expensive: 'no', sound: 'no', everyday: 'sometimes', smallerThanPhone: 'no' } },
+    { name: 'an airplane', attrs: { alive: 'no', holdable: 'no', indoors: 'no', biggerThanBackpack: 'yes', manmade: 'yes', fun: 'sometimes', food: 'no', movesSelf: 'yes', famous: 'no', roadtrip: 'sometimes', place: 'no', person: 'no', electricity: 'yes', oneColor: 'no', kidsKnow: 'yes', nature: 'no', expensive: 'yes', sound: 'yes', everyday: 'no', smallerThanPhone: 'no' } },
+    { name: 'a tree', attrs: { alive: 'yes', holdable: 'no', indoors: 'no', biggerThanBackpack: 'yes', manmade: 'no', fun: 'no', food: 'no', movesSelf: 'no', famous: 'no', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'no', oneColor: 'no', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'no', everyday: 'yes', smallerThanPhone: 'no' } },
+    { name: 'a guitar', attrs: { alive: 'no', holdable: 'yes', indoors: 'yes', biggerThanBackpack: 'yes', manmade: 'yes', fun: 'yes', food: 'no', movesSelf: 'no', famous: 'no', roadtrip: 'no', place: 'no', person: 'no', electricity: 'sometimes', oneColor: 'no', kidsKnow: 'yes', nature: 'no', expensive: 'sometimes', sound: 'yes', everyday: 'no', smallerThanPhone: 'no' } },
+    { name: 'a snowman', attrs: { alive: 'no', holdable: 'no', indoors: 'no', biggerThanBackpack: 'yes', manmade: 'yes', fun: 'yes', food: 'no', movesSelf: 'no', famous: 'no', roadtrip: 'no', place: 'no', person: 'no', electricity: 'no', oneColor: 'yes', kidsKnow: 'yes', nature: 'sometimes', expensive: 'no', sound: 'no', everyday: 'no', smallerThanPhone: 'no' } },
+    { name: 'a book', attrs: { alive: 'no', holdable: 'yes', indoors: 'yes', biggerThanBackpack: 'no', manmade: 'yes', fun: 'sometimes', food: 'no', movesSelf: 'no', famous: 'no', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'no', oneColor: 'no', kidsKnow: 'yes', nature: 'no', expensive: 'no', sound: 'no', everyday: 'yes', smallerThanPhone: 'no' } },
+    { name: 'an elephant', attrs: { alive: 'yes', holdable: 'no', indoors: 'no', biggerThanBackpack: 'yes', manmade: 'no', fun: 'sometimes', food: 'no', movesSelf: 'yes', famous: 'no', roadtrip: 'no', place: 'no', person: 'no', electricity: 'no', oneColor: 'yes', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'yes', everyday: 'no', smallerThanPhone: 'no' } },
+    { name: 'ice cream', attrs: { alive: 'no', holdable: 'yes', indoors: 'yes', biggerThanBackpack: 'no', manmade: 'yes', fun: 'yes', food: 'yes', movesSelf: 'no', famous: 'no', roadtrip: 'sometimes', place: 'no', person: 'no', electricity: 'no', oneColor: 'no', kidsKnow: 'yes', nature: 'no', expensive: 'no', sound: 'no', everyday: 'sometimes', smallerThanPhone: 'yes' } },
+    { name: 'a river', attrs: { alive: 'no', holdable: 'no', indoors: 'no', biggerThanBackpack: 'yes', manmade: 'no', fun: 'sometimes', food: 'no', movesSelf: 'yes', famous: 'sometimes', roadtrip: 'yes', place: 'yes', person: 'no', electricity: 'no', oneColor: 'no', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'yes', everyday: 'no', smallerThanPhone: 'no' } },
+  ];
+
+  function twentyComputerAnswer(object, tag) {
+    const value = object && object.attrs ? object.attrs[tag] : null;
+    if (value === 'yes') return 'Yes';
+    if (value === 'no') return 'No';
+    return 'Sometimes';
+  }
+
+  function formatTwentyComputerHistory() {
+    if (!twentyComputerAsked.length) return '';
+    const start = Math.max(0, twentyComputerAsked.length - 5);
+    const recent = twentyComputerAsked.slice(start).map((entry, index) => (
+      `${start + index + 1}. ${entry.question} ${entry.answer}`
+    ));
+    return `\n\nAnswers so far:\n${recent.join('\n')}`;
+  }
+
+  function startTwentyQuestionsChooser() {
+    showHuntSideGame(
+      '20 Questions',
+      'Who Hides the Secret?',
+      'Pick who thinks of the secret thing. The other side gets 20 questions to figure it out.',
+      [
+        { label: 'We think of it (app asks us)', primary: true, onClick: startTwentyQuestions },
+        { label: 'Computer thinks of it (we guess)', onClick: startTwentyQuestionsComputer },
+        { label: 'Close', onClick: hideHuntSideGame },
+      ]
+    );
+  }
+
+  function startTwentyQuestionsComputer() {
+    twentyComputerObject = TWENTY_QUESTIONS_OBJECTS[Math.floor(Math.random() * TWENTY_QUESTIONS_OBJECTS.length)];
+    twentyComputerTurns = 0;
+    twentyComputerAsked = [];
+    renderTwentyComputer('The computer is thinking of a person, place, or thing. Ask yes-or-no questions to figure it out!');
+  }
+
+  function renderTwentyComputer(resultLine) {
+    const askedTags = new Set(twentyComputerAsked.map(entry => entry.tag));
+    const remaining = TWENTY_QUESTIONS_LIST.filter(item => !askedTags.has(item.tag));
+    const history = formatTwentyComputerHistory();
+    const intro = `${resultLine}\n\nTurn ${Math.min(twentyComputerTurns + 1, 20)}/20. Tap a question to ask, then guess when ready.${history}`;
+    if (twentyComputerTurns >= 20 || !remaining.length) {
+      showHuntSideGame('20 Questions', 'Time to Guess', `${intro}\n\nNo more questions left. Make your final guess.`, [
+        { label: 'Reveal Answer', primary: true, onClick: () => revealTwentyComputer(false) },
+        { label: 'Start Over', onClick: startTwentyQuestionsComputer },
+        { label: 'Close', onClick: hideHuntSideGame },
+      ]);
+      return;
+    }
+    const offered = shuffle(remaining.slice()).slice(0, 6);
+    const actions = offered.map(item => ({
+      label: item.question,
+      onClick: () => {
+        const answer = twentyComputerAnswer(twentyComputerObject, item.tag);
+        twentyComputerAsked.push({ question: item.question, tag: item.tag, answer });
+        twentyComputerTurns++;
+        renderTwentyComputer(`You asked: ${item.question}  Computer says: ${answer}.`);
+      },
+    }));
+    actions.push({ label: 'Make a Guess', primary: true, onClick: showTwentyComputerGuess });
+    actions.push({ label: 'Different Questions', onClick: () => renderTwentyComputer(resultLine) });
+    actions.push({ label: 'Reveal Answer', onClick: () => revealTwentyComputer(false) });
+    actions.push({ label: 'Close', onClick: hideHuntSideGame });
+    showHuntSideGame('20 Questions', 'Computer Picked Something', intro, actions);
+  }
+
+  function showTwentyComputerGuess() {
+    showHuntSideGame(
+      '20 Questions',
+      'Make a Guess',
+      `Say one guess out loud, then check it.${formatTwentyComputerHistory()}`,
+      [
+        { label: 'We Guessed Right', primary: true, onClick: () => revealTwentyComputer(true) },
+        { label: 'Wrong, Keep Asking', onClick: () => { twentyComputerTurns++; renderTwentyComputer('That guess was off. Keep narrowing it down.'); } },
+        { label: 'Reveal Answer', onClick: () => revealTwentyComputer(false) },
+      ]
+    );
+  }
+
+  function revealTwentyComputer(solved) {
+    const name = twentyComputerObject ? twentyComputerObject.name : 'its secret';
+    showHuntSideGame(
+      '20 Questions',
+      solved ? 'You Got It!' : 'The Answer',
+      `The computer was thinking of ${name}.${formatTwentyComputerHistory()}`,
+      [
+        { label: 'Play Again', primary: true, onClick: startTwentyQuestionsComputer },
+        { label: 'Switch Mode', onClick: startTwentyQuestionsChooser },
+        { label: 'Close', onClick: hideHuntSideGame },
+      ]
+    );
   }
 
   function startTwentyQuestions() {
@@ -6597,7 +6735,7 @@
     } else if (selectedCategory === 'twenty') {
       resetGame();
       showSection('scavenger');
-      startTwentyQuestions();
+      startTwentyQuestionsChooser();
     } else if (selectedCategory === 'hideSeek') {
       startHideSeekGame();
     } else {
@@ -6806,7 +6944,7 @@
     setHuntTheme(button.dataset.huntTheme);
   });
   huntLightningButton.addEventListener('click', startLightningRound);
-  huntTwentyButton.addEventListener('click', startTwentyQuestions);
+  huntTwentyButton.addEventListener('click', startTwentyQuestionsChooser);
   huntAlphabetButton.addEventListener('click', startAlphabetGame);
   huntEtaButton.addEventListener('click', startEtaGuess);
   showTriviaAnswerButton.addEventListener('click', () => {
