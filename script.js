@@ -3817,11 +3817,41 @@
     drawHideSeekRoom(ctx, room, palette);
     drawHideSeekSpots(ctx, room);
     drawHideSeekActors(ctx, room);
+    drawHideSeekTouchTarget(ctx);
     drawHideSeekActionEffects(ctx, room);
     drawHideSeekParticles(ctx, room);
     drawHideSeekAtmosphere(ctx, room, map);
     ctx.restore();
     if (hideSeekDebugEnabled) drawHideSeekDebug(ctx, room, map);
+  }
+
+  function drawHideSeekTouchTarget(ctx) {
+    const target = hideSeekState.touchTarget;
+    if (!target || !isHideSeekMovementPhase()) return;
+    const actor = getHideSeekActiveActor();
+    ctx.save();
+    ctx.strokeStyle = '#ffd74a';
+    ctx.lineWidth = 2;
+    if (actor) {
+      ctx.globalAlpha = 0.4;
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath();
+      ctx.moveTo(actor.x + actor.width / 2, actor.y + actor.height / 2);
+      ctx.lineTo(target.x, target.y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    const pulse = 4 + Math.sin(Date.now() / 150) * 2.5;
+    ctx.globalAlpha = 0.6;
+    ctx.beginPath();
+    ctx.arc(target.x, target.y, 9 + pulse, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = 0.9;
+    ctx.fillStyle = '#ffd74a';
+    ctx.beginPath();
+    ctx.arc(target.x, target.y, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
   }
 
   function fillHideSeekRoundedRect(ctx, x, y, width, height, radius) {
