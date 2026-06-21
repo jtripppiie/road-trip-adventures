@@ -1304,28 +1304,6 @@
         'Use it as road math, not a driving recommendation.',
       ],
     },
-    laugh: {
-      title: 'Car Laughs',
-      type: 'Just for fun',
-      scored: false,
-      summary: 'Silly prompts for voices, stories, and quick bits.',
-      rules: [
-        'Read the prompt aloud.',
-        'Everyone plays if they want to.',
-        'Tap Stamp It when the moment is done.',
-      ],
-    },
-    compete: {
-      title: 'Quick Challenges',
-      type: 'Just for fun',
-      scored: false,
-      summary: 'Tiny car challenges with group judgment instead of a saved scoreboard.',
-      rules: [
-        'Read the challenge aloud.',
-        'The car decides the winner for that prompt.',
-        'Use it for quick laughs, not serious scoring.',
-      ],
-    },
     jokes: {
       title: 'Joke Vote',
       type: 'Scored Game',
@@ -1794,10 +1772,8 @@
 
   function buildMysteryMix(count) {
     const targets = [
-      { category: 'look', count: Math.ceil(count * 0.4) },
-      { category: 'laugh', count: Math.ceil(count * 0.3) },
-      { category: 'learn', count: Math.max(1, Math.floor(count * 0.2)) },
-      { category: 'compete', count: Math.max(1, Math.floor(count * 0.1)) },
+      { category: 'look', count: Math.ceil(count * 0.6) },
+      { category: 'learn', count: Math.max(1, Math.floor(count * 0.4)) },
     ];
     const selected = [];
     targets.forEach(target => {
@@ -6100,7 +6076,7 @@
     } else if (selectedCategory === 'local') {
       regionCode = 'CA';
       startAdventure();
-    } else if (['look', 'laugh', 'compete', 'random'].includes(selectedCategory)) {
+    } else if (['look', 'random'].includes(selectedCategory)) {
       regionCode = '*';
       startAdventure();
     } else {
@@ -6269,7 +6245,7 @@
   }
 
   function startQuickStart() {
-    const quickModes = ['random', 'scavenger', 'trivia', 'jokes', 'learn', 'look', 'laugh', 'compete', 'pi', 'pong', 'hideSeek', 'gorillas'];
+    const quickModes = ['random', 'scavenger', 'trivia', 'jokes', 'learn', 'look', 'pi', 'pong', 'hideSeek', 'gorillas'];
     const mode = quickModes[Math.floor(Math.random() * quickModes.length)];
     selectedCategory = mode;
     if (mode === 'scavenger') {
