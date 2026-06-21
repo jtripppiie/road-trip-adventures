@@ -1383,17 +1383,17 @@ body.immersive-lock {
   width: 100dvw;
   height: 100vh;
   height: 100dvh;
-  padding: 0.4rem;
+  padding: 0;
+  margin: 0;
   overflow: hidden;
-  background: var(--color-background);
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
+  background: #0b1a2c;
+  display: block;
 }
 
-/* In full screen the play area is the focus, so the setup selectors, scoreboard
-   and the stats grid are hidden — the canvas, a slim status line, the movement
-   pad and the action buttons are all that remain. */
+/* In full screen the canvas IS the screen: hide the setup, scoreboard and the
+   stats grid, and float the remaining controls on top of the canvas so the play
+   area can fill the whole viewport (instead of being squished by sibling
+   layout, which was collapsing it on short landscape phones). */
 #hide-seek-game:fullscreen .mode-header,
 #hide-seek-game.is-immersive .mode-header,
 #hide-seek-game:fullscreen #hide-seek-scoreboard,
@@ -1409,27 +1409,16 @@ body.immersive-lock {
   display: none !important;
 }
 
-/* Collapse the cover-description card (the first article) that sits above the
-   round card — it only repeats the status text. */
-#hide-seek-game:fullscreen #hide-seek-round-card,
-#hide-seek-game.is-immersive #hide-seek-round-card {
-  margin: 0;
-  padding: 0.3rem 0.6rem;
-  flex: 0 0 auto;
-}
-
-#hide-seek-game:fullscreen #hide-seek-round-card h3,
-#hide-seek-game.is-immersive #hide-seek-round-card h3 {
-  font-size: 0.98rem;
-  margin: 0.1rem 0;
-}
-
+/* Stage + canvas fill the entire viewport. */
 #hide-seek-game:fullscreen .hide-seek-stage,
 #hide-seek-game.is-immersive .hide-seek-stage {
-  flex: 1 1 auto;
-  min-height: 0;
+  position: absolute;
+  inset: 0;
   width: 100%;
-  margin: 0 auto;
+  height: 100%;
+  margin: 0;
+  border: none;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1437,35 +1426,79 @@ body.immersive-lock {
 
 #hide-seek-game:fullscreen .hide-seek-canvas,
 #hide-seek-game.is-immersive .hide-seek-canvas {
+  width: 100%;
   height: 100%;
-  width: auto;
   max-width: 100%;
-  aspect-ratio: 16 / 9;
+  max-height: 100%;
+  object-fit: contain;
 }
 
-/* Movement pad + actions stay pinned at the bottom; the action row scrolls
-   horizontally instead of wrapping into several tall rows. */
+/* Round status floats as a compact pill at the top-centre. */
+#hide-seek-game:fullscreen #hide-seek-round-card,
+#hide-seek-game.is-immersive #hide-seek-round-card {
+  position: absolute;
+  top: max(0.4rem, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 8;
+  margin: 0;
+  padding: 0.2rem 0.7rem;
+  max-width: 80%;
+  text-align: center;
+  background: rgba(6, 21, 36, 0.72);
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+#hide-seek-game:fullscreen #hide-seek-round-card h3,
+#hide-seek-game.is-immersive #hide-seek-round-card h3 {
+  font-size: 0.82rem;
+  line-height: 1.15;
+  margin: 0;
+}
+
+#hide-seek-game:fullscreen #hide-seek-round-card .challenge-badge,
+#hide-seek-game.is-immersive #hide-seek-round-card .challenge-badge,
+#hide-seek-game:fullscreen #hide-seek-countdown-text,
+#hide-seek-game.is-immersive #hide-seek-countdown-text {
+  display: none;
+}
+
+/* Movement pad floats bottom-left; actions float bottom-right (to the right of
+   the pad) as a horizontally scrollable bar. Both overlay the canvas. */
 #hide-seek-game:fullscreen .hide-seek-controls,
 #hide-seek-game.is-immersive .hide-seek-controls {
-  flex: 0 0 auto;
-  margin: 0.2rem auto;
+  position: absolute;
+  left: max(0.5rem, env(safe-area-inset-left));
+  bottom: max(0.5rem, env(safe-area-inset-bottom));
+  z-index: 9;
+  margin: 0;
 }
 
 #hide-seek-game:fullscreen .adventure-actions,
 #hide-seek-game.is-immersive .adventure-actions {
-  flex: 0 0 auto;
+  position: absolute;
+  right: max(0.5rem, env(safe-area-inset-right));
+  bottom: max(0.5rem, env(safe-area-inset-bottom));
+  left: 9.5rem;
+  z-index: 9;
   margin: 0;
   display: flex;
   flex-wrap: nowrap;
   overflow-x: auto;
-  justify-content: flex-start;
+  justify-content: flex-end;
   gap: 0.35rem;
+  padding: 0.25rem;
+  background: rgba(6, 21, 36, 0.55);
+  border-radius: 10px;
 }
 
 #hide-seek-game:fullscreen .adventure-actions button,
 #hide-seek-game.is-immersive .adventure-actions button {
   flex: 0 0 auto;
   white-space: nowrap;
+  min-height: 2.2rem;
+  padding: 0.35rem 0.6rem;
 }
 
 /* Computer Mode / Debug overlay panel — compact, corner-anchored, scrollable. */
