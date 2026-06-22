@@ -7879,6 +7879,9 @@
       }
     } else if (section.id === 'setup-region') {
       regionCode = target.getAttribute('data-region');
+      if (regionCode === 'random') {
+        regionCode = pickRandomRegionCode();
+      }
       startAdventure();
     }
   });
@@ -7888,6 +7891,14 @@
     buildAdventure();
     showSection('adventure');
     showChallenge();
+  }
+
+  function pickRandomRegionCode() {
+    const codes = Array.from(document.querySelectorAll('#setup-region [data-region]'))
+      .map(button => button.getAttribute('data-region'))
+      .filter(code => code && code !== 'random' && code !== '*');
+    if (!codes.length) return '*';
+    return codes[Math.floor(Math.random() * codes.length)];
   }
 
   nextButton.addEventListener('click', () => {
