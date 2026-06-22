@@ -1462,7 +1462,9 @@ body #hide-seek-game.is-immersive .adventure-actions {
   left: max(0.5rem, env(safe-area-inset-left));
   width: auto;
   max-width: none;
-  justify-content: flex-start;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  overflow: visible;
 }
 
 /* On a touch screen you move by tapping the canvas, so the directional pad is
