@@ -1480,6 +1480,14 @@ body #hide-seek-game.is-immersive .adventure-actions button {
   font-size: 0.72rem;
 }
 
+/* Removed from the player UI: the Debug toggle is admin-only and Sprint isn't
+   needed. Kept in the DOM (display:none) so existing script references that set
+   their text/hidden/disabled state stay valid. */
+#hide-seek-debug,
+#hide-seek-sprint {
+  display: none !important;
+}
+
 /* On a touch screen you move by tapping the canvas, so the directional pad is
    redundant in full screen — hide it and let the action bar span the bottom. */
 body #hide-seek-game:fullscreen .hide-seek-controls,
