@@ -14,6 +14,7 @@ const root = path.resolve(__dirname, '..');
 const dataFiles = [
   'js/data/trivia.js',
   'js/data/community-trivia.js',
+  'js/data/oak-island.js',
 ];
 
 const sandbox = {
