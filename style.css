@@ -18,7 +18,7 @@
   --color-text: #16283a;
   --color-card: #ffffff;
   --color-ink: #061524;
-  --font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+  --font-family: 'Nunito', 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
   --transition-speed: 0.3s;
 }
 
