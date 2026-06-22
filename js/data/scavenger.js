@@ -1870,8 +1870,8 @@
       prompt: 'Spot or name something road-trip related that starts with',
     },
     {
-      id: 'alaska-train',
-      label: 'Alaska Train',
+      id: window.RTA_THEMES['alaska-train'].id,
+      label: window.RTA_THEMES['alaska-train'].label,
       prompt: 'Name or spot an Alaska, train, mountain, snow, or wildlife thing that starts with',
     },
     {

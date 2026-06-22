@@ -1,7 +1,7 @@
 /* Offline cache for Road Trip Adventures.
    Static, no backend — caches the app shell so it keeps working after the
    first load even with no signal. Bump CACHE_VERSION when assets change. */
-const CACHE_VERSION = 'rta-v19';
+const CACHE_VERSION = 'rta-v20';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const CORE_ASSETS = [
   './script.js',
   './manifest.json',
   './assets/roadside-logo.png',
+  './js/data/themes.js',
   './js/data/trivia.js',
   './js/data/community-trivia.js',
   './js/data/scavenger.js',

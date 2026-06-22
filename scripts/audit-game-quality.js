@@ -8,6 +8,7 @@ const errors = [];
 const warnings = [];
 
 global.window = {};
+require(path.join(root, 'js/data/themes.js'));
 require(path.join(root, 'js/data/questions.js'));
 require(path.join(root, 'js/data/scavenger.js'));
 require(path.join(root, 'js/data/trivia.js'));

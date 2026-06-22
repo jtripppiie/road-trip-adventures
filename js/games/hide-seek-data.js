@@ -82,8 +82,8 @@
       },
     },
     'alaska-train': {
-      id: 'alaska-train',
-      name: 'Alaska Train',
+      id: window.RTA_THEMES['alaska-train'].id,
+      name: window.RTA_THEMES['alaska-train'].label,
       startRoom: 'observation',
       palette: { wall: '#21394f', floor: '#b8d8ea', trim: '#061524', accent: '#2ec7d3' },
       rooms: {

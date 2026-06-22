@@ -3,6 +3,7 @@ const path = require('path');
 const root = path.resolve(__dirname, '..');
 global.window = {};
 
+require(path.join(root, 'js/data/themes.js'));
 require(path.join(root, 'js/data/questions.js'));
 require(path.join(root, 'js/data/scavenger.js'));
 
