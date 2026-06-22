@@ -1503,10 +1503,26 @@ body #hide-seek-game.is-immersive .hide-seek-controls {
 }
 
 #hide-seek-game:fullscreen #hide-seek-round-card .challenge-badge,
-#hide-seek-game.is-immersive #hide-seek-round-card .challenge-badge,
-#hide-seek-game:fullscreen #hide-seek-countdown-text,
-#hide-seek-game.is-immersive #hide-seek-countdown-text {
+#hide-seek-game.is-immersive #hide-seek-round-card .challenge-badge {
   display: none;
+}
+
+/* Keep the hide/seek countdown timer visible in full screen. */
+#hide-seek-game:fullscreen #hide-seek-countdown-text:not([hidden]),
+#hide-seek-game.is-immersive #hide-seek-countdown-text:not([hidden]) {
+  display: block;
+  margin: 0.1rem 0 0;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #ffd166;
+}
+
+/* Remove Reset Game and Finish Hide & Seek from the full-screen action cluster. */
+body #hide-seek-game:fullscreen #hide-seek-reset,
+body #hide-seek-game.is-immersive #hide-seek-reset,
+body #hide-seek-game:fullscreen #hide-seek-finish,
+body #hide-seek-game.is-immersive #hide-seek-finish {
+  display: none !important;
 }
 
 /* Movement pad floats bottom-left; actions float bottom-right (to the right of
