@@ -1433,21 +1433,43 @@ body.immersive-lock {
   object-fit: contain;
 }
 
-/* Round status floats as a compact pill at the top-centre. */
+/* Round status floats as a compact pill at the top-left. */
 #hide-seek-game:fullscreen #hide-seek-round-card,
 #hide-seek-game.is-immersive #hide-seek-round-card {
   position: absolute;
   top: max(0.4rem, env(safe-area-inset-top));
-  left: 50%;
-  transform: translateX(-50%);
+  left: max(0.5rem, env(safe-area-inset-left));
+  transform: none;
   z-index: 8;
   margin: 0;
   padding: 0.2rem 0.7rem;
-  max-width: 80%;
-  text-align: center;
+  max-width: 46%;
+  text-align: left;
   background: rgba(6, 21, 36, 0.72);
-  border-radius: 999px;
+  border-radius: 12px;
   pointer-events: none;
+}
+
+/* Overlap fix: pin the action buttons to the top-right and keep the movement
+   pad compact (bottom-left) so "Finish Hide & Seek" can never sit on top of the
+   directional arrows. Higher specificity (leading `body`) so this wins over the
+   base immersive rules regardless of source order. */
+body #hide-seek-game:fullscreen .adventure-actions,
+body #hide-seek-game.is-immersive .adventure-actions {
+  top: auto;
+  bottom: max(0.5rem, env(safe-area-inset-bottom));
+  right: max(0.5rem, env(safe-area-inset-right));
+  left: max(0.5rem, env(safe-area-inset-left));
+  width: auto;
+  max-width: none;
+  justify-content: flex-start;
+}
+
+/* On a touch screen you move by tapping the canvas, so the directional pad is
+   redundant in full screen — hide it and let the action bar span the bottom. */
+body #hide-seek-game:fullscreen .hide-seek-controls,
+body #hide-seek-game.is-immersive .hide-seek-controls {
+  display: none;
 }
 
 #hide-seek-game:fullscreen #hide-seek-round-card h3,
@@ -1480,7 +1502,10 @@ body.immersive-lock {
   position: absolute;
   right: max(0.5rem, env(safe-area-inset-right));
   bottom: max(0.5rem, env(safe-area-inset-bottom));
-  left: 9.5rem;
+  left: auto;
+  /* Reserve space on the left for the movement pad so the buttons never sit on
+     top of the directional arrows. */
+  max-width: calc(100% - 17rem);
   z-index: 9;
   margin: 0;
   display: flex;
