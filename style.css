@@ -1459,12 +1459,25 @@ body #hide-seek-game.is-immersive .adventure-actions {
   top: auto;
   bottom: max(0.5rem, env(safe-area-inset-bottom));
   right: max(0.5rem, env(safe-area-inset-right));
-  left: max(0.5rem, env(safe-area-inset-left));
+  left: auto;
   width: auto;
-  max-width: none;
+  max-width: min(64%, 24rem);
   justify-content: flex-end;
+  align-items: flex-end;
   flex-wrap: wrap;
   overflow: visible;
+}
+
+/* Compact, auto-width buttons clustered in the bottom-right corner (the base
+   button styles stretch them full width, which covered half the play area). */
+body #hide-seek-game:fullscreen .adventure-actions button,
+body #hide-seek-game.is-immersive .adventure-actions button {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 0;
+  min-height: 2rem;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.72rem;
 }
 
 /* On a touch screen you move by tapping the canvas, so the directional pad is
