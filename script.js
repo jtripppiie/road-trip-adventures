@@ -11,7 +11,7 @@
 (() => {
   // Visible build version. Bump this (and CACHE_VERSION in sw.js) on every
   // deploy so the on-screen badge confirms which build is actually live.
-  const APP_VERSION = 'v22 · 2026-06-27';
+  const APP_VERSION = 'v23 · 2026-06-27';
   const versionBadge = document.getElementById('app-version');
   if (versionBadge) {
     versionBadge.textContent = APP_VERSION;
@@ -2053,8 +2053,13 @@
     return `${item.id || ''} ${item.label || ''} ${item.hint || ''}`.toLowerCase();
   }
 
+  function huntItemHasThemeTag(item, theme) {
+    return Array.isArray(item.themes) && item.themes.includes(theme);
+  }
+
   function huntItemMatchesTheme(item, theme) {
     if (theme === 'mixed') return true;
+    if (huntItemHasThemeTag(item, theme)) return true;
     const text = getHuntItemSearchText(item);
     if (theme === 'vehicles') {
       return /car|vehicle|truck|plate|motorcycle|camper|rv|trailer|tire|bike|bus|van|semi|tow|fuel|gas/.test(text);
@@ -2135,7 +2140,8 @@
   }
 
   function buildHuntDeck() {
-    const unclaimedItems = activeScavengerItems.filter(item => !item.claimedBy);
+    const currentActiveIds = new Set(activeHuntIds);
+    const unclaimedItems = activeScavengerItems.filter(item => !item.claimedBy && !currentActiveIds.has(item.id));
     const themedItems = activeHuntTheme === 'mixed'
       ? unclaimedItems.filter(huntItemMatchesTripPreset)
       : unclaimedItems.filter(item => huntItemMatchesTheme(item, activeHuntTheme) && huntItemMatchesTripPreset(item));
@@ -2152,6 +2158,19 @@
     return tripSettings.gameLength === 'short' ? 4 : 5;
   }
 
+  function fillActiveHuntTargets(count = getHuntBatchSize()) {
+    while (activeHuntIds.length < count) {
+      if (!huntDeck.length) buildHuntDeck();
+      if (!huntDeck.length) break;
+      const nextId = huntDeck.pop();
+      const item = activeScavengerItems.find(entry => entry.id === nextId);
+      if (item && !item.claimedBy && !activeHuntIds.includes(nextId)) {
+        activeHuntIds.push(nextId);
+        markScavengerSeen(item);
+      }
+    }
+  }
+
   function drawHuntTargets(count = getHuntBatchSize()) {
     if (!huntDeck.length) buildHuntDeck();
     activeHuntIds.forEach(itemId => {
@@ -2161,14 +2180,7 @@
       }
     });
     activeHuntIds = [];
-    while (activeHuntIds.length < count && huntDeck.length) {
-      const nextId = huntDeck.pop();
-      const item = activeScavengerItems.find(entry => entry.id === nextId);
-      if (item && !item.claimedBy && !activeHuntIds.includes(nextId)) {
-        activeHuntIds.push(nextId);
-        markScavengerSeen(item);
-      }
-    }
+    fillActiveHuntTargets(count);
     renderHunt();
   }
 
@@ -2252,6 +2264,7 @@
     if (!item || item.claimedBy) return;
     item.claimedBy = playerId;
     activeHuntIds = activeHuntIds.filter(id => id !== itemId);
+    fillActiveHuntTargets();
     renderHunt();
   }
 
@@ -2259,8 +2272,8 @@
     activeScavengerItems.forEach(item => {
       delete item.claimedBy;
     });
-    buildHuntDeck();
     activeHuntIds = [];
+    buildHuntDeck();
     drawHuntTargets();
   }
 

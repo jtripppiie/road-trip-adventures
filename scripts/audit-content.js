@@ -29,12 +29,31 @@ function checkLength(label, value, maxLength) {
 const scavengerItems = window.RTA_SCAVENGER_ITEMS || [];
 const scavengerDuplicateIds = findDuplicates(scavengerItems, item => item.id);
 scavengerDuplicateIds.forEach(id => errors.push(`scavenger: duplicate id "${id}"`));
+const validScavengerThemes = new Set([
+  'vehicles',
+  'signs',
+  'places',
+  'nature',
+  'alaska-train',
+  'weird',
+  'jackpot',
+  'easy',
+]);
 
 scavengerItems.forEach(item => {
   if (!item.id) errors.push('scavenger: missing id');
   if (!item.emoji) errors.push(`scavenger ${item.id}: missing emoji`);
   if (!item.label) errors.push(`scavenger ${item.id}: missing label`);
   if (!item.hint) errors.push(`scavenger ${item.id}: missing hint`);
+  if (item.themes) {
+    if (!Array.isArray(item.themes)) {
+      errors.push(`scavenger ${item.id}: themes must be an array`);
+    } else {
+      item.themes.forEach(theme => {
+        if (!validScavengerThemes.has(theme)) errors.push(`scavenger ${item.id}: unknown theme "${theme}"`);
+      });
+    }
+  }
   checkLength(`scavenger ${item.id} label`, item.label, 42);
   checkLength(`scavenger ${item.id} hint`, item.hint, 110);
 });

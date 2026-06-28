@@ -29,6 +29,16 @@ const allPrompts = basePrompts.concat(window.RTA_ADVENTURE_PROMPTS || []);
 const allScavenger = window.RTA_SCAVENGER_ITEMS || [];
 const hideSeekMaps = window.RTA_HIDE_SEEK_MAPS || {};
 const hiddenTriviaCategories = new Set(['weirdlaws']);
+const validScavengerThemes = new Set([
+  'vehicles',
+  'signs',
+  'places',
+  'nature',
+  'alaska-train',
+  'weird',
+  'jackpot',
+  'easy',
+]);
 const triviaCategories = new Set([
   'mixed',
   'states',
@@ -158,6 +168,15 @@ function checkScavenger() {
     if (ids.has(item.id)) errors.push(`scavenger ${item.id}: duplicate id`);
     ids.add(item.id);
     if (!item.label || !item.hint) errors.push(`scavenger ${item.id}: missing label or hint`);
+    if (item.themes) {
+      if (!Array.isArray(item.themes)) {
+        errors.push(`scavenger ${item.id}: themes must be an array`);
+      } else {
+        item.themes.forEach(theme => {
+          if (!validScavengerThemes.has(theme)) errors.push(`scavenger ${item.id}: unknown theme "${theme}"`);
+        });
+      }
+    }
     if ((item.label || '').length > 44) warnings.push(`scavenger ${item.id}: label is long for cards`);
     if ((item.hint || '').length > 120) warnings.push(`scavenger ${item.id}: hint is long for cards`);
     if (/closest count|silent count/i.test(`${item.label} ${item.hint}`)) {
