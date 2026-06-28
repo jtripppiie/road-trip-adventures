@@ -969,6 +969,7 @@
   const HIDE_SEEK_HUMAN_INDEX = 0;
   const hideSeekAI = { thinkTimer: 0, lastRoom: null };
   let hideSeekLastCanvasTap = null;
+  let hideSeekActiveCanvasPointerId = null;
   const HIDE_SEEK_HIDE_SECONDS = 60;
   const HIDE_SEEK_SEARCH_COUNTS = {
     easy: 10,
@@ -5444,9 +5445,10 @@
     };
   }
 
-  function handleHideSeekPointer(event) {
+  function handleHideSeekPointer(event, options = {}) {
     if (!hideSeekCanvas || !hideSeekState.input) return;
     if (!isHideSeekMovementPhase()) return;
+    if (!options.start && event.pointerId !== hideSeekActiveCanvasPointerId) return;
     const point = getHideSeekCanvasPoint(event);
     if (!point) return;
     event.preventDefault();
@@ -5485,6 +5487,7 @@
   }
 
   function releaseHideSeekPointer() {
+    hideSeekActiveCanvasPointerId = null;
     hideSeekState.touchTarget = null;
   }
 
@@ -8873,8 +8876,9 @@
   });
   if (hideSeekCanvas) {
     hideSeekCanvas.addEventListener('pointerdown', event => {
+      hideSeekActiveCanvasPointerId = event.pointerId;
       hideSeekCanvas.setPointerCapture(event.pointerId);
-      handleHideSeekPointer(event);
+      handleHideSeekPointer(event, { start: true });
       handleHideSeekCanvasDoubleTap(event);
     });
     hideSeekCanvas.addEventListener('pointermove', handleHideSeekPointer);
