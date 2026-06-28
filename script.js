@@ -11,7 +11,7 @@
 (() => {
   // Visible build version. Bump this (and CACHE_VERSION in sw.js) on every
   // deploy so the on-screen badge confirms which build is actually live.
-  const APP_VERSION = 'v21 · 2026-06-22';
+  const APP_VERSION = 'v22 · 2026-06-27';
   const versionBadge = document.getElementById('app-version');
   if (versionBadge) {
     versionBadge.textContent = APP_VERSION;
@@ -36,9 +36,13 @@
    * @param {boolean} defaultValue
    */
   function getPreference(key, defaultValue) {
-    const stored = localStorage.getItem(key);
-    if (stored === null) return defaultValue;
-    return stored === 'true';
+    try {
+      const stored = localStorage.getItem(key);
+      if (stored === null) return defaultValue;
+      return stored === 'true';
+    } catch (error) {
+      return defaultValue;
+    }
   }
 
   /**
@@ -47,7 +51,11 @@
    * @param {boolean} value
    */
   function setPreference(key, value) {
-    localStorage.setItem(key, value ? 'true' : 'false');
+    try {
+      localStorage.setItem(key, value ? 'true' : 'false');
+    } catch (error) {
+      // Preferences are optional; keep the current session usable if storage is blocked.
+    }
   }
 
   function getStoredJson(key, fallback) {
