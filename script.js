@@ -11,7 +11,7 @@
 (() => {
   // Visible build version. Bump this (and CACHE_VERSION in sw.js) on every
   // deploy so the on-screen badge confirms which build is actually live.
-  const APP_VERSION = 'v23 · 2026-06-27';
+  const APP_VERSION = 'v24 · 2026-06-27';
   const versionBadge = document.getElementById('app-version');
   if (versionBadge) {
     versionBadge.textContent = APP_VERSION;
@@ -1257,6 +1257,7 @@
   const gorillasPower = document.getElementById('gorillas-power');
   const gorillasFireButton = document.getElementById('gorillas-fire');
   const gorillasFullscreenButton = document.getElementById('gorillas-fullscreen');
+  const gorillasImmersiveExitButton = document.getElementById('gorillas-immersive-exit');
   const gorillasResetButton = document.getElementById('gorillas-reset');
   const gorillasFinishButton = document.getElementById('gorillas-finish');
   const appLogo = document.querySelector('.app-logo');
@@ -8215,6 +8216,9 @@
   });
   gorillasFireButton.addEventListener('click', fireGorillasShot);
   gorillasFullscreenButton.addEventListener('click', toggleGorillasFullscreen);
+  if (gorillasImmersiveExitButton) {
+    gorillasImmersiveExitButton.addEventListener('click', toggleGorillasFullscreen);
+  }
   gorillasResetButton.addEventListener('click', resetGorillasGame);
   gorillasFinishButton.addEventListener('click', showGorillasSummary);
   [gorillasAngle, gorillasPower].forEach(input => {
