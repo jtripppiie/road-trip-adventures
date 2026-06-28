@@ -583,7 +583,7 @@
       <div id="hide-seek-scoreboard" class="team-scoreboard" aria-live="polite"></div>
       <article class="trivia-card">
         <span id="hide-seek-badge" class="challenge-badge">Setup</span>
-        <p id="hide-seek-status" class="hunt-status">Pick a map, difficulty, and match length. Hiders get a minute to settle into cover. Seekers only get a handful of real checks, so room choices matter.</p>
+        <p id="hide-seek-status" class="hunt-status">Pick a map, difficulty, and match length. Hiders lock in real cover. Seekers inspect exact spots, and each wrong new check spends a search.</p>
         <div class="hide-seek-setup">
           <label class="team-name-field" for="hide-seek-mode">
             <span>Map</span>
@@ -655,8 +655,8 @@
       </div>
       <div class="adventure-actions">
         <button id="hide-seek-start" class="primary-button">Start Match</button>
-        <button id="hide-seek-found" class="primary-button" hidden>Hide / Inspect</button>
-        <button id="hide-seek-special" class="secondary-button" hidden>Listen</button>
+        <button id="hide-seek-found" class="primary-button" hidden>Hide Here</button>
+        <button id="hide-seek-special" class="secondary-button" hidden>Peek</button>
         <button id="hide-seek-sprint" class="secondary-button" hidden>Sprint</button>
         <button id="hide-seek-next" class="secondary-button" hidden>Next Round</button>
         <button id="hide-seek-solo" class="secondary-button" aria-pressed="false">Solo vs Computer: Off</button>
@@ -803,28 +803,69 @@
       <div class="mode-header">
         <div>
           <h2 id="gorillas-heading">Banana Towers</h2>
-          <p>Player one sets the shot, throws the banana, then the other player gets a turn.</p>
+          <p>Pick angle and power, watch the wind, throw a banana, then adjust from the last shot.</p>
         </div>
         <div id="gorillas-score" class="emoji-target" aria-label="Banana Towers score">0 : 0</div>
       </div>
       <article class="trivia-card gorillas-control-card">
+        <div class="gorillas-howto">
+          <strong>How to play</strong>
+          <span>1. Pick an angle. 2. Pick power. 3. Watch the wind. 4. Throw. 5. Adjust.</span>
+        </div>
+        <div class="gorillas-mode-controls" aria-label="Banana Towers match settings">
+          <label class="team-name-field" for="gorillas-opponent">
+            <span>Opponent</span>
+            <select id="gorillas-opponent">
+              <option value="local">Local Player</option>
+              <option value="computer">Computer</option>
+            </select>
+          </label>
+          <label class="team-name-field" for="gorillas-match">
+            <span>Match</span>
+            <select id="gorillas-match">
+              <option value="3">First to 3</option>
+              <option value="5">First to 5</option>
+              <option value="sudden">Sudden Banana</option>
+            </select>
+          </label>
+          <label class="team-name-field" for="gorillas-difficulty">
+            <span>Computer</span>
+            <select id="gorillas-difficulty">
+              <option value="easy">Easy</option>
+              <option value="normal">Normal</option>
+              <option value="hard">Hard</option>
+            </select>
+          </label>
+        </div>
         <div class="gorillas-setup">
           <label class="team-name-field" for="gorillas-angle">
             <span>Angle</span>
-            <input id="gorillas-angle" type="number" min="10" max="80" value="45" inputmode="numeric" />
+            <span class="banana-adjust-row">
+              <button type="button" class="secondary-button banana-step-button" data-banana-angle="-5">-5</button>
+              <input id="gorillas-angle" type="number" min="10" max="80" value="45" inputmode="numeric" />
+              <button type="button" class="secondary-button banana-step-button" data-banana-angle="5">+5</button>
+            </span>
           </label>
           <label class="team-name-field" for="gorillas-power">
             <span>Power</span>
-            <input id="gorillas-power" type="number" min="20" max="100" value="70" inputmode="numeric" />
+            <span class="banana-adjust-row">
+              <button type="button" class="secondary-button banana-step-button" data-banana-power="-10">-10</button>
+              <input id="gorillas-power" type="number" min="20" max="100" value="70" inputmode="numeric" />
+              <button type="button" class="secondary-button banana-step-button" data-banana-power="10">+10</button>
+            </span>
           </label>
         </div>
+        <p id="gorillas-shot-summary" class="gorillas-shot-summary">Preview shows the first part of your banana path. Wind may still push it.</p>
+        <ol id="gorillas-shot-history" class="gorillas-shot-history" aria-label="Last Banana Towers shots"></ol>
       </article>
       <canvas id="gorillas-canvas" class="pong-canvas" width="720" height="420" aria-label="Banana Towers game board"></canvas>
       <button id="gorillas-immersive-exit" class="immersive-exit" type="button" aria-label="Exit full screen">✕</button>
       <p id="gorillas-status" class="hunt-status" aria-live="polite">Set your angle and power, then launch the banana.</p>
       <div class="adventure-actions">
         <button id="gorillas-fire" class="primary-button">Throw Banana</button>
+        <button id="gorillas-quick-shot" class="secondary-button">Quick Shot</button>
         <button id="gorillas-fullscreen" class="secondary-button">Full Screen</button>
+        <button id="gorillas-debug" class="secondary-button" aria-pressed="false">Debug: Off</button>
         <button id="gorillas-reset" class="secondary-button">Reset Game</button>
         <button id="gorillas-finish" class="secondary-button">Finish Game</button>
       </div>

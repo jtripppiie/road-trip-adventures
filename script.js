@@ -974,6 +974,29 @@
     normal: 8,
     hard: 6,
   };
+  const HIDE_SEEK_AI_PROFILES = {
+    easy: {
+      thinkDelay: 1.1,
+      prefersNoise: 0.25,
+      prefersDifficulty: 0.2,
+      mistakeChance: 0.25,
+      roomDistance: 0.15,
+    },
+    normal: {
+      thinkDelay: 0.75,
+      prefersNoise: 0.45,
+      prefersDifficulty: 0.45,
+      mistakeChance: 0.12,
+      roomDistance: 0.35,
+    },
+    hard: {
+      thinkDelay: 0.45,
+      prefersNoise: 0.75,
+      prefersDifficulty: 0.75,
+      mistakeChance: 0.04,
+      roomDistance: 0.62,
+    },
+  };
   const HIDE_SEEK_DEFAULT_DIFFICULTY = 'normal';
   const HIDE_SEEK_SEARCH_TOLERANCE = 51;
   const HIDE_SEEK_INSPECT_SECONDS = 1.1;
@@ -1008,6 +1031,9 @@
     searchesRemaining: getHideSeekSearchCount(HIDE_SEEK_DEFAULT_DIFFICULTY),
     hiderTimeRemaining: HIDE_SEEK_HIDE_SECONDS,
     wrongGuesses: 0,
+    listenUsed: false,
+    roundMedal: '',
+    lastClue: '',
     roundHiderScore: 0,
     roundSeekerScore: 0,
     lastRoundText: '',
@@ -1053,6 +1079,13 @@
   let gorillasTurn = 0;
   let gorillasLastFrameTs = 0;
   let gorillasBuildingLayer = null;
+  let gorillasSettings = Object.assign({
+    opponent: 'local',
+    match: '3',
+    difficulty: 'normal',
+    debug: false,
+  }, getStoredJson('rtaGorillasSettings', {}));
+  let gorillasComputerTimer = null;
   let logoClickCount = 0;
   let logoClickTimer = null;
   let secretUnlockStep = 0;
@@ -1275,8 +1308,15 @@
   const gorillasStatus = document.getElementById('gorillas-status');
   const gorillasAngle = document.getElementById('gorillas-angle');
   const gorillasPower = document.getElementById('gorillas-power');
+  const gorillasOpponent = document.getElementById('gorillas-opponent');
+  const gorillasMatch = document.getElementById('gorillas-match');
+  const gorillasDifficulty = document.getElementById('gorillas-difficulty');
+  const gorillasShotSummary = document.getElementById('gorillas-shot-summary');
+  const gorillasShotHistory = document.getElementById('gorillas-shot-history');
   const gorillasFireButton = document.getElementById('gorillas-fire');
+  const gorillasQuickShotButton = document.getElementById('gorillas-quick-shot');
   const gorillasFullscreenButton = document.getElementById('gorillas-fullscreen');
+  const gorillasDebugButton = document.getElementById('gorillas-debug');
   const gorillasImmersiveExitButton = document.getElementById('gorillas-immersive-exit');
   const gorillasResetButton = document.getElementById('gorillas-reset');
   const gorillasFinishButton = document.getElementById('gorillas-finish');
@@ -3048,11 +3088,78 @@
     hideSeekState.roomTrail = trail.slice(-5);
   }
 
-  function getHideSeekSearchFeedback(sameRoom, distance) {
+  function getHideSeekSpotSearchText(spot, key, fallback) {
+    if (!spot || !spot.searchText) return fallback;
+    return spot.searchText[key] || fallback;
+  }
+
+  function getHideSeekSearchFeedback(sameRoom, distance, inspectedSpot) {
     if (sameRoom && distance <= HIDE_SEEK_SEARCH_TOLERANCE) {
-      return { text: 'Found!', tone: 'found' };
+      return {
+        text: getHideSeekSpotSearchText(inspectedSpot, 'found', 'Found! Someone was squeezed into that cover.'),
+        tone: 'found',
+        result: 'found',
+      };
     }
-    return { text: 'Not there.', tone: 'cold' };
+    const hiddenSpot = getHideSeekSpotById(hideSeekState.hiddenSpotId);
+    const hiddenCenter = hiddenSpot ? getHideSeekSpotCenter(hiddenSpot) : null;
+    const inspectedCenter = inspectedSpot ? getHideSeekSpotCenter(inspectedSpot) : null;
+    const spotDistance = hiddenCenter && inspectedCenter
+      ? Math.hypot(inspectedCenter.x - hiddenCenter.x, inspectedCenter.y - hiddenCenter.y)
+      : distance;
+    const noisy = hideSeekState.noiseLevel >= 0.55;
+    const lowSearches = hideSeekState.searchesRemaining <= 2;
+    if (sameRoom && spotDistance <= HIDE_SEEK_SEARCH_TOLERANCE * 2.15) {
+      return {
+        text: noisy || lowSearches
+          ? 'Same room. Very close - something rustled near cover.'
+          : 'Same room. Very close, but not this exact spot.',
+        tone: 'hot',
+        result: 'very close',
+      };
+    }
+    if (sameRoom) {
+      return {
+        text: getHideSeekSpotSearchText(inspectedSpot, 'empty', noisy
+          ? 'Same room. You hear something nearby, but this cover is empty.'
+          : 'Same room, wrong cover. The room still feels suspicious.'),
+        tone: noisy ? 'warm' : 'cold',
+        result: 'same room',
+      };
+    }
+    if (noisy && Math.random() < 0.55) {
+      return {
+        text: 'Different room. A tiny sound carries from somewhere else.',
+        tone: 'warm',
+        result: 'different room',
+      };
+    }
+    return {
+      text: getHideSeekSpotSearchText(inspectedSpot, 'empty', lowSearches
+        ? 'Cold check. This room feels clear enough to move on.'
+        : 'Cold check. That spot is empty.'),
+      tone: 'cold',
+      result: 'cold',
+    };
+  }
+
+  function setHideSeekRoundMedal(found) {
+    const coverScore = Number(hideSeekState.hiddenCoverQuality) || 1;
+    const searchesUsed = hideSeekState.inspectionCount;
+    let medal = '';
+    if (found) {
+      if (searchesUsed <= 1) medal = 'Lucky Guess';
+      else if (hideSeekState.searchesRemaining <= 1) medal = 'Panic Search';
+      else if (hideSeekState.wrongGuesses >= 3) medal = 'Room Sweeper';
+    } else if (hideSeekState.peekCount === 0 && hideSeekState.noiseLevel < 0.35) {
+      medal = 'Ghost Mode';
+    } else if (hideSeekState.noiseLevel >= 0.65) {
+      medal = 'Noisy Hider';
+    } else if (coverScore >= 5) {
+      medal = 'Perfect Cover';
+    }
+    hideSeekState.roundMedal = medal;
+    return medal;
   }
 
   function setHideSeekSearchPulse(actor, tone) {
@@ -3109,7 +3216,39 @@
   function useHideSeekSpecialAction() {
     if (hideSeekState.phase === HideSeekGameState.HIDER_TURN) {
       peekHideSeekHider();
+    } else if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
+      listenHideSeekSeeker();
     }
+  }
+
+  function listenHideSeekSeeker() {
+    if (hideSeekState.listenUsed || hideSeekState.phase !== HideSeekGameState.SEEKER_TURN) return;
+    hideSeekState.listenUsed = true;
+    const seeker = hideSeekState.actors.seeker;
+    const hiddenPosition = hideSeekState.hiddenPosition;
+    const sameRoom = hiddenPosition && seeker.roomId === hiddenPosition.roomId;
+    const hiddenSpot = getHideSeekSpotById(hideSeekState.hiddenSpotId);
+    const noisy = hideSeekState.noiseLevel >= 0.55;
+    let message = 'Listen used. The hider was very quiet.';
+    let tone = 'cold';
+    if (sameRoom && noisy) {
+      message = `Listen used. A tiny rustle comes from cover in this room.`;
+      tone = 'warm';
+    } else if (sameRoom) {
+      message = `Listen used. This room feels suspicious, but the exact spot stays hidden.`;
+      tone = 'warm';
+    } else if (noisy) {
+      message = 'Listen used. You hear something from another room.';
+      tone = 'warm';
+    } else if (hideSeekState.searchesRemaining <= 2 && hiddenSpot) {
+      message = `Listen used. Nothing clear, but ${hiddenSpot.label} would be a sneaky kind of cover.`;
+    }
+    setHideSeekSearchPulse(seeker, tone);
+    setHideSeekMessage(message);
+    hideSeekState.lastClue = message;
+    playHideSeekTone('listen');
+    renderHideSeek();
+    setHideSeekMessage(message);
   }
 
   function peekHideSeekHider() {
@@ -3303,6 +3442,9 @@
     hideSeekState.searchesRemaining = getHideSeekSearchCount(hideSeekState.difficulty);
     hideSeekState.hiderTimeRemaining = HIDE_SEEK_HIDE_SECONDS;
     hideSeekState.wrongGuesses = 0;
+    hideSeekState.listenUsed = false;
+    hideSeekState.roundMedal = '';
+    hideSeekState.lastClue = '';
     hideSeekState.roundHiderScore = 0;
     hideSeekState.roundSeekerScore = 0;
     hideSeekState.revealPulse = 0;
@@ -3343,7 +3485,7 @@
 
     hideSeekStartButton.hidden = ![HideSeekGameState.TITLE, HideSeekGameState.ROUND_START, HideSeekGameState.GAME_OVER].includes(hideSeekState.phase);
     hideSeekFoundButton.hidden = ![HideSeekGameState.HIDER_TURN, HideSeekGameState.SEEKER_LOOK_AWAY, HideSeekGameState.SEEKER_TURN].includes(hideSeekState.phase);
-    hideSeekSpecialButton.hidden = hideSeekState.phase !== HideSeekGameState.HIDER_TURN;
+    hideSeekSpecialButton.hidden = ![HideSeekGameState.HIDER_TURN, HideSeekGameState.SEEKER_TURN].includes(hideSeekState.phase);
     hideSeekSprintButton.hidden = ![HideSeekGameState.HIDER_TURN, HideSeekGameState.SEEKER_TURN].includes(hideSeekState.phase);
     hideSeekNextButton.hidden = ![HideSeekGameState.FOUND, HideSeekGameState.ROUND_RESULTS].includes(hideSeekState.phase);
     hideSeekFoundButton.disabled = false;
@@ -3363,9 +3505,8 @@
     }
 
     if (hideSeekState.phase === HideSeekGameState.HIDER_TURN) {
-      hideSeekFoundButton.textContent = 'Hide Here';
-      hideSeekFoundButton.textContent = nearbySpot ? 'Hide Here' : 'Hide (find cover)';
-      hideSeekFoundButton.setAttribute('aria-label', 'Enter this hiding spot');
+      hideSeekFoundButton.textContent = nearbySpot ? 'Hide Here' : 'Move Closer to Cover';
+      hideSeekFoundButton.setAttribute('aria-label', nearbySpot ? 'Hide here' : 'Move closer to cover');
       hideSeekFoundButton.disabled = false;
       hideSeekSpecialButton.textContent = 'Peek';
       hideSeekSpecialButton.setAttribute('aria-label', 'Peek and risk making noise');
@@ -3373,25 +3514,30 @@
       hideSeekRoundTitle.textContent = `${hiderName}, you have ${Math.ceil(hideSeekState.hiderTimeRemaining)} seconds to hide.`;
       hideSeekRoundText.textContent = coverQuality.spot
         ? `${coverQuality.detail} Hide Here locks it in. Peek helps you scout, but it raises your noise.`
-        : `Move into a room, step close to a highlighted cover spot, and hide before the timer runs out.`;
+        : `Move next to a glowing hiding spot. The Hide Here button turns on when cover is in reach.`;
       setHideSeekMessage(coverQuality.spot ? coverQuality.detail : `${hiderName} is looking for cover.`);
     } else if (hideSeekState.phase === HideSeekGameState.SEEKER_LOOK_AWAY) {
-      hideSeekFoundButton.textContent = `${seekerName} Starts Searching`;
+      hideSeekFoundButton.textContent = 'Start Seeking';
       hideSeekFoundButton.setAttribute('aria-label', `${seekerName} starts searching`);
       hideSeekRoundTitle.textContent = `${hiderName} is hidden.`;
       hideSeekRoundText.textContent = `Pass the phone to ${seekerName}. The map resets to the start room, and each wrong unique inspection uses one search.`;
       setHideSeekMessage(`${seekerName}, no peeking until you tap start searching.`);
     } else if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
-      hideSeekFoundButton.textContent = nearbySpot ? 'Inspect Spot' : 'Inspect (find cover)';
-      hideSeekFoundButton.setAttribute('aria-label', 'Inspect this hiding spot');
+      hideSeekFoundButton.textContent = nearbySpot ? 'Inspect Spot' : 'Move Closer to Inspect';
+      hideSeekFoundButton.setAttribute('aria-label', nearbySpot ? 'Inspect this hiding spot' : 'Move closer to inspect');
       hideSeekFoundButton.disabled = hideSeekState.inspectTime > 0;
+      hideSeekSpecialButton.textContent = hideSeekState.listenUsed ? 'Listen Used' : 'Listen';
+      hideSeekSpecialButton.disabled = hideSeekState.listenUsed || hideSeekState.inspectTime > 0;
+      hideSeekSpecialButton.setAttribute('aria-label', 'Listen for a vague clue');
       hideSeekRoundTitle.textContent = `${seekerName}, find the hider.`;
       hideSeekRoundText.textContent = nearbySpot
         ? `You are close to the ${nearbySpot.label}. Inspect it when you are ready.`
-        : `Walk room to room, stop beside cover, and inspect carefully. Every wrong new check costs one search.`;
-      setHideSeekMessage(`${seekerName} is searching ${room.name}. Searches left: ${hideSeekState.searchesRemaining}.`);
+        : `Move beside a glowing cover spot to inspect it. Listen gives one vague clue and does not spend a search.`;
+      setHideSeekMessage(hideSeekState.lastClue || `${seekerName} is searching ${room.name}. Searches left: ${hideSeekState.searchesRemaining}.`);
     } else if (hideSeekState.phase === HideSeekGameState.FOUND || hideSeekState.phase === HideSeekGameState.ROUND_RESULTS) {
-      hideSeekRoundTitle.textContent = hideSeekState.phase === HideSeekGameState.FOUND ? 'Found!' : 'Round over.';
+      hideSeekRoundTitle.textContent = hideSeekState.phase === HideSeekGameState.FOUND
+        ? `Found near the ${hideSeekState.hiddenSpotLabel.replace(/^near the /, '')}!`
+        : `${hiderName} survived!`;
       hideSeekRoundText.textContent = hideSeekState.lastRoundText || `${hiderName} was hidden ${hideSeekState.hiddenSpotLabel}.`;
       setHideSeekMessage(hideSeekState.lastRoundText || 'Round complete.');
     } else if (hideSeekState.phase === HideSeekGameState.GAME_OVER) {
@@ -3486,6 +3632,8 @@
     const map = getHideSeekMap();
     hideSeekState.phase = HideSeekGameState.SEEKER_TURN;
     hideSeekState.searchesRemaining = getHideSeekSearchCount(hideSeekState.difficulty);
+    hideSeekState.listenUsed = false;
+    hideSeekState.lastClue = '';
     hideSeekState.lastUrgentSecond = null;
     hideSeekState.actors.seeker = createHideSeekActor(map.startRoom, true, '#f58220');
     hideSeekState.activeRoomId = map.startRoom;
@@ -3626,7 +3774,7 @@
         `dist=${Math.round(distance)} tol=${HIDE_SEEK_SEARCH_TOLERANCE}`
       );
     }
-    const feedback = getHideSeekSearchFeedback(sameRoom, distance);
+    const feedback = getHideSeekSearchFeedback(sameRoom, distance, inspectedSpot);
     setHideSeekSearchPulse(actor, feedback.tone);
     if (inspectedSpot.id !== hideSeekState.hiddenSpotId) {
       hideSeekState.wrongGuesses += 1;
@@ -3642,10 +3790,15 @@
         life: 0.62,
       });
       hideSeekState.cameraShake = Math.max(hideSeekState.cameraShake, 0.12);
-      setHideSeekMessage(`${feedback.text} ${hideSeekState.searchesRemaining} searches left.`);
+      hideSeekState.lastClue = `${feedback.text} ${hideSeekState.searchesRemaining} searches left.`;
+      setHideSeekMessage(hideSeekState.lastClue);
       playHideSeekTone('wrong');
       renderHideSeek();
-      if (hideSeekState.searchesRemaining <= 0) hideSeekSeekerFailed();
+      if (hideSeekState.searchesRemaining <= 0) {
+        hideSeekSeekerFailed();
+      } else {
+        setHideSeekMessage(hideSeekState.lastClue);
+      }
       return;
     }
 
@@ -3671,7 +3824,8 @@
     hideSeekState.cameraShake = Math.max(hideSeekState.cameraShake, 0.45);
     revealHideSeekHider(foundSpot);
     hideSeekRound += 1;
-    hideSeekState.lastRoundText = `${getHideSeekDisplayName(hideSeekState.seekerIndex)} found ${getHideSeekDisplayName(hideSeekState.hiderIndex)} ${hideSeekState.hiddenSpotLabel}. Cover: ${hideSeekState.hiddenCoverLabel}. ${getHideSeekDisplayName(hideSeekState.seekerIndex)}: +${hideSeekState.roundSeekerScore}. ${getHideSeekDisplayName(hideSeekState.hiderIndex)}: +${hideSeekState.roundHiderScore}. Searches used: ${hideSeekState.inspectionCount}. Stealth bonus: ${stealthBonus}.`;
+    const medal = setHideSeekRoundMedal(true);
+    hideSeekState.lastRoundText = `${getHideSeekDisplayName(hideSeekState.seekerIndex)} found ${getHideSeekDisplayName(hideSeekState.hiderIndex)} ${hideSeekState.hiddenSpotLabel}. ${feedback.text} Cover: ${hideSeekState.hiddenCoverLabel}. Searches used: ${hideSeekState.inspectionCount}. ${getHideSeekDisplayName(hideSeekState.seekerIndex)}: +${hideSeekState.roundSeekerScore}. ${getHideSeekDisplayName(hideSeekState.hiderIndex)}: +${hideSeekState.roundHiderScore}.${medal ? ` Medal: ${medal}.` : ''}`;
     playHideSeekTone('found');
     renderHideSeek();
   }
@@ -3714,7 +3868,8 @@
     hideSeekState.cameraShake = Math.max(hideSeekState.cameraShake, 0.25);
     revealHideSeekHider(spot || createHideSeekActor(hideSeekState.activeRoomId, true, '#2ec7d3'));
     hideSeekRound += 1;
-    hideSeekState.lastRoundText = `${getHideSeekDisplayName(hideSeekState.hiderIndex)} stayed hidden ${hideSeekState.hiddenSpotLabel}. Cover: ${hideSeekState.hiddenCoverLabel}. Peeks: ${hideSeekState.peekCount}. Stealth bonus: ${stealthBonus}. ${getHideSeekDisplayName(hideSeekState.hiderIndex)}: +${hideSeekState.roundHiderScore}.`;
+    const medal = setHideSeekRoundMedal(false);
+    hideSeekState.lastRoundText = `${getHideSeekDisplayName(hideSeekState.hiderIndex)} vanished ${hideSeekState.hiddenSpotLabel}. The seeker ran out of searches before clearing the right cover. Cover: ${hideSeekState.hiddenCoverLabel}. Peeks: ${hideSeekState.peekCount}. ${getHideSeekDisplayName(hideSeekState.hiderIndex)}: +${hideSeekState.roundHiderScore}.${medal ? ` Medal: ${medal}.` : ''}`;
     playHideSeekTone('wrong');
     renderHideSeek();
   }
@@ -3755,8 +3910,23 @@
     return getHideSeekPlayerName(index);
   }
 
-  // If it is the computer's turn to hide, pick a random valid spot in the start
-  // room and lock it in, then hand the seeker turn to the human.
+  function getHideSeekAIProfile() {
+    return HIDE_SEEK_AI_PROFILES[hideSeekState.difficulty] || HIDE_SEEK_AI_PROFILES[HIDE_SEEK_DEFAULT_DIFFICULTY];
+  }
+
+  function chooseWeightedHideSeekItem(items, getWeight) {
+    const weighted = items.map(item => ({ item, weight: Math.max(0.01, Number(getWeight(item)) || 0.01) }));
+    const total = weighted.reduce((sum, entry) => sum + entry.weight, 0);
+    let marker = Math.random() * total;
+    for (const entry of weighted) {
+      marker -= entry.weight;
+      if (marker <= 0) return entry.item;
+    }
+    return weighted[weighted.length - 1] ? weighted[weighted.length - 1].item : null;
+  }
+
+  // If it is the computer's turn to hide, pick a weighted valid spot anywhere on
+  // the map and lock it in, then hand the seeker turn to the human.
   function maybeStartHideSeekComputerTurn() {
     if (!hideSeekSoloEnabled) return;
     if (hideSeekState.phase === HideSeekGameState.HIDER_TURN && isHideSeekComputerHider()) {
@@ -3766,15 +3936,22 @@
 
   function hideSeekComputerHide() {
     if (hideSeekState.phase !== HideSeekGameState.HIDER_TURN) return;
-    const map = getHideSeekMap();
-    const startRoom = getHideSeekRoom(map.startRoom);
-    if (!startRoom) return;
     const hider = hideSeekState.actors.hider;
-    hider.roomId = startRoom.id;
-    hideSeekState.activeRoomId = startRoom.id;
-    const spots = (startRoom.spots || []).filter(spot => getHideSeekSpotState(spot.id) !== 'disabled');
+    const profile = getHideSeekAIProfile();
+    const spots = getAllHideSeekSpots().filter(spot => getHideSeekSpotState(spot.id) !== 'disabled');
     if (!spots.length) return;
-    const spot = Object.assign({ roomId: startRoom.id }, spots[Math.floor(Math.random() * spots.length)]);
+    const spot = chooseWeightedHideSeekItem(spots, item => {
+      const difficulty = Number(item.difficulty) || 3;
+      const difficultyWeight = hideSeekState.difficulty === 'easy'
+        ? Math.pow(6 - difficulty, 1.6)
+        : Math.pow(difficulty, hideSeekState.difficulty === 'hard' ? 2.1 : 1.35);
+      const startRoomPenalty = item.roomId === getHideSeekMap().startRoom ? 0.82 : 1.18;
+      const noisyPenalty = item.noisy && hideSeekState.difficulty === 'hard' ? 0.7 : 1;
+      return difficultyWeight * startRoomPenalty * noisyPenalty * (0.75 + Math.random() * 0.7);
+    });
+    if (!spot) return;
+    hider.roomId = spot.roomId;
+    hideSeekState.activeRoomId = spot.roomId;
     placeHideSeekActorAtSpot(hider, spot);
     hideSeekSelectedSpotId = spot.id;
     if (hideSeekDebugEnabled) hideSeekDebugLog(`Computer hid at ${spot.id} (${spot.label}).`);
@@ -3785,9 +3962,7 @@
     }
   }
 
-  // Simple, fair AI seeker: walk to the nearest unsearched spot in the room and
-  // inspect it; once a room is cleared, head through an exit toward a room that
-  // still has unsearched spots.
+  // Fair AI seeker: inspect plausible nearby cover, then steer room to room.
   function roomHasUnsearchedHideSeekSpots(roomId) {
     const room = getHideSeekRoom(roomId);
     return ((room && room.spots) || []).some(spot => {
@@ -3796,19 +3971,61 @@
     });
   }
 
+  function chooseHideSeekAISeekerTarget(seeker, room, profile) {
+    const hiddenSpot = getHideSeekSpotById(hideSeekState.hiddenSpotId);
+    const noisy = hideSeekState.noiseLevel >= 0.55;
+    const candidates = (room.spots || [])
+      .filter(spot => {
+        const state = getHideSeekSpotState(spot.id);
+        return state !== 'disabled' && state !== 'searched' && state !== 'found';
+      })
+      .map(spot => {
+        const distance = getHideSeekDistanceToRect(seeker, spot);
+        const difficulty = Number(spot.difficulty) || 3;
+        const hiddenSignal = hiddenSpot && hiddenSpot.roomId === room.id && spot.id === hiddenSpot.id
+          ? profile.prefersNoise * (noisy ? 130 : 45)
+          : 0;
+        const spotNoiseSignal = spot.noisy ? profile.prefersNoise * 28 : 0;
+        const difficultySignal = difficulty * profile.prefersDifficulty * 15;
+        const mistakeNoise = Math.random() < profile.mistakeChance ? Math.random() * 190 : 0;
+        return {
+          spot,
+          distance,
+          score: distance - hiddenSignal - spotNoiseSignal - difficultySignal + mistakeNoise,
+        };
+      })
+      .sort((a, b) => a.score - b.score);
+    if (!candidates.length) return null;
+    if (Math.random() < profile.mistakeChance) {
+      return candidates[Math.floor(Math.random() * Math.min(candidates.length, 3))];
+    }
+    return candidates[0];
+  }
+
+  function chooseHideSeekAIExit(room, profile) {
+    const exits = room.exits || [];
+    if (!exits.length) return null;
+    const hiddenSpot = getHideSeekSpotById(hideSeekState.hiddenSpotId);
+    const noisy = hideSeekState.noiseLevel >= 0.55;
+    const usefulExits = exits.filter(exit => roomHasUnsearchedHideSeekSpots(exit.targetRoom));
+    const candidates = usefulExits.length ? usefulExits : exits;
+    return chooseWeightedHideSeekItem(candidates, exit => {
+      const revisitPenalty = exit.targetRoom === hideSeekAI.lastRoom ? 0.55 : 1;
+      const hiddenRoomSignal = hiddenSpot && hiddenSpot.roomId === exit.targetRoom
+        ? 1 + profile.roomDistance + (noisy ? profile.prefersNoise : 0)
+        : 1;
+      return revisitPenalty * hiddenRoomSignal * (0.8 + Math.random() * 0.45);
+    });
+  }
+
   function updateHideSeekAISeeker(delta) {
     const seeker = hideSeekState.actors.seeker;
     const room = getHideSeekRoom(seeker.roomId);
     if (!room) return;
+    const profile = getHideSeekAIProfile();
     hideSeekAI.thinkTimer = Math.max(0, hideSeekAI.thinkTimer - delta);
 
-    let target = null;
-    (room.spots || []).forEach(spot => {
-      const state = getHideSeekSpotState(spot.id);
-      if (state === 'disabled' || state === 'searched' || state === 'found') return;
-      const distance = getHideSeekDistanceToRect(seeker, spot);
-      if (!target || distance < target.distance) target = { spot, distance };
-    });
+    const target = chooseHideSeekAISeekerTarget(seeker, room, profile);
 
     if (target) {
       const near = getNearbyHideSeekSpot(seeker);
@@ -3816,7 +4033,7 @@
         hideSeekState.touchTarget = null;
         if (hideSeekState.inspectTime <= 0 && hideSeekAI.thinkTimer <= 0) {
           searchHideSeekPosition();
-          hideSeekAI.thinkTimer = 0.7;
+          hideSeekAI.thinkTimer = profile.thinkDelay;
         }
       } else {
         const center = getHideSeekSpotCenter(target.spot);
@@ -3826,11 +4043,8 @@
     }
 
     // Room cleared — steer toward an exit leading somewhere still worth checking.
-    const exits = room.exits || [];
-    if (!exits.length) return;
-    const chosen = exits.find(exit => exit.targetRoom !== hideSeekAI.lastRoom && roomHasUnsearchedHideSeekSpots(exit.targetRoom))
-      || exits.find(exit => roomHasUnsearchedHideSeekSpots(exit.targetRoom))
-      || exits[0];
+    const chosen = chooseHideSeekAIExit(room, profile);
+    if (!chosen) return;
     const trigger = getHideSeekExitTriggerRect(chosen);
     hideSeekState.touchTarget = { x: trigger.x + trigger.width / 2, y: trigger.y + trigger.height / 2 };
     hideSeekAI.lastRoom = room.id;
@@ -3880,6 +4094,9 @@
       searchesRemaining: getHideSeekSearchCount(hideSeekCountdown.value || HIDE_SEEK_DEFAULT_DIFFICULTY),
       hiderTimeRemaining: HIDE_SEEK_HIDE_SECONDS,
       wrongGuesses: 0,
+      listenUsed: false,
+      roundMedal: '',
+      lastClue: '',
       roundHiderScore: 0,
       roundSeekerScore: 0,
       lastRoundText: '',
@@ -7038,6 +7255,10 @@
 
   function stopGorillas() {
     gorillasRunning = false;
+    if (gorillasComputerTimer) {
+      window.clearTimeout(gorillasComputerTimer);
+      gorillasComputerTimer = null;
+    }
     if (gorillasAnimationFrame) {
       window.cancelAnimationFrame(gorillasAnimationFrame);
       gorillasAnimationFrame = null;
@@ -7050,6 +7271,7 @@
     const buildings = [];
     const count = 7;
     const buildingWidth = width / count;
+    const details = ['antenna', 'vent', 'water', 'hotel', 'neon', 'plain'];
     for (let i = 0; i < count; i++) {
       const buildingBase = height * (0.22 + Math.random() * 0.28);
       buildings.push({
@@ -7057,6 +7279,8 @@
         width: buildingWidth - 8,
         height: buildingBase,
         roofY: height - buildingBase - 36,
+        detail: details[i % details.length],
+        litOffset: Math.floor(Math.random() * 3),
       });
     }
     return {
@@ -7071,9 +7295,53 @@
       gravity: 860,
       wind: Math.round((Math.random() * 2 - 1) * 22),
       trail: [],
+      lastTrail: [],
+      shotHistory: [],
+      lastImpact: null,
+      lastDebugTrajectory: [],
+      computerMemory: {
+        angle: 45,
+        power: 70,
+        lastResult: '',
+      },
       explosion: null,
       sparks: [],
     };
+  }
+
+  function normalizeGorillasSettings(settings = gorillasSettings) {
+    const merged = Object.assign({ opponent: 'local', match: '3', difficulty: 'normal', debug: false }, settings || {});
+    merged.opponent = merged.opponent === 'computer' ? 'computer' : 'local';
+    merged.match = ['sudden', '3', '5'].includes(merged.match) ? merged.match : '3';
+    merged.difficulty = ['easy', 'normal', 'hard'].includes(merged.difficulty) ? merged.difficulty : 'normal';
+    merged.debug = Boolean(merged.debug);
+    return merged;
+  }
+
+  function saveGorillasSettings() {
+    gorillasSettings = normalizeGorillasSettings({
+      opponent: gorillasOpponent ? gorillasOpponent.value : gorillasSettings.opponent,
+      match: gorillasMatch ? gorillasMatch.value : gorillasSettings.match,
+      difficulty: gorillasDifficulty ? gorillasDifficulty.value : gorillasSettings.difficulty,
+      debug: gorillasSettings.debug,
+    });
+    setStoredJson('rtaGorillasSettings', gorillasSettings);
+  }
+
+  function populateGorillasSettings() {
+    gorillasSettings = normalizeGorillasSettings(gorillasSettings);
+    if (gorillasOpponent) gorillasOpponent.value = gorillasSettings.opponent;
+    if (gorillasMatch) gorillasMatch.value = gorillasSettings.match;
+    if (gorillasDifficulty) gorillasDifficulty.value = gorillasSettings.difficulty;
+    if (gorillasDebugButton) {
+      gorillasDebugButton.textContent = gorillasSettings.debug ? 'Debug: On' : 'Debug: Off';
+      gorillasDebugButton.setAttribute('aria-pressed', String(gorillasSettings.debug));
+    }
+  }
+
+  function getGorillasTargetScore() {
+    if (gorillasSettings.match === 'sudden') return 1;
+    return Number(gorillasSettings.match) || 3;
   }
 
   function normalizeGorillasInputs() {
@@ -7099,14 +7367,47 @@
     return turnIndex % 2 === 0 ? 'left' : 'right';
   }
 
+  function isGorillasComputerTurn() {
+    return gorillasSettings.opponent === 'computer' && getGorillasSide(gorillasTurn) === 'right';
+  }
+
   function getGorillasWindLabel() {
-    if (!gorillasState || gorillasState.wind === 0) return 'calm wind';
-    return `${Math.abs(gorillasState.wind)} mph ${gorillasState.wind > 0 ? 'tailwind right' : 'tailwind left'}`;
+    if (!gorillasState || gorillasState.wind === 0) return 'Calm wind';
+    return `Wind pushes ${gorillasState.wind > 0 ? 'right' : 'left'} · ${Math.abs(gorillasState.wind)}`;
+  }
+
+  function getGorillasWindHudLabel() {
+    if (!gorillasState || gorillasState.wind === 0) return 'Wind: Calm';
+    return `Wind: ${Math.abs(gorillasState.wind)} ${gorillasState.wind > 0 ? '→' : '←'}`;
+  }
+
+  function getGorillasShotSummary() {
+    if (!gorillasState) return 'Preview shows the first part of your banana path. Wind may still push it.';
+    const { angle, power } = normalizeGorillasInputs();
+    return `${getGorillasPlayerName(gorillasTurn)} aiming · ${angle}° · ${power} power · ${getGorillasWindLabel()}. Preview shows the first part of the path; wind may still push it.`;
   }
 
   function renderGorillasControls() {
     if (!gorillasFireButton) return;
-    gorillasFireButton.disabled = !gorillasState || Boolean(gorillasState.projectile) || Boolean(gorillasState.winner);
+    const locked = !gorillasState || Boolean(gorillasState.projectile) || Boolean(gorillasState.winner) || isGorillasComputerTurn();
+    gorillasFireButton.disabled = locked;
+    if (gorillasQuickShotButton) gorillasQuickShotButton.disabled = locked;
+    if (gorillasShotSummary && gorillasState && !gorillasState.projectile) {
+      gorillasShotSummary.textContent = gorillasState.winner
+        ? 'Match complete. Reset for a new skyline or finish for the summary.'
+        : getGorillasShotSummary();
+    }
+    renderGorillasShotHistory();
+  }
+
+  function renderGorillasShotHistory() {
+    if (!gorillasShotHistory || !gorillasState) return;
+    gorillasShotHistory.innerHTML = '';
+    gorillasState.shotHistory.slice(-5).reverse().forEach(shot => {
+      const li = document.createElement('li');
+      li.textContent = `${shot.playerName}: ${shot.angle}° / ${shot.power} · ${shot.result}`;
+      gorillasShotHistory.appendChild(li);
+    });
   }
 
   async function toggleGorillasFullscreen() {
@@ -7214,19 +7515,57 @@
     ctx.fillText('TOWERS', x + 20, y + 38);
   }
 
+  function drawGorillasRoofDetail(ctx, building, index) {
+    const x = building.x + 4;
+    const roofY = building.roofY;
+    ctx.save();
+    ctx.fillStyle = '#09233f';
+    ctx.strokeStyle = '#09233f';
+    ctx.lineWidth = 2;
+    if (building.detail === 'antenna') {
+      ctx.beginPath();
+      ctx.moveTo(x + building.width * 0.5, roofY);
+      ctx.lineTo(x + building.width * 0.5, roofY - 24);
+      ctx.moveTo(x + building.width * 0.5, roofY - 16);
+      ctx.lineTo(x + building.width * 0.5 + 12, roofY - 23);
+      ctx.stroke();
+    } else if (building.detail === 'vent') {
+      ctx.fillRect(x + 16, roofY - 10, 28, 10);
+      ctx.fillStyle = '#f58220';
+      ctx.fillRect(x + 19, roofY - 16, 22, 6);
+    } else if (building.detail === 'water') {
+      ctx.fillRect(x + building.width - 28, roofY - 20, 20, 20);
+      ctx.fillRect(x + building.width - 23, roofY - 30, 10, 10);
+    } else if (building.detail === 'hotel') {
+      ctx.fillStyle = '#f7fbff';
+      ctx.fillRect(x + 8, roofY + 10, 30, 22);
+      ctx.fillStyle = '#f58220';
+      ctx.font = '900 9px Atkinson Hyperlegible, Arial, sans-serif';
+      ctx.fillText('MOTEL', x + 10, roofY + 25);
+    } else if (building.detail === 'neon') {
+      ctx.fillStyle = index % 2 === 0 ? '#2ec7d3' : '#ffd74a';
+      ctx.fillRect(x + building.width - 42, roofY + 18, 30, 14);
+      ctx.fillStyle = '#09233f';
+      ctx.font = '900 8px Atkinson Hyperlegible, Arial, sans-serif';
+      ctx.fillText('EAT', x + building.width - 38, roofY + 28);
+    }
+    ctx.restore();
+  }
+
   function drawGorillasHud(ctx) {
-    ctx.fillStyle = 'rgba(247,251,255,0.82)';
-    ctx.fillRect(10, 10, 238, 48);
+    const { angle, power } = normalizeGorillasInputs();
+    ctx.fillStyle = 'rgba(247,251,255,0.86)';
+    ctx.fillRect(10, 10, 292, 52);
     ctx.strokeStyle = 'rgba(9,35,63,0.3)';
     ctx.lineWidth = 2;
-    ctx.strokeRect(10, 10, 238, 48);
+    ctx.strokeRect(10, 10, 292, 52);
     ctx.fillStyle = '#09233f';
     ctx.font = '900 14px Atkinson Hyperlegible, Arial, sans-serif';
-    ctx.fillText(getGorillasWindLabel(), 22, 30);
-    ctx.fillText(`${getGorillasPlayerName(gorillasTurn)} aiming`, 22, 49);
+    ctx.fillText(`${getGorillasPlayerName(gorillasTurn)} aiming · ${angle}° · ${power}`, 22, 31);
+    ctx.fillText(`${getGorillasWindHudLabel()} · First to ${getGorillasTargetScore()}`, 22, 51);
 
-    const arrowX = 224;
-    const arrowY = 27;
+    const arrowX = 276;
+    const arrowY = 24;
     ctx.fillStyle = '#f58220';
     ctx.beginPath();
     if (gorillasState.wind >= 0) {
@@ -7263,35 +7602,172 @@
 
   function drawGorillasAimPreview(ctx) {
     if (!gorillasState || gorillasState.projectile || gorillasState.winner) return;
-    const angle = Math.max(10, Math.min(80, Number(gorillasAngle.value) || 45));
-    const power = Math.max(20, Math.min(100, Number(gorillasPower.value) || 70));
-    const side = getGorillasSide(gorillasTurn);
+    const { angle, power } = normalizeGorillasInputs();
+    const points = simulateGorillasTrajectory(angle, power, getGorillasSide(gorillasTurn), 34).points;
+    gorillasState.lastDebugTrajectory = points;
+    ctx.save();
+    points.forEach((point, i) => {
+      if (i % 3 === 0) {
+        ctx.globalAlpha = 0.58 * (1 - i / Math.max(1, points.length));
+        ctx.fillStyle = '#ffd74a';
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 2.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+    ctx.restore();
+  }
+
+  function getGorillasShotStart(side) {
     const shooterBuilding = side === 'left'
       ? gorillasState.buildings[0]
       : gorillasState.buildings[gorillasState.buildings.length - 1];
+    return {
+      x: side === 'left' ? shooterBuilding.x + shooterBuilding.width + 6 : shooterBuilding.x - 6,
+      y: shooterBuilding.roofY - 12,
+    };
+  }
+
+  function simulateGorillasTrajectory(angle, power, side, maxSteps = 220) {
+    if (!gorillasState) return { points: [], impact: null };
     const direction = side === 'left' ? 1 : -1;
     const radians = angle * Math.PI / 180;
     const speed = power * 10.2;
-    let x = side === 'left' ? shooterBuilding.x + shooterBuilding.width + 6 : shooterBuilding.x - 6;
-    let y = shooterBuilding.roofY - 12;
+    const start = getGorillasShotStart(side);
+    let x = start.x;
+    let y = start.y;
     let vx = Math.cos(radians) * speed * direction;
     let vy = -Math.sin(radians) * speed;
     const dt = 0.016;
-    const steps = 30;
-    ctx.save();
-    for (let i = 0; i < steps; i++) {
+    const points = [{ x, y, vx, vy }];
+    for (let i = 0; i < maxSteps; i++) {
       vx += gorillasState.wind * dt;
       vy += gorillasState.gravity * dt;
       x += vx * dt;
       y += vy * dt;
-      if (x < 0 || x > gorillasState.width || y > gorillasState.height - 36) break;
-      if (i % 3 === 0) {
-        ctx.globalAlpha = 0.55 * (1 - i / steps);
-        ctx.fillStyle = '#ffd74a';
-        ctx.beginPath();
-        ctx.arc(x, y, 2.2, 0, Math.PI * 2);
-        ctx.fill();
+      points.push({ x, y, vx, vy });
+      const result = evaluateGorillasPoint({ x, y, vx, vy }, side);
+      if (result) {
+        return { points, impact: Object.assign({ x, y, vx, vy }, result) };
       }
+    }
+    return { points, impact: null };
+  }
+
+  function getGorillasHitboxes(shooterSide = getGorillasSide(gorillasTurn)) {
+    if (!gorillasState) return null;
+    const lastBuildingIndex = gorillasState.buildings.length - 1;
+    const targetIndex = shooterSide === 'left' ? lastBuildingIndex : 0;
+    const shooterIndex = shooterSide === 'left' ? 0 : lastBuildingIndex;
+    const target = gorillasState.buildings[targetIndex];
+    const shooter = gorillasState.buildings[shooterIndex];
+    const targetGorillaX = targetIndex === 0
+      ? target.x + target.width * 0.62
+      : target.x + target.width * 0.38;
+    const targetGorillaY = target.roofY - 2;
+    const shooterGorillaX = shooterIndex === 0
+      ? shooter.x + shooter.width * 0.62
+      : shooter.x + shooter.width * 0.38;
+    const shooterGorillaY = shooter.roofY - 2;
+    return {
+      targetIndex,
+      shooterIndex,
+      target: {
+        x: targetGorillaX - 18,
+        y: targetGorillaY - 30,
+        width: 36,
+        height: 48,
+      },
+      self: {
+        x: shooterGorillaX - 18,
+        y: shooterGorillaY - 30,
+        width: 36,
+        height: 48,
+      },
+      buildings: gorillasState.buildings.map(building => ({
+        x: building.x + 4,
+        y: building.roofY,
+        width: building.width,
+        height: building.height,
+      })),
+    };
+  }
+
+  function pointInRect(point, rect) {
+    return point.x >= rect.x
+      && point.x <= rect.x + rect.width
+      && point.y >= rect.y
+      && point.y <= rect.y + rect.height;
+  }
+
+  function evaluateGorillasPoint(point, shooterSide = getGorillasSide(gorillasTurn)) {
+    if (!gorillasState) return null;
+    const hitboxes = getGorillasHitboxes(shooterSide);
+    const groundY = gorillasState.height - 36;
+    if (pointInRect(point, hitboxes.target)) return { type: 'target' };
+    const inCrater = isPointInGorillasCrater(point.x, point.y);
+    const hitBuildingIndex = inCrater ? -1 : hitboxes.buildings.findIndex(rect => pointInRect(point, rect));
+    if (hitBuildingIndex !== -1) {
+      return {
+        type: hitBuildingIndex === hitboxes.shooterIndex ? 'self' : 'building',
+        buildingIndex: hitBuildingIndex,
+      };
+    }
+    if (point.y >= groundY) return { type: 'ground' };
+    if (point.x < 0 || point.x > gorillasState.width) return { type: 'out' };
+    return null;
+  }
+
+  function drawGorillasDebug(ctx) {
+    if (!gorillasState) return;
+    const hitboxes = getGorillasHitboxes();
+    ctx.save();
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 4]);
+    ctx.strokeStyle = 'rgba(46, 199, 211, 0.85)';
+    hitboxes.buildings.forEach(rect => ctx.strokeRect(rect.x, rect.y, rect.width, rect.height));
+    ctx.strokeStyle = 'rgba(0, 180, 90, 0.95)';
+    ctx.strokeRect(hitboxes.target.x, hitboxes.target.y, hitboxes.target.width, hitboxes.target.height);
+    ctx.strokeStyle = 'rgba(245, 130, 32, 0.95)';
+    ctx.strokeRect(hitboxes.self.x, hitboxes.self.y, hitboxes.self.width, hitboxes.self.height);
+    if (gorillasState.lastDebugTrajectory && gorillasState.lastDebugTrajectory.length > 1) {
+      ctx.setLineDash([]);
+      ctx.strokeStyle = 'rgba(123, 78, 230, 0.7)';
+      ctx.beginPath();
+      gorillasState.lastDebugTrajectory.forEach((point, index) => {
+        if (index === 0) ctx.moveTo(point.x, point.y);
+        else ctx.lineTo(point.x, point.y);
+      });
+      ctx.stroke();
+    }
+    if (gorillasState.lastImpact) {
+      ctx.fillStyle = 'rgba(255, 20, 20, 0.85)';
+      ctx.beginPath();
+      ctx.arc(gorillasState.lastImpact.x, gorillasState.lastImpact.y, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    const projectile = gorillasState.projectile;
+    const { angle, power } = normalizeGorillasInputs();
+    const fullTrajectory = simulateGorillasTrajectory(angle, power, getGorillasSide(gorillasTurn), 240).points;
+    const debugLines = [
+      `Debug · angle ${gorillasAngle.value} · power ${gorillasPower.value} · wind ${gorillasState.wind}`,
+      projectile ? `banana x/y ${Math.round(projectile.x)},${Math.round(projectile.y)} · vx/vy ${Math.round(projectile.vx)},${Math.round(projectile.vy)}` : 'banana x/y idle',
+      gorillasState.lastImpact ? `last impact ${Math.round(gorillasState.lastImpact.x)},${Math.round(gorillasState.lastImpact.y)} · ${gorillasState.lastImpact.result}` : 'last impact none',
+    ];
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(6,21,36,0.78)';
+    ctx.fillRect(10, 68, 390, 66);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '800 12px Atkinson Hyperlegible, Arial, sans-serif';
+    debugLines.forEach((line, index) => ctx.fillText(line, 20, 88 + index * 18));
+    if (fullTrajectory.length > 1) {
+      ctx.strokeStyle = 'rgba(255, 215, 74, 0.65)';
+      ctx.beginPath();
+      fullTrajectory.forEach((point, index) => {
+        if (index === 0) ctx.moveTo(point.x, point.y);
+        else ctx.lineTo(point.x, point.y);
+      });
+      ctx.stroke();
     }
     ctx.restore();
   }
@@ -7331,6 +7807,7 @@
       }
       lctx.fillStyle = 'rgba(255,255,255,0.18)';
       lctx.fillRect(x, y, building.width, 4);
+      drawGorillasRoofDetail(lctx, building, index);
     });
     if (Array.isArray(gorillasState.craters) && gorillasState.craters.length) {
       lctx.save();
@@ -7350,6 +7827,18 @@
     ctx.fillStyle = 'rgba(9,35,63,0.45)';
     ctx.fillRect(gorillasState.width / 2 - 2, 96, 4, gorillasState.height - 132);
     drawGorillasHud(ctx);
+    if (gorillasState.lastTrail && gorillasState.lastTrail.length > 1) {
+      ctx.strokeStyle = 'rgba(255,255,255,0.42)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 7]);
+      ctx.beginPath();
+      gorillasState.lastTrail.forEach((point, index) => {
+        if (index === 0) ctx.moveTo(point.x, point.y);
+        else ctx.lineTo(point.x, point.y);
+      });
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
     if (gorillasState.trail.length > 1) {
       ctx.strokeStyle = 'rgba(245,130,32,0.55)';
       ctx.lineWidth = 3;
@@ -7381,10 +7870,13 @@
         ctx.fillRect(spark.x - 2, spark.y - 2, 4, 4);
       });
     }
+    if (gorillasSettings.debug) drawGorillasDebug(ctx);
   }
 
   function startGorillasGame() {
     stopGorillas();
+    populateGorillasSettings();
+    saveGorillasSettings();
     gorillasState = createGorillasState();
     gorillasTurn = 0;
     gorillasLastFrameTs = 0;
@@ -7392,13 +7884,66 @@
     renderGorillasControls();
     updateGorillasFullscreenButton();
     showSection('gorillas');
-    gorillasStatus.textContent = `${getGorillasPlayerName(gorillasTurn)} goes first. Wind is ${getGorillasWindLabel()}. Set angle and power, then throw.`;
+    gorillasStatus.textContent = `${getGorillasPlayerName(gorillasTurn)} goes first. ${getGorillasWindLabel()}. First to ${getGorillasTargetScore()}.`;
     drawGorillas();
+  }
+
+  function getGorillasResultLabel(result) {
+    return {
+      direct: 'Direct Hit',
+      self: 'Self Bonk',
+      close: 'Close Call',
+      tower: 'Tower Tap',
+      short: 'Short Shot',
+      overshot: 'Sky Banana',
+      low: 'Too Low',
+      out: 'Another Zip Code',
+      miss: 'Almost Famous',
+    }[result] || 'Banana Report';
+  }
+
+  function classifyGorillasMiss(impact, shooterSide) {
+    if (!gorillasState || !impact) return 'miss';
+    if (impact.type === 'building') {
+      const targetIndex = shooterSide === 'left' ? gorillasState.buildings.length - 1 : 0;
+      return Math.abs(impact.buildingIndex - targetIndex) <= 1 ? 'close' : 'tower';
+    }
+    if (impact.type === 'ground') {
+      const target = shooterSide === 'left'
+        ? gorillasState.buildings[gorillasState.buildings.length - 1]
+        : gorillasState.buildings[0];
+      if ((shooterSide === 'left' && impact.x < target.x) || (shooterSide === 'right' && impact.x > target.x + target.width)) return 'short';
+      return 'low';
+    }
+    if (impact.type === 'out') return 'overshot';
+    return 'miss';
+  }
+
+  function getGorillasFeedback(result, shooterName, scoredName) {
+    const lines = {
+      direct: `${getGorillasResultLabel(result)}! ${scoredName} lands banana justice. One point on the board.`,
+      self: `${getGorillasResultLabel(result)}! ${shooterName} clipped home base, so the point goes the other way.`,
+      close: `${getGorillasResultLabel(result)}. Hit near the target tower. Try a tiny angle or power change.`,
+      tower: `${getGorillasResultLabel(result)}. Nice line, questionable real estate outcome.`,
+      short: `${getGorillasResultLabel(result)}. Add power or raise the angle.`,
+      overshot: `${getGorillasResultLabel(result)}. That shot entered another zip code. Reduce power or lower the angle.`,
+      low: `${getGorillasResultLabel(result)}. Raise the arc or add a little power.`,
+      out: `${getGorillasResultLabel(result)}. Too much ambition, not enough address.`,
+      miss: `${getGorillasResultLabel(result)}. Wind may have nudged it off course.`,
+    };
+    return lines[result] || `${shooterName} missed, but the banana learned something.`;
+  }
+
+  function addGorillasShotHistory(entry) {
+    if (!gorillasState) return;
+    gorillasState.shotHistory.push(entry);
+    if (gorillasState.shotHistory.length > 5) gorillasState.shotHistory.shift();
   }
 
   function advanceGorillasTurn(scored, options = {}) {
     if (!gorillasState) return;
-    const impact = gorillasState.projectile ? { x: gorillasState.projectile.x, y: gorillasState.projectile.y } : null;
+    const projectile = gorillasState.projectile;
+    const impact = projectile ? { x: projectile.x, y: projectile.y } : null;
     gorillasRunning = false;
     gorillasLastFrameTs = 0;
     if (gorillasAnimationFrame) {
@@ -7407,18 +7952,33 @@
     }
     const shooterName = getGorillasPlayerName(gorillasTurn);
     const scorerSide = options.scorerSide || getGorillasSide(gorillasTurn);
+    const scorerName = scorerSide === getGorillasSide(gorillasTurn)
+      ? shooterName
+      : getGorillasPlayerName(gorillasTurn + 1);
+    const result = options.result || (scored ? 'direct' : 'miss');
+    gorillasState.lastTrail = gorillasState.trail.slice();
+    gorillasState.lastImpact = impact ? Object.assign({ result }, impact) : null;
+    addGorillasShotHistory({
+      playerName: shooterName,
+      angle: projectile ? projectile.angle : Number(gorillasAngle.value) || 45,
+      power: projectile ? projectile.power : Number(gorillasPower.value) || 70,
+      wind: gorillasState.wind,
+      result: getGorillasResultLabel(result),
+    });
+    if (isGorillasComputerTurn() && gorillasState.computerMemory && projectile) {
+      gorillasState.computerMemory.angle = projectile.angle;
+      gorillasState.computerMemory.power = projectile.power;
+      gorillasState.computerMemory.lastResult = result;
+    }
     if (scored) {
       const scorer = scorerSide === 'left' ? 'scoreLeft' : 'scoreRight';
       gorillasState[scorer] += 1;
       renderGorillasScore();
-      const winnerName = scorerSide === getGorillasSide(gorillasTurn)
-        ? shooterName
-        : getGorillasPlayerName(gorillasTurn + 1);
-      if (options.instantWin || gorillasState[scorer] >= 5) {
+      if (gorillasState[scorer] >= getGorillasTargetScore()) {
         gorillasState.winner = scorer;
         gorillasState.explosion = impact;
         gorillasState.sparks = impact ? createGorillasSparks(impact.x, impact.y) : [];
-        gorillasStatus.textContent = `${winnerName} wins Banana Towers!`;
+        gorillasStatus.textContent = `${scorerName} wins Banana Towers! ${getGorillasFeedback(result, shooterName, scorerName)}`;
         stopGorillas();
         renderGorillasControls();
         drawGorillas();
@@ -7426,16 +7986,17 @@
       }
       gorillasState.explosion = impact;
       gorillasState.sparks = impact ? createGorillasSparks(impact.x, impact.y) : [];
-      gorillasStatus.textContent = options.statusText || `${shooterName} scored!`;
+      gorillasStatus.textContent = options.statusText || getGorillasFeedback(result, shooterName, scorerName);
     } else {
       gorillasState.explosion = impact && impact.y < gorillasState.height - 40 ? impact : null;
       gorillasState.sparks = gorillasState.explosion ? createGorillasSparks(gorillasState.explosion.x, gorillasState.explosion.y) : [];
-      gorillasStatus.textContent = options.statusText || `${shooterName} missed.`;
+      gorillasStatus.textContent = options.statusText || getGorillasFeedback(result, shooterName, scorerName);
     }
     gorillasTurn += 1;
     gorillasState.projectile = null;
     renderGorillasControls();
     drawGorillas();
+    maybeStartGorillasComputerTurn();
   }
 
   function isPointInGorillasCrater(x, y) {
@@ -7457,11 +8018,19 @@
       y: shooterBuilding.roofY - 12,
       vx: Math.cos(radians) * speed * direction,
       vy: -Math.sin(radians) * speed,
+      angle,
+      power,
     };
     gorillasState.trail = [{ x: gorillasState.projectile.x, y: gorillasState.projectile.y }];
     gorillasState.explosion = null;
     gorillasState.sparks = [];
-    gorillasStatus.textContent = `${getGorillasPlayerName(gorillasTurn)} launches the banana!`;
+    const launches = [
+      'launches a banana into questionable airspace',
+      'consults the wind and ignores common sense',
+      'sends one yellow idea into the sky',
+      'trusts the preview and the laws of snack physics',
+    ];
+    gorillasStatus.textContent = `${getGorillasPlayerName(gorillasTurn)} ${launches[Math.floor(Math.random() * launches.length)]}.`;
     gorillasRunning = true;
     gorillasLastFrameTs = 0;
     renderGorillasControls();
@@ -7480,68 +8049,43 @@
     gorillasState.trail.push({ x: projectile.x, y: projectile.y });
     if (gorillasState.trail.length > 42) gorillasState.trail.shift();
 
-    const groundY = gorillasState.height - 36;
     const shooterSide = getGorillasSide(gorillasTurn);
-    const lastBuildingIndex = gorillasState.buildings.length - 1;
-    const targetIndex = shooterSide === 'left' ? lastBuildingIndex : 0;
-    const shooterIndex = shooterSide === 'left' ? 0 : lastBuildingIndex;
-    const target = gorillasState.buildings[targetIndex];
-    const inCrater = isPointInGorillasCrater(projectile.x, projectile.y);
-    const targetGorillaX = targetIndex === 0
-      ? target.x + target.width * 0.62
-      : target.x + target.width * 0.38;
-    const targetGorillaY = target.roofY - 2;
-    const hitGorilla = projectile.x >= targetGorillaX - 18
-      && projectile.x <= targetGorillaX + 18
-      && projectile.y >= targetGorillaY - 30
-      && projectile.y <= targetGorillaY + 18;
-    const hitTarget = hitGorilla;
-    const hitBuildingIndex = inCrater ? -1 : gorillasState.buildings.findIndex(building => {
-      const rect = {
-        x: building.x + 4,
-        y: building.roofY,
-        width: building.width,
-        height: building.height,
-      };
-      return projectile.x >= rect.x
-        && projectile.x <= rect.x + rect.width
-        && projectile.y >= rect.y
-        && projectile.y <= rect.y + rect.height;
-    });
-    const hitAnyBuilding = hitBuildingIndex !== -1;
-    const hitSelf = hitAnyBuilding && hitBuildingIndex === shooterIndex && shooterIndex !== targetIndex;
-    const hitGround = projectile.y >= groundY;
-    const outOfBounds = projectile.x < 0 || projectile.x > gorillasState.width;
+    const impactResult = evaluateGorillasPoint(projectile, shooterSide);
+    const impact = impactResult ? Object.assign({
+      x: projectile.x,
+      y: projectile.y,
+      vx: projectile.vx,
+      vy: projectile.vy,
+    }, impactResult) : null;
 
     drawGorillas();
 
-    if (hitTarget) {
-      addGorillasCrater(projectile.x, projectile.y);
-      advanceGorillasTurn(true, { instantWin: true });
-      return;
-    }
-    if (hitSelf) {
-      addGorillasCrater(projectile.x, projectile.y);
-      const shooterName = getGorillasPlayerName(gorillasTurn);
-      const opponentSide = shooterSide === 'left' ? 'right' : 'left';
-      advanceGorillasTurn(true, {
-        scorerSide: opponentSide,
-        instantWin: true,
-        statusText: `${shooterName} clipped their own tower — the point goes the other way!`,
-      });
-      return;
-    }
-    if (hitAnyBuilding) {
-      addGorillasCrater(projectile.x, projectile.y);
-      advanceGorillasTurn(false);
-      return;
-    }
-    if (hitGround || outOfBounds) {
-      advanceGorillasTurn(false);
+    if (!impact) {
+      gorillasAnimationFrame = window.requestAnimationFrame(tickGorillas);
       return;
     }
 
-    gorillasAnimationFrame = window.requestAnimationFrame(tickGorillas);
+    if (impact.type === 'target') {
+      addGorillasCrater(projectile.x, projectile.y);
+      advanceGorillasTurn(true, { result: 'direct' });
+      return;
+    }
+    if (impact.type === 'self') {
+      addGorillasCrater(projectile.x, projectile.y);
+      const opponentSide = shooterSide === 'left' ? 'right' : 'left';
+      advanceGorillasTurn(true, {
+        scorerSide: opponentSide,
+        result: 'self',
+      });
+      return;
+    }
+    if (impact.type === 'building') {
+      addGorillasCrater(projectile.x, projectile.y);
+      advanceGorillasTurn(false, { result: classifyGorillasMiss(impact, shooterSide) });
+      return;
+    }
+
+    advanceGorillasTurn(false, { result: classifyGorillasMiss(impact, shooterSide) });
   }
 
   function addGorillasCrater(x, y) {
@@ -7552,30 +8096,107 @@
     if (gorillasState.craters.length > 60) gorillasState.craters.shift();
   }
 
+  function getGorillasComputerError() {
+    if (gorillasSettings.difficulty === 'hard') return { angle: 2.5, power: 5 };
+    if (gorillasSettings.difficulty === 'easy') return { angle: 7, power: 14 };
+    return { angle: 4.5, power: 9 };
+  }
+
+  function pickGorillasComputerShot() {
+    if (!gorillasState) return { angle: 45, power: 70 };
+    const side = getGorillasSide(gorillasTurn);
+    const hitboxes = getGorillasHitboxes(side);
+    const targetCenter = {
+      x: hitboxes.target.x + hitboxes.target.width / 2,
+      y: hitboxes.target.y + hitboxes.target.height / 2,
+    };
+    let best = { angle: 45, power: 70, score: Infinity };
+    for (let angle = 24; angle <= 72; angle += 3) {
+      for (let power = 35; power <= 100; power += 5) {
+        const sim = simulateGorillasTrajectory(angle, power, side, 240);
+        const impact = sim.impact;
+        const finalPoint = impact || sim.points[sim.points.length - 1] || targetCenter;
+        const hitBonus = impact && impact.type === 'target' ? -900 : 0;
+        const selfPenalty = impact && impact.type === 'self' ? 700 : 0;
+        const score = Math.hypot(finalPoint.x - targetCenter.x, finalPoint.y - targetCenter.y) + hitBonus + selfPenalty;
+        if (score < best.score) best = { angle, power, score };
+      }
+    }
+    const error = getGorillasComputerError();
+    const memory = gorillasState.computerMemory || {};
+    const blend = gorillasSettings.difficulty === 'easy' ? 0.35 : gorillasSettings.difficulty === 'hard' ? 0.82 : 0.62;
+    const rememberedAngle = Number.isFinite(memory.angle) ? memory.angle : best.angle;
+    const rememberedPower = Number.isFinite(memory.power) ? memory.power : best.power;
+    return {
+      angle: Math.round(Math.max(10, Math.min(80, rememberedAngle * (1 - blend) + best.angle * blend + (Math.random() - 0.5) * error.angle))),
+      power: Math.round(Math.max(20, Math.min(100, rememberedPower * (1 - blend) + best.power * blend + (Math.random() - 0.5) * error.power))),
+    };
+  }
+
+  function maybeStartGorillasComputerTurn() {
+    if (!gorillasState || gorillasState.winner || gorillasState.projectile || !isGorillasComputerTurn()) return;
+    renderGorillasControls();
+    gorillasStatus.textContent = `${getGorillasPlayerName(gorillasTurn)} is lining up a computer shot. ${getGorillasWindLabel()}.`;
+    gorillasComputerTimer = window.setTimeout(() => {
+      if (!gorillasState || gorillasState.winner || !isGorillasComputerTurn()) return;
+      const shot = pickGorillasComputerShot();
+      gorillasAngle.value = String(shot.angle);
+      gorillasPower.value = String(shot.power);
+      normalizeGorillasInputs();
+      drawGorillas();
+      fireGorillasShot();
+    }, 850);
+  }
+
+  function quickGorillasShot() {
+    if (!gorillasState || gorillasState.projectile || gorillasState.winner) return;
+    const side = getGorillasSide(gorillasTurn);
+    const shot = side === 'right'
+      ? pickGorillasComputerShot()
+      : {
+          angle: 38 + Math.round(Math.random() * 18),
+          power: 58 + Math.round(Math.random() * 26),
+        };
+    gorillasAngle.value = String(shot.angle);
+    gorillasPower.value = String(shot.power);
+    normalizeGorillasInputs();
+    renderGorillasControls();
+    drawGorillas();
+  }
+
   function resetGorillasGame() {
     stopGorillas();
+    saveGorillasSettings();
     gorillasState = createGorillasState();
     gorillasTurn = 0;
     gorillasLastFrameTs = 0;
     renderGorillasScore();
     renderGorillasControls();
-    gorillasStatus.textContent = `New skyline loaded. Wind is ${getGorillasWindLabel()}. Set angle and power, then throw.`;
+    gorillasStatus.textContent = `New skyline loaded. ${getGorillasWindLabel()}. First to ${getGorillasTargetScore()}.`;
     drawGorillas();
+    maybeStartGorillasComputerTurn();
   }
 
   function showGorillasSummary() {
     stopGorillas();
     showSection('summary');
+    const rightName = gorillasSettings.opponent === 'computer' ? 'Computer' : (players[1] ? players[1].name : 'P2');
     const leader = gorillasState.scoreLeft === gorillasState.scoreRight
       ? null
-      : (gorillasState.scoreLeft > gorillasState.scoreRight ? players[0] : players[1]);
+      : (gorillasState.scoreLeft > gorillasState.scoreRight ? (players[0] || { name: 'P1' }) : { name: rightName });
     summaryText.textContent = leader
       ? `${leader.name} wins Banana Towers, ${gorillasState.scoreLeft} to ${gorillasState.scoreRight}.`
       : `Banana Towers ends in a tie, ${gorillasState.scoreLeft} to ${gorillasState.scoreRight}.`;
     summaryList.innerHTML = '';
-    const li = document.createElement('li');
-    li.textContent = 'Each turn: pick angle, pick power, throw banana, then swap turns.';
-    summaryList.appendChild(li);
+    [
+      `Match mode: ${gorillasSettings.match === 'sudden' ? 'Sudden Banana' : `first to ${getGorillasTargetScore()}`}.`,
+      gorillasState.shotHistory.length ? `Best recent moment: ${gorillasState.shotHistory[gorillasState.shotHistory.length - 1].result}.` : 'No bananas were thrown yet.',
+      'Prize idea: winner chooses the next mini-game, loser names the next banana.',
+    ].forEach(text => {
+      const li = document.createElement('li');
+      li.textContent = text;
+      summaryList.appendChild(li);
+    });
   }
 
   function resetPongGame() {
@@ -8330,7 +8951,18 @@
     }
   });
   gorillasFireButton.addEventListener('click', fireGorillasShot);
+  if (gorillasQuickShotButton) {
+    gorillasQuickShotButton.addEventListener('click', quickGorillasShot);
+  }
   gorillasFullscreenButton.addEventListener('click', toggleGorillasFullscreen);
+  if (gorillasDebugButton) {
+    gorillasDebugButton.addEventListener('click', () => {
+      gorillasSettings.debug = !gorillasSettings.debug;
+      saveGorillasSettings();
+      populateGorillasSettings();
+      if (gorillasState) drawGorillas();
+    });
+  }
   if (gorillasImmersiveExitButton) {
     gorillasImmersiveExitButton.addEventListener('click', toggleGorillasFullscreen);
   }
@@ -8339,8 +8971,44 @@
   [gorillasAngle, gorillasPower].forEach(input => {
     input.addEventListener('input', () => {
       normalizeGorillasInputs();
+      renderGorillasControls();
       if (gorillasState && !gorillasState.projectile && !gorillasState.winner) drawGorillas();
     });
+  });
+  [gorillasOpponent, gorillasMatch, gorillasDifficulty].forEach(input => {
+    if (!input) return;
+    input.addEventListener('change', () => {
+      saveGorillasSettings();
+      renderGorillasControls();
+      if (gorillasState && !gorillasState.projectile) {
+        drawGorillas();
+        maybeStartGorillasComputerTurn();
+      }
+    });
+  });
+  document.addEventListener('click', event => {
+    const angleButton = event.target.closest('button[data-banana-angle]');
+    const powerButton = event.target.closest('button[data-banana-power]');
+    if (!angleButton && !powerButton) return;
+    if (!sections.gorillas || !sections.gorillas.contains(event.target)) return;
+    if (gorillasState && (gorillasState.projectile || gorillasState.winner || isGorillasComputerTurn())) return;
+    if (angleButton) {
+      gorillasAngle.value = String((Number(gorillasAngle.value) || 45) + Number(angleButton.dataset.bananaAngle || 0));
+    }
+    if (powerButton) {
+      gorillasPower.value = String((Number(gorillasPower.value) || 70) + Number(powerButton.dataset.bananaPower || 0));
+    }
+    normalizeGorillasInputs();
+    renderGorillasControls();
+    if (gorillasState) drawGorillas();
+  });
+  document.addEventListener('keydown', event => {
+    if (currentSectionKey !== 'gorillas' || event.key !== '`') return;
+    event.preventDefault();
+    gorillasSettings.debug = !gorillasSettings.debug;
+    saveGorillasSettings();
+    populateGorillasSettings();
+    if (gorillasState) drawGorillas();
   });
   secretSubmitButton.addEventListener('click', submitSecretAnswer);
   secretSkipButton.addEventListener('click', skipSecretQuestion);
@@ -8437,6 +9105,7 @@
     tripSettings = normalizeTripSettings(tripSettings);
     populateTripSettingsForm();
     renderPongSettings();
+    populateGorillasSettings();
     applyTripSettings();
     renderPlayerFields();
     passengerConfirmButton.addEventListener('click', confirmPassengerStatus);

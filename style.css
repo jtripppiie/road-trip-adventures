@@ -902,10 +902,32 @@ body.large-text {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.gorillas-howto {
+  display: grid;
+  gap: 0.2rem;
+  margin-bottom: 0.85rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 8px;
+  background: rgba(46, 199, 211, 0.14);
+  color: var(--color-primary);
+  text-align: left;
+}
+
+.gorillas-howto strong,
+.gorillas-howto span {
+  display: block;
+}
+
+.gorillas-mode-controls,
 .gorillas-setup {
   display: grid;
-  grid-template-columns: repeat(2, minmax(120px, 1fr));
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
   gap: 0.75rem;
+}
+
+.gorillas-setup {
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
+  margin-top: 0.75rem;
 }
 
 .gorillas-setup input {
@@ -914,6 +936,46 @@ body.large-text {
   border-radius: 8px;
   text-align: center;
   font-weight: 900;
+}
+
+.banana-adjust-row {
+  display: grid;
+  grid-template-columns: minmax(3rem, 0.6fr) minmax(4rem, 1fr) minmax(3rem, 0.6fr);
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.banana-step-button {
+  width: auto;
+  min-height: 3rem;
+  margin-top: 0;
+  padding: 0.45rem 0.55rem;
+}
+
+.gorillas-shot-summary {
+  margin: 0.85rem 0 0;
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  background: rgba(245, 130, 32, 0.12);
+  color: var(--color-primary);
+  font-weight: 800;
+}
+
+.gorillas-shot-history {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.gorillas-shot-history li {
+  padding: 0.45rem 0.6rem;
+  border: 1px solid rgba(9, 35, 63, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  font-weight: 800;
 }
 
 .gorillas-control-card {
@@ -1365,7 +1427,7 @@ body.immersive-lock {
   left: max(0.5rem, env(safe-area-inset-left));
   bottom: max(0.5rem, env(safe-area-inset-bottom));
   z-index: 9;
-  max-width: min(46vw, 24rem);
+  max-width: min(54vw, 34rem);
   margin: 0;
   padding: 0.45rem;
   border-color: rgba(255, 255, 255, 0.28);
@@ -1376,10 +1438,23 @@ body.immersive-lock {
   backdrop-filter: blur(4px);
 }
 
+#gorillas-game:fullscreen .gorillas-howto,
+#gorillas-game.is-immersive .gorillas-howto {
+  display: none;
+}
+
+#gorillas-game:fullscreen .gorillas-mode-controls,
+#gorillas-game.is-immersive .gorillas-mode-controls {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.35rem;
+  margin-bottom: 0.4rem;
+}
+
 #gorillas-game:fullscreen .gorillas-setup,
 #gorillas-game.is-immersive .gorillas-setup {
-  grid-template-columns: repeat(2, minmax(120px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.45rem;
+  margin-top: 0;
 }
 
 #gorillas-game:fullscreen .team-name-field,
@@ -1388,9 +1463,25 @@ body.immersive-lock {
 }
 
 #gorillas-game:fullscreen .team-name-field input,
-#gorillas-game.is-immersive .team-name-field input {
+#gorillas-game.is-immersive .team-name-field input,
+#gorillas-game:fullscreen .team-name-field select,
+#gorillas-game.is-immersive .team-name-field select {
   min-height: 2.25rem;
   padding: 0.3rem 0.45rem;
+}
+
+#gorillas-game:fullscreen .banana-step-button,
+#gorillas-game.is-immersive .banana-step-button {
+  min-height: 2.25rem;
+  padding: 0.25rem 0.35rem;
+  font-size: 0.78rem;
+}
+
+#gorillas-game:fullscreen .gorillas-shot-summary,
+#gorillas-game.is-immersive .gorillas-shot-summary,
+#gorillas-game:fullscreen .gorillas-shot-history,
+#gorillas-game.is-immersive .gorillas-shot-history {
+  display: none;
 }
 
 #gorillas-game:fullscreen .pong-canvas,
@@ -1473,6 +1564,11 @@ body.immersive-lock {
 
   #gorillas-game:fullscreen .gorillas-setup,
   #gorillas-game.is-immersive .gorillas-setup {
+    grid-template-columns: 1fr;
+  }
+
+  #gorillas-game:fullscreen .gorillas-mode-controls,
+  #gorillas-game.is-immersive .gorillas-mode-controls {
     grid-template-columns: 1fr;
   }
 
@@ -2358,6 +2454,11 @@ body.reduce-motion .stamp.earned {
 
   .trivia-category-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gorillas-mode-controls,
+  .gorillas-setup {
+    grid-template-columns: 1fr;
   }
 
   .trivia-choices {
