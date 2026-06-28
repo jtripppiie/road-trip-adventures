@@ -119,8 +119,15 @@
       <button class="quick-start-card" data-category="quickstart">
         <span class="option-emoji" aria-hidden="true">🚗</span>
         <span class="option-title">Start a Road Trip Mix</span>
-        <span class="option-subtitle">Let the app pick a game and get moving.</span>
+        <span class="option-subtitle">Pick a vibe below, or tap here for a balanced passenger mix.</span>
       </button>
+      <div class="quick-start-options" aria-label="Quick start choices">
+        <button type="button" data-quick-intent="laugh">Make us laugh</button>
+        <button type="button" data-quick-intent="outside">Look outside</button>
+        <button type="button" data-quick-intent="learn">Learn something</button>
+        <button type="button" data-quick-intent="scored">Play scored</button>
+        <button type="button" data-quick-intent="surprise">Surprise us</button>
+      </div>
       <div class="mode-group-list" aria-label="Adventure categories">
         <section class="mode-group" aria-labelledby="mode-look-heading">
           <h3 id="mode-look-heading">Look Outside</h3>
@@ -128,17 +135,23 @@
             <button class="option-card" data-category="look">
               <span class="option-emoji" aria-hidden="true">👀</span>
               <span class="option-title">Window Quests</span>
+              <span class="option-description">Turn real scenery into stories, clues, and tiny debates.</span>
               <span class="mode-pill">Just for fun</span>
+              <span class="best-for">Best for: quick, creative, all ages</span>
             </button>
             <button class="option-card" data-category="local">
               <span class="option-emoji" aria-hidden="true">🌎</span>
               <span class="option-title">Local Explorer</span>
+              <span class="option-description">Choose a region manually and notice what makes it different.</span>
               <span class="mode-pill">Just for fun</span>
+              <span class="best-for">Best when: someone can read aloud</span>
             </button>
             <button class="option-card" data-category="scavenger">
               <span class="option-emoji" aria-hidden="true">🔎</span>
               <span class="option-title">Scavenger Hunt</span>
+              <span class="option-description">Race to spot real roadside targets the car can verify.</span>
               <span class="mode-pill scored">Scored</span>
+              <span class="best-for">Best for: active, competitive passengers</span>
             </button>
           </div>
         </section>
@@ -149,22 +162,30 @@
             <button class="option-card" data-category="learn">
               <span class="option-emoji" aria-hidden="true">🧠</span>
               <span class="option-title">Learn Something</span>
+              <span class="option-description">Short facts and questions to pass around the car.</span>
               <span class="mode-pill">Just for fun</span>
+              <span class="best-for">Best for: quiet car, curious readers</span>
             </button>
             <button class="option-card" data-category="trivia">
               <span class="option-emoji" aria-hidden="true">🧩</span>
               <span class="option-title">Trivia Run</span>
+              <span class="option-description">Take turns answering multiple-choice road-trip trivia.</span>
               <span class="mode-pill scored">Scored</span>
+              <span class="best-for">Best for: longer, seated play</span>
             </button>
             <button class="option-card" data-category="pi">
               <span class="option-emoji" aria-hidden="true">π</span>
               <span class="option-title">Pi Digits</span>
+              <span class="option-description">Recite digits, enter scores, and crown the memory champ.</span>
               <span class="mode-pill scored">Scored</span>
+              <span class="best-for">Best for: quiet challenge rounds</span>
             </button>
             <button class="option-card" data-category="calculator">
               <span class="option-emoji" aria-hidden="true">🧮</span>
               <span class="option-title">Trip Calculator</span>
+              <span class="option-description">Compare travel times and turn the route into road math.</span>
               <span class="mode-pill">Tool</span>
+              <span class="best-for">Best when: estimating, not driving</span>
             </button>
           </div>
         </section>
@@ -176,21 +197,29 @@
             <button class="option-card" data-category="jokes">
               <span class="option-emoji" aria-hidden="true">🎤</span>
               <span class="option-title">Joke Vote</span>
+              <span class="option-description">Read jokes aloud and vote for the biggest laugh.</span>
               <span class="mode-pill scored">Scored</span>
+              <span class="best-for">Best for: silly group energy</span>
             </button>
             <button class="option-card" data-category="emoji">
               <span class="option-emoji" aria-hidden="true">😜</span>
               <span class="option-title">Emoji Face‑Off</span>
+              <span class="option-description">Copy the emoji face, then vote for the closest match.</span>
               <span class="mode-pill scored">Scored</span>
+              <span class="best-for">Best when: passengers are stopped or settled</span>
             </button>
             <button class="option-card" data-category="hide-seek">
               <span class="option-emoji" aria-hidden="true">🫥</span>
               <span class="option-title">Hide & Seek</span>
+              <span class="option-description">Pass-and-play map searching with secret hiding spots.</span>
               <span class="mode-pill">Party</span>
+              <span class="best-for">Best when: two players can pass the phone</span>
             </button>            <button class="option-card" data-category="twenty">
               <span class="option-emoji" aria-hidden="true">❓</span>
               <span class="option-title">20 Questions</span>
+              <span class="option-description">One secret thing, yes-or-no clues, and a final guess.</span>
               <span class="mode-pill">Party</span>
+              <span class="best-for">Best for: quiet guessing together</span>
             </button>          </div>
         </section>
 
@@ -200,26 +229,36 @@
             <button class="option-card" data-category="random">
               <span class="option-emoji" aria-hidden="true">🎲</span>
               <span class="option-title">Surprise Me</span>
+              <span class="option-description">A mixed prompt run when nobody wants to choose.</span>
               <span class="mode-pill">Mixed</span>
+              <span class="best-for">Best for: instant momentum</span>
             </button>
             <button class="option-card" data-category="pong">
               <span class="option-emoji" aria-hidden="true">🏓</span>
               <span class="option-title">Road Pong</span>
+              <span class="option-description">Touch arcade pong for one or two passengers.</span>
               <span class="mode-pill scored">Scored</span>
+              <span class="best-for">Best for: quick arcade breaks</span>
             </button>
             <button class="option-card" data-category="gorillas">
               <span class="option-emoji" aria-hidden="true">🍌</span>
               <span class="option-title">Banana Towers</span>
+              <span class="option-description">Launch bananas across a skyline with wind and angles.</span>
               <span class="mode-pill scored">Scored</span>
+              <span class="best-for">Best in: landscape, two players</span>
             </button>            <button class="option-card" data-category="puns">
               <span class="option-emoji" aria-hidden="true">🤪</span>
               <span class="option-title">Pun Generator</span>
+              <span class="option-description">Type a word and get groan-worthy lines to read aloud.</span>
               <span class="mode-pill">Tool</span>
+              <span class="best-for">Best for: quick laughs</span>
             </button>
             <button class="option-card" data-category="mentalist">
               <span class="option-emoji" aria-hidden="true">🔮</span>
               <span class="option-title">Road Trip Mentalist</span>
+              <span class="option-description">Harmless magic-style tricks with numbers and choices.</span>
               <span class="mode-pill">Magic</span>
+              <span class="best-for">Best for: one reader, many guessers</span>
             </button>          </div>
         </section>
       </div>
@@ -262,6 +301,18 @@
             <option value="rainy">Rainy day</option>
             <option value="night">Night drive</option>
           </select>
+        </label>
+        <label class="team-name-field" for="setting-age-group">
+          <span>Player age mix</span>
+          <select id="setting-age-group">
+            <option value="kids">Younger kids</option>
+            <option value="mixed">Mixed ages</option>
+            <option value="teens">Teens/adults</option>
+          </select>
+        </label>
+        <label class="checkbox-row" for="setting-quiet-car">
+          <input id="setting-quiet-car" type="checkbox" />
+          <span>Quiet car mode</span>
         </label>
         <label class="checkbox-row" for="setting-no-camera">
           <input id="setting-no-camera" type="checkbox" />

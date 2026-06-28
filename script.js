@@ -100,7 +100,9 @@
       ageGroups: ['*'],
       regions: ['CA'],
       requiresTimer: false,
-      text: 'Can you spot a palm tree?',
+      text: 'Palm Tree Press Conference: Spot a palm tree, then explain what important roadside announcement it is about to make.',
+      tags: ['observation', 'story', 'quick'],
+      quality: 'strong',
       points: 1,
     },
     {
@@ -109,7 +111,9 @@
       ageGroups: ['*'],
       regions: ['AK'],
       requiresTimer: false,
-      text: 'Can you spot a snowy peak, evergreen forest, or glacier?',
+      text: 'Alaska Survival Briefing: Spot a snowy peak, evergreen forest, or glacier, then give one real survival tip and one ridiculous fake tip.',
+      tags: ['observation', 'creative', 'local'],
+      quality: 'strong',
       points: 1,
     },
     {
@@ -118,7 +122,9 @@
       ageGroups: ['*'],
       regions: ['*'],
       requiresTimer: false,
-      text: 'Find a license plate from another state.',
+      text: 'Out-of-State Mission: Find a license plate from another state. Invent the driver’s secret mission in one sentence.',
+      tags: ['observation', 'story', 'vote'],
+      quality: 'strong',
       points: 1,
     },
     {
@@ -136,7 +142,9 @@
       ageGroups: ['*'],
       regions: ['*'],
       requiresTimer: true,
-      text: 'Color hunt: spot something red, yellow, green, blue, and white outside.',
+      text: 'Color Evidence: Spot red, yellow, green, blue, and white outside. The car votes which color object is most suspicious.',
+      tags: ['observation', 'vote', 'quick'],
+      quality: 'okay',
       points: 1,
     },
     {
@@ -277,7 +285,9 @@
       ageGroups: ['*'],
       regions: ['*'],
       requiresTimer: true,
-      text: 'Name five animals as fast as you can!',
+      text: 'Animal Casting Call: Name five animals, then pick which one should narrate this road trip and why.',
+      tags: ['creative', 'quick'],
+      quality: 'okay',
       points: 1,
     },
     {
@@ -295,7 +305,9 @@
       ageGroups: ['*'],
       regions: ['*'],
       requiresTimer: true,
-      text: 'First to five: name five things you might pack for a dream road trip.',
+      text: 'Dream Trip Bag Check: Name five things you would pack, then defend the weirdest item like it is absolutely essential.',
+      tags: ['creative', 'conversation'],
+      quality: 'strong',
       points: 1,
     },
     {
@@ -475,7 +487,9 @@
       ageGroups: ['*'],
       regions: ['*'],
       requiresTimer: false,
-      text: 'Find a town, exit, or street name. Guess why it might have that name.',
+      text: 'Fake Local Legend: Find a town, exit, or street name. Invent the totally unofficial legend for how it got that name.',
+      tags: ['observation', 'story', 'local'],
+      quality: 'strong',
       points: 1,
     },
     {
@@ -501,6 +515,8 @@
       requiresTimer: Boolean(prompt.requiresTimer),
       text,
       points: Number.isFinite(prompt.points) ? prompt.points : 1,
+      quality: prompt.quality || 'okay',
+      tags: Array.isArray(prompt.tags) ? prompt.tags.slice() : [],
     };
   }
 
@@ -880,6 +896,8 @@
   const defaultTripSettings = {
     gameLength: 'long',
     tripPreset: 'any',
+    ageGroup: 'mixed',
+    quietCar: false,
     noCameraGames: false,
     noPopCulture: false,
     hardTrivia: false,
@@ -898,7 +916,7 @@
   let tripSettings = Object.assign({}, defaultTripSettings, getStoredJson('rtaTripSettings', {}));
 
   // Application state
-  let selectedAge = 'mixed';
+  let selectedAge = tripSettings.ageGroup || 'mixed';
   let selectedCategory = null;
   let selectedLearnTopic = getStoredJson('rtaLastLearnTopic', 'all');
   let regionCode = null; // Optional region code for local questions
@@ -1129,6 +1147,8 @@
   const modeRulesBackButton = document.getElementById('mode-rules-back');
   const settingGameLength = document.getElementById('setting-game-length');
   const settingTripPreset = document.getElementById('setting-trip-preset');
+  const settingAgeGroup = document.getElementById('setting-age-group');
+  const settingQuietCar = document.getElementById('setting-quiet-car');
   const settingNoCamera = document.getElementById('setting-no-camera');
   const settingNoPopCulture = document.getElementById('setting-no-pop-culture');
   const settingHardTrivia = document.getElementById('setting-hard-trivia');
@@ -1317,6 +1337,7 @@
       type: 'Just for fun',
       scored: false,
       summary: 'Quick prompts that get everyone looking outside instead of staring down.',
+      bestWhen: 'Best when everyone can safely see outside.',
       rules: [
         'Read each prompt aloud.',
         'Everyone looks outside or answers together.',
@@ -1328,6 +1349,7 @@
       type: 'Just for fun',
       scored: false,
       summary: 'Manual region prompts. No GPS, no location sensors, no tracking.',
+      bestWhen: 'Best when someone wants to read a fact or challenge aloud.',
       rules: [
         'Choose the region yourself.',
         'Read each local prompt aloud.',
@@ -1339,6 +1361,7 @@
       type: 'Scored Game',
       scored: true,
       summary: 'Keep a tight target list active and call real finds before someone else does.',
+      bestWhen: 'Best when passengers want an active scored game.',
       rules: [
         'The app shows 4 or 5 targets at a time.',
         'First player to clearly spot a target gets 1 point.',
@@ -1351,6 +1374,7 @@
       type: 'Just for fun',
       scored: false,
       summary: 'Short facts and mini-lessons to pass around the car.',
+      bestWhen: 'Best for quiet cars, night drives, and curious readers.',
       rules: [
         'Pick a topic lane.',
         'Pass the phone and read the fact aloud.',
@@ -1362,6 +1386,7 @@
       type: 'Scored Game',
       scored: true,
       summary: 'Turn-based multiple choice trivia with a cleaner category lane and automatic scoring.',
+      bestWhen: 'Best when someone wants to read questions aloud.',
       rules: [
         'The app names whose turn it is.',
         'That player chooses an answer. Correct picks score automatically.',
@@ -1396,6 +1421,7 @@
       type: 'Just for fun',
       scored: false,
       summary: 'Read a Dad, Mom, Brother, and Sister joke each round and rate the laughs.',
+      bestWhen: 'Best when the car wants quick laughs.',
       rules: [
         'Read each joke out loud.',
         'Tap whoever got the bigger laugh.',
@@ -1418,7 +1444,9 @@
       type: 'Just for fun',
       scored: false,
       summary: 'Think of any thing and the app tries to guess it, or let the computer hide a secret for you to guess.',
+      bestWhen: 'Best when one passenger can hold the secret and everyone else can look away.',
       rules: [
+        'Pass the phone to the secret keeper. Only they should look until guessing starts.',
         'Pick who hides the secret thing.',
         'Answer each question Yes, No, Sometimes, Maybe, or Unknown.',
         'The guesser gets up to 20 questions to figure it out.',
@@ -1440,6 +1468,7 @@
       type: 'Scored Game',
       scored: true,
       summary: 'Players copy an emoji face and the car votes for the closest match.',
+      bestWhen: 'Best when passengers are settled and camera play feels comfortable.',
       rules: [
         'Camera is optional and stays on this device.',
         'Snap a face or just act it out.',
@@ -1451,9 +1480,11 @@
       type: 'Scored Party Game',
       scored: true,
       summary: 'A local room-search game where hiders choose secret spots and seekers inspect the map.',
+      bestWhen: 'Best when two players can safely pass the phone.',
       rules: [
         'Choose a map, search timer, and match length.',
-        'The hider moves first while the seeker looks away.',
+        'Pass the phone to the hider first. Only the hider should look.',
+        'Then pass the phone to the seeker. Everyone else looks away from the secret.',
         'The seeker inspects hiding spots. Wrong guesses cost time.',
         'Roles rotate each round and both hiding and seeking earn points.',
       ],
@@ -1463,6 +1494,7 @@
       type: 'Mixed',
       scored: false,
       summary: 'A mixed prompt run for when nobody wants to pick a mode.',
+      bestWhen: 'Best when the car needs instant momentum.',
       rules: [
         'The app mixes looking, laughing, learning, and quick challenges.',
         'Prompts are completed, not scored.',
@@ -1474,6 +1506,7 @@
       type: 'Scored Game',
       scored: true,
       summary: 'Quick arcade break with touch controls on the canvas and optional keyboard backup.',
+      bestWhen: 'Best when one or two passengers want a fast arcade round.',
       rules: [
         'Choose local player or computer before starting.',
         'Pick a difficulty from easy to death match.',
@@ -1487,6 +1520,7 @@
       type: 'Scored Game',
       scored: true,
       summary: 'A turn-based banana toss duel where angle, wind, and skyline all matter.',
+      bestWhen: 'Best in landscape with two passengers sharing turns.',
       rules: [
         'Each player chooses an angle and power on their turn.',
         'The banana arcs over the buildings and can hit the opponent.',
@@ -1516,6 +1550,8 @@
     const merged = Object.assign({}, defaultTripSettings, settings || {});
     merged.gameLength = merged.gameLength === 'short' ? 'short' : 'long';
     merged.tripPreset = tripPresets[merged.tripPreset] ? merged.tripPreset : 'any';
+    merged.ageGroup = ['kids', 'mixed', 'teens'].includes(merged.ageGroup) ? merged.ageGroup : 'mixed';
+    merged.quietCar = Boolean(merged.quietCar);
     merged.noCameraGames = Boolean(merged.noCameraGames);
     merged.noPopCulture = Boolean(merged.noPopCulture);
     merged.hardTrivia = Boolean(merged.hardTrivia);
@@ -1526,6 +1562,8 @@
     tripSettings = normalizeTripSettings(tripSettings);
     settingGameLength.value = tripSettings.gameLength;
     settingTripPreset.value = tripSettings.tripPreset;
+    settingAgeGroup.value = tripSettings.ageGroup;
+    settingQuietCar.checked = tripSettings.quietCar;
     settingNoCamera.checked = tripSettings.noCameraGames;
     settingNoPopCulture.checked = tripSettings.noPopCulture;
     settingHardTrivia.checked = tripSettings.hardTrivia;
@@ -1535,6 +1573,8 @@
     tripSettings = normalizeTripSettings({
       gameLength: settingGameLength.value,
       tripPreset: settingTripPreset.value,
+      ageGroup: settingAgeGroup.value,
+      quietCar: settingQuietCar.checked,
       noCameraGames: settingNoCamera.checked,
       noPopCulture: settingNoPopCulture.checked,
       hardTrivia: settingHardTrivia.checked,
@@ -1546,10 +1586,11 @@
 
   function applyTripSettings() {
     tripSettings = normalizeTripSettings(tripSettings);
+    selectedAge = tripSettings.ageGroup;
     const emojiButton = document.querySelector('[data-category="emoji"]');
     if (emojiButton) {
-      emojiButton.hidden = tripSettings.noCameraGames;
-      emojiButton.disabled = tripSettings.noCameraGames;
+      emojiButton.hidden = tripSettings.noCameraGames || tripSettings.quietCar;
+      emojiButton.disabled = tripSettings.noCameraGames || tripSettings.quietCar;
     }
     if (tripSettings.hardTrivia) {
       activeTriviaDifficulty = 'hard';
@@ -1824,7 +1865,17 @@
   }
 
   function matchesAge(question) {
-    return question.ageGroups.indexOf('*') !== -1 || question.ageGroups.indexOf(selectedAge) !== -1 || question.ageGroups.indexOf('mixed') !== -1;
+    return question.ageGroups.indexOf('*') !== -1
+      || question.ageGroups.indexOf(selectedAge) !== -1
+      || (selectedAge === 'teens' && question.ageGroups.indexOf('adults') !== -1)
+      || question.ageGroups.indexOf('mixed') !== -1;
+  }
+
+  function adventurePromptAllowedBySettings(question) {
+    if (!tripSettings.quietCar) return true;
+    if (question.category === 'laugh' || question.category === 'compete') return false;
+    if (question.requiresTimer) return false;
+    return !/(shout|loud|speed|race|fast|speak like|karaoke|commercial|face|perform)/i.test(question.text || '');
   }
 
   function matchesRegion(question) {
@@ -1900,11 +1951,11 @@
     ];
     const selected = [];
     targets.forEach(target => {
-      const pool = shuffle(adventurePromptDatabase.filter(q => matchesAge(q) && q.category === target.category && matchesRegion(q)));
+      const pool = shuffle(adventurePromptDatabase.filter(q => matchesAge(q) && adventurePromptAllowedBySettings(q) && q.category === target.category && matchesRegion(q)));
       selected.push(...selectAdventurePrompts(pool, target.count, getAdventureHistoryKey('random', target.category)));
     });
     const selectedIds = selected.map(q => q.id);
-    const refill = shuffle(adventurePromptDatabase.filter(q => matchesAge(q) && matchesRegion(q) && selectedIds.indexOf(q.id) === -1));
+    const refill = shuffle(adventurePromptDatabase.filter(q => matchesAge(q) && adventurePromptAllowedBySettings(q) && matchesRegion(q) && selectedIds.indexOf(q.id) === -1));
     const refillCount = Math.max(0, count - selected.length);
     const refillSelected = selectAdventurePrompts(refill, refillCount, getAdventureHistoryKey('random', 'refill'));
     return shuffle(selected.concat(refillSelected)).slice(0, count);
@@ -1920,6 +1971,7 @@
 
     let filtered = adventurePromptDatabase.filter(q => (
       matchesAge(q)
+      && adventurePromptAllowedBySettings(q)
       && q.category === selectedCategory
       && matchesRegion(q)
       && (selectedCategory !== 'learn' || matchesLearnTopic(q))
@@ -1970,6 +2022,9 @@
       return topic ? `Learn: ${topic.label}` : 'Learn Something';
     }
     if (question.category === 'compete') return 'Friendly Challenge';
+    if (question.category === 'local') {
+      return /challenge|spot|find|invent|introduce|give/i.test(question.text || '') ? 'Local Challenge' : 'Local Fact';
+    }
     return 'Local Explorer';
   }
 
@@ -1986,8 +2041,14 @@
     badge.textContent = getChallengeBadgeText(q);
     const p = document.createElement('p');
     p.textContent = q.text;
+    const nextHint = document.createElement('small');
+    nextHint.className = 'challenge-next-hint';
+    nextHint.textContent = q.requiresTimer
+      ? 'Try it together, then tap Stamp It when the timer feels done.'
+      : 'Read it aloud, look up, play it out, then tap Stamp It.';
     challengeContainer.appendChild(badge);
     challengeContainer.appendChild(p);
+    challengeContainer.appendChild(nextHint);
     // Timer
     if (q.requiresTimer) {
       timerElement.hidden = false;
@@ -2034,8 +2095,18 @@
       li.textContent = `Prompt games played: ${seenModes.join(', ')}.`;
       summaryList.appendChild(li);
     }
+    const completedPrompts = adventureQuestions.slice(0, completed);
+    if (completedPrompts.length) {
+      const best = completedPrompts.find(item => item.quality === 'strong') || completedPrompts[0];
+      const li = document.createElement('li');
+      li.textContent = `Best moment to remember: ${best.text}`;
+      summaryList.appendChild(li);
+    }
+    const prize = document.createElement('li');
+    prize.textContent = 'Prize idea: the next reader chooses the next mode, or the funniest answer gets snack naming rights.';
+    summaryList.appendChild(prize);
     const note = document.createElement('li');
-    note.textContent = 'Prompt games do not use scores. Scored games still keep their own winner rules.';
+    note.textContent = 'Short recap: no tracking, no scores here, just passengers noticing the ride together.';
     summaryList.appendChild(note);
     progressFill.style.width = '100%';
   }
@@ -5565,6 +5636,18 @@
   function renderTriviaChoices(item) {
     triviaChoices.innerHTML = '';
     const turnPlayerId = getTurnPlayerId(triviaIndex);
+    const feedback = {
+      correct: [
+        'Direct hit. The car brain just got one point stronger.',
+        'Clean answer. Give that passenger the tiny scholar nod.',
+        'Correct. That one deserves a dashboard drumroll.',
+      ],
+      wrong: [
+        'Close call, but the road signs disagree.',
+        'Wrong exit. The right answer was hiding in the next lane.',
+        'Not quite. Same road, different mile marker.',
+      ],
+    };
     getTriviaChoices(item).forEach(choice => {
       const button = document.createElement('button');
       button.type = 'button';
@@ -5579,8 +5662,10 @@
         });
         triviaAnswer.hidden = false;
         if (isCorrect && turnPlayerId) {
+          triviaAnswer.textContent = `${feedback.correct[Math.floor(Math.random() * feedback.correct.length)]} Answer: ${item.answer}`;
           awardTrivia(turnPlayerId);
         } else {
+          triviaAnswer.textContent = `${feedback.wrong[Math.floor(Math.random() * feedback.wrong.length)]} Answer: ${item.answer}`;
           renderAwardButtons(triviaAwardButtons, 'Gets Override Point', awardTrivia, false);
         }
       });
@@ -5678,6 +5763,7 @@
     triviaHandoff.textContent = `${getTurnPlayerName(triviaIndex)} answers this one.${judgeNote ? ` ${judgeNote}` : ''}`;
     triviaQuestion.textContent = item.question;
     triviaAnswer.textContent = item.answer;
+    triviaAnswer.dataset.answer = item.answer;
     triviaAnswer.hidden = true;
     renderTriviaChoices(item);
     triviaQuestionAwarded = false;
@@ -7736,6 +7822,12 @@
     modeRulesHeading.textContent = rules.title;
     modeRulesSummary.textContent = rules.summary;
     modeRulesList.innerHTML = '';
+    if (rules.bestWhen) {
+      const li = document.createElement('li');
+      li.className = 'best-when-rule';
+      li.textContent = rules.bestWhen;
+      modeRulesList.appendChild(li);
+    }
     rules.rules.forEach(rule => {
       const li = document.createElement('li');
       li.textContent = rule;
@@ -7787,8 +7879,22 @@
     }
   }
 
-  function startQuickStart() {
-    const quickModes = ['random', 'scavenger', 'trivia', 'jokes', 'learn', 'look', 'pi', 'pong', 'hideSeek', 'gorillas'];
+  function startQuickStart(intent = 'surprise') {
+    const modeSets = {
+      laugh: ['jokes', 'puns', 'mentalist', 'look'],
+      outside: ['look', 'local', 'scavenger'],
+      learn: ['learn', 'trivia', 'pi'],
+      scored: ['scavenger', 'trivia', 'pi', 'pong', 'gorillas'],
+      surprise: ['random', 'scavenger', 'trivia', 'jokes', 'learn', 'look', 'pi', 'pong', 'hideSeek', 'gorillas'],
+    };
+    let quickModes = (modeSets[intent] || modeSets.surprise).slice();
+    if (tripSettings.quietCar) {
+      quickModes = quickModes.filter(mode => !['jokes', 'pong', 'hideSeek', 'gorillas'].includes(mode));
+    }
+    if (tripSettings.noCameraGames || tripSettings.quietCar) {
+      quickModes = quickModes.filter(mode => mode !== 'emoji');
+    }
+    if (!quickModes.length) quickModes = ['learn', 'look', 'trivia'];
     const mode = quickModes[Math.floor(Math.random() * quickModes.length)];
     selectedCategory = mode;
     if (mode === 'scavenger') {
@@ -7887,6 +7993,14 @@
 
   // Setup section event delegation
   document.addEventListener('click', event => {
+    const quickTarget = event.target.closest('button[data-quick-intent]');
+    if (quickTarget) {
+      const section = quickTarget.closest('.setup-section');
+      if (section && section.id === 'setup-category') {
+        startQuickStart(quickTarget.getAttribute('data-quick-intent'));
+      }
+      return;
+    }
     const target = event.target.closest('button[data-category], button.option-card');
     if (!target) return;
     // Determine which section this belongs to
@@ -7895,7 +8009,7 @@
     if (section.id === 'setup-category') {
       selectedCategory = normalizeCategoryKey(target.getAttribute('data-category'));
       if (selectedCategory === 'quickstart') {
-        startQuickStart();
+        startQuickStart('surprise');
       } else {
         renderModeRules(selectedCategory);
       }
@@ -8002,6 +8116,7 @@
   huntAlphabetButton.addEventListener('click', startAlphabetGame);
   huntEtaButton.addEventListener('click', startEtaGuess);
   showTriviaAnswerButton.addEventListener('click', () => {
+    triviaAnswer.textContent = triviaAnswer.dataset.answer ? `Answer: ${triviaAnswer.dataset.answer}` : triviaAnswer.textContent;
     triviaAnswer.hidden = false;
     renderAwardButtons(triviaAwardButtons, 'Gets Override Point', awardTrivia, triviaQuestionAwarded);
   });

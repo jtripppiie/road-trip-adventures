@@ -353,6 +353,25 @@ body.large-text {
   color: var(--color-accent);
 }
 
+.quick-start-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  gap: 0.5rem;
+  width: min(100%, 640px);
+  margin: 0.6rem auto 1rem;
+}
+
+.quick-start-options button {
+  min-height: 3rem;
+  padding: 0.55rem 0.7rem;
+  border: 2px solid var(--color-primary);
+  border-radius: 8px;
+  background: var(--color-card);
+  color: var(--color-primary);
+  cursor: pointer;
+  font-weight: 800;
+}
+
 .mode-group {
   padding: 0.85rem;
   border: 2px solid rgba(9, 35, 63, 0.16);
@@ -382,7 +401,7 @@ body.large-text {
   border: 2px solid var(--color-primary);
   border-radius: 8px;
   padding: 1rem;
-  min-height: 8rem;
+  min-height: 11.25rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -407,6 +426,25 @@ body.large-text {
 .option-title {
   font-weight: bold;
   margin-bottom: 0.25rem;
+}
+
+.option-description,
+.best-for {
+  display: block;
+  max-width: 16rem;
+  font-size: 0.82rem;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.option-description {
+  color: var(--color-text);
+}
+
+.best-for {
+  margin-top: 0.3rem;
+  color: var(--color-primary);
+  font-weight: 800;
 }
 
 .option-subtitle {
@@ -640,6 +678,13 @@ body.large-text {
   border: 2px solid rgba(9, 38, 66, 0.12);
   border-radius: 8px;
   background: var(--color-card);
+}
+
+.mode-rules-list .best-when-rule {
+  border-color: rgba(245, 130, 32, 0.35);
+  background: rgba(245, 130, 32, 0.12);
+  color: var(--color-primary);
+  font-weight: 800;
 }
 
 .team-scoreboard {
@@ -913,6 +958,13 @@ body.large-text {
   max-width: 100%;
   background: #fff2d8;
   color: #6b3b00;
+  font-weight: 800;
+}
+
+.challenge-next-hint {
+  display: block;
+  margin-top: 0.75rem;
+  color: var(--color-primary);
   font-weight: 800;
 }
 
@@ -2213,7 +2265,11 @@ body.reduce-motion .stamp.earned {
 
   .option-card {
     padding: 0.75rem 0.5rem;
-    min-height: 6.75rem;
+    min-height: 10.5rem;
+  }
+
+  .quick-start-options {
+    grid-template-columns: 1fr;
   }
 
   .team-setup-grid {
