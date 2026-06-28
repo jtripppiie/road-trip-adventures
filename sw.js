@@ -1,12 +1,12 @@
 /* Offline cache for Road Trip Adventures.
    Static, no backend — caches the app shell so it keeps working after the
    first load even with no signal. Bump CACHE_VERSION when assets change. */
-const CACHE_VERSION = 'rta-v24';
+const CACHE_VERSION = 'rta-v25';
 const CORE_ASSETS = [
   './',
   './index.html',
-  './style.css',
-  './script.js',
+  './style.css?v=25',
+  './script.js?v=25',
   './manifest.json',
   './assets/roadside-logo.png',
   './js/data/themes.js',
@@ -17,7 +17,7 @@ const CORE_ASSETS = [
   './js/data/questions.js',
   './js/data/jokes.js',
   './js/data/trivia-cleanup.js',
-  './js/games/hide-seek-data.js',
+  './js/games/hide-seek-data.js?v=25',
   './js/games/hide-seek-art.js',
   './js/games/pong-data.js',
   './js/games/pong-art.js',
@@ -53,6 +53,22 @@ self.addEventListener('fetch', event => {
   const request = event.request;
   // Only handle same-origin GET requests; let everything else (fonts, etc.) pass through.
   if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) {
+    return;
+  }
+  const shouldPreferNetwork = request.mode === 'navigate'
+    || ['document', 'script', 'style'].includes(request.destination);
+  if (shouldPreferNetwork) {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          if (response && response.ok && response.type === 'basic') {
+            const copy = response.clone();
+            caches.open(CACHE_VERSION).then(cache => cache.put(request, copy)).catch(() => {});
+          }
+          return response;
+        })
+        .catch(() => caches.match(request).then(cached => cached || caches.match('./index.html')))
+    );
     return;
   }
   // Stale-while-revalidate: serve the cached copy immediately for speed and
