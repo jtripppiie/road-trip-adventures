@@ -968,6 +968,7 @@
   let hideSeekSoloEnabled = getStoredJson('rtaHideSeekSolo', false);
   const HIDE_SEEK_HUMAN_INDEX = 0;
   const hideSeekAI = { thinkTimer: 0, lastRoom: null };
+  let hideSeekLastCanvasTap = null;
   const HIDE_SEEK_HIDE_SECONDS = 60;
   const HIDE_SEEK_SEARCH_COUNTS = {
     easy: 10,
@@ -1002,6 +1003,8 @@
   const HIDE_SEEK_INSPECT_SECONDS = 1.1;
   const HIDE_SEEK_MAX_STAMINA = 100;
   const HIDE_SEEK_SPRINT_SPEED_MULTIPLIER = 1.45;
+  const HIDE_SEEK_DOUBLE_TAP_MS = 360;
+  const HIDE_SEEK_DOUBLE_TAP_RADIUS = 44;
 
   function getHideSeekSearchCount(difficulty) {
     return HIDE_SEEK_SEARCH_COUNTS[difficulty] || HIDE_SEEK_SEARCH_COUNTS[HIDE_SEEK_DEFAULT_DIFFICULTY];
@@ -5462,6 +5465,25 @@
     }
   }
 
+  function handleHideSeekCanvasDoubleTap(event) {
+    if (hideSeekState.phase !== HideSeekGameState.HIDER_TURN) {
+      hideSeekLastCanvasTap = null;
+      return;
+    }
+    const point = getHideSeekCanvasPoint(event);
+    if (!point) return;
+    const now = event.timeStamp || performance.now();
+    const previous = hideSeekLastCanvasTap;
+    const isDoubleTap = previous
+      && now - previous.time <= HIDE_SEEK_DOUBLE_TAP_MS
+      && Math.hypot(point.x - previous.x, point.y - previous.y) <= HIDE_SEEK_DOUBLE_TAP_RADIUS;
+    hideSeekLastCanvasTap = { time: now, x: point.x, y: point.y };
+    if (!isDoubleTap) return;
+    hideSeekLastCanvasTap = null;
+    hideSeekState.touchTarget = null;
+    lockHideSeekHiderPosition('button', getNearbyHideSeekSpot(hideSeekState.actors.hider));
+  }
+
   function releaseHideSeekPointer() {
     hideSeekState.touchTarget = null;
   }
@@ -8853,6 +8875,7 @@
     hideSeekCanvas.addEventListener('pointerdown', event => {
       hideSeekCanvas.setPointerCapture(event.pointerId);
       handleHideSeekPointer(event);
+      handleHideSeekCanvasDoubleTap(event);
     });
     hideSeekCanvas.addEventListener('pointermove', handleHideSeekPointer);
     hideSeekCanvas.addEventListener('pointerup', releaseHideSeekPointer);
