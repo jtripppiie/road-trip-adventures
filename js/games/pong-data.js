@@ -17,13 +17,14 @@
 
       targetScore: 5,
 
-      paddleHeight: 108,
-      humanSpeed: 7,
+      paddleHeight: 114,
+      humanSpeed: 7.4,
 
-      ballSpeed: 4.0,
+      ballSpeed: 3.8,
+      maxBallSpeed: 7.2,
 
       aiSpeed: 3.8,
-      aiError: 36,
+      aiError: 44,
       reactionDelay: 180, // ms
       trackingChance: 0.75,
       aiPerfect: false,
@@ -36,9 +37,10 @@
       targetScore: 7,
 
       paddleHeight: 96,
-      humanSpeed: 7,
+      humanSpeed: 7.2,
 
-      ballSpeed: 4.5,
+      ballSpeed: 4.25,
+      maxBallSpeed: 8.3,
 
       aiSpeed: 5.8,
       aiError: 16,
@@ -54,9 +56,10 @@
       targetScore: 7,
 
       paddleHeight: 86,
-      humanSpeed: 7,
+      humanSpeed: 7.3,
 
-      ballSpeed: 5.0,
+      ballSpeed: 4.65,
+      maxBallSpeed: 9.1,
 
       aiSpeed: 7.4,
       aiError: 6,
@@ -74,7 +77,8 @@
       paddleHeight: 112, // slight handicap for player
       humanSpeed: 7,
 
-      ballSpeed: 5.4,
+      ballSpeed: 5.15,
+      maxBallSpeed: 9.6,
 
       aiSpeed: 14,
       aiError: 0,

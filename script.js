@@ -1570,8 +1570,8 @@
         'The banana arcs over the buildings and can hit the opponent.',
         'Wait for the banana to land before the next player throws.',
         'Bananas blast a crater out of a building and can fly through gaps they made.',
-        'Clip your own tower and your opponent wins.',
-        'Hit the other gorilla directly to win the match instantly.',
+        'Clip your own tower and your opponent scores.',
+        'First player to the match target wins.',
       ],
     },
   };
@@ -2572,7 +2572,27 @@
     { name: 'a cloud', attrs: { alive: 'no', holdable: 'no', indoors: 'no', biggerThanBackpack: 'yes', manmade: 'no', fun: 'no', food: 'no', movesSelf: 'yes', famous: 'no', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'no', oneColor: 'yes', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'no', everyday: 'yes', smallerThanPhone: 'no' } },
     { name: 'a cow', attrs: { alive: 'yes', holdable: 'no', indoors: 'no', biggerThanBackpack: 'yes', manmade: 'no', fun: 'no', food: 'no', movesSelf: 'yes', famous: 'no', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'no', oneColor: 'no', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'yes', everyday: 'no', smallerThanPhone: 'no' } },
     { name: 'a backpack', attrs: { alive: 'no', holdable: 'yes', indoors: 'yes', biggerThanBackpack: 'no', manmade: 'yes', fun: 'no', food: 'no', movesSelf: 'no', famous: 'no', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'no', oneColor: 'sometimes', kidsKnow: 'yes', nature: 'no', expensive: 'no', sound: 'no', everyday: 'yes', smallerThanPhone: 'no' } },
+    { name: 'a rest stop', attrs: { alive: 'no', holdable: 'no', indoors: 'sometimes', biggerThanBackpack: 'yes', manmade: 'yes', fun: 'sometimes', food: 'sometimes', movesSelf: 'no', famous: 'no', roadtrip: 'yes', place: 'yes', person: 'no', electricity: 'yes', oneColor: 'no', kidsKnow: 'yes', nature: 'no', expensive: 'no', sound: 'sometimes', everyday: 'no', smallerThanPhone: 'no' } },
+    { name: 'a suitcase', attrs: { alive: 'no', holdable: 'yes', indoors: 'yes', biggerThanBackpack: 'sometimes', manmade: 'yes', fun: 'no', food: 'no', movesSelf: 'no', famous: 'no', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'no', oneColor: 'sometimes', kidsKnow: 'yes', nature: 'no', expensive: 'sometimes', sound: 'no', everyday: 'sometimes', smallerThanPhone: 'no' } },
+    { name: 'a gas station', attrs: { alive: 'no', holdable: 'no', indoors: 'sometimes', biggerThanBackpack: 'yes', manmade: 'yes', fun: 'no', food: 'sometimes', movesSelf: 'no', famous: 'no', roadtrip: 'yes', place: 'yes', person: 'no', electricity: 'yes', oneColor: 'no', kidsKnow: 'yes', nature: 'no', expensive: 'sometimes', sound: 'sometimes', everyday: 'yes', smallerThanPhone: 'no' } },
+    { name: 'a license plate', attrs: { alive: 'no', holdable: 'yes', indoors: 'no', biggerThanBackpack: 'no', manmade: 'yes', fun: 'sometimes', food: 'no', movesSelf: 'no', famous: 'no', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'no', oneColor: 'no', kidsKnow: 'yes', nature: 'no', expensive: 'no', sound: 'no', everyday: 'yes', smallerThanPhone: 'no' } },
   ];
+
+  const TWENTY_CATEGORY_PROMPTS = [
+    'Road trip idea: think of something you can see from the car.',
+    'Food idea: think of a snack, meal, or drink.',
+    'Nature idea: think of an animal, plant, place, or sky object.',
+    'Everyday idea: think of something almost everyone has used.',
+  ];
+
+  function formatTwentyProgress(turns) {
+    const used = Math.min(20, Math.max(0, turns));
+    return `${used}/20 used, ${Math.max(0, 20 - used)} left`;
+  }
+
+  function formatTwentyPromptIdeas() {
+    return TWENTY_CATEGORY_PROMPTS.map((prompt, index) => `${index + 1}. ${prompt}`).join('\n');
+  }
 
   function twentyComputerAnswer(object, tag) {
     const value = object && object.attrs ? object.attrs[tag] : null;
@@ -2594,10 +2614,10 @@
     showHuntSideGame(
       '20 Questions',
       'Who Hides the Secret?',
-      'Pick who thinks of the secret thing. The other side gets 20 questions to figure it out.',
+      `Pick who thinks of the secret thing. The secret keeper answers quietly; the guessers get up to 20 yes-or-no style questions.\n\nNeed a category?\n${formatTwentyPromptIdeas()}`,
       [
-        { label: 'We think of it (app guesses)', primary: true, onClick: startTwentyQuestions },
-        { label: 'Computer thinks of it (we guess)', onClick: startTwentyQuestionsComputer },
+        { label: 'We Hide It', primary: true, onClick: startTwentyQuestions },
+        { label: 'Computer Hides It', onClick: startTwentyQuestionsComputer },
         { label: 'Close', onClick: hideHuntSideGame },
       ]
     );
@@ -2607,16 +2627,16 @@
     twentyComputerObject = TWENTY_QUESTIONS_OBJECTS[Math.floor(Math.random() * TWENTY_QUESTIONS_OBJECTS.length)];
     twentyComputerTurns = 0;
     twentyComputerAsked = [];
-    renderTwentyComputer('The computer is thinking of a person, place, or thing. Ask yes-or-no questions to figure it out!');
+    renderTwentyComputer('The computer has picked a secret person, place, or thing. Ask one question at a time, then make a final guess when the car feels confident.');
   }
 
   function renderTwentyComputer(resultLine) {
     const askedTags = new Set(twentyComputerAsked.map(entry => entry.tag));
     const remaining = TWENTY_QUESTIONS_LIST.filter(item => !askedTags.has(item.tag));
     const history = formatTwentyComputerHistory();
-    const intro = `${resultLine}\n\nTurn ${Math.min(twentyComputerTurns + 1, 20)}/20. Tap a question to ask, then guess when ready.${history}`;
+    const intro = `${resultLine}\n\nQuestions: ${formatTwentyProgress(twentyComputerTurns)}. Tap a question to ask, or make a guess when ready.${history}`;
     if (twentyComputerTurns >= 20 || !remaining.length) {
-      showHuntSideGame('20 Questions', 'Time to Guess', `${intro}\n\nNo more questions left. Make your final guess.`, [
+      showHuntSideGame('20 Questions', 'Final Guess', `${intro}\n\nNo more questions left. Say one final guess out loud before revealing.`, [
         { label: 'Reveal Answer', primary: true, onClick: () => revealTwentyComputer(false) },
         { label: 'Start Over', onClick: startTwentyQuestionsComputer },
         { label: 'Close', onClick: hideHuntSideGame },
@@ -2644,10 +2664,10 @@
     showHuntSideGame(
       '20 Questions',
       'Make a Guess',
-      `Say one guess out loud, then check it.${formatTwentyComputerHistory()}`,
+      `Say one guess out loud, then check it. A wrong guess uses one of your 20 turns.\n\nQuestions: ${formatTwentyProgress(twentyComputerTurns)}.${formatTwentyComputerHistory()}`,
       [
         { label: 'We Guessed Right', primary: true, onClick: () => revealTwentyComputer(true) },
-        { label: 'Wrong, Keep Asking', onClick: () => { twentyComputerTurns++; renderTwentyComputer('That guess was off. Keep narrowing it down.'); } },
+        { label: 'Wrong, Keep Asking', onClick: () => { twentyComputerTurns++; renderTwentyComputer('That guess was off. Good detective work still counts - keep narrowing it down.'); } },
         { label: 'Reveal Answer', onClick: () => revealTwentyComputer(false) },
       ]
     );
@@ -2658,7 +2678,7 @@
     showHuntSideGame(
       '20 Questions',
       solved ? 'You Got It!' : 'The Answer',
-      `The computer was thinking of ${name}.${formatTwentyComputerHistory()}`,
+      `The computer was thinking of ${name}.\n\nQuestions: ${formatTwentyProgress(twentyComputerTurns)}.${formatTwentyComputerHistory()}`,
       [
         { label: 'Play Again', primary: true, onClick: startTwentyQuestionsComputer },
         { label: 'Switch Mode', onClick: startTwentyQuestionsChooser },
@@ -2749,7 +2769,7 @@
     twentyGuessLog = [];
     twentyGuessTurns = 0;
     twentyGuessRejected = [];
-    twentyGuessStep('Think of any person, place, animal, food, or object. Do not tell me what it is, and I will try to guess it.');
+    twentyGuessStep(`Secret keeper: think of any person, place, animal, food, or object. Do not say it out loud. The app will ask up to 20 questions.\n\nNeed a category?\n${formatTwentyPromptIdeas()}`);
   }
 
   function twentyGuessStep(resultLine) {
@@ -2769,7 +2789,7 @@
   }
 
   function twentyAskGuessQuestion(item, resultLine) {
-    const intro = `${resultLine}\n\nTurn ${Math.min(twentyGuessTurns + 1, 20)}/20\nQuestion: ${item.question}${formatTwentyGuessHistory()}`;
+    const intro = `${resultLine}\n\nQuestions: ${formatTwentyProgress(twentyGuessTurns)}\nNext question: ${item.question}${formatTwentyGuessHistory()}`;
     const actions = ['Yes', 'No', 'Sometimes', 'Maybe', 'Unknown'].map(answer => ({
       label: answer,
       onClick: () => {
@@ -2791,12 +2811,12 @@
     showHuntSideGame(
       '20 Questions',
       'My Guess',
-      `${resultLine}\n\nI think you are thinking of ${name}. Am I right?${formatTwentyGuessHistory()}`,
+      `${resultLine}\n\nMy guess uses turn ${Math.min(twentyGuessTurns, 20)}. I think you are thinking of ${name}. Am I right?${formatTwentyGuessHistory()}`,
       [
         { label: 'Yes, you got it!', primary: true, onClick: () => twentyGuessWin(object) },
         { label: 'No, keep going', onClick: () => {
           if (object) twentyGuessRejected.push(object.name);
-          twentyGuessStep('Hmm, not that. Let me narrow it down more.');
+          twentyGuessStep('Hmm, not that. I crossed it off and will ask a sharper question.');
         } },
         { label: 'Start Over', onClick: startTwentyQuestions },
       ]
@@ -3100,7 +3120,7 @@
   function getHideSeekSearchFeedback(sameRoom, distance, inspectedSpot) {
     if (sameRoom && distance <= HIDE_SEEK_SEARCH_TOLERANCE) {
       return {
-        text: getHideSeekSpotSearchText(inspectedSpot, 'found', 'Found! Someone was squeezed into that cover.'),
+        text: getHideSeekSpotSearchText(inspectedSpot, 'found', `Found! The ${inspectedSpot.label} was the exact hiding spot.`),
         tone: 'found',
         result: 'found',
       };
@@ -3116,8 +3136,8 @@
     if (sameRoom && spotDistance <= HIDE_SEEK_SEARCH_TOLERANCE * 2.15) {
       return {
         text: noisy || lowSearches
-          ? 'Same room. Very close - something rustled near cover.'
-          : 'Same room. Very close, but not this exact spot.',
+          ? `Same room. Very close - something rustled near the ${inspectedSpot.label}.`
+          : `Same room. Very close, but the ${inspectedSpot.label} is not the exact spot.`,
         tone: 'hot',
         result: 'very close',
       };
@@ -3125,8 +3145,8 @@
     if (sameRoom) {
       return {
         text: getHideSeekSpotSearchText(inspectedSpot, 'empty', noisy
-          ? 'Same room. You hear something nearby, but this cover is empty.'
-          : 'Same room, wrong cover. The room still feels suspicious.'),
+          ? `Same room. The ${inspectedSpot.label} is empty, but something nearby made noise.`
+          : `Same room, wrong cover. The ${inspectedSpot.label} is clear, but the room still feels suspicious.`),
         tone: noisy ? 'warm' : 'cold',
         result: 'same room',
       };
@@ -3140,8 +3160,8 @@
     }
     return {
       text: getHideSeekSpotSearchText(inspectedSpot, 'empty', lowSearches
-        ? 'Cold check. This room feels clear enough to move on.'
-        : 'Cold check. That spot is empty.'),
+        ? `Cold check. The ${inspectedSpot.label} is empty, and this room feels clear enough to move on.`
+        : `Cold check. The ${inspectedSpot.label} is empty.`),
       tone: 'cold',
       result: 'cold',
     };
@@ -3527,7 +3547,7 @@
       hideSeekRoundText.textContent = `Pass the phone to ${seekerName}. The map resets to the start room, and each wrong unique inspection uses one search.`;
       setHideSeekMessage(`${seekerName}, no peeking until you tap start searching.`);
     } else if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
-      hideSeekFoundButton.textContent = nearbySpot ? 'Inspect Spot' : 'Move Closer to Inspect';
+      hideSeekFoundButton.textContent = hideSeekState.inspectTime > 0 ? 'Inspecting...' : (nearbySpot ? 'Inspect Spot' : 'Move Closer to Inspect');
       hideSeekFoundButton.setAttribute('aria-label', nearbySpot ? 'Inspect this hiding spot' : 'Move closer to inspect');
       hideSeekFoundButton.disabled = hideSeekState.inspectTime > 0;
       hideSeekSpecialButton.textContent = hideSeekState.listenUsed ? 'Listen Used' : 'Listen';
@@ -3535,7 +3555,7 @@
       hideSeekSpecialButton.setAttribute('aria-label', 'Listen for a vague clue');
       hideSeekRoundTitle.textContent = `${seekerName}, find the hider.`;
       hideSeekRoundText.textContent = nearbySpot
-        ? `You are close to the ${nearbySpot.label}. Inspect it when you are ready.`
+        ? `You are close to the ${nearbySpot.label}. Inspect it when you are ready. A clear spot turns gray.`
         : `Move beside a glowing cover spot to inspect it. Listen gives one vague clue and does not spend a search.`;
       setHideSeekMessage(hideSeekState.lastClue || `${seekerName} is searching ${room.name}. Searches left: ${hideSeekState.searchesRemaining}.`);
     } else if (hideSeekState.phase === HideSeekGameState.FOUND || hideSeekState.phase === HideSeekGameState.ROUND_RESULTS) {
@@ -3641,6 +3661,7 @@
     hideSeekState.lastUrgentSecond = null;
     hideSeekState.actors.seeker = createHideSeekActor(map.startRoom, true, '#f58220');
     hideSeekState.activeRoomId = map.startRoom;
+    hideSeekState.lastClue = `${getHideSeekDisplayName(hideSeekState.seekerIndex)} starts in ${getHideSeekRoom(map.startRoom).name}. Search glowing cover; each wrong new spot spends one search.`;
     playHideSeekTone('door');
     renderHideSeek();
   }
@@ -3725,7 +3746,7 @@
     hideSeekState.phase = HideSeekGameState.SEEKER_LOOK_AWAY;
     hideSeekState.hiderTimeRemaining = source === 'timer' ? 0 : hideSeekState.hiderTimeRemaining;
     playHideSeekTone('hide');
-    setHideSeekMessage(`${coverQuality.label}. Phone pass time.`);
+    setHideSeekMessage(`${coverQuality.label} locked at the ${nearbySpot.label}. Phone pass time.`);
     renderHideSeek();
     // Solo: when the computer is the seeker, no phone pass is needed — let the
     // AI start searching right away.
@@ -3750,7 +3771,7 @@
     const inspectedState = getHideSeekSpotState(inspectedSpot.id);
     const isDuplicateWrongSearch = inspectedSpot.id !== hideSeekState.hiddenSpotId && inspectedState === 'searched';
     if (isDuplicateWrongSearch) {
-      setHideSeekMessage('You already checked there.');
+      setHideSeekMessage(`You already checked the ${inspectedSpot.label}. Pick a different glowing spot.`);
       playHideSeekTone('wrong');
       renderHideSeek();
       return;
@@ -3794,7 +3815,7 @@
         life: 0.62,
       });
       hideSeekState.cameraShake = Math.max(hideSeekState.cameraShake, 0.12);
-      hideSeekState.lastClue = `${feedback.text} ${hideSeekState.searchesRemaining} searches left.`;
+      hideSeekState.lastClue = `${feedback.text} ${hideSeekState.searchesRemaining} search${hideSeekState.searchesRemaining === 1 ? '' : 'es'} left.`;
       setHideSeekMessage(hideSeekState.lastClue);
       playHideSeekTone('wrong');
       renderHideSeek();
@@ -6886,6 +6907,8 @@
     pongState.ball.y = pongState.height / 2;
     pongState.ball.vx = config.ballSpeed * direction;
     pongState.ball.vy = (config.ballSpeed * 0.55) * (Math.random() > 0.5 ? 1 : -1);
+    pongState.rally = 0;
+    pongState.lastHitSide = '';
   }
 
   function drawPong() {
@@ -7016,6 +7039,37 @@
       pongScore.textContent = `${pongState.leftPaddle.score} : ${pongState.rightPaddle.score}`;
     }
     pongStatus.textContent = `${leftName} controls the left paddle, ${rightName} controls the right paddle. ${modeLabel}. First to ${pongState.targetScore} wins.`;
+  }
+
+  function getPongPlayerLabels() {
+    return {
+      leftName: players[0] ? players[0].name : 'P1',
+      rightName: pongSettings.opponentMode === 'computer'
+        ? (pongSettings.difficulty === 'deathmatch' ? 'Death Match AI' : 'Computer')
+        : (players[1] ? players[1].name : 'P2'),
+    };
+  }
+
+  function capPongBallSpeed() {
+    const config = getPongDifficultyConfig();
+    const cap = config.maxBallSpeed || 8.5;
+    const speed = Math.hypot(pongState.ball.vx, pongState.ball.vy);
+    if (speed <= cap || speed <= 0) return;
+    const scale = cap / speed;
+    pongState.ball.vx *= scale;
+    pongState.ball.vy *= scale;
+  }
+
+  function describePongPoint(scoringSide) {
+    const labels = getPongPlayerLabels();
+    const scorer = scoringSide === 'left' ? labels.leftName : labels.rightName;
+    const rally = pongState.rally || 0;
+    const rallyText = rally >= 8
+      ? ` after a ${rally}-hit rally`
+      : rally >= 3
+        ? ` after ${rally} hits`
+        : '';
+    return `${scorer} scores${rallyText}. ${pongState.leftPaddle.score} to ${pongState.rightPaddle.score}. First to ${pongState.targetScore}.`;
   }
 
   function movePongPaddleTo(side, clientY) {
@@ -7168,11 +7222,12 @@
       if (pongKeys.rightDown) pongState.rightPaddle.y += speed;
     } else {
       const targetY = predictPongInterceptY() - pongState.paddleHeight / 2;
+      const pressure = Math.min(1.2, 1 + Math.max(0, (pongState.rally || 0) - 4) * 0.025);
       const delta = targetY - pongState.rightPaddle.y;
       if (config.aiPerfect) {
         pongState.rightPaddle.y = targetY;
       } else if (Math.abs(delta) > config.aiError) {
-        pongState.rightPaddle.y += Math.sign(delta) * Math.min(config.aiSpeed, Math.abs(delta));
+        pongState.rightPaddle.y += Math.sign(delta) * Math.min(config.aiSpeed * pressure, Math.abs(delta));
       } else {
         pongState.rightPaddle.y += Math.sign(delta) * Math.min(2.5, Math.abs(delta));
       }
@@ -7207,8 +7262,14 @@
     pongState.ball.x += pongState.ball.vx;
     pongState.ball.y += pongState.ball.vy;
 
-    if (pongState.ball.y <= pongState.ball.size / 2 || pongState.ball.y >= pongState.height - pongState.ball.size / 2) {
-      pongState.ball.vy *= -1;
+    if (pongState.ball.y <= pongState.ball.size / 2) {
+      pongState.ball.y = pongState.ball.size / 2;
+      pongState.ball.vy = Math.abs(pongState.ball.vy);
+      pongState.shakeFrames = Math.max(pongState.shakeFrames, 2);
+    } else if (pongState.ball.y >= pongState.height - pongState.ball.size / 2) {
+      pongState.ball.y = pongState.height - pongState.ball.size / 2;
+      pongState.ball.vy = -Math.abs(pongState.ball.vy);
+      pongState.shakeFrames = Math.max(pongState.shakeFrames, 2);
     }
 
     const leftHit = pongState.ball.vx < 0
@@ -7223,20 +7284,33 @@
       const paddle = leftHit ? pongState.leftPaddle : pongState.rightPaddle;
       const paddleY = paddle.y;
       const offset = (pongState.ball.y - (paddleY + pongState.paddleHeight / 2)) / (pongState.paddleHeight / 2);
-      pongState.ball.vx *= -1.06;
-      pongState.ball.vy = offset * 5;
+      const side = leftHit ? 'left' : 'right';
+      const direction = leftHit ? 1 : -1;
+      const speedUp = 1.018 + Math.min(0.022, (pongState.rally || 0) * 0.002);
+      pongState.ball.x = leftHit
+        ? 36 + pongState.ball.size / 2 + 1
+        : pongState.width - 36 - pongState.ball.size / 2 - 1;
+      pongState.ball.vx = Math.abs(pongState.ball.vx) * direction * speedUp;
+      pongState.ball.vy = offset * (4.35 + Math.min(1.25, (pongState.rally || 0) * 0.08));
+      pongState.rally = (pongState.rally || 0) + 1;
+      pongState.lastHitSide = side;
+      capPongBallSpeed();
       paddle.flashFrames = 8;
       pongState.shakeFrames = 4;
     }
 
     if (pongState.ball.x < 0) {
       pongState.rightPaddle.score++;
+      const pointText = describePongPoint('right');
       resetPongBall(-1);
       updatePongScore();
+      pongStatus.textContent = pointText;
     } else if (pongState.ball.x > pongState.width) {
       pongState.leftPaddle.score++;
+      const pointText = describePongPoint('left');
       resetPongBall(1);
       updatePongScore();
+      pongStatus.textContent = pointText;
     }
 
     if (window.RTA_PONG_ART && window.RTA_PONG_ART.updateEffects) {
@@ -7251,7 +7325,8 @@
       const winner = pongState.leftPaddle.score > pongState.rightPaddle.score
         ? (players[0] ? players[0].name : 'Left player')
         : rightName;
-      pongStatus.textContent = `${winner} wins Road Pong. Winner gets first pick in the next road-trip game.`;
+      const loserScore = Math.min(pongState.leftPaddle.score, pongState.rightPaddle.score);
+      pongStatus.textContent = `${winner} wins Road Pong ${pongState.targetScore} to ${loserScore}. Winner gets first pick in the next road-trip game.`;
       drawPong();
       return;
     }
@@ -7406,10 +7481,28 @@
     return `Wind: ${Math.abs(gorillasState.wind)} ${gorillasState.wind > 0 ? '→' : '←'}`;
   }
 
+  function getGorillasAimCoach(angle, power) {
+    if (!gorillasState || gorillasState.projectile || gorillasState.winner) return 'Preview shows the first part of the path.';
+    const sim = simulateGorillasTrajectory(angle, power, getGorillasSide(gorillasTurn), 220);
+    if (!sim.impact) return 'Preview: still airborne after the guide path. Watch for a high miss.';
+    const result = sim.impact.type === 'target' ? 'direct' : classifyGorillasMiss(sim.impact, getGorillasSide(gorillasTurn));
+    const hints = {
+      direct: 'Preview: this line can hit if the wind behaves.',
+      self: 'Preview: danger, that may tag your own tower.',
+      close: 'Preview: close to the target tower. Tiny changes matter.',
+      tower: 'Preview: it hits buildings before the target.',
+      short: 'Preview: likely short. Add power or lift the angle.',
+      overshot: 'Preview: likely long. Ease off power or lower the angle.',
+      low: 'Preview: likely low. Raise the arc or add a little power.',
+      miss: 'Preview: playable line, but the wind may decide.',
+    };
+    return hints[result] || 'Preview shows the first part of the path.';
+  }
+
   function getGorillasShotSummary() {
     if (!gorillasState) return 'Preview shows the first part of your banana path. Wind may still push it.';
     const { angle, power } = normalizeGorillasInputs();
-    return `${getGorillasPlayerName(gorillasTurn)} aiming · ${angle}° · ${power} power · ${getGorillasWindLabel()}. Preview shows the first part of the path; wind may still push it.`;
+    return `${getGorillasPlayerName(gorillasTurn)} aiming · ${angle}° · ${power} power · ${getGorillasWindLabel()}. ${getGorillasAimCoach(angle, power)}`;
   }
 
   function renderGorillasControls() {
@@ -7430,7 +7523,7 @@
     gorillasShotHistory.innerHTML = '';
     gorillasState.shotHistory.slice(-5).reverse().forEach(shot => {
       const li = document.createElement('li');
-      li.textContent = `${shot.playerName}: ${shot.angle}° / ${shot.power} · ${shot.result}`;
+      li.textContent = `${shot.playerName}: ${shot.angle}° / ${shot.power} · ${shot.result}${shot.hint ? ` · ${shot.hint}` : ''}`;
       gorillasShotHistory.appendChild(li);
     });
   }
@@ -7959,6 +8052,29 @@
     return lines[result] || `${shooterName} missed, but the banana learned something.`;
   }
 
+  function getGorillasAdjustmentHint(result) {
+    return {
+      direct: 'Save that angle.',
+      self: 'Next time, lift the angle before adding power.',
+      close: 'Nudge angle or power by one small step.',
+      tower: 'Go higher or use a little more power.',
+      short: 'Add power or raise the angle.',
+      overshot: 'Reduce power or lower the angle.',
+      low: 'Raise the arc.',
+      out: 'Bring the banana back to this zip code.',
+      miss: 'Try the quick shot coach or make one small change.',
+    }[result] || 'Make one small change.';
+  }
+
+  function rollNextGorillasWind() {
+    const previous = gorillasState ? gorillasState.wind : 0;
+    const next = Math.round((Math.random() * 2 - 1) * 24);
+    if (Math.sign(next) === Math.sign(previous) && Math.abs(next - previous) < 5) {
+      return Math.max(-28, Math.min(28, next + (next >= 0 ? -8 : 8)));
+    }
+    return next;
+  }
+
   function addGorillasShotHistory(entry) {
     if (!gorillasState) return;
     gorillasState.shotHistory.push(entry);
@@ -7981,6 +8097,7 @@
       ? shooterName
       : getGorillasPlayerName(gorillasTurn + 1);
     const result = options.result || (scored ? 'direct' : 'miss');
+    const hint = getGorillasAdjustmentHint(result);
     gorillasState.lastTrail = gorillasState.trail.slice();
     gorillasState.lastImpact = impact ? Object.assign({ result }, impact) : null;
     addGorillasShotHistory({
@@ -7989,6 +8106,7 @@
       power: projectile ? projectile.power : Number(gorillasPower.value) || 70,
       wind: gorillasState.wind,
       result: getGorillasResultLabel(result),
+      hint,
     });
     if (isGorillasComputerTurn() && gorillasState.computerMemory && projectile) {
       gorillasState.computerMemory.angle = projectile.angle;
@@ -8003,7 +8121,7 @@
         gorillasState.winner = scorer;
         gorillasState.explosion = impact;
         gorillasState.sparks = impact ? createGorillasSparks(impact.x, impact.y) : [];
-        gorillasStatus.textContent = `${scorerName} wins Banana Towers! ${getGorillasFeedback(result, shooterName, scorerName)}`;
+        gorillasStatus.textContent = `${scorerName} wins Banana Towers! ${getGorillasFeedback(result, shooterName, scorerName)} ${hint}`;
         stopGorillas();
         renderGorillasControls();
         drawGorillas();
@@ -8011,11 +8129,12 @@
       }
       gorillasState.explosion = impact;
       gorillasState.sparks = impact ? createGorillasSparks(impact.x, impact.y) : [];
-      gorillasStatus.textContent = options.statusText || getGorillasFeedback(result, shooterName, scorerName);
+      gorillasState.wind = rollNextGorillasWind();
+      gorillasStatus.textContent = options.statusText || `${getGorillasFeedback(result, shooterName, scorerName)} ${hint} New wind for the next toss: ${getGorillasWindLabel()}.`;
     } else {
       gorillasState.explosion = impact && impact.y < gorillasState.height - 40 ? impact : null;
       gorillasState.sparks = gorillasState.explosion ? createGorillasSparks(gorillasState.explosion.x, gorillasState.explosion.y) : [];
-      gorillasStatus.textContent = options.statusText || getGorillasFeedback(result, shooterName, scorerName);
+      gorillasStatus.textContent = options.statusText || `${getGorillasFeedback(result, shooterName, scorerName)} ${hint}`;
     }
     gorillasTurn += 1;
     gorillasState.projectile = null;
@@ -8186,6 +8305,7 @@
     gorillasPower.value = String(shot.power);
     normalizeGorillasInputs();
     renderGorillasControls();
+    gorillasStatus.textContent = `Coach shot set for ${getGorillasPlayerName(gorillasTurn)}. Check the preview, then throw or fine-tune.`;
     drawGorillas();
   }
 

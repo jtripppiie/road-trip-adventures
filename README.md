@@ -13,11 +13,13 @@ This project was built with **no backend**, **no user accounts** and **no data c
 - **Organized modes:** Pick from **Look Outside**, **Trivia & Brain**, **Party Games**, and **Bonus** sections.
 - **Adventure types:** Play categories like **Look Outside**, **Learn Something**, **Quick Challenges**, **Local Explorer**, **Trip Calculator**, **Road Pong**, **Banana Towers**, or **Hide & Seek Adventure**.
 - **Scavenger Hunt:** Play an any-route hunt where 2 to 8 players tap real-world sightings to claim points.
-- **Trivia Run:** Play broad road-trip trivia across all 50 state capitals, state nicknames, license plates, rivers, remote places, math, science, biology, random facts, food facts, sports, music, TV, K-pop, Taylor Swift and decade trivia.
+- **Trivia Run:** Play broad road-trip trivia across state capitals, license plates, national parks, roadside landmarks, road food, science, animals, sports, music, TV, and decade trivia. Runtime cleanup removes duplicate imported questions, adds difficulty labels, and keeps answer choices exact.
 - **Joke Vote:** Let each player tell clean jokes and award Dad Joke or Mom Joke honors.
 - **Emoji Face-Off:** Copy emoji expressions with an optional local camera snap, then vote for the closest match. Photos are not uploaded or saved by the app.
 - **Pi Digits:** See who can recite the most digits of pi and track scores for every player.
-- **Hide & Seek Adventure:** Play a local pass-and-play canvas game on a responsive 1200x675 board with a 1-minute hiding scramble, limited inspection-based searches, best-of-5 default match, sprint stamina, stealth bonuses, real hiding spot states, listen clues, particles, lighting, cover quality, obstacles, room transitions and role swaps.
+- **Hide & Seek Adventure:** Play a local pass-and-play canvas game on a responsive 1200x675 board with a 1-minute hiding scramble, limited inspection-based searches, best-of-5 default match, sprint stamina, clearer exact-spot feedback, stealth bonuses, real hiding spot states, listen clues, particles, lighting, cover quality, obstacles, room transitions and role swaps.
+- **20 Questions:** Play app-guesses or computer-hides rounds with a visible 20-question count, role prompts, optional category ideas, yes/no/sometimes answers, and reveal/play-again flow.
+- **Banana Towers and Road Pong:** Passenger-safe arcade games with local-only scoring, touch controls, clearer round feedback, and lightweight difficulty tuning.
 - **Dynamic adventures:** The app builds an adventure from a pool of questions and prompts.  Timed challenges show a 15 second countdown.
 - **Progress bar:** See how far along your adventure you are.
 - **Summary:** At the end, get a breakdown of how many discoveries, laughs, facts and wins you achieved.
@@ -38,6 +40,7 @@ js/
     scavenger.js          # scavenger, lightning, alphabet, and mini-bet data
     trivia.js             # curated offline trivia packs
     community-trivia.js   # larger imported/community trivia pack
+    trivia-cleanup.js     # runtime duplicate cleanup, difficulty tags, small curated additions
   games/
     hide-seek-art.js      # canvas renderers for Hide & Seek objects and rooms
     hide-seek-data.js     # Hide & Seek maps, rooms, exits, objects, obstacles
