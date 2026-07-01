@@ -13,7 +13,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Road Trip Adventures</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=25" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#1f7a8c" />
   <link rel="icon" href="assets/roadside-logo.png" />
@@ -119,8 +119,15 @@
       <button class="quick-start-card" data-category="quickstart">
         <span class="option-emoji" aria-hidden="true">🚗</span>
         <span class="option-title">Start a Road Trip Mix</span>
-        <span class="option-subtitle">Let the app pick a game and get moving.</span>
+        <span class="option-subtitle">Pick a vibe below, or tap here for a balanced passenger mix.</span>
       </button>
+      <div class="quick-start-options" aria-label="Quick start choices">
+        <button type="button" data-quick-intent="laugh">Make us laugh</button>
+        <button type="button" data-quick-intent="outside">Look outside</button>
+        <button type="button" data-quick-intent="learn">Learn something</button>
+        <button type="button" data-quick-intent="scored">Play scored</button>
+        <button type="button" data-quick-intent="surprise">Surprise us</button>
+      </div>
       <div class="mode-group-list" aria-label="Adventure categories">
         <section class="mode-group" aria-labelledby="mode-look-heading">
           <h3 id="mode-look-heading">Look Outside</h3>
@@ -128,17 +135,23 @@
             <button class="option-card" data-category="look">
               <span class="option-emoji" aria-hidden="true">👀</span>
               <span class="option-title">Window Quests</span>
+              <span class="option-description">Turn real scenery into stories, clues, and tiny debates.</span>
               <span class="mode-pill">Just for fun</span>
+              <span class="best-for">Best for: quick, creative, all ages</span>
             </button>
             <button class="option-card" data-category="local">
               <span class="option-emoji" aria-hidden="true">🌎</span>
               <span class="option-title">Local Explorer</span>
+              <span class="option-description">Choose a region manually and notice what makes it different.</span>
               <span class="mode-pill">Just for fun</span>
+              <span class="best-for">Best when: someone can read aloud</span>
             </button>
             <button class="option-card" data-category="scavenger">
               <span class="option-emoji" aria-hidden="true">🔎</span>
               <span class="option-title">Scavenger Hunt</span>
+              <span class="option-description">Race to spot real roadside targets the car can verify.</span>
               <span class="mode-pill scored">Scored</span>
+              <span class="best-for">Best for: active, competitive passengers</span>
             </button>
           </div>
         </section>
@@ -149,22 +162,30 @@
             <button class="option-card" data-category="learn">
               <span class="option-emoji" aria-hidden="true">🧠</span>
               <span class="option-title">Learn Something</span>
+              <span class="option-description">Short facts and questions to pass around the car.</span>
               <span class="mode-pill">Just for fun</span>
+              <span class="best-for">Best for: quiet car, curious readers</span>
             </button>
             <button class="option-card" data-category="trivia">
               <span class="option-emoji" aria-hidden="true">🧩</span>
               <span class="option-title">Trivia Run</span>
+              <span class="option-description">Take turns answering multiple-choice road-trip trivia.</span>
               <span class="mode-pill scored">Scored</span>
+              <span class="best-for">Best for: longer, seated play</span>
             </button>
             <button class="option-card" data-category="pi">
               <span class="option-emoji" aria-hidden="true">π</span>
               <span class="option-title">Pi Digits</span>
+              <span class="option-description">Recite digits, enter scores, and crown the memory champ.</span>
               <span class="mode-pill scored">Scored</span>
+              <span class="best-for">Best for: quiet challenge rounds</span>
             </button>
             <button class="option-card" data-category="calculator">
               <span class="option-emoji" aria-hidden="true">🧮</span>
               <span class="option-title">Trip Calculator</span>
+              <span class="option-description">Compare travel times and turn the route into road math.</span>
               <span class="mode-pill">Tool</span>
+              <span class="best-for">Best when: estimating, not driving</span>
             </button>
           </div>
         </section>
@@ -176,21 +197,29 @@
             <button class="option-card" data-category="jokes">
               <span class="option-emoji" aria-hidden="true">🎤</span>
               <span class="option-title">Joke Vote</span>
+              <span class="option-description">Read jokes aloud and vote for the biggest laugh.</span>
               <span class="mode-pill scored">Scored</span>
+              <span class="best-for">Best for: silly group energy</span>
             </button>
             <button class="option-card" data-category="emoji">
               <span class="option-emoji" aria-hidden="true">😜</span>
               <span class="option-title">Emoji Face‑Off</span>
+              <span class="option-description">Copy the emoji face, then vote for the closest match.</span>
               <span class="mode-pill scored">Scored</span>
+              <span class="best-for">Best when: passengers are stopped or settled</span>
             </button>
             <button class="option-card" data-category="hide-seek">
               <span class="option-emoji" aria-hidden="true">🫥</span>
               <span class="option-title">Hide & Seek</span>
+              <span class="option-description">Pass-and-play map searching with secret hiding spots.</span>
               <span class="mode-pill">Party</span>
+              <span class="best-for">Best when: two players can pass the phone</span>
             </button>            <button class="option-card" data-category="twenty">
               <span class="option-emoji" aria-hidden="true">❓</span>
               <span class="option-title">20 Questions</span>
+              <span class="option-description">One secret thing, yes-or-no clues, and a final guess.</span>
               <span class="mode-pill">Party</span>
+              <span class="best-for">Best for: quiet guessing together</span>
             </button>          </div>
         </section>
 
@@ -200,26 +229,36 @@
             <button class="option-card" data-category="random">
               <span class="option-emoji" aria-hidden="true">🎲</span>
               <span class="option-title">Surprise Me</span>
+              <span class="option-description">A mixed prompt run when nobody wants to choose.</span>
               <span class="mode-pill">Mixed</span>
+              <span class="best-for">Best for: instant momentum</span>
             </button>
             <button class="option-card" data-category="pong">
               <span class="option-emoji" aria-hidden="true">🏓</span>
               <span class="option-title">Road Pong</span>
+              <span class="option-description">Touch arcade pong for one or two passengers.</span>
               <span class="mode-pill scored">Scored</span>
+              <span class="best-for">Best for: quick arcade breaks</span>
             </button>
             <button class="option-card" data-category="gorillas">
               <span class="option-emoji" aria-hidden="true">🍌</span>
               <span class="option-title">Banana Towers</span>
+              <span class="option-description">Launch bananas across a skyline with wind and angles.</span>
               <span class="mode-pill scored">Scored</span>
+              <span class="best-for">Best in: landscape, two players</span>
             </button>            <button class="option-card" data-category="puns">
               <span class="option-emoji" aria-hidden="true">🤪</span>
               <span class="option-title">Pun Generator</span>
+              <span class="option-description">Type a word and get groan-worthy lines to read aloud.</span>
               <span class="mode-pill">Tool</span>
+              <span class="best-for">Best for: quick laughs</span>
             </button>
             <button class="option-card" data-category="mentalist">
               <span class="option-emoji" aria-hidden="true">🔮</span>
               <span class="option-title">Road Trip Mentalist</span>
+              <span class="option-description">Harmless magic-style tricks with numbers and choices.</span>
               <span class="mode-pill">Magic</span>
+              <span class="best-for">Best for: one reader, many guessers</span>
             </button>          </div>
         </section>
       </div>
@@ -262,6 +301,18 @@
             <option value="rainy">Rainy day</option>
             <option value="night">Night drive</option>
           </select>
+        </label>
+        <label class="team-name-field" for="setting-age-group">
+          <span>Player age mix</span>
+          <select id="setting-age-group">
+            <option value="kids">Younger kids</option>
+            <option value="mixed">Mixed ages</option>
+            <option value="teens">Teens/adults</option>
+          </select>
+        </label>
+        <label class="checkbox-row" for="setting-quiet-car">
+          <input id="setting-quiet-car" type="checkbox" />
+          <span>Quiet car mode</span>
         </label>
         <label class="checkbox-row" for="setting-no-camera">
           <input id="setting-no-camera" type="checkbox" />
@@ -532,7 +583,7 @@
       <div id="hide-seek-scoreboard" class="team-scoreboard" aria-live="polite"></div>
       <article class="trivia-card">
         <span id="hide-seek-badge" class="challenge-badge">Setup</span>
-        <p id="hide-seek-status" class="hunt-status">Pick a map, difficulty, and match length. Hiders get a minute to settle into cover. Seekers only get a handful of real checks, so room choices matter.</p>
+        <p id="hide-seek-status" class="hunt-status">Pick a map, difficulty, and match length. Hiders lock in real cover. Seekers inspect exact spots, and each wrong new check spends a search.</p>
         <div class="hide-seek-setup">
           <label class="team-name-field" for="hide-seek-mode">
             <span>Map</span>
@@ -604,8 +655,8 @@
       </div>
       <div class="adventure-actions">
         <button id="hide-seek-start" class="primary-button">Start Match</button>
-        <button id="hide-seek-found" class="primary-button" hidden>Hide / Inspect</button>
-        <button id="hide-seek-special" class="secondary-button" hidden>Listen</button>
+        <button id="hide-seek-found" class="primary-button" hidden>Hide Here</button>
+        <button id="hide-seek-special" class="secondary-button" hidden>Peek</button>
         <button id="hide-seek-sprint" class="secondary-button" hidden>Sprint</button>
         <button id="hide-seek-next" class="secondary-button" hidden>Next Round</button>
         <button id="hide-seek-solo" class="secondary-button" aria-pressed="false">Solo vs Computer: Off</button>
@@ -752,27 +803,69 @@
       <div class="mode-header">
         <div>
           <h2 id="gorillas-heading">Banana Towers</h2>
-          <p>Player one sets the shot, throws the banana, then the other player gets a turn.</p>
+          <p>Pick angle and power, read the preview coach, throw a banana, then adjust from the last shot.</p>
         </div>
         <div id="gorillas-score" class="emoji-target" aria-label="Banana Towers score">0 : 0</div>
       </div>
       <article class="trivia-card gorillas-control-card">
+        <div class="gorillas-howto">
+          <strong>How to play</strong>
+          <span>1. Pick angle and power. 2. Check wind and preview. 3. Throw. 4. Use the hint. 5. First to the match target wins.</span>
+        </div>
+        <div class="gorillas-mode-controls" aria-label="Banana Towers match settings">
+          <label class="team-name-field" for="gorillas-opponent">
+            <span>Opponent</span>
+            <select id="gorillas-opponent">
+              <option value="local">Local Player</option>
+              <option value="computer">Computer</option>
+            </select>
+          </label>
+          <label class="team-name-field" for="gorillas-match">
+            <span>Match</span>
+            <select id="gorillas-match">
+              <option value="3">First to 3</option>
+              <option value="5">First to 5</option>
+              <option value="sudden">Sudden Banana</option>
+            </select>
+          </label>
+          <label class="team-name-field" for="gorillas-difficulty">
+            <span>Computer</span>
+            <select id="gorillas-difficulty">
+              <option value="easy">Easy</option>
+              <option value="normal">Normal</option>
+              <option value="hard">Hard</option>
+            </select>
+          </label>
+        </div>
         <div class="gorillas-setup">
           <label class="team-name-field" for="gorillas-angle">
             <span>Angle</span>
-            <input id="gorillas-angle" type="number" min="10" max="80" value="45" inputmode="numeric" />
+            <span class="banana-adjust-row">
+              <button type="button" class="secondary-button banana-step-button" data-banana-angle="-5">-5</button>
+              <input id="gorillas-angle" type="number" min="10" max="80" value="45" inputmode="numeric" />
+              <button type="button" class="secondary-button banana-step-button" data-banana-angle="5">+5</button>
+            </span>
           </label>
           <label class="team-name-field" for="gorillas-power">
             <span>Power</span>
-            <input id="gorillas-power" type="number" min="20" max="100" value="70" inputmode="numeric" />
+            <span class="banana-adjust-row">
+              <button type="button" class="secondary-button banana-step-button" data-banana-power="-10">-10</button>
+              <input id="gorillas-power" type="number" min="20" max="100" value="70" inputmode="numeric" />
+              <button type="button" class="secondary-button banana-step-button" data-banana-power="10">+10</button>
+            </span>
           </label>
         </div>
+        <p id="gorillas-shot-summary" class="gorillas-shot-summary">Preview shows the first part of your banana path. Wind may still push it.</p>
+        <ol id="gorillas-shot-history" class="gorillas-shot-history" aria-label="Last Banana Towers shots"></ol>
       </article>
       <canvas id="gorillas-canvas" class="pong-canvas" width="720" height="420" aria-label="Banana Towers game board"></canvas>
+      <button id="gorillas-immersive-exit" class="immersive-exit" type="button" aria-label="Exit full screen">✕</button>
       <p id="gorillas-status" class="hunt-status" aria-live="polite">Set your angle and power, then launch the banana.</p>
       <div class="adventure-actions">
         <button id="gorillas-fire" class="primary-button">Throw Banana</button>
+        <button id="gorillas-quick-shot" class="secondary-button">Coach Shot</button>
         <button id="gorillas-fullscreen" class="secondary-button">Full Screen</button>
+        <button id="gorillas-debug" class="secondary-button" aria-pressed="false">Debug: Off</button>
         <button id="gorillas-reset" class="secondary-button">Reset Game</button>
         <button id="gorillas-finish" class="secondary-button">Finish Game</button>
       </div>
@@ -896,10 +989,11 @@
   <script src="js/data/trivia.js"></script>
   <script src="js/data/community-trivia.js"></script>
   <script src="js/data/oak-island.js"></script>
+  <script src="js/data/trivia-cleanup.js"></script>
   <script src="js/data/scavenger.js"></script>
   <script src="js/data/questions.js"></script>
   <script src="js/data/jokes.js"></script>
-  <script src="js/games/hide-seek-data.js"></script>
+  <script src="js/games/hide-seek-data.js?v=25"></script>
   <script src="js/games/hide-seek-art.js"></script>
   <script src="js/games/pong-data.js"></script>
   <script src="js/games/pong-art.js"></script>
@@ -908,7 +1002,7 @@
        paint lean; uncomment the line below to make the global `kontra` object
        available for future engine-powered games. -->
   <!-- <script src="vendor/kontra.min.js"></script> -->
-  <script src="script.js"></script>
+  <script src="script.js?v=25"></script>
   <script>
     if ('serviceWorker' in navigator) {
       // Reload once when a new service worker takes control, so a fresh deploy

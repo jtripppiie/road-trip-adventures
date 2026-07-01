@@ -15,6 +15,7 @@ const dataFiles = [
   'js/data/trivia.js',
   'js/data/community-trivia.js',
   'js/data/oak-island.js',
+  'js/data/trivia-cleanup.js',
 ];
 
 const sandbox = {

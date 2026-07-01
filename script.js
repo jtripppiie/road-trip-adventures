@@ -11,7 +11,7 @@
 (() => {
   // Visible build version. Bump this (and CACHE_VERSION in sw.js) on every
   // deploy so the on-screen badge confirms which build is actually live.
-  const APP_VERSION = 'v21 · 2026-06-22';
+  const APP_VERSION = 'v25 · 2026-06-28';
   const versionBadge = document.getElementById('app-version');
   if (versionBadge) {
     versionBadge.textContent = APP_VERSION;
@@ -36,9 +36,13 @@
    * @param {boolean} defaultValue
    */
   function getPreference(key, defaultValue) {
-    const stored = localStorage.getItem(key);
-    if (stored === null) return defaultValue;
-    return stored === 'true';
+    try {
+      const stored = localStorage.getItem(key);
+      if (stored === null) return defaultValue;
+      return stored === 'true';
+    } catch (error) {
+      return defaultValue;
+    }
   }
 
   /**
@@ -47,7 +51,11 @@
    * @param {boolean} value
    */
   function setPreference(key, value) {
-    localStorage.setItem(key, value ? 'true' : 'false');
+    try {
+      localStorage.setItem(key, value ? 'true' : 'false');
+    } catch (error) {
+      // Preferences are optional; keep the current session usable if storage is blocked.
+    }
   }
 
   function getStoredJson(key, fallback) {
@@ -92,7 +100,9 @@
       ageGroups: ['*'],
       regions: ['CA'],
       requiresTimer: false,
-      text: 'Can you spot a palm tree?',
+      text: 'Palm Tree Press Conference: Spot a palm tree, then explain what important roadside announcement it is about to make.',
+      tags: ['observation', 'story', 'quick'],
+      quality: 'strong',
       points: 1,
     },
     {
@@ -101,7 +111,9 @@
       ageGroups: ['*'],
       regions: ['AK'],
       requiresTimer: false,
-      text: 'Can you spot a snowy peak, evergreen forest, or glacier?',
+      text: 'Alaska Survival Briefing: Spot a snowy peak, evergreen forest, or glacier, then give one real survival tip and one ridiculous fake tip.',
+      tags: ['observation', 'creative', 'local'],
+      quality: 'strong',
       points: 1,
     },
     {
@@ -110,7 +122,9 @@
       ageGroups: ['*'],
       regions: ['*'],
       requiresTimer: false,
-      text: 'Find a license plate from another state.',
+      text: 'Out-of-State Mission: Find a license plate from another state. Invent the driver’s secret mission in one sentence.',
+      tags: ['observation', 'story', 'vote'],
+      quality: 'strong',
       points: 1,
     },
     {
@@ -128,7 +142,9 @@
       ageGroups: ['*'],
       regions: ['*'],
       requiresTimer: true,
-      text: 'Color hunt: spot something red, yellow, green, blue, and white outside.',
+      text: 'Color Evidence: Spot red, yellow, green, blue, and white outside. The car votes which color object is most suspicious.',
+      tags: ['observation', 'vote', 'quick'],
+      quality: 'okay',
       points: 1,
     },
     {
@@ -269,7 +285,9 @@
       ageGroups: ['*'],
       regions: ['*'],
       requiresTimer: true,
-      text: 'Name five animals as fast as you can!',
+      text: 'Animal Casting Call: Name five animals, then pick which one should narrate this road trip and why.',
+      tags: ['creative', 'quick'],
+      quality: 'okay',
       points: 1,
     },
     {
@@ -287,7 +305,9 @@
       ageGroups: ['*'],
       regions: ['*'],
       requiresTimer: true,
-      text: 'First to five: name five things you might pack for a dream road trip.',
+      text: 'Dream Trip Bag Check: Name five things you would pack, then defend the weirdest item like it is absolutely essential.',
+      tags: ['creative', 'conversation'],
+      quality: 'strong',
       points: 1,
     },
     {
@@ -467,7 +487,9 @@
       ageGroups: ['*'],
       regions: ['*'],
       requiresTimer: false,
-      text: 'Find a town, exit, or street name. Guess why it might have that name.',
+      text: 'Fake Local Legend: Find a town, exit, or street name. Invent the totally unofficial legend for how it got that name.',
+      tags: ['observation', 'story', 'local'],
+      quality: 'strong',
       points: 1,
     },
     {
@@ -493,6 +515,8 @@
       requiresTimer: Boolean(prompt.requiresTimer),
       text,
       points: Number.isFinite(prompt.points) ? prompt.points : 1,
+      quality: prompt.quality || 'okay',
+      tags: Array.isArray(prompt.tags) ? prompt.tags.slice() : [],
     };
   }
 
@@ -872,6 +896,8 @@
   const defaultTripSettings = {
     gameLength: 'long',
     tripPreset: 'any',
+    ageGroup: 'mixed',
+    quietCar: false,
     noCameraGames: false,
     noPopCulture: false,
     hardTrivia: false,
@@ -890,7 +916,7 @@
   let tripSettings = Object.assign({}, defaultTripSettings, getStoredJson('rtaTripSettings', {}));
 
   // Application state
-  let selectedAge = 'mixed';
+  let selectedAge = tripSettings.ageGroup || 'mixed';
   let selectedCategory = null;
   let selectedLearnTopic = getStoredJson('rtaLastLearnTopic', 'all');
   let regionCode = null; // Optional region code for local questions
@@ -942,17 +968,44 @@
   let hideSeekSoloEnabled = getStoredJson('rtaHideSeekSolo', false);
   const HIDE_SEEK_HUMAN_INDEX = 0;
   const hideSeekAI = { thinkTimer: 0, lastRoom: null };
+  let hideSeekLastCanvasTap = null;
+  let hideSeekActiveCanvasPointerId = null;
   const HIDE_SEEK_HIDE_SECONDS = 60;
   const HIDE_SEEK_SEARCH_COUNTS = {
     easy: 10,
     normal: 8,
     hard: 6,
   };
+  const HIDE_SEEK_AI_PROFILES = {
+    easy: {
+      thinkDelay: 1.1,
+      prefersNoise: 0.25,
+      prefersDifficulty: 0.2,
+      mistakeChance: 0.25,
+      roomDistance: 0.15,
+    },
+    normal: {
+      thinkDelay: 0.75,
+      prefersNoise: 0.45,
+      prefersDifficulty: 0.45,
+      mistakeChance: 0.12,
+      roomDistance: 0.35,
+    },
+    hard: {
+      thinkDelay: 0.45,
+      prefersNoise: 0.75,
+      prefersDifficulty: 0.75,
+      mistakeChance: 0.04,
+      roomDistance: 0.62,
+    },
+  };
   const HIDE_SEEK_DEFAULT_DIFFICULTY = 'normal';
   const HIDE_SEEK_SEARCH_TOLERANCE = 51;
   const HIDE_SEEK_INSPECT_SECONDS = 1.1;
   const HIDE_SEEK_MAX_STAMINA = 100;
   const HIDE_SEEK_SPRINT_SPEED_MULTIPLIER = 1.45;
+  const HIDE_SEEK_DOUBLE_TAP_MS = 360;
+  const HIDE_SEEK_DOUBLE_TAP_RADIUS = 44;
 
   function getHideSeekSearchCount(difficulty) {
     return HIDE_SEEK_SEARCH_COUNTS[difficulty] || HIDE_SEEK_SEARCH_COUNTS[HIDE_SEEK_DEFAULT_DIFFICULTY];
@@ -982,6 +1035,9 @@
     searchesRemaining: getHideSeekSearchCount(HIDE_SEEK_DEFAULT_DIFFICULTY),
     hiderTimeRemaining: HIDE_SEEK_HIDE_SECONDS,
     wrongGuesses: 0,
+    listenUsed: false,
+    roundMedal: '',
+    lastClue: '',
     roundHiderScore: 0,
     roundSeekerScore: 0,
     lastRoundText: '',
@@ -996,6 +1052,7 @@
     searchPulse: null,
     roomTrail: [],
     particles: [],
+    effects: [],
     cameraShake: 0,
     coverGlowPulse: 0,
     lastUrgentSecond: null,
@@ -1027,6 +1084,13 @@
   let gorillasTurn = 0;
   let gorillasLastFrameTs = 0;
   let gorillasBuildingLayer = null;
+  let gorillasSettings = Object.assign({
+    opponent: 'local',
+    match: '3',
+    difficulty: 'normal',
+    debug: false,
+  }, getStoredJson('rtaGorillasSettings', {}));
+  let gorillasComputerTimer = null;
   let logoClickCount = 0;
   let logoClickTimer = null;
   let secretUnlockStep = 0;
@@ -1121,6 +1185,8 @@
   const modeRulesBackButton = document.getElementById('mode-rules-back');
   const settingGameLength = document.getElementById('setting-game-length');
   const settingTripPreset = document.getElementById('setting-trip-preset');
+  const settingAgeGroup = document.getElementById('setting-age-group');
+  const settingQuietCar = document.getElementById('setting-quiet-car');
   const settingNoCamera = document.getElementById('setting-no-camera');
   const settingNoPopCulture = document.getElementById('setting-no-pop-culture');
   const settingHardTrivia = document.getElementById('setting-hard-trivia');
@@ -1247,8 +1313,16 @@
   const gorillasStatus = document.getElementById('gorillas-status');
   const gorillasAngle = document.getElementById('gorillas-angle');
   const gorillasPower = document.getElementById('gorillas-power');
+  const gorillasOpponent = document.getElementById('gorillas-opponent');
+  const gorillasMatch = document.getElementById('gorillas-match');
+  const gorillasDifficulty = document.getElementById('gorillas-difficulty');
+  const gorillasShotSummary = document.getElementById('gorillas-shot-summary');
+  const gorillasShotHistory = document.getElementById('gorillas-shot-history');
   const gorillasFireButton = document.getElementById('gorillas-fire');
+  const gorillasQuickShotButton = document.getElementById('gorillas-quick-shot');
   const gorillasFullscreenButton = document.getElementById('gorillas-fullscreen');
+  const gorillasDebugButton = document.getElementById('gorillas-debug');
+  const gorillasImmersiveExitButton = document.getElementById('gorillas-immersive-exit');
   const gorillasResetButton = document.getElementById('gorillas-reset');
   const gorillasFinishButton = document.getElementById('gorillas-finish');
   const appLogo = document.querySelector('.app-logo');
@@ -1308,6 +1382,7 @@
       type: 'Just for fun',
       scored: false,
       summary: 'Quick prompts that get everyone looking outside instead of staring down.',
+      bestWhen: 'Best when everyone can safely see outside.',
       rules: [
         'Read each prompt aloud.',
         'Everyone looks outside or answers together.',
@@ -1319,6 +1394,7 @@
       type: 'Just for fun',
       scored: false,
       summary: 'Manual region prompts. No GPS, no location sensors, no tracking.',
+      bestWhen: 'Best when someone wants to read a fact or challenge aloud.',
       rules: [
         'Choose the region yourself.',
         'Read each local prompt aloud.',
@@ -1330,6 +1406,7 @@
       type: 'Scored Game',
       scored: true,
       summary: 'Keep a tight target list active and call real finds before someone else does.',
+      bestWhen: 'Best when passengers want an active scored game.',
       rules: [
         'The app shows 4 or 5 targets at a time.',
         'First player to clearly spot a target gets 1 point.',
@@ -1342,6 +1419,7 @@
       type: 'Just for fun',
       scored: false,
       summary: 'Short facts and mini-lessons to pass around the car.',
+      bestWhen: 'Best for quiet cars, night drives, and curious readers.',
       rules: [
         'Pick a topic lane.',
         'Pass the phone and read the fact aloud.',
@@ -1353,6 +1431,7 @@
       type: 'Scored Game',
       scored: true,
       summary: 'Turn-based multiple choice trivia with a cleaner category lane and automatic scoring.',
+      bestWhen: 'Best when someone wants to read questions aloud.',
       rules: [
         'The app names whose turn it is.',
         'That player chooses an answer. Correct picks score automatically.',
@@ -1387,6 +1466,7 @@
       type: 'Just for fun',
       scored: false,
       summary: 'Read a Dad, Mom, Brother, and Sister joke each round and rate the laughs.',
+      bestWhen: 'Best when the car wants quick laughs.',
       rules: [
         'Read each joke out loud.',
         'Tap whoever got the bigger laugh.',
@@ -1409,7 +1489,9 @@
       type: 'Just for fun',
       scored: false,
       summary: 'Think of any thing and the app tries to guess it, or let the computer hide a secret for you to guess.',
+      bestWhen: 'Best when one passenger can hold the secret and everyone else can look away.',
       rules: [
+        'Pass the phone to the secret keeper. Only they should look until guessing starts.',
         'Pick who hides the secret thing.',
         'Answer each question Yes, No, Sometimes, Maybe, or Unknown.',
         'The guesser gets up to 20 questions to figure it out.',
@@ -1431,6 +1513,7 @@
       type: 'Scored Game',
       scored: true,
       summary: 'Players copy an emoji face and the car votes for the closest match.',
+      bestWhen: 'Best when passengers are settled and camera play feels comfortable.',
       rules: [
         'Camera is optional and stays on this device.',
         'Snap a face or just act it out.',
@@ -1442,9 +1525,11 @@
       type: 'Scored Party Game',
       scored: true,
       summary: 'A local room-search game where hiders choose secret spots and seekers inspect the map.',
+      bestWhen: 'Best when two players can safely pass the phone.',
       rules: [
         'Choose a map, search timer, and match length.',
-        'The hider moves first while the seeker looks away.',
+        'Pass the phone to the hider first. Only the hider should look.',
+        'Then pass the phone to the seeker. Everyone else looks away from the secret.',
         'The seeker inspects hiding spots. Wrong guesses cost time.',
         'Roles rotate each round and both hiding and seeking earn points.',
       ],
@@ -1454,6 +1539,7 @@
       type: 'Mixed',
       scored: false,
       summary: 'A mixed prompt run for when nobody wants to pick a mode.',
+      bestWhen: 'Best when the car needs instant momentum.',
       rules: [
         'The app mixes looking, laughing, learning, and quick challenges.',
         'Prompts are completed, not scored.',
@@ -1465,6 +1551,7 @@
       type: 'Scored Game',
       scored: true,
       summary: 'Quick arcade break with touch controls on the canvas and optional keyboard backup.',
+      bestWhen: 'Best when one or two passengers want a fast arcade round.',
       rules: [
         'Choose local player or computer before starting.',
         'Pick a difficulty from easy to death match.',
@@ -1478,13 +1565,14 @@
       type: 'Scored Game',
       scored: true,
       summary: 'A turn-based banana toss duel where angle, wind, and skyline all matter.',
+      bestWhen: 'Best in landscape with two passengers sharing turns.',
       rules: [
         'Each player chooses an angle and power on their turn.',
         'The banana arcs over the buildings and can hit the opponent.',
         'Wait for the banana to land before the next player throws.',
         'Bananas blast a crater out of a building and can fly through gaps they made.',
-        'Clip your own tower and your opponent wins.',
-        'Hit the other gorilla directly to win the match instantly.',
+        'Clip your own tower and your opponent scores.',
+        'First player to the match target wins.',
       ],
     },
   };
@@ -1507,6 +1595,8 @@
     const merged = Object.assign({}, defaultTripSettings, settings || {});
     merged.gameLength = merged.gameLength === 'short' ? 'short' : 'long';
     merged.tripPreset = tripPresets[merged.tripPreset] ? merged.tripPreset : 'any';
+    merged.ageGroup = ['kids', 'mixed', 'teens'].includes(merged.ageGroup) ? merged.ageGroup : 'mixed';
+    merged.quietCar = Boolean(merged.quietCar);
     merged.noCameraGames = Boolean(merged.noCameraGames);
     merged.noPopCulture = Boolean(merged.noPopCulture);
     merged.hardTrivia = Boolean(merged.hardTrivia);
@@ -1517,6 +1607,8 @@
     tripSettings = normalizeTripSettings(tripSettings);
     settingGameLength.value = tripSettings.gameLength;
     settingTripPreset.value = tripSettings.tripPreset;
+    settingAgeGroup.value = tripSettings.ageGroup;
+    settingQuietCar.checked = tripSettings.quietCar;
     settingNoCamera.checked = tripSettings.noCameraGames;
     settingNoPopCulture.checked = tripSettings.noPopCulture;
     settingHardTrivia.checked = tripSettings.hardTrivia;
@@ -1526,6 +1618,8 @@
     tripSettings = normalizeTripSettings({
       gameLength: settingGameLength.value,
       tripPreset: settingTripPreset.value,
+      ageGroup: settingAgeGroup.value,
+      quietCar: settingQuietCar.checked,
       noCameraGames: settingNoCamera.checked,
       noPopCulture: settingNoPopCulture.checked,
       hardTrivia: settingHardTrivia.checked,
@@ -1537,10 +1631,11 @@
 
   function applyTripSettings() {
     tripSettings = normalizeTripSettings(tripSettings);
+    selectedAge = tripSettings.ageGroup;
     const emojiButton = document.querySelector('[data-category="emoji"]');
     if (emojiButton) {
-      emojiButton.hidden = tripSettings.noCameraGames;
-      emojiButton.disabled = tripSettings.noCameraGames;
+      emojiButton.hidden = tripSettings.noCameraGames || tripSettings.quietCar;
+      emojiButton.disabled = tripSettings.noCameraGames || tripSettings.quietCar;
     }
     if (tripSettings.hardTrivia) {
       activeTriviaDifficulty = 'hard';
@@ -1815,7 +1910,17 @@
   }
 
   function matchesAge(question) {
-    return question.ageGroups.indexOf('*') !== -1 || question.ageGroups.indexOf(selectedAge) !== -1 || question.ageGroups.indexOf('mixed') !== -1;
+    return question.ageGroups.indexOf('*') !== -1
+      || question.ageGroups.indexOf(selectedAge) !== -1
+      || (selectedAge === 'teens' && question.ageGroups.indexOf('adults') !== -1)
+      || question.ageGroups.indexOf('mixed') !== -1;
+  }
+
+  function adventurePromptAllowedBySettings(question) {
+    if (!tripSettings.quietCar) return true;
+    if (question.category === 'laugh' || question.category === 'compete') return false;
+    if (question.requiresTimer) return false;
+    return !/(shout|loud|speed|race|fast|speak like|karaoke|commercial|face|perform)/i.test(question.text || '');
   }
 
   function matchesRegion(question) {
@@ -1891,11 +1996,11 @@
     ];
     const selected = [];
     targets.forEach(target => {
-      const pool = shuffle(adventurePromptDatabase.filter(q => matchesAge(q) && q.category === target.category && matchesRegion(q)));
+      const pool = shuffle(adventurePromptDatabase.filter(q => matchesAge(q) && adventurePromptAllowedBySettings(q) && q.category === target.category && matchesRegion(q)));
       selected.push(...selectAdventurePrompts(pool, target.count, getAdventureHistoryKey('random', target.category)));
     });
     const selectedIds = selected.map(q => q.id);
-    const refill = shuffle(adventurePromptDatabase.filter(q => matchesAge(q) && matchesRegion(q) && selectedIds.indexOf(q.id) === -1));
+    const refill = shuffle(adventurePromptDatabase.filter(q => matchesAge(q) && adventurePromptAllowedBySettings(q) && matchesRegion(q) && selectedIds.indexOf(q.id) === -1));
     const refillCount = Math.max(0, count - selected.length);
     const refillSelected = selectAdventurePrompts(refill, refillCount, getAdventureHistoryKey('random', 'refill'));
     return shuffle(selected.concat(refillSelected)).slice(0, count);
@@ -1911,6 +2016,7 @@
 
     let filtered = adventurePromptDatabase.filter(q => (
       matchesAge(q)
+      && adventurePromptAllowedBySettings(q)
       && q.category === selectedCategory
       && matchesRegion(q)
       && (selectedCategory !== 'learn' || matchesLearnTopic(q))
@@ -1961,6 +2067,9 @@
       return topic ? `Learn: ${topic.label}` : 'Learn Something';
     }
     if (question.category === 'compete') return 'Friendly Challenge';
+    if (question.category === 'local') {
+      return /challenge|spot|find|invent|introduce|give/i.test(question.text || '') ? 'Local Challenge' : 'Local Fact';
+    }
     return 'Local Explorer';
   }
 
@@ -1977,8 +2086,14 @@
     badge.textContent = getChallengeBadgeText(q);
     const p = document.createElement('p');
     p.textContent = q.text;
+    const nextHint = document.createElement('small');
+    nextHint.className = 'challenge-next-hint';
+    nextHint.textContent = q.requiresTimer
+      ? 'Try it together, then tap Stamp It when the timer feels done.'
+      : 'Read it aloud, look up, play it out, then tap Stamp It.';
     challengeContainer.appendChild(badge);
     challengeContainer.appendChild(p);
+    challengeContainer.appendChild(nextHint);
     // Timer
     if (q.requiresTimer) {
       timerElement.hidden = false;
@@ -2025,8 +2140,18 @@
       li.textContent = `Prompt games played: ${seenModes.join(', ')}.`;
       summaryList.appendChild(li);
     }
+    const completedPrompts = adventureQuestions.slice(0, completed);
+    if (completedPrompts.length) {
+      const best = completedPrompts.find(item => item.quality === 'strong') || completedPrompts[0];
+      const li = document.createElement('li');
+      li.textContent = `Best moment to remember: ${best.text}`;
+      summaryList.appendChild(li);
+    }
+    const prize = document.createElement('li');
+    prize.textContent = 'Prize idea: the next reader chooses the next mode, or the funniest answer gets snack naming rights.';
+    summaryList.appendChild(prize);
     const note = document.createElement('li');
-    note.textContent = 'Prompt games do not use scores. Scored games still keep their own winner rules.';
+    note.textContent = 'Short recap: no tracking, no scores here, just passengers noticing the ride together.';
     summaryList.appendChild(note);
     progressFill.style.width = '100%';
   }
@@ -2045,8 +2170,13 @@
     return `${item.id || ''} ${item.label || ''} ${item.hint || ''}`.toLowerCase();
   }
 
+  function huntItemHasThemeTag(item, theme) {
+    return Array.isArray(item.themes) && item.themes.includes(theme);
+  }
+
   function huntItemMatchesTheme(item, theme) {
     if (theme === 'mixed') return true;
+    if (huntItemHasThemeTag(item, theme)) return true;
     const text = getHuntItemSearchText(item);
     if (theme === 'vehicles') {
       return /car|vehicle|truck|plate|motorcycle|camper|rv|trailer|tire|bike|bus|van|semi|tow|fuel|gas/.test(text);
@@ -2127,7 +2257,8 @@
   }
 
   function buildHuntDeck() {
-    const unclaimedItems = activeScavengerItems.filter(item => !item.claimedBy);
+    const currentActiveIds = new Set(activeHuntIds);
+    const unclaimedItems = activeScavengerItems.filter(item => !item.claimedBy && !currentActiveIds.has(item.id));
     const themedItems = activeHuntTheme === 'mixed'
       ? unclaimedItems.filter(huntItemMatchesTripPreset)
       : unclaimedItems.filter(item => huntItemMatchesTheme(item, activeHuntTheme) && huntItemMatchesTripPreset(item));
@@ -2144,6 +2275,19 @@
     return tripSettings.gameLength === 'short' ? 4 : 5;
   }
 
+  function fillActiveHuntTargets(count = getHuntBatchSize()) {
+    while (activeHuntIds.length < count) {
+      if (!huntDeck.length) buildHuntDeck();
+      if (!huntDeck.length) break;
+      const nextId = huntDeck.pop();
+      const item = activeScavengerItems.find(entry => entry.id === nextId);
+      if (item && !item.claimedBy && !activeHuntIds.includes(nextId)) {
+        activeHuntIds.push(nextId);
+        markScavengerSeen(item);
+      }
+    }
+  }
+
   function drawHuntTargets(count = getHuntBatchSize()) {
     if (!huntDeck.length) buildHuntDeck();
     activeHuntIds.forEach(itemId => {
@@ -2153,14 +2297,7 @@
       }
     });
     activeHuntIds = [];
-    while (activeHuntIds.length < count && huntDeck.length) {
-      const nextId = huntDeck.pop();
-      const item = activeScavengerItems.find(entry => entry.id === nextId);
-      if (item && !item.claimedBy && !activeHuntIds.includes(nextId)) {
-        activeHuntIds.push(nextId);
-        markScavengerSeen(item);
-      }
-    }
+    fillActiveHuntTargets(count);
     renderHunt();
   }
 
@@ -2244,6 +2381,7 @@
     if (!item || item.claimedBy) return;
     item.claimedBy = playerId;
     activeHuntIds = activeHuntIds.filter(id => id !== itemId);
+    fillActiveHuntTargets();
     renderHunt();
   }
 
@@ -2251,8 +2389,8 @@
     activeScavengerItems.forEach(item => {
       delete item.claimedBy;
     });
-    buildHuntDeck();
     activeHuntIds = [];
+    buildHuntDeck();
     drawHuntTargets();
   }
 
@@ -2435,7 +2573,27 @@
     { name: 'a cloud', attrs: { alive: 'no', holdable: 'no', indoors: 'no', biggerThanBackpack: 'yes', manmade: 'no', fun: 'no', food: 'no', movesSelf: 'yes', famous: 'no', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'no', oneColor: 'yes', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'no', everyday: 'yes', smallerThanPhone: 'no' } },
     { name: 'a cow', attrs: { alive: 'yes', holdable: 'no', indoors: 'no', biggerThanBackpack: 'yes', manmade: 'no', fun: 'no', food: 'no', movesSelf: 'yes', famous: 'no', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'no', oneColor: 'no', kidsKnow: 'yes', nature: 'yes', expensive: 'no', sound: 'yes', everyday: 'no', smallerThanPhone: 'no' } },
     { name: 'a backpack', attrs: { alive: 'no', holdable: 'yes', indoors: 'yes', biggerThanBackpack: 'no', manmade: 'yes', fun: 'no', food: 'no', movesSelf: 'no', famous: 'no', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'no', oneColor: 'sometimes', kidsKnow: 'yes', nature: 'no', expensive: 'no', sound: 'no', everyday: 'yes', smallerThanPhone: 'no' } },
+    { name: 'a rest stop', attrs: { alive: 'no', holdable: 'no', indoors: 'sometimes', biggerThanBackpack: 'yes', manmade: 'yes', fun: 'sometimes', food: 'sometimes', movesSelf: 'no', famous: 'no', roadtrip: 'yes', place: 'yes', person: 'no', electricity: 'yes', oneColor: 'no', kidsKnow: 'yes', nature: 'no', expensive: 'no', sound: 'sometimes', everyday: 'no', smallerThanPhone: 'no' } },
+    { name: 'a suitcase', attrs: { alive: 'no', holdable: 'yes', indoors: 'yes', biggerThanBackpack: 'sometimes', manmade: 'yes', fun: 'no', food: 'no', movesSelf: 'no', famous: 'no', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'no', oneColor: 'sometimes', kidsKnow: 'yes', nature: 'no', expensive: 'sometimes', sound: 'no', everyday: 'sometimes', smallerThanPhone: 'no' } },
+    { name: 'a gas station', attrs: { alive: 'no', holdable: 'no', indoors: 'sometimes', biggerThanBackpack: 'yes', manmade: 'yes', fun: 'no', food: 'sometimes', movesSelf: 'no', famous: 'no', roadtrip: 'yes', place: 'yes', person: 'no', electricity: 'yes', oneColor: 'no', kidsKnow: 'yes', nature: 'no', expensive: 'sometimes', sound: 'sometimes', everyday: 'yes', smallerThanPhone: 'no' } },
+    { name: 'a license plate', attrs: { alive: 'no', holdable: 'yes', indoors: 'no', biggerThanBackpack: 'no', manmade: 'yes', fun: 'sometimes', food: 'no', movesSelf: 'no', famous: 'no', roadtrip: 'yes', place: 'no', person: 'no', electricity: 'no', oneColor: 'no', kidsKnow: 'yes', nature: 'no', expensive: 'no', sound: 'no', everyday: 'yes', smallerThanPhone: 'no' } },
   ];
+
+  const TWENTY_CATEGORY_PROMPTS = [
+    'Road trip idea: think of something you can see from the car.',
+    'Food idea: think of a snack, meal, or drink.',
+    'Nature idea: think of an animal, plant, place, or sky object.',
+    'Everyday idea: think of something almost everyone has used.',
+  ];
+
+  function formatTwentyProgress(turns) {
+    const used = Math.min(20, Math.max(0, turns));
+    return `${used}/20 used, ${Math.max(0, 20 - used)} left`;
+  }
+
+  function formatTwentyPromptIdeas() {
+    return TWENTY_CATEGORY_PROMPTS.map((prompt, index) => `${index + 1}. ${prompt}`).join('\n');
+  }
 
   function twentyComputerAnswer(object, tag) {
     const value = object && object.attrs ? object.attrs[tag] : null;
@@ -2457,10 +2615,10 @@
     showHuntSideGame(
       '20 Questions',
       'Who Hides the Secret?',
-      'Pick who thinks of the secret thing. The other side gets 20 questions to figure it out.',
+      `Pick who thinks of the secret thing. The secret keeper answers quietly; the guessers get up to 20 yes-or-no style questions.\n\nNeed a category?\n${formatTwentyPromptIdeas()}`,
       [
-        { label: 'We think of it (app guesses)', primary: true, onClick: startTwentyQuestions },
-        { label: 'Computer thinks of it (we guess)', onClick: startTwentyQuestionsComputer },
+        { label: 'We Hide It', primary: true, onClick: startTwentyQuestions },
+        { label: 'Computer Hides It', onClick: startTwentyQuestionsComputer },
         { label: 'Close', onClick: hideHuntSideGame },
       ]
     );
@@ -2470,16 +2628,16 @@
     twentyComputerObject = TWENTY_QUESTIONS_OBJECTS[Math.floor(Math.random() * TWENTY_QUESTIONS_OBJECTS.length)];
     twentyComputerTurns = 0;
     twentyComputerAsked = [];
-    renderTwentyComputer('The computer is thinking of a person, place, or thing. Ask yes-or-no questions to figure it out!');
+    renderTwentyComputer('The computer has picked a secret person, place, or thing. Ask one question at a time, then make a final guess when the car feels confident.');
   }
 
   function renderTwentyComputer(resultLine) {
     const askedTags = new Set(twentyComputerAsked.map(entry => entry.tag));
     const remaining = TWENTY_QUESTIONS_LIST.filter(item => !askedTags.has(item.tag));
     const history = formatTwentyComputerHistory();
-    const intro = `${resultLine}\n\nTurn ${Math.min(twentyComputerTurns + 1, 20)}/20. Tap a question to ask, then guess when ready.${history}`;
+    const intro = `${resultLine}\n\nQuestions: ${formatTwentyProgress(twentyComputerTurns)}. Tap a question to ask, or make a guess when ready.${history}`;
     if (twentyComputerTurns >= 20 || !remaining.length) {
-      showHuntSideGame('20 Questions', 'Time to Guess', `${intro}\n\nNo more questions left. Make your final guess.`, [
+      showHuntSideGame('20 Questions', 'Final Guess', `${intro}\n\nNo more questions left. Say one final guess out loud before revealing.`, [
         { label: 'Reveal Answer', primary: true, onClick: () => revealTwentyComputer(false) },
         { label: 'Start Over', onClick: startTwentyQuestionsComputer },
         { label: 'Close', onClick: hideHuntSideGame },
@@ -2507,10 +2665,10 @@
     showHuntSideGame(
       '20 Questions',
       'Make a Guess',
-      `Say one guess out loud, then check it.${formatTwentyComputerHistory()}`,
+      `Say one guess out loud, then check it. A wrong guess uses one of your 20 turns.\n\nQuestions: ${formatTwentyProgress(twentyComputerTurns)}.${formatTwentyComputerHistory()}`,
       [
         { label: 'We Guessed Right', primary: true, onClick: () => revealTwentyComputer(true) },
-        { label: 'Wrong, Keep Asking', onClick: () => { twentyComputerTurns++; renderTwentyComputer('That guess was off. Keep narrowing it down.'); } },
+        { label: 'Wrong, Keep Asking', onClick: () => { twentyComputerTurns++; renderTwentyComputer('That guess was off. Good detective work still counts - keep narrowing it down.'); } },
         { label: 'Reveal Answer', onClick: () => revealTwentyComputer(false) },
       ]
     );
@@ -2521,7 +2679,7 @@
     showHuntSideGame(
       '20 Questions',
       solved ? 'You Got It!' : 'The Answer',
-      `The computer was thinking of ${name}.${formatTwentyComputerHistory()}`,
+      `The computer was thinking of ${name}.\n\nQuestions: ${formatTwentyProgress(twentyComputerTurns)}.${formatTwentyComputerHistory()}`,
       [
         { label: 'Play Again', primary: true, onClick: startTwentyQuestionsComputer },
         { label: 'Switch Mode', onClick: startTwentyQuestionsChooser },
@@ -2612,7 +2770,7 @@
     twentyGuessLog = [];
     twentyGuessTurns = 0;
     twentyGuessRejected = [];
-    twentyGuessStep('Think of any person, place, animal, food, or object. Do not tell me what it is, and I will try to guess it.');
+    twentyGuessStep(`Secret keeper: think of any person, place, animal, food, or object. Do not say it out loud. The app will ask up to 20 questions.\n\nNeed a category?\n${formatTwentyPromptIdeas()}`);
   }
 
   function twentyGuessStep(resultLine) {
@@ -2632,7 +2790,7 @@
   }
 
   function twentyAskGuessQuestion(item, resultLine) {
-    const intro = `${resultLine}\n\nTurn ${Math.min(twentyGuessTurns + 1, 20)}/20\nQuestion: ${item.question}${formatTwentyGuessHistory()}`;
+    const intro = `${resultLine}\n\nQuestions: ${formatTwentyProgress(twentyGuessTurns)}\nNext question: ${item.question}${formatTwentyGuessHistory()}`;
     const actions = ['Yes', 'No', 'Sometimes', 'Maybe', 'Unknown'].map(answer => ({
       label: answer,
       onClick: () => {
@@ -2654,12 +2812,12 @@
     showHuntSideGame(
       '20 Questions',
       'My Guess',
-      `${resultLine}\n\nI think you are thinking of ${name}. Am I right?${formatTwentyGuessHistory()}`,
+      `${resultLine}\n\nMy guess uses turn ${Math.min(twentyGuessTurns, 20)}. I think you are thinking of ${name}. Am I right?${formatTwentyGuessHistory()}`,
       [
         { label: 'Yes, you got it!', primary: true, onClick: () => twentyGuessWin(object) },
         { label: 'No, keep going', onClick: () => {
           if (object) twentyGuessRejected.push(object.name);
-          twentyGuessStep('Hmm, not that. Let me narrow it down more.');
+          twentyGuessStep('Hmm, not that. I crossed it off and will ask a sharper question.');
         } },
         { label: 'Start Over', onClick: startTwentyQuestions },
       ]
@@ -2899,17 +3057,21 @@
     }, null);
   }
 
-  function getNearbyHideSeekSpot(actor) {
+  function getNearbyHideSeekSpot(actor, extraRadius = 0) {
     if (!actor) return null;
     const room = getHideSeekRoom(actor.roomId);
     return room.spots.reduce((closest, spot) => {
       if (getHideSeekSpotState(spot.id) === 'disabled') return closest;
-      const radius = spot.interactionRadius || Math.round(56 * HIDE_SEEK_SCALE);
+      const radius = (spot.interactionRadius || Math.round(56 * HIDE_SEEK_SCALE)) + extraRadius;
       const distance = getHideSeekDistanceToRect(actor, spot);
       if (distance > radius) return closest;
       if (!closest || distance < closest.distance) return Object.assign({ distance, roomId: room.id }, spot);
       return closest;
     }, null);
+  }
+
+  function getBufferedHideSeekSpot(actor) {
+    return getNearbyHideSeekSpot(actor, Math.round(18 * HIDE_SEEK_SCALE));
   }
 
   function getHideSeekActorCenter(actor) {
@@ -2955,11 +3117,78 @@
     hideSeekState.roomTrail = trail.slice(-5);
   }
 
-  function getHideSeekSearchFeedback(sameRoom, distance) {
+  function getHideSeekSpotSearchText(spot, key, fallback) {
+    if (!spot || !spot.searchText) return fallback;
+    return spot.searchText[key] || fallback;
+  }
+
+  function getHideSeekSearchFeedback(sameRoom, distance, inspectedSpot) {
     if (sameRoom && distance <= HIDE_SEEK_SEARCH_TOLERANCE) {
-      return { text: 'Found!', tone: 'found' };
+      return {
+        text: getHideSeekSpotSearchText(inspectedSpot, 'found', `Found! The ${inspectedSpot.label} was the exact hiding spot.`),
+        tone: 'found',
+        result: 'found',
+      };
     }
-    return { text: 'Not there.', tone: 'cold' };
+    const hiddenSpot = getHideSeekSpotById(hideSeekState.hiddenSpotId);
+    const hiddenCenter = hiddenSpot ? getHideSeekSpotCenter(hiddenSpot) : null;
+    const inspectedCenter = inspectedSpot ? getHideSeekSpotCenter(inspectedSpot) : null;
+    const spotDistance = hiddenCenter && inspectedCenter
+      ? Math.hypot(inspectedCenter.x - hiddenCenter.x, inspectedCenter.y - hiddenCenter.y)
+      : distance;
+    const noisy = hideSeekState.noiseLevel >= 0.55;
+    const lowSearches = hideSeekState.searchesRemaining <= 2;
+    if (sameRoom && spotDistance <= HIDE_SEEK_SEARCH_TOLERANCE * 2.15) {
+      return {
+        text: noisy || lowSearches
+          ? `Same room. Very close - something rustled near the ${inspectedSpot.label}.`
+          : `Same room. Very close, but the ${inspectedSpot.label} is not the exact spot.`,
+        tone: 'hot',
+        result: 'very close',
+      };
+    }
+    if (sameRoom) {
+      return {
+        text: getHideSeekSpotSearchText(inspectedSpot, 'empty', noisy
+          ? `Same room. The ${inspectedSpot.label} is empty, but something nearby made noise.`
+          : `Same room, wrong cover. The ${inspectedSpot.label} is clear, but the room still feels suspicious.`),
+        tone: noisy ? 'warm' : 'cold',
+        result: 'same room',
+      };
+    }
+    if (noisy && Math.random() < 0.55) {
+      return {
+        text: 'Different room. A tiny sound carries from somewhere else.',
+        tone: 'warm',
+        result: 'different room',
+      };
+    }
+    return {
+      text: getHideSeekSpotSearchText(inspectedSpot, 'empty', lowSearches
+        ? `Cold check. The ${inspectedSpot.label} is empty, and this room feels clear enough to move on.`
+        : `Cold check. The ${inspectedSpot.label} is empty.`),
+      tone: 'cold',
+      result: 'cold',
+    };
+  }
+
+  function setHideSeekRoundMedal(found) {
+    const coverScore = Number(hideSeekState.hiddenCoverQuality) || 1;
+    const searchesUsed = hideSeekState.inspectionCount;
+    let medal = '';
+    if (found) {
+      if (searchesUsed <= 1) medal = 'Lucky Guess';
+      else if (hideSeekState.searchesRemaining <= 1) medal = 'Panic Search';
+      else if (hideSeekState.wrongGuesses >= 3) medal = 'Room Sweeper';
+    } else if (hideSeekState.peekCount === 0 && hideSeekState.noiseLevel < 0.35) {
+      medal = 'Ghost Mode';
+    } else if (hideSeekState.noiseLevel >= 0.65) {
+      medal = 'Noisy Hider';
+    } else if (coverScore >= 5) {
+      medal = 'Perfect Cover';
+    }
+    hideSeekState.roundMedal = medal;
+    return medal;
   }
 
   function setHideSeekSearchPulse(actor, tone) {
@@ -3003,6 +3232,53 @@
     }
   }
 
+  function spawnHideSeekCallout(text, x, y, roomId, options) {
+    if (!text) return;
+    const settings = Object.assign({
+      tone: 'info',
+      life: 1.15,
+      vy: -18,
+    }, options || {});
+    const colors = {
+      found: '#2ec7d3',
+      hot: '#f58220',
+      warm: '#ffd166',
+      cold: '#9aa4b2',
+      good: '#8cff66',
+      risk: '#ffb347',
+      info: '#bdeff4',
+    };
+    if (!Array.isArray(hideSeekState.effects)) hideSeekState.effects = [];
+    hideSeekState.effects.push({
+      text,
+      x,
+      y,
+      vy: settings.vy,
+      roomId,
+      color: colors[settings.tone] || colors.info,
+      life: settings.life,
+      maxLife: settings.life,
+    });
+    if (hideSeekState.effects.length > 10) hideSeekState.effects.shift();
+  }
+
+  function spawnHideSeekSpotCallout(spot, text, tone) {
+    if (!spot) return;
+    spawnHideSeekCallout(text, spot.x + spot.width / 2, spot.y - 8, spot.roomId || hideSeekState.activeRoomId, {
+      tone,
+      life: 1.25,
+      vy: -14,
+    });
+  }
+
+  function updateHideSeekEffects(delta) {
+    hideSeekState.effects = (hideSeekState.effects || []).filter(effect => {
+      effect.life -= delta;
+      effect.y += (effect.vy || 0) * delta;
+      return effect.life > 0;
+    });
+  }
+
   function updateHideSeekParticles(delta) {
     hideSeekState.particles = (hideSeekState.particles || []).filter(particle => {
       particle.life -= delta;
@@ -3016,7 +3292,43 @@
   function useHideSeekSpecialAction() {
     if (hideSeekState.phase === HideSeekGameState.HIDER_TURN) {
       peekHideSeekHider();
+    } else if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
+      listenHideSeekSeeker();
     }
+  }
+
+  function listenHideSeekSeeker() {
+    if (hideSeekState.listenUsed || hideSeekState.phase !== HideSeekGameState.SEEKER_TURN) return;
+    hideSeekState.listenUsed = true;
+    const seeker = hideSeekState.actors.seeker;
+    const hiddenPosition = hideSeekState.hiddenPosition;
+    const sameRoom = hiddenPosition && seeker.roomId === hiddenPosition.roomId;
+    const hiddenSpot = getHideSeekSpotById(hideSeekState.hiddenSpotId);
+    const noisy = hideSeekState.noiseLevel >= 0.55;
+    let message = 'Listen used. The hider was very quiet.';
+    let tone = 'cold';
+    if (sameRoom && noisy) {
+      message = `Listen used. A tiny rustle comes from cover in this room.`;
+      tone = 'warm';
+    } else if (sameRoom) {
+      message = `Listen used. This room feels suspicious, but the exact spot stays hidden.`;
+      tone = 'warm';
+    } else if (noisy) {
+      message = 'Listen used. You hear something from another room.';
+      tone = 'warm';
+    } else if (hideSeekState.searchesRemaining <= 2 && hiddenSpot) {
+      message = `Listen used. Nothing clear, but ${hiddenSpot.label} would be a sneaky kind of cover.`;
+    }
+    setHideSeekSearchPulse(seeker, tone);
+    spawnHideSeekCallout(tone === 'warm' ? 'RUSTLE?' : 'LISTEN', seeker.x + seeker.width / 2, seeker.y - 8, seeker.roomId, {
+      tone: tone === 'warm' ? 'warm' : 'info',
+      life: 1.2,
+    });
+    setHideSeekMessage(message);
+    hideSeekState.lastClue = message;
+    playHideSeekTone('listen');
+    renderHideSeek();
+    setHideSeekMessage(message);
   }
 
   function peekHideSeekHider() {
@@ -3039,6 +3351,10 @@
       speed: 32,
       size: 3,
       life: 0.55,
+    });
+    spawnHideSeekCallout('PEEK +NOISE', actor.x + actor.width / 2, actor.y - 8, actor.roomId, {
+      tone: hideSeekState.noiseLevel >= 0.5 ? 'risk' : 'warm',
+      life: 1.1,
     });
     setHideSeekMessage(`Peeked near the ${coverQuality.spot.label}. Noise risk is ${Math.round(hideSeekState.noiseLevel * 100)}%.`);
     playHideSeekTone('listen');
@@ -3210,12 +3526,16 @@
     hideSeekState.searchesRemaining = getHideSeekSearchCount(hideSeekState.difficulty);
     hideSeekState.hiderTimeRemaining = HIDE_SEEK_HIDE_SECONDS;
     hideSeekState.wrongGuesses = 0;
+    hideSeekState.listenUsed = false;
+    hideSeekState.roundMedal = '';
+    hideSeekState.lastClue = '';
     hideSeekState.roundHiderScore = 0;
     hideSeekState.roundSeekerScore = 0;
     hideSeekState.revealPulse = 0;
     hideSeekState.searchPulse = null;
     hideSeekState.roomTrail = [hideSeekState.activeRoomId];
     hideSeekState.particles = [];
+    hideSeekState.effects = [];
     hideSeekState.cameraShake = 0;
     hideSeekState.coverGlowPulse = 0;
     hideSeekState.lastUrgentSecond = null;
@@ -3250,7 +3570,7 @@
 
     hideSeekStartButton.hidden = ![HideSeekGameState.TITLE, HideSeekGameState.ROUND_START, HideSeekGameState.GAME_OVER].includes(hideSeekState.phase);
     hideSeekFoundButton.hidden = ![HideSeekGameState.HIDER_TURN, HideSeekGameState.SEEKER_LOOK_AWAY, HideSeekGameState.SEEKER_TURN].includes(hideSeekState.phase);
-    hideSeekSpecialButton.hidden = hideSeekState.phase !== HideSeekGameState.HIDER_TURN;
+    hideSeekSpecialButton.hidden = ![HideSeekGameState.HIDER_TURN, HideSeekGameState.SEEKER_TURN].includes(hideSeekState.phase);
     hideSeekSprintButton.hidden = ![HideSeekGameState.HIDER_TURN, HideSeekGameState.SEEKER_TURN].includes(hideSeekState.phase);
     hideSeekNextButton.hidden = ![HideSeekGameState.FOUND, HideSeekGameState.ROUND_RESULTS].includes(hideSeekState.phase);
     hideSeekFoundButton.disabled = false;
@@ -3270,9 +3590,8 @@
     }
 
     if (hideSeekState.phase === HideSeekGameState.HIDER_TURN) {
-      hideSeekFoundButton.textContent = 'Hide Here';
-      hideSeekFoundButton.textContent = nearbySpot ? 'Hide Here' : 'Hide (find cover)';
-      hideSeekFoundButton.setAttribute('aria-label', 'Enter this hiding spot');
+      hideSeekFoundButton.textContent = nearbySpot ? 'Hide Here' : 'Move Closer to Cover';
+      hideSeekFoundButton.setAttribute('aria-label', nearbySpot ? 'Hide here' : 'Move closer to cover');
       hideSeekFoundButton.disabled = false;
       hideSeekSpecialButton.textContent = 'Peek';
       hideSeekSpecialButton.setAttribute('aria-label', 'Peek and risk making noise');
@@ -3280,25 +3599,30 @@
       hideSeekRoundTitle.textContent = `${hiderName}, you have ${Math.ceil(hideSeekState.hiderTimeRemaining)} seconds to hide.`;
       hideSeekRoundText.textContent = coverQuality.spot
         ? `${coverQuality.detail} Hide Here locks it in. Peek helps you scout, but it raises your noise.`
-        : `Move into a room, step close to a highlighted cover spot, and hide before the timer runs out.`;
+        : `Move next to a glowing hiding spot. The Hide Here button turns on when cover is in reach.`;
       setHideSeekMessage(coverQuality.spot ? coverQuality.detail : `${hiderName} is looking for cover.`);
     } else if (hideSeekState.phase === HideSeekGameState.SEEKER_LOOK_AWAY) {
-      hideSeekFoundButton.textContent = `${seekerName} Starts Searching`;
+      hideSeekFoundButton.textContent = 'Start Seeking';
       hideSeekFoundButton.setAttribute('aria-label', `${seekerName} starts searching`);
       hideSeekRoundTitle.textContent = `${hiderName} is hidden.`;
       hideSeekRoundText.textContent = `Pass the phone to ${seekerName}. The map resets to the start room, and each wrong unique inspection uses one search.`;
       setHideSeekMessage(`${seekerName}, no peeking until you tap start searching.`);
     } else if (hideSeekState.phase === HideSeekGameState.SEEKER_TURN) {
-      hideSeekFoundButton.textContent = nearbySpot ? 'Inspect Spot' : 'Inspect (find cover)';
-      hideSeekFoundButton.setAttribute('aria-label', 'Inspect this hiding spot');
+      hideSeekFoundButton.textContent = hideSeekState.inspectTime > 0 ? 'Inspecting...' : (nearbySpot ? 'Inspect Spot' : 'Move Closer to Inspect');
+      hideSeekFoundButton.setAttribute('aria-label', nearbySpot ? 'Inspect this hiding spot' : 'Move closer to inspect');
       hideSeekFoundButton.disabled = hideSeekState.inspectTime > 0;
+      hideSeekSpecialButton.textContent = hideSeekState.listenUsed ? 'Listen Used' : 'Listen';
+      hideSeekSpecialButton.disabled = hideSeekState.listenUsed || hideSeekState.inspectTime > 0;
+      hideSeekSpecialButton.setAttribute('aria-label', 'Listen for a vague clue');
       hideSeekRoundTitle.textContent = `${seekerName}, find the hider.`;
       hideSeekRoundText.textContent = nearbySpot
-        ? `You are close to the ${nearbySpot.label}. Inspect it when you are ready.`
-        : `Walk room to room, stop beside cover, and inspect carefully. Every wrong new check costs one search.`;
-      setHideSeekMessage(`${seekerName} is searching ${room.name}. Searches left: ${hideSeekState.searchesRemaining}.`);
+        ? `You are close to the ${nearbySpot.label}. Inspect it when you are ready. A clear spot turns gray.`
+        : `Move beside a glowing cover spot to inspect it. Listen gives one vague clue and does not spend a search.`;
+      setHideSeekMessage(hideSeekState.lastClue || `${seekerName} is searching ${room.name}. Searches left: ${hideSeekState.searchesRemaining}.`);
     } else if (hideSeekState.phase === HideSeekGameState.FOUND || hideSeekState.phase === HideSeekGameState.ROUND_RESULTS) {
-      hideSeekRoundTitle.textContent = hideSeekState.phase === HideSeekGameState.FOUND ? 'Found!' : 'Round over.';
+      hideSeekRoundTitle.textContent = hideSeekState.phase === HideSeekGameState.FOUND
+        ? `Found near the ${hideSeekState.hiddenSpotLabel.replace(/^near the /, '')}!`
+        : `${hiderName} survived!`;
       hideSeekRoundText.textContent = hideSeekState.lastRoundText || `${hiderName} was hidden ${hideSeekState.hiddenSpotLabel}.`;
       setHideSeekMessage(hideSeekState.lastRoundText || 'Round complete.');
     } else if (hideSeekState.phase === HideSeekGameState.GAME_OVER) {
@@ -3393,9 +3717,16 @@
     const map = getHideSeekMap();
     hideSeekState.phase = HideSeekGameState.SEEKER_TURN;
     hideSeekState.searchesRemaining = getHideSeekSearchCount(hideSeekState.difficulty);
+    hideSeekState.listenUsed = false;
+    hideSeekState.lastClue = '';
     hideSeekState.lastUrgentSecond = null;
     hideSeekState.actors.seeker = createHideSeekActor(map.startRoom, true, '#f58220');
     hideSeekState.activeRoomId = map.startRoom;
+    hideSeekState.lastClue = `${getHideSeekDisplayName(hideSeekState.seekerIndex)} starts in ${getHideSeekRoom(map.startRoom).name}. Search glowing cover; each wrong new spot spends one search.`;
+    spawnHideSeekCallout('SEEK!', hideSeekState.actors.seeker.x + hideSeekState.actors.seeker.width / 2, hideSeekState.actors.seeker.y - 8, map.startRoom, {
+      tone: 'info',
+      life: 1.1,
+    });
     playHideSeekTone('door');
     renderHideSeek();
   }
@@ -3407,7 +3738,7 @@
       return;
     }
     if (hideSeekState.phase === HideSeekGameState.HIDER_TURN) {
-      lockHideSeekHiderPosition('button', getNearbyHideSeekSpot(actor));
+      lockHideSeekHiderPosition('button', getBufferedHideSeekSpot(actor));
       return;
     }
     if (hideSeekState.phase !== HideSeekGameState.SEEKER_TURN) return;
@@ -3470,6 +3801,7 @@
       size: 3,
       life: 0.7,
     });
+    spawnHideSeekSpotCallout(nearbySpot, 'HIDDEN', 'good');
     hideSeekState.cameraShake = Math.max(hideSeekState.cameraShake, 0.18);
     hideSeekState.hiddenPosition = {
       x: actor.x,
@@ -3480,7 +3812,7 @@
     hideSeekState.phase = HideSeekGameState.SEEKER_LOOK_AWAY;
     hideSeekState.hiderTimeRemaining = source === 'timer' ? 0 : hideSeekState.hiderTimeRemaining;
     playHideSeekTone('hide');
-    setHideSeekMessage(`${coverQuality.label}. Phone pass time.`);
+    setHideSeekMessage(`${coverQuality.label} locked at the ${nearbySpot.label}. Phone pass time.`);
     renderHideSeek();
     // Solo: when the computer is the seeker, no phone pass is needed — let the
     // AI start searching right away.
@@ -3494,7 +3826,7 @@
     const hider = getHideSeekPlayer(hideSeekState.hiderIndex);
     const seeker = getHideSeekPlayer(hideSeekState.seekerIndex);
     const actor = hideSeekState.actors.seeker;
-    const inspectedSpot = getNearbyHideSeekSpot(actor);
+    const inspectedSpot = getBufferedHideSeekSpot(actor);
     const hiddenPosition = hideSeekState.hiddenPosition;
     if (!hiddenPosition) return;
     if (!inspectedSpot) {
@@ -3505,7 +3837,8 @@
     const inspectedState = getHideSeekSpotState(inspectedSpot.id);
     const isDuplicateWrongSearch = inspectedSpot.id !== hideSeekState.hiddenSpotId && inspectedState === 'searched';
     if (isDuplicateWrongSearch) {
-      setHideSeekMessage('You already checked there.');
+      setHideSeekMessage(`You already checked the ${inspectedSpot.label}. Pick a different glowing spot.`);
+      spawnHideSeekSpotCallout(inspectedSpot, 'ALREADY CLEAR', 'cold');
       playHideSeekTone('wrong');
       renderHideSeek();
       return;
@@ -3533,7 +3866,7 @@
         `dist=${Math.round(distance)} tol=${HIDE_SEEK_SEARCH_TOLERANCE}`
       );
     }
-    const feedback = getHideSeekSearchFeedback(sameRoom, distance);
+    const feedback = getHideSeekSearchFeedback(sameRoom, distance, inspectedSpot);
     setHideSeekSearchPulse(actor, feedback.tone);
     if (inspectedSpot.id !== hideSeekState.hiddenSpotId) {
       hideSeekState.wrongGuesses += 1;
@@ -3549,14 +3882,21 @@
         life: 0.62,
       });
       hideSeekState.cameraShake = Math.max(hideSeekState.cameraShake, 0.12);
-      setHideSeekMessage(`${feedback.text} ${hideSeekState.searchesRemaining} searches left.`);
+      hideSeekState.lastClue = `${feedback.text} ${hideSeekState.searchesRemaining} search${hideSeekState.searchesRemaining === 1 ? '' : 'es'} left.`;
+      spawnHideSeekSpotCallout(inspectedSpot, feedback.tone === 'hot' ? 'VERY CLOSE' : feedback.tone === 'warm' ? 'WARM' : 'CLEAR', feedback.tone);
+      setHideSeekMessage(hideSeekState.lastClue);
       playHideSeekTone('wrong');
       renderHideSeek();
-      if (hideSeekState.searchesRemaining <= 0) hideSeekSeekerFailed();
+      if (hideSeekState.searchesRemaining <= 0) {
+        hideSeekSeekerFailed();
+      } else {
+        setHideSeekMessage(hideSeekState.lastClue);
+      }
       return;
     }
 
     setHideSeekSpotState(inspectedSpot.id, 'found');
+    spawnHideSeekSpotCallout(inspectedSpot, 'FOUND!', 'found');
     const foundSpot = getHideSeekSpotById(hideSeekState.hiddenSpotId) || {
       label: hideSeekState.hiddenSpotLabel || 'hiding place',
       difficulty: 3,
@@ -3578,7 +3918,8 @@
     hideSeekState.cameraShake = Math.max(hideSeekState.cameraShake, 0.45);
     revealHideSeekHider(foundSpot);
     hideSeekRound += 1;
-    hideSeekState.lastRoundText = `${getHideSeekDisplayName(hideSeekState.seekerIndex)} found ${getHideSeekDisplayName(hideSeekState.hiderIndex)} ${hideSeekState.hiddenSpotLabel}. Cover: ${hideSeekState.hiddenCoverLabel}. ${getHideSeekDisplayName(hideSeekState.seekerIndex)}: +${hideSeekState.roundSeekerScore}. ${getHideSeekDisplayName(hideSeekState.hiderIndex)}: +${hideSeekState.roundHiderScore}. Searches used: ${hideSeekState.inspectionCount}. Stealth bonus: ${stealthBonus}.`;
+    const medal = setHideSeekRoundMedal(true);
+    hideSeekState.lastRoundText = `${getHideSeekDisplayName(hideSeekState.seekerIndex)} found ${getHideSeekDisplayName(hideSeekState.hiderIndex)} ${hideSeekState.hiddenSpotLabel}. ${feedback.text} Cover: ${hideSeekState.hiddenCoverLabel}. Searches used: ${hideSeekState.inspectionCount}. ${getHideSeekDisplayName(hideSeekState.seekerIndex)}: +${hideSeekState.roundSeekerScore}. ${getHideSeekDisplayName(hideSeekState.hiderIndex)}: +${hideSeekState.roundHiderScore}.${medal ? ` Medal: ${medal}.` : ''}`;
     playHideSeekTone('found');
     renderHideSeek();
   }
@@ -3621,7 +3962,9 @@
     hideSeekState.cameraShake = Math.max(hideSeekState.cameraShake, 0.25);
     revealHideSeekHider(spot || createHideSeekActor(hideSeekState.activeRoomId, true, '#2ec7d3'));
     hideSeekRound += 1;
-    hideSeekState.lastRoundText = `${getHideSeekDisplayName(hideSeekState.hiderIndex)} stayed hidden ${hideSeekState.hiddenSpotLabel}. Cover: ${hideSeekState.hiddenCoverLabel}. Peeks: ${hideSeekState.peekCount}. Stealth bonus: ${stealthBonus}. ${getHideSeekDisplayName(hideSeekState.hiderIndex)}: +${hideSeekState.roundHiderScore}.`;
+    const medal = setHideSeekRoundMedal(false);
+    if (spot) spawnHideSeekSpotCallout(spot, 'ESCAPED!', 'risk');
+    hideSeekState.lastRoundText = `${getHideSeekDisplayName(hideSeekState.hiderIndex)} vanished ${hideSeekState.hiddenSpotLabel}. The seeker ran out of searches before clearing the right cover. Cover: ${hideSeekState.hiddenCoverLabel}. Peeks: ${hideSeekState.peekCount}. ${getHideSeekDisplayName(hideSeekState.hiderIndex)}: +${hideSeekState.roundHiderScore}.${medal ? ` Medal: ${medal}.` : ''}`;
     playHideSeekTone('wrong');
     renderHideSeek();
   }
@@ -3662,8 +4005,23 @@
     return getHideSeekPlayerName(index);
   }
 
-  // If it is the computer's turn to hide, pick a random valid spot in the start
-  // room and lock it in, then hand the seeker turn to the human.
+  function getHideSeekAIProfile() {
+    return HIDE_SEEK_AI_PROFILES[hideSeekState.difficulty] || HIDE_SEEK_AI_PROFILES[HIDE_SEEK_DEFAULT_DIFFICULTY];
+  }
+
+  function chooseWeightedHideSeekItem(items, getWeight) {
+    const weighted = items.map(item => ({ item, weight: Math.max(0.01, Number(getWeight(item)) || 0.01) }));
+    const total = weighted.reduce((sum, entry) => sum + entry.weight, 0);
+    let marker = Math.random() * total;
+    for (const entry of weighted) {
+      marker -= entry.weight;
+      if (marker <= 0) return entry.item;
+    }
+    return weighted[weighted.length - 1] ? weighted[weighted.length - 1].item : null;
+  }
+
+  // If it is the computer's turn to hide, pick a weighted valid spot anywhere on
+  // the map and lock it in, then hand the seeker turn to the human.
   function maybeStartHideSeekComputerTurn() {
     if (!hideSeekSoloEnabled) return;
     if (hideSeekState.phase === HideSeekGameState.HIDER_TURN && isHideSeekComputerHider()) {
@@ -3673,15 +4031,22 @@
 
   function hideSeekComputerHide() {
     if (hideSeekState.phase !== HideSeekGameState.HIDER_TURN) return;
-    const map = getHideSeekMap();
-    const startRoom = getHideSeekRoom(map.startRoom);
-    if (!startRoom) return;
     const hider = hideSeekState.actors.hider;
-    hider.roomId = startRoom.id;
-    hideSeekState.activeRoomId = startRoom.id;
-    const spots = (startRoom.spots || []).filter(spot => getHideSeekSpotState(spot.id) !== 'disabled');
+    const profile = getHideSeekAIProfile();
+    const spots = getAllHideSeekSpots().filter(spot => getHideSeekSpotState(spot.id) !== 'disabled');
     if (!spots.length) return;
-    const spot = Object.assign({ roomId: startRoom.id }, spots[Math.floor(Math.random() * spots.length)]);
+    const spot = chooseWeightedHideSeekItem(spots, item => {
+      const difficulty = Number(item.difficulty) || 3;
+      const difficultyWeight = hideSeekState.difficulty === 'easy'
+        ? Math.pow(6 - difficulty, 1.6)
+        : Math.pow(difficulty, hideSeekState.difficulty === 'hard' ? 2.1 : 1.35);
+      const startRoomPenalty = item.roomId === getHideSeekMap().startRoom ? 0.82 : 1.18;
+      const noisyPenalty = item.noisy && hideSeekState.difficulty === 'hard' ? 0.7 : 1;
+      return difficultyWeight * startRoomPenalty * noisyPenalty * (0.75 + Math.random() * 0.7);
+    });
+    if (!spot) return;
+    hider.roomId = spot.roomId;
+    hideSeekState.activeRoomId = spot.roomId;
     placeHideSeekActorAtSpot(hider, spot);
     hideSeekSelectedSpotId = spot.id;
     if (hideSeekDebugEnabled) hideSeekDebugLog(`Computer hid at ${spot.id} (${spot.label}).`);
@@ -3692,9 +4057,7 @@
     }
   }
 
-  // Simple, fair AI seeker: walk to the nearest unsearched spot in the room and
-  // inspect it; once a room is cleared, head through an exit toward a room that
-  // still has unsearched spots.
+  // Fair AI seeker: inspect plausible nearby cover, then steer room to room.
   function roomHasUnsearchedHideSeekSpots(roomId) {
     const room = getHideSeekRoom(roomId);
     return ((room && room.spots) || []).some(spot => {
@@ -3703,19 +4066,61 @@
     });
   }
 
+  function chooseHideSeekAISeekerTarget(seeker, room, profile) {
+    const hiddenSpot = getHideSeekSpotById(hideSeekState.hiddenSpotId);
+    const noisy = hideSeekState.noiseLevel >= 0.55;
+    const candidates = (room.spots || [])
+      .filter(spot => {
+        const state = getHideSeekSpotState(spot.id);
+        return state !== 'disabled' && state !== 'searched' && state !== 'found';
+      })
+      .map(spot => {
+        const distance = getHideSeekDistanceToRect(seeker, spot);
+        const difficulty = Number(spot.difficulty) || 3;
+        const hiddenSignal = hiddenSpot && hiddenSpot.roomId === room.id && spot.id === hiddenSpot.id
+          ? profile.prefersNoise * (noisy ? 130 : 45)
+          : 0;
+        const spotNoiseSignal = spot.noisy ? profile.prefersNoise * 28 : 0;
+        const difficultySignal = difficulty * profile.prefersDifficulty * 15;
+        const mistakeNoise = Math.random() < profile.mistakeChance ? Math.random() * 190 : 0;
+        return {
+          spot,
+          distance,
+          score: distance - hiddenSignal - spotNoiseSignal - difficultySignal + mistakeNoise,
+        };
+      })
+      .sort((a, b) => a.score - b.score);
+    if (!candidates.length) return null;
+    if (Math.random() < profile.mistakeChance) {
+      return candidates[Math.floor(Math.random() * Math.min(candidates.length, 3))];
+    }
+    return candidates[0];
+  }
+
+  function chooseHideSeekAIExit(room, profile) {
+    const exits = room.exits || [];
+    if (!exits.length) return null;
+    const hiddenSpot = getHideSeekSpotById(hideSeekState.hiddenSpotId);
+    const noisy = hideSeekState.noiseLevel >= 0.55;
+    const usefulExits = exits.filter(exit => roomHasUnsearchedHideSeekSpots(exit.targetRoom));
+    const candidates = usefulExits.length ? usefulExits : exits;
+    return chooseWeightedHideSeekItem(candidates, exit => {
+      const revisitPenalty = exit.targetRoom === hideSeekAI.lastRoom ? 0.55 : 1;
+      const hiddenRoomSignal = hiddenSpot && hiddenSpot.roomId === exit.targetRoom
+        ? 1 + profile.roomDistance + (noisy ? profile.prefersNoise : 0)
+        : 1;
+      return revisitPenalty * hiddenRoomSignal * (0.8 + Math.random() * 0.45);
+    });
+  }
+
   function updateHideSeekAISeeker(delta) {
     const seeker = hideSeekState.actors.seeker;
     const room = getHideSeekRoom(seeker.roomId);
     if (!room) return;
+    const profile = getHideSeekAIProfile();
     hideSeekAI.thinkTimer = Math.max(0, hideSeekAI.thinkTimer - delta);
 
-    let target = null;
-    (room.spots || []).forEach(spot => {
-      const state = getHideSeekSpotState(spot.id);
-      if (state === 'disabled' || state === 'searched' || state === 'found') return;
-      const distance = getHideSeekDistanceToRect(seeker, spot);
-      if (!target || distance < target.distance) target = { spot, distance };
-    });
+    const target = chooseHideSeekAISeekerTarget(seeker, room, profile);
 
     if (target) {
       const near = getNearbyHideSeekSpot(seeker);
@@ -3723,7 +4128,7 @@
         hideSeekState.touchTarget = null;
         if (hideSeekState.inspectTime <= 0 && hideSeekAI.thinkTimer <= 0) {
           searchHideSeekPosition();
-          hideSeekAI.thinkTimer = 0.7;
+          hideSeekAI.thinkTimer = profile.thinkDelay;
         }
       } else {
         const center = getHideSeekSpotCenter(target.spot);
@@ -3733,11 +4138,8 @@
     }
 
     // Room cleared — steer toward an exit leading somewhere still worth checking.
-    const exits = room.exits || [];
-    if (!exits.length) return;
-    const chosen = exits.find(exit => exit.targetRoom !== hideSeekAI.lastRoom && roomHasUnsearchedHideSeekSpots(exit.targetRoom))
-      || exits.find(exit => roomHasUnsearchedHideSeekSpots(exit.targetRoom))
-      || exits[0];
+    const chosen = chooseHideSeekAIExit(room, profile);
+    if (!chosen) return;
     const trigger = getHideSeekExitTriggerRect(chosen);
     hideSeekState.touchTarget = { x: trigger.x + trigger.width / 2, y: trigger.y + trigger.height / 2 };
     hideSeekAI.lastRoom = room.id;
@@ -3787,6 +4189,9 @@
       searchesRemaining: getHideSeekSearchCount(hideSeekCountdown.value || HIDE_SEEK_DEFAULT_DIFFICULTY),
       hiderTimeRemaining: HIDE_SEEK_HIDE_SECONDS,
       wrongGuesses: 0,
+      listenUsed: false,
+      roundMedal: '',
+      lastClue: '',
       roundHiderScore: 0,
       roundSeekerScore: 0,
       lastRoundText: '',
@@ -3801,6 +4206,7 @@
       searchPulse: null,
       roomTrail: [((hideSeekMaps[hideSeekMode.value] || hideSeekMaps['roadside-lodge']).startRoom)],
       particles: [],
+      effects: [],
       cameraShake: 0,
       coverGlowPulse: 0,
       lastUrgentSecond: null,
@@ -3838,6 +4244,7 @@
     }
     if (hideSeekState.cameraShake > 0) hideSeekState.cameraShake = Math.max(0, hideSeekState.cameraShake - delta * 1.8);
     updateHideSeekParticles(delta);
+    updateHideSeekEffects(delta);
     if (hideSeekState.inspectTime > 0) hideSeekState.inspectTime = Math.max(0, hideSeekState.inspectTime - delta);
     if (hideSeekState.noiseLevel > 0) hideSeekState.noiseLevel = Math.max(0, hideSeekState.noiseLevel - delta * 0.025);
     hideSeekState.coverGlowPulse = (hideSeekState.coverGlowPulse + delta * 2.2) % (Math.PI * 2);
@@ -4195,6 +4602,7 @@
     drawHideSeekActionEffects(ctx, room);
     drawHideSeekParticles(ctx, room);
     drawHideSeekAtmosphere(ctx, room, map);
+    drawHideSeekEffects(ctx, room);
     ctx.restore();
     if (hideSeekDebugEnabled) drawHideSeekDebug(ctx, room, map);
   }
@@ -4521,6 +4929,31 @@
       ctx.beginPath();
       ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
       ctx.fill();
+      ctx.restore();
+    });
+  }
+
+  function drawHideSeekEffects(ctx, room) {
+    (hideSeekState.effects || []).forEach(effect => {
+      if (effect.roomId !== room.id) return;
+      const alpha = Math.max(0, effect.life / effect.maxLife);
+      const text = String(effect.text || '').slice(0, 18);
+      const width = Math.max(58, text.length * 9 + 18);
+      const height = 22;
+      const x = effect.x - width / 2;
+      const y = effect.y - height;
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, alpha * 1.15);
+      ctx.fillStyle = 'rgba(6, 21, 36, 0.86)';
+      fillHideSeekRoundedRect(ctx, x, y, width, height, 11);
+      ctx.strokeStyle = effect.color || '#bdeff4';
+      ctx.lineWidth = 2;
+      strokeHideSeekRoundedRect(ctx, x + 1, y + 1, width - 2, height - 2, 10);
+      ctx.fillStyle = effect.color || '#bdeff4';
+      ctx.font = '900 11px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, effect.x, y + height / 2 + 1);
       ctx.restore();
     });
   }
@@ -5131,9 +5564,10 @@
     };
   }
 
-  function handleHideSeekPointer(event) {
+  function handleHideSeekPointer(event, options = {}) {
     if (!hideSeekCanvas || !hideSeekState.input) return;
     if (!isHideSeekMovementPhase()) return;
+    if (!options.start && event.pointerId !== hideSeekActiveCanvasPointerId) return;
     const point = getHideSeekCanvasPoint(event);
     if (!point) return;
     event.preventDefault();
@@ -5152,7 +5586,27 @@
     }
   }
 
+  function handleHideSeekCanvasDoubleTap(event) {
+    if (hideSeekState.phase !== HideSeekGameState.HIDER_TURN) {
+      hideSeekLastCanvasTap = null;
+      return;
+    }
+    const point = getHideSeekCanvasPoint(event);
+    if (!point) return;
+    const now = event.timeStamp || performance.now();
+    const previous = hideSeekLastCanvasTap;
+    const isDoubleTap = previous
+      && now - previous.time <= HIDE_SEEK_DOUBLE_TAP_MS
+      && Math.hypot(point.x - previous.x, point.y - previous.y) <= HIDE_SEEK_DOUBLE_TAP_RADIUS;
+    hideSeekLastCanvasTap = { time: now, x: point.x, y: point.y };
+    if (!isDoubleTap) return;
+    hideSeekLastCanvasTap = null;
+    hideSeekState.touchTarget = null;
+    lockHideSeekHiderPosition('button', getNearbyHideSeekSpot(hideSeekState.actors.hider));
+  }
+
   function releaseHideSeekPointer() {
+    hideSeekActiveCanvasPointerId = null;
     hideSeekState.touchTarget = null;
   }
 
@@ -5543,6 +5997,18 @@
   function renderTriviaChoices(item) {
     triviaChoices.innerHTML = '';
     const turnPlayerId = getTurnPlayerId(triviaIndex);
+    const feedback = {
+      correct: [
+        'Direct hit. The car brain just got one point stronger.',
+        'Clean answer. Give that passenger the tiny scholar nod.',
+        'Correct. That one deserves a dashboard drumroll.',
+      ],
+      wrong: [
+        'Close call, but the road signs disagree.',
+        'Wrong exit. The right answer was hiding in the next lane.',
+        'Not quite. Same road, different mile marker.',
+      ],
+    };
     getTriviaChoices(item).forEach(choice => {
       const button = document.createElement('button');
       button.type = 'button';
@@ -5557,8 +6023,10 @@
         });
         triviaAnswer.hidden = false;
         if (isCorrect && turnPlayerId) {
+          triviaAnswer.textContent = `${feedback.correct[Math.floor(Math.random() * feedback.correct.length)]} Answer: ${item.answer}`;
           awardTrivia(turnPlayerId);
         } else {
+          triviaAnswer.textContent = `${feedback.wrong[Math.floor(Math.random() * feedback.wrong.length)]} Answer: ${item.answer}`;
           renderAwardButtons(triviaAwardButtons, 'Gets Override Point', awardTrivia, false);
         }
       });
@@ -5656,6 +6124,7 @@
     triviaHandoff.textContent = `${getTurnPlayerName(triviaIndex)} answers this one.${judgeNote ? ` ${judgeNote}` : ''}`;
     triviaQuestion.textContent = item.question;
     triviaAnswer.textContent = item.answer;
+    triviaAnswer.dataset.answer = item.answer;
     triviaAnswer.hidden = true;
     renderTriviaChoices(item);
     triviaQuestionAwarded = false;
@@ -6536,6 +7005,8 @@
     pongState.ball.y = pongState.height / 2;
     pongState.ball.vx = config.ballSpeed * direction;
     pongState.ball.vy = (config.ballSpeed * 0.55) * (Math.random() > 0.5 ? 1 : -1);
+    pongState.rally = 0;
+    pongState.lastHitSide = '';
   }
 
   function drawPong() {
@@ -6666,6 +7137,37 @@
       pongScore.textContent = `${pongState.leftPaddle.score} : ${pongState.rightPaddle.score}`;
     }
     pongStatus.textContent = `${leftName} controls the left paddle, ${rightName} controls the right paddle. ${modeLabel}. First to ${pongState.targetScore} wins.`;
+  }
+
+  function getPongPlayerLabels() {
+    return {
+      leftName: players[0] ? players[0].name : 'P1',
+      rightName: pongSettings.opponentMode === 'computer'
+        ? (pongSettings.difficulty === 'deathmatch' ? 'Death Match AI' : 'Computer')
+        : (players[1] ? players[1].name : 'P2'),
+    };
+  }
+
+  function capPongBallSpeed() {
+    const config = getPongDifficultyConfig();
+    const cap = config.maxBallSpeed || 8.5;
+    const speed = Math.hypot(pongState.ball.vx, pongState.ball.vy);
+    if (speed <= cap || speed <= 0) return;
+    const scale = cap / speed;
+    pongState.ball.vx *= scale;
+    pongState.ball.vy *= scale;
+  }
+
+  function describePongPoint(scoringSide) {
+    const labels = getPongPlayerLabels();
+    const scorer = scoringSide === 'left' ? labels.leftName : labels.rightName;
+    const rally = pongState.rally || 0;
+    const rallyText = rally >= 8
+      ? ` after a ${rally}-hit rally`
+      : rally >= 3
+        ? ` after ${rally} hits`
+        : '';
+    return `${scorer} scores${rallyText}. ${pongState.leftPaddle.score} to ${pongState.rightPaddle.score}. First to ${pongState.targetScore}.`;
   }
 
   function movePongPaddleTo(side, clientY) {
@@ -6818,11 +7320,12 @@
       if (pongKeys.rightDown) pongState.rightPaddle.y += speed;
     } else {
       const targetY = predictPongInterceptY() - pongState.paddleHeight / 2;
+      const pressure = Math.min(1.2, 1 + Math.max(0, (pongState.rally || 0) - 4) * 0.025);
       const delta = targetY - pongState.rightPaddle.y;
       if (config.aiPerfect) {
         pongState.rightPaddle.y = targetY;
       } else if (Math.abs(delta) > config.aiError) {
-        pongState.rightPaddle.y += Math.sign(delta) * Math.min(config.aiSpeed, Math.abs(delta));
+        pongState.rightPaddle.y += Math.sign(delta) * Math.min(config.aiSpeed * pressure, Math.abs(delta));
       } else {
         pongState.rightPaddle.y += Math.sign(delta) * Math.min(2.5, Math.abs(delta));
       }
@@ -6857,8 +7360,14 @@
     pongState.ball.x += pongState.ball.vx;
     pongState.ball.y += pongState.ball.vy;
 
-    if (pongState.ball.y <= pongState.ball.size / 2 || pongState.ball.y >= pongState.height - pongState.ball.size / 2) {
-      pongState.ball.vy *= -1;
+    if (pongState.ball.y <= pongState.ball.size / 2) {
+      pongState.ball.y = pongState.ball.size / 2;
+      pongState.ball.vy = Math.abs(pongState.ball.vy);
+      pongState.shakeFrames = Math.max(pongState.shakeFrames, 2);
+    } else if (pongState.ball.y >= pongState.height - pongState.ball.size / 2) {
+      pongState.ball.y = pongState.height - pongState.ball.size / 2;
+      pongState.ball.vy = -Math.abs(pongState.ball.vy);
+      pongState.shakeFrames = Math.max(pongState.shakeFrames, 2);
     }
 
     const leftHit = pongState.ball.vx < 0
@@ -6873,20 +7382,33 @@
       const paddle = leftHit ? pongState.leftPaddle : pongState.rightPaddle;
       const paddleY = paddle.y;
       const offset = (pongState.ball.y - (paddleY + pongState.paddleHeight / 2)) / (pongState.paddleHeight / 2);
-      pongState.ball.vx *= -1.06;
-      pongState.ball.vy = offset * 5;
+      const side = leftHit ? 'left' : 'right';
+      const direction = leftHit ? 1 : -1;
+      const speedUp = 1.018 + Math.min(0.022, (pongState.rally || 0) * 0.002);
+      pongState.ball.x = leftHit
+        ? 36 + pongState.ball.size / 2 + 1
+        : pongState.width - 36 - pongState.ball.size / 2 - 1;
+      pongState.ball.vx = Math.abs(pongState.ball.vx) * direction * speedUp;
+      pongState.ball.vy = offset * (4.35 + Math.min(1.25, (pongState.rally || 0) * 0.08));
+      pongState.rally = (pongState.rally || 0) + 1;
+      pongState.lastHitSide = side;
+      capPongBallSpeed();
       paddle.flashFrames = 8;
       pongState.shakeFrames = 4;
     }
 
     if (pongState.ball.x < 0) {
       pongState.rightPaddle.score++;
+      const pointText = describePongPoint('right');
       resetPongBall(-1);
       updatePongScore();
+      pongStatus.textContent = pointText;
     } else if (pongState.ball.x > pongState.width) {
       pongState.leftPaddle.score++;
+      const pointText = describePongPoint('left');
       resetPongBall(1);
       updatePongScore();
+      pongStatus.textContent = pointText;
     }
 
     if (window.RTA_PONG_ART && window.RTA_PONG_ART.updateEffects) {
@@ -6901,7 +7423,8 @@
       const winner = pongState.leftPaddle.score > pongState.rightPaddle.score
         ? (players[0] ? players[0].name : 'Left player')
         : rightName;
-      pongStatus.textContent = `${winner} wins Road Pong. Winner gets first pick in the next road-trip game.`;
+      const loserScore = Math.min(pongState.leftPaddle.score, pongState.rightPaddle.score);
+      pongStatus.textContent = `${winner} wins Road Pong ${pongState.targetScore} to ${loserScore}. Winner gets first pick in the next road-trip game.`;
       drawPong();
       return;
     }
@@ -6930,6 +7453,10 @@
 
   function stopGorillas() {
     gorillasRunning = false;
+    if (gorillasComputerTimer) {
+      window.clearTimeout(gorillasComputerTimer);
+      gorillasComputerTimer = null;
+    }
     if (gorillasAnimationFrame) {
       window.cancelAnimationFrame(gorillasAnimationFrame);
       gorillasAnimationFrame = null;
@@ -6942,6 +7469,7 @@
     const buildings = [];
     const count = 7;
     const buildingWidth = width / count;
+    const details = ['antenna', 'vent', 'water', 'hotel', 'neon', 'plain'];
     for (let i = 0; i < count; i++) {
       const buildingBase = height * (0.22 + Math.random() * 0.28);
       buildings.push({
@@ -6949,6 +7477,8 @@
         width: buildingWidth - 8,
         height: buildingBase,
         roofY: height - buildingBase - 36,
+        detail: details[i % details.length],
+        litOffset: Math.floor(Math.random() * 3),
       });
     }
     return {
@@ -6963,9 +7493,53 @@
       gravity: 860,
       wind: Math.round((Math.random() * 2 - 1) * 22),
       trail: [],
+      lastTrail: [],
+      shotHistory: [],
+      lastImpact: null,
+      lastDebugTrajectory: [],
+      computerMemory: {
+        angle: 45,
+        power: 70,
+        lastResult: '',
+      },
       explosion: null,
       sparks: [],
     };
+  }
+
+  function normalizeGorillasSettings(settings = gorillasSettings) {
+    const merged = Object.assign({ opponent: 'local', match: '3', difficulty: 'normal', debug: false }, settings || {});
+    merged.opponent = merged.opponent === 'computer' ? 'computer' : 'local';
+    merged.match = ['sudden', '3', '5'].includes(merged.match) ? merged.match : '3';
+    merged.difficulty = ['easy', 'normal', 'hard'].includes(merged.difficulty) ? merged.difficulty : 'normal';
+    merged.debug = Boolean(merged.debug);
+    return merged;
+  }
+
+  function saveGorillasSettings() {
+    gorillasSettings = normalizeGorillasSettings({
+      opponent: gorillasOpponent ? gorillasOpponent.value : gorillasSettings.opponent,
+      match: gorillasMatch ? gorillasMatch.value : gorillasSettings.match,
+      difficulty: gorillasDifficulty ? gorillasDifficulty.value : gorillasSettings.difficulty,
+      debug: gorillasSettings.debug,
+    });
+    setStoredJson('rtaGorillasSettings', gorillasSettings);
+  }
+
+  function populateGorillasSettings() {
+    gorillasSettings = normalizeGorillasSettings(gorillasSettings);
+    if (gorillasOpponent) gorillasOpponent.value = gorillasSettings.opponent;
+    if (gorillasMatch) gorillasMatch.value = gorillasSettings.match;
+    if (gorillasDifficulty) gorillasDifficulty.value = gorillasSettings.difficulty;
+    if (gorillasDebugButton) {
+      gorillasDebugButton.textContent = gorillasSettings.debug ? 'Debug: On' : 'Debug: Off';
+      gorillasDebugButton.setAttribute('aria-pressed', String(gorillasSettings.debug));
+    }
+  }
+
+  function getGorillasTargetScore() {
+    if (gorillasSettings.match === 'sudden') return 1;
+    return Number(gorillasSettings.match) || 3;
   }
 
   function normalizeGorillasInputs() {
@@ -6991,14 +7565,65 @@
     return turnIndex % 2 === 0 ? 'left' : 'right';
   }
 
+  function isGorillasComputerTurn() {
+    return gorillasSettings.opponent === 'computer' && getGorillasSide(gorillasTurn) === 'right';
+  }
+
   function getGorillasWindLabel() {
-    if (!gorillasState || gorillasState.wind === 0) return 'calm wind';
-    return `${Math.abs(gorillasState.wind)} mph ${gorillasState.wind > 0 ? 'tailwind right' : 'tailwind left'}`;
+    if (!gorillasState || gorillasState.wind === 0) return 'Calm wind';
+    return `Wind pushes ${gorillasState.wind > 0 ? 'right' : 'left'} · ${Math.abs(gorillasState.wind)}`;
+  }
+
+  function getGorillasWindHudLabel() {
+    if (!gorillasState || gorillasState.wind === 0) return 'Wind: Calm';
+    return `Wind: ${Math.abs(gorillasState.wind)} ${gorillasState.wind > 0 ? '→' : '←'}`;
+  }
+
+  function getGorillasAimCoach(angle, power) {
+    if (!gorillasState || gorillasState.projectile || gorillasState.winner) return 'Preview shows the first part of the path.';
+    const sim = simulateGorillasTrajectory(angle, power, getGorillasSide(gorillasTurn), 220);
+    if (!sim.impact) return 'Preview: still airborne after the guide path. Watch for a high miss.';
+    const result = sim.impact.type === 'target' ? 'direct' : classifyGorillasMiss(sim.impact, getGorillasSide(gorillasTurn));
+    const hints = {
+      direct: 'Preview: this line can hit if the wind behaves.',
+      self: 'Preview: danger, that may tag your own tower.',
+      close: 'Preview: close to the target tower. Tiny changes matter.',
+      tower: 'Preview: it hits buildings before the target.',
+      short: 'Preview: likely short. Add power or lift the angle.',
+      overshot: 'Preview: likely long. Ease off power or lower the angle.',
+      low: 'Preview: likely low. Raise the arc or add a little power.',
+      miss: 'Preview: playable line, but the wind may decide.',
+    };
+    return hints[result] || 'Preview shows the first part of the path.';
+  }
+
+  function getGorillasShotSummary() {
+    if (!gorillasState) return 'Preview shows the first part of your banana path. Wind may still push it.';
+    const { angle, power } = normalizeGorillasInputs();
+    return `${getGorillasPlayerName(gorillasTurn)} aiming · ${angle}° · ${power} power · ${getGorillasWindLabel()}. ${getGorillasAimCoach(angle, power)}`;
   }
 
   function renderGorillasControls() {
     if (!gorillasFireButton) return;
-    gorillasFireButton.disabled = !gorillasState || Boolean(gorillasState.projectile) || Boolean(gorillasState.winner);
+    const locked = !gorillasState || Boolean(gorillasState.projectile) || Boolean(gorillasState.winner) || isGorillasComputerTurn();
+    gorillasFireButton.disabled = locked;
+    if (gorillasQuickShotButton) gorillasQuickShotButton.disabled = locked;
+    if (gorillasShotSummary && gorillasState && !gorillasState.projectile) {
+      gorillasShotSummary.textContent = gorillasState.winner
+        ? 'Match complete. Reset for a new skyline or finish for the summary.'
+        : getGorillasShotSummary();
+    }
+    renderGorillasShotHistory();
+  }
+
+  function renderGorillasShotHistory() {
+    if (!gorillasShotHistory || !gorillasState) return;
+    gorillasShotHistory.innerHTML = '';
+    gorillasState.shotHistory.slice(-5).reverse().forEach(shot => {
+      const li = document.createElement('li');
+      li.textContent = `${shot.playerName}: ${shot.angle}° / ${shot.power} · ${shot.result}${shot.hint ? ` · ${shot.hint}` : ''}`;
+      gorillasShotHistory.appendChild(li);
+    });
   }
 
   async function toggleGorillasFullscreen() {
@@ -7106,19 +7731,57 @@
     ctx.fillText('TOWERS', x + 20, y + 38);
   }
 
+  function drawGorillasRoofDetail(ctx, building, index) {
+    const x = building.x + 4;
+    const roofY = building.roofY;
+    ctx.save();
+    ctx.fillStyle = '#09233f';
+    ctx.strokeStyle = '#09233f';
+    ctx.lineWidth = 2;
+    if (building.detail === 'antenna') {
+      ctx.beginPath();
+      ctx.moveTo(x + building.width * 0.5, roofY);
+      ctx.lineTo(x + building.width * 0.5, roofY - 24);
+      ctx.moveTo(x + building.width * 0.5, roofY - 16);
+      ctx.lineTo(x + building.width * 0.5 + 12, roofY - 23);
+      ctx.stroke();
+    } else if (building.detail === 'vent') {
+      ctx.fillRect(x + 16, roofY - 10, 28, 10);
+      ctx.fillStyle = '#f58220';
+      ctx.fillRect(x + 19, roofY - 16, 22, 6);
+    } else if (building.detail === 'water') {
+      ctx.fillRect(x + building.width - 28, roofY - 20, 20, 20);
+      ctx.fillRect(x + building.width - 23, roofY - 30, 10, 10);
+    } else if (building.detail === 'hotel') {
+      ctx.fillStyle = '#f7fbff';
+      ctx.fillRect(x + 8, roofY + 10, 30, 22);
+      ctx.fillStyle = '#f58220';
+      ctx.font = '900 9px Atkinson Hyperlegible, Arial, sans-serif';
+      ctx.fillText('MOTEL', x + 10, roofY + 25);
+    } else if (building.detail === 'neon') {
+      ctx.fillStyle = index % 2 === 0 ? '#2ec7d3' : '#ffd74a';
+      ctx.fillRect(x + building.width - 42, roofY + 18, 30, 14);
+      ctx.fillStyle = '#09233f';
+      ctx.font = '900 8px Atkinson Hyperlegible, Arial, sans-serif';
+      ctx.fillText('EAT', x + building.width - 38, roofY + 28);
+    }
+    ctx.restore();
+  }
+
   function drawGorillasHud(ctx) {
-    ctx.fillStyle = 'rgba(247,251,255,0.82)';
-    ctx.fillRect(10, 10, 238, 48);
+    const { angle, power } = normalizeGorillasInputs();
+    ctx.fillStyle = 'rgba(247,251,255,0.86)';
+    ctx.fillRect(10, 10, 292, 52);
     ctx.strokeStyle = 'rgba(9,35,63,0.3)';
     ctx.lineWidth = 2;
-    ctx.strokeRect(10, 10, 238, 48);
+    ctx.strokeRect(10, 10, 292, 52);
     ctx.fillStyle = '#09233f';
     ctx.font = '900 14px Atkinson Hyperlegible, Arial, sans-serif';
-    ctx.fillText(getGorillasWindLabel(), 22, 30);
-    ctx.fillText(`${getGorillasPlayerName(gorillasTurn)} aiming`, 22, 49);
+    ctx.fillText(`${getGorillasPlayerName(gorillasTurn)} aiming · ${angle}° · ${power}`, 22, 31);
+    ctx.fillText(`${getGorillasWindHudLabel()} · First to ${getGorillasTargetScore()}`, 22, 51);
 
-    const arrowX = 224;
-    const arrowY = 27;
+    const arrowX = 276;
+    const arrowY = 24;
     ctx.fillStyle = '#f58220';
     ctx.beginPath();
     if (gorillasState.wind >= 0) {
@@ -7155,35 +7818,172 @@
 
   function drawGorillasAimPreview(ctx) {
     if (!gorillasState || gorillasState.projectile || gorillasState.winner) return;
-    const angle = Math.max(10, Math.min(80, Number(gorillasAngle.value) || 45));
-    const power = Math.max(20, Math.min(100, Number(gorillasPower.value) || 70));
-    const side = getGorillasSide(gorillasTurn);
+    const { angle, power } = normalizeGorillasInputs();
+    const points = simulateGorillasTrajectory(angle, power, getGorillasSide(gorillasTurn), 34).points;
+    gorillasState.lastDebugTrajectory = points;
+    ctx.save();
+    points.forEach((point, i) => {
+      if (i % 3 === 0) {
+        ctx.globalAlpha = 0.58 * (1 - i / Math.max(1, points.length));
+        ctx.fillStyle = '#ffd74a';
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 2.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+    ctx.restore();
+  }
+
+  function getGorillasShotStart(side) {
     const shooterBuilding = side === 'left'
       ? gorillasState.buildings[0]
       : gorillasState.buildings[gorillasState.buildings.length - 1];
+    return {
+      x: side === 'left' ? shooterBuilding.x + shooterBuilding.width + 6 : shooterBuilding.x - 6,
+      y: shooterBuilding.roofY - 12,
+    };
+  }
+
+  function simulateGorillasTrajectory(angle, power, side, maxSteps = 220) {
+    if (!gorillasState) return { points: [], impact: null };
     const direction = side === 'left' ? 1 : -1;
     const radians = angle * Math.PI / 180;
     const speed = power * 10.2;
-    let x = side === 'left' ? shooterBuilding.x + shooterBuilding.width + 6 : shooterBuilding.x - 6;
-    let y = shooterBuilding.roofY - 12;
+    const start = getGorillasShotStart(side);
+    let x = start.x;
+    let y = start.y;
     let vx = Math.cos(radians) * speed * direction;
     let vy = -Math.sin(radians) * speed;
     const dt = 0.016;
-    const steps = 30;
-    ctx.save();
-    for (let i = 0; i < steps; i++) {
+    const points = [{ x, y, vx, vy }];
+    for (let i = 0; i < maxSteps; i++) {
       vx += gorillasState.wind * dt;
       vy += gorillasState.gravity * dt;
       x += vx * dt;
       y += vy * dt;
-      if (x < 0 || x > gorillasState.width || y > gorillasState.height - 36) break;
-      if (i % 3 === 0) {
-        ctx.globalAlpha = 0.55 * (1 - i / steps);
-        ctx.fillStyle = '#ffd74a';
-        ctx.beginPath();
-        ctx.arc(x, y, 2.2, 0, Math.PI * 2);
-        ctx.fill();
+      points.push({ x, y, vx, vy });
+      const result = evaluateGorillasPoint({ x, y, vx, vy }, side);
+      if (result) {
+        return { points, impact: Object.assign({ x, y, vx, vy }, result) };
       }
+    }
+    return { points, impact: null };
+  }
+
+  function getGorillasHitboxes(shooterSide = getGorillasSide(gorillasTurn)) {
+    if (!gorillasState) return null;
+    const lastBuildingIndex = gorillasState.buildings.length - 1;
+    const targetIndex = shooterSide === 'left' ? lastBuildingIndex : 0;
+    const shooterIndex = shooterSide === 'left' ? 0 : lastBuildingIndex;
+    const target = gorillasState.buildings[targetIndex];
+    const shooter = gorillasState.buildings[shooterIndex];
+    const targetGorillaX = targetIndex === 0
+      ? target.x + target.width * 0.62
+      : target.x + target.width * 0.38;
+    const targetGorillaY = target.roofY - 2;
+    const shooterGorillaX = shooterIndex === 0
+      ? shooter.x + shooter.width * 0.62
+      : shooter.x + shooter.width * 0.38;
+    const shooterGorillaY = shooter.roofY - 2;
+    return {
+      targetIndex,
+      shooterIndex,
+      target: {
+        x: targetGorillaX - 18,
+        y: targetGorillaY - 30,
+        width: 36,
+        height: 48,
+      },
+      self: {
+        x: shooterGorillaX - 18,
+        y: shooterGorillaY - 30,
+        width: 36,
+        height: 48,
+      },
+      buildings: gorillasState.buildings.map(building => ({
+        x: building.x + 4,
+        y: building.roofY,
+        width: building.width,
+        height: building.height,
+      })),
+    };
+  }
+
+  function pointInRect(point, rect) {
+    return point.x >= rect.x
+      && point.x <= rect.x + rect.width
+      && point.y >= rect.y
+      && point.y <= rect.y + rect.height;
+  }
+
+  function evaluateGorillasPoint(point, shooterSide = getGorillasSide(gorillasTurn)) {
+    if (!gorillasState) return null;
+    const hitboxes = getGorillasHitboxes(shooterSide);
+    const groundY = gorillasState.height - 36;
+    if (pointInRect(point, hitboxes.target)) return { type: 'target' };
+    const inCrater = isPointInGorillasCrater(point.x, point.y);
+    const hitBuildingIndex = inCrater ? -1 : hitboxes.buildings.findIndex(rect => pointInRect(point, rect));
+    if (hitBuildingIndex !== -1) {
+      return {
+        type: hitBuildingIndex === hitboxes.shooterIndex ? 'self' : 'building',
+        buildingIndex: hitBuildingIndex,
+      };
+    }
+    if (point.y >= groundY) return { type: 'ground' };
+    if (point.x < 0 || point.x > gorillasState.width) return { type: 'out' };
+    return null;
+  }
+
+  function drawGorillasDebug(ctx) {
+    if (!gorillasState) return;
+    const hitboxes = getGorillasHitboxes();
+    ctx.save();
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 4]);
+    ctx.strokeStyle = 'rgba(46, 199, 211, 0.85)';
+    hitboxes.buildings.forEach(rect => ctx.strokeRect(rect.x, rect.y, rect.width, rect.height));
+    ctx.strokeStyle = 'rgba(0, 180, 90, 0.95)';
+    ctx.strokeRect(hitboxes.target.x, hitboxes.target.y, hitboxes.target.width, hitboxes.target.height);
+    ctx.strokeStyle = 'rgba(245, 130, 32, 0.95)';
+    ctx.strokeRect(hitboxes.self.x, hitboxes.self.y, hitboxes.self.width, hitboxes.self.height);
+    if (gorillasState.lastDebugTrajectory && gorillasState.lastDebugTrajectory.length > 1) {
+      ctx.setLineDash([]);
+      ctx.strokeStyle = 'rgba(123, 78, 230, 0.7)';
+      ctx.beginPath();
+      gorillasState.lastDebugTrajectory.forEach((point, index) => {
+        if (index === 0) ctx.moveTo(point.x, point.y);
+        else ctx.lineTo(point.x, point.y);
+      });
+      ctx.stroke();
+    }
+    if (gorillasState.lastImpact) {
+      ctx.fillStyle = 'rgba(255, 20, 20, 0.85)';
+      ctx.beginPath();
+      ctx.arc(gorillasState.lastImpact.x, gorillasState.lastImpact.y, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    const projectile = gorillasState.projectile;
+    const { angle, power } = normalizeGorillasInputs();
+    const fullTrajectory = simulateGorillasTrajectory(angle, power, getGorillasSide(gorillasTurn), 240).points;
+    const debugLines = [
+      `Debug · angle ${gorillasAngle.value} · power ${gorillasPower.value} · wind ${gorillasState.wind}`,
+      projectile ? `banana x/y ${Math.round(projectile.x)},${Math.round(projectile.y)} · vx/vy ${Math.round(projectile.vx)},${Math.round(projectile.vy)}` : 'banana x/y idle',
+      gorillasState.lastImpact ? `last impact ${Math.round(gorillasState.lastImpact.x)},${Math.round(gorillasState.lastImpact.y)} · ${gorillasState.lastImpact.result}` : 'last impact none',
+    ];
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(6,21,36,0.78)';
+    ctx.fillRect(10, 68, 390, 66);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '800 12px Atkinson Hyperlegible, Arial, sans-serif';
+    debugLines.forEach((line, index) => ctx.fillText(line, 20, 88 + index * 18));
+    if (fullTrajectory.length > 1) {
+      ctx.strokeStyle = 'rgba(255, 215, 74, 0.65)';
+      ctx.beginPath();
+      fullTrajectory.forEach((point, index) => {
+        if (index === 0) ctx.moveTo(point.x, point.y);
+        else ctx.lineTo(point.x, point.y);
+      });
+      ctx.stroke();
     }
     ctx.restore();
   }
@@ -7223,6 +8023,7 @@
       }
       lctx.fillStyle = 'rgba(255,255,255,0.18)';
       lctx.fillRect(x, y, building.width, 4);
+      drawGorillasRoofDetail(lctx, building, index);
     });
     if (Array.isArray(gorillasState.craters) && gorillasState.craters.length) {
       lctx.save();
@@ -7242,6 +8043,18 @@
     ctx.fillStyle = 'rgba(9,35,63,0.45)';
     ctx.fillRect(gorillasState.width / 2 - 2, 96, 4, gorillasState.height - 132);
     drawGorillasHud(ctx);
+    if (gorillasState.lastTrail && gorillasState.lastTrail.length > 1) {
+      ctx.strokeStyle = 'rgba(255,255,255,0.42)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 7]);
+      ctx.beginPath();
+      gorillasState.lastTrail.forEach((point, index) => {
+        if (index === 0) ctx.moveTo(point.x, point.y);
+        else ctx.lineTo(point.x, point.y);
+      });
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
     if (gorillasState.trail.length > 1) {
       ctx.strokeStyle = 'rgba(245,130,32,0.55)';
       ctx.lineWidth = 3;
@@ -7273,10 +8086,13 @@
         ctx.fillRect(spark.x - 2, spark.y - 2, 4, 4);
       });
     }
+    if (gorillasSettings.debug) drawGorillasDebug(ctx);
   }
 
   function startGorillasGame() {
     stopGorillas();
+    populateGorillasSettings();
+    saveGorillasSettings();
     gorillasState = createGorillasState();
     gorillasTurn = 0;
     gorillasLastFrameTs = 0;
@@ -7284,13 +8100,89 @@
     renderGorillasControls();
     updateGorillasFullscreenButton();
     showSection('gorillas');
-    gorillasStatus.textContent = `${getGorillasPlayerName(gorillasTurn)} goes first. Wind is ${getGorillasWindLabel()}. Set angle and power, then throw.`;
+    gorillasStatus.textContent = `${getGorillasPlayerName(gorillasTurn)} goes first. ${getGorillasWindLabel()}. First to ${getGorillasTargetScore()}.`;
     drawGorillas();
+  }
+
+  function getGorillasResultLabel(result) {
+    return {
+      direct: 'Direct Hit',
+      self: 'Self Bonk',
+      close: 'Close Call',
+      tower: 'Tower Tap',
+      short: 'Short Shot',
+      overshot: 'Sky Banana',
+      low: 'Too Low',
+      out: 'Another Zip Code',
+      miss: 'Almost Famous',
+    }[result] || 'Banana Report';
+  }
+
+  function classifyGorillasMiss(impact, shooterSide) {
+    if (!gorillasState || !impact) return 'miss';
+    if (impact.type === 'building') {
+      const targetIndex = shooterSide === 'left' ? gorillasState.buildings.length - 1 : 0;
+      return Math.abs(impact.buildingIndex - targetIndex) <= 1 ? 'close' : 'tower';
+    }
+    if (impact.type === 'ground') {
+      const target = shooterSide === 'left'
+        ? gorillasState.buildings[gorillasState.buildings.length - 1]
+        : gorillasState.buildings[0];
+      if ((shooterSide === 'left' && impact.x < target.x) || (shooterSide === 'right' && impact.x > target.x + target.width)) return 'short';
+      return 'low';
+    }
+    if (impact.type === 'out') return 'overshot';
+    return 'miss';
+  }
+
+  function getGorillasFeedback(result, shooterName, scoredName) {
+    const lines = {
+      direct: `${getGorillasResultLabel(result)}! ${scoredName} lands banana justice. One point on the board.`,
+      self: `${getGorillasResultLabel(result)}! ${shooterName} clipped home base, so the point goes the other way.`,
+      close: `${getGorillasResultLabel(result)}. Hit near the target tower. Try a tiny angle or power change.`,
+      tower: `${getGorillasResultLabel(result)}. Nice line, questionable real estate outcome.`,
+      short: `${getGorillasResultLabel(result)}. Add power or raise the angle.`,
+      overshot: `${getGorillasResultLabel(result)}. That shot entered another zip code. Reduce power or lower the angle.`,
+      low: `${getGorillasResultLabel(result)}. Raise the arc or add a little power.`,
+      out: `${getGorillasResultLabel(result)}. Too much ambition, not enough address.`,
+      miss: `${getGorillasResultLabel(result)}. Wind may have nudged it off course.`,
+    };
+    return lines[result] || `${shooterName} missed, but the banana learned something.`;
+  }
+
+  function getGorillasAdjustmentHint(result) {
+    return {
+      direct: 'Save that angle.',
+      self: 'Next time, lift the angle before adding power.',
+      close: 'Nudge angle or power by one small step.',
+      tower: 'Go higher or use a little more power.',
+      short: 'Add power or raise the angle.',
+      overshot: 'Reduce power or lower the angle.',
+      low: 'Raise the arc.',
+      out: 'Bring the banana back to this zip code.',
+      miss: 'Try the quick shot coach or make one small change.',
+    }[result] || 'Make one small change.';
+  }
+
+  function rollNextGorillasWind() {
+    const previous = gorillasState ? gorillasState.wind : 0;
+    const next = Math.round((Math.random() * 2 - 1) * 24);
+    if (Math.sign(next) === Math.sign(previous) && Math.abs(next - previous) < 5) {
+      return Math.max(-28, Math.min(28, next + (next >= 0 ? -8 : 8)));
+    }
+    return next;
+  }
+
+  function addGorillasShotHistory(entry) {
+    if (!gorillasState) return;
+    gorillasState.shotHistory.push(entry);
+    if (gorillasState.shotHistory.length > 5) gorillasState.shotHistory.shift();
   }
 
   function advanceGorillasTurn(scored, options = {}) {
     if (!gorillasState) return;
-    const impact = gorillasState.projectile ? { x: gorillasState.projectile.x, y: gorillasState.projectile.y } : null;
+    const projectile = gorillasState.projectile;
+    const impact = projectile ? { x: projectile.x, y: projectile.y } : null;
     gorillasRunning = false;
     gorillasLastFrameTs = 0;
     if (gorillasAnimationFrame) {
@@ -7299,18 +8191,35 @@
     }
     const shooterName = getGorillasPlayerName(gorillasTurn);
     const scorerSide = options.scorerSide || getGorillasSide(gorillasTurn);
+    const scorerName = scorerSide === getGorillasSide(gorillasTurn)
+      ? shooterName
+      : getGorillasPlayerName(gorillasTurn + 1);
+    const result = options.result || (scored ? 'direct' : 'miss');
+    const hint = getGorillasAdjustmentHint(result);
+    gorillasState.lastTrail = gorillasState.trail.slice();
+    gorillasState.lastImpact = impact ? Object.assign({ result }, impact) : null;
+    addGorillasShotHistory({
+      playerName: shooterName,
+      angle: projectile ? projectile.angle : Number(gorillasAngle.value) || 45,
+      power: projectile ? projectile.power : Number(gorillasPower.value) || 70,
+      wind: gorillasState.wind,
+      result: getGorillasResultLabel(result),
+      hint,
+    });
+    if (isGorillasComputerTurn() && gorillasState.computerMemory && projectile) {
+      gorillasState.computerMemory.angle = projectile.angle;
+      gorillasState.computerMemory.power = projectile.power;
+      gorillasState.computerMemory.lastResult = result;
+    }
     if (scored) {
       const scorer = scorerSide === 'left' ? 'scoreLeft' : 'scoreRight';
       gorillasState[scorer] += 1;
       renderGorillasScore();
-      const winnerName = scorerSide === getGorillasSide(gorillasTurn)
-        ? shooterName
-        : getGorillasPlayerName(gorillasTurn + 1);
-      if (options.instantWin || gorillasState[scorer] >= 5) {
+      if (gorillasState[scorer] >= getGorillasTargetScore()) {
         gorillasState.winner = scorer;
         gorillasState.explosion = impact;
         gorillasState.sparks = impact ? createGorillasSparks(impact.x, impact.y) : [];
-        gorillasStatus.textContent = `${winnerName} wins Banana Towers!`;
+        gorillasStatus.textContent = `${scorerName} wins Banana Towers! ${getGorillasFeedback(result, shooterName, scorerName)} ${hint}`;
         stopGorillas();
         renderGorillasControls();
         drawGorillas();
@@ -7318,16 +8227,18 @@
       }
       gorillasState.explosion = impact;
       gorillasState.sparks = impact ? createGorillasSparks(impact.x, impact.y) : [];
-      gorillasStatus.textContent = options.statusText || `${shooterName} scored!`;
+      gorillasState.wind = rollNextGorillasWind();
+      gorillasStatus.textContent = options.statusText || `${getGorillasFeedback(result, shooterName, scorerName)} ${hint} New wind for the next toss: ${getGorillasWindLabel()}.`;
     } else {
       gorillasState.explosion = impact && impact.y < gorillasState.height - 40 ? impact : null;
       gorillasState.sparks = gorillasState.explosion ? createGorillasSparks(gorillasState.explosion.x, gorillasState.explosion.y) : [];
-      gorillasStatus.textContent = options.statusText || `${shooterName} missed.`;
+      gorillasStatus.textContent = options.statusText || `${getGorillasFeedback(result, shooterName, scorerName)} ${hint}`;
     }
     gorillasTurn += 1;
     gorillasState.projectile = null;
     renderGorillasControls();
     drawGorillas();
+    maybeStartGorillasComputerTurn();
   }
 
   function isPointInGorillasCrater(x, y) {
@@ -7349,11 +8260,19 @@
       y: shooterBuilding.roofY - 12,
       vx: Math.cos(radians) * speed * direction,
       vy: -Math.sin(radians) * speed,
+      angle,
+      power,
     };
     gorillasState.trail = [{ x: gorillasState.projectile.x, y: gorillasState.projectile.y }];
     gorillasState.explosion = null;
     gorillasState.sparks = [];
-    gorillasStatus.textContent = `${getGorillasPlayerName(gorillasTurn)} launches the banana!`;
+    const launches = [
+      'launches a banana into questionable airspace',
+      'consults the wind and ignores common sense',
+      'sends one yellow idea into the sky',
+      'trusts the preview and the laws of snack physics',
+    ];
+    gorillasStatus.textContent = `${getGorillasPlayerName(gorillasTurn)} ${launches[Math.floor(Math.random() * launches.length)]}.`;
     gorillasRunning = true;
     gorillasLastFrameTs = 0;
     renderGorillasControls();
@@ -7372,68 +8291,43 @@
     gorillasState.trail.push({ x: projectile.x, y: projectile.y });
     if (gorillasState.trail.length > 42) gorillasState.trail.shift();
 
-    const groundY = gorillasState.height - 36;
     const shooterSide = getGorillasSide(gorillasTurn);
-    const lastBuildingIndex = gorillasState.buildings.length - 1;
-    const targetIndex = shooterSide === 'left' ? lastBuildingIndex : 0;
-    const shooterIndex = shooterSide === 'left' ? 0 : lastBuildingIndex;
-    const target = gorillasState.buildings[targetIndex];
-    const inCrater = isPointInGorillasCrater(projectile.x, projectile.y);
-    const targetGorillaX = targetIndex === 0
-      ? target.x + target.width * 0.62
-      : target.x + target.width * 0.38;
-    const targetGorillaY = target.roofY - 2;
-    const hitGorilla = projectile.x >= targetGorillaX - 18
-      && projectile.x <= targetGorillaX + 18
-      && projectile.y >= targetGorillaY - 30
-      && projectile.y <= targetGorillaY + 18;
-    const hitTarget = hitGorilla;
-    const hitBuildingIndex = inCrater ? -1 : gorillasState.buildings.findIndex(building => {
-      const rect = {
-        x: building.x + 4,
-        y: building.roofY,
-        width: building.width,
-        height: building.height,
-      };
-      return projectile.x >= rect.x
-        && projectile.x <= rect.x + rect.width
-        && projectile.y >= rect.y
-        && projectile.y <= rect.y + rect.height;
-    });
-    const hitAnyBuilding = hitBuildingIndex !== -1;
-    const hitSelf = hitAnyBuilding && hitBuildingIndex === shooterIndex && shooterIndex !== targetIndex;
-    const hitGround = projectile.y >= groundY;
-    const outOfBounds = projectile.x < 0 || projectile.x > gorillasState.width;
+    const impactResult = evaluateGorillasPoint(projectile, shooterSide);
+    const impact = impactResult ? Object.assign({
+      x: projectile.x,
+      y: projectile.y,
+      vx: projectile.vx,
+      vy: projectile.vy,
+    }, impactResult) : null;
 
     drawGorillas();
 
-    if (hitTarget) {
-      addGorillasCrater(projectile.x, projectile.y);
-      advanceGorillasTurn(true, { instantWin: true });
-      return;
-    }
-    if (hitSelf) {
-      addGorillasCrater(projectile.x, projectile.y);
-      const shooterName = getGorillasPlayerName(gorillasTurn);
-      const opponentSide = shooterSide === 'left' ? 'right' : 'left';
-      advanceGorillasTurn(true, {
-        scorerSide: opponentSide,
-        instantWin: true,
-        statusText: `${shooterName} clipped their own tower — the point goes the other way!`,
-      });
-      return;
-    }
-    if (hitAnyBuilding) {
-      addGorillasCrater(projectile.x, projectile.y);
-      advanceGorillasTurn(false);
-      return;
-    }
-    if (hitGround || outOfBounds) {
-      advanceGorillasTurn(false);
+    if (!impact) {
+      gorillasAnimationFrame = window.requestAnimationFrame(tickGorillas);
       return;
     }
 
-    gorillasAnimationFrame = window.requestAnimationFrame(tickGorillas);
+    if (impact.type === 'target') {
+      addGorillasCrater(projectile.x, projectile.y);
+      advanceGorillasTurn(true, { result: 'direct' });
+      return;
+    }
+    if (impact.type === 'self') {
+      addGorillasCrater(projectile.x, projectile.y);
+      const opponentSide = shooterSide === 'left' ? 'right' : 'left';
+      advanceGorillasTurn(true, {
+        scorerSide: opponentSide,
+        result: 'self',
+      });
+      return;
+    }
+    if (impact.type === 'building') {
+      addGorillasCrater(projectile.x, projectile.y);
+      advanceGorillasTurn(false, { result: classifyGorillasMiss(impact, shooterSide) });
+      return;
+    }
+
+    advanceGorillasTurn(false, { result: classifyGorillasMiss(impact, shooterSide) });
   }
 
   function addGorillasCrater(x, y) {
@@ -7444,30 +8338,108 @@
     if (gorillasState.craters.length > 60) gorillasState.craters.shift();
   }
 
+  function getGorillasComputerError() {
+    if (gorillasSettings.difficulty === 'hard') return { angle: 2.5, power: 5 };
+    if (gorillasSettings.difficulty === 'easy') return { angle: 7, power: 14 };
+    return { angle: 4.5, power: 9 };
+  }
+
+  function pickGorillasComputerShot() {
+    if (!gorillasState) return { angle: 45, power: 70 };
+    const side = getGorillasSide(gorillasTurn);
+    const hitboxes = getGorillasHitboxes(side);
+    const targetCenter = {
+      x: hitboxes.target.x + hitboxes.target.width / 2,
+      y: hitboxes.target.y + hitboxes.target.height / 2,
+    };
+    let best = { angle: 45, power: 70, score: Infinity };
+    for (let angle = 24; angle <= 72; angle += 3) {
+      for (let power = 35; power <= 100; power += 5) {
+        const sim = simulateGorillasTrajectory(angle, power, side, 240);
+        const impact = sim.impact;
+        const finalPoint = impact || sim.points[sim.points.length - 1] || targetCenter;
+        const hitBonus = impact && impact.type === 'target' ? -900 : 0;
+        const selfPenalty = impact && impact.type === 'self' ? 700 : 0;
+        const score = Math.hypot(finalPoint.x - targetCenter.x, finalPoint.y - targetCenter.y) + hitBonus + selfPenalty;
+        if (score < best.score) best = { angle, power, score };
+      }
+    }
+    const error = getGorillasComputerError();
+    const memory = gorillasState.computerMemory || {};
+    const blend = gorillasSettings.difficulty === 'easy' ? 0.35 : gorillasSettings.difficulty === 'hard' ? 0.82 : 0.62;
+    const rememberedAngle = Number.isFinite(memory.angle) ? memory.angle : best.angle;
+    const rememberedPower = Number.isFinite(memory.power) ? memory.power : best.power;
+    return {
+      angle: Math.round(Math.max(10, Math.min(80, rememberedAngle * (1 - blend) + best.angle * blend + (Math.random() - 0.5) * error.angle))),
+      power: Math.round(Math.max(20, Math.min(100, rememberedPower * (1 - blend) + best.power * blend + (Math.random() - 0.5) * error.power))),
+    };
+  }
+
+  function maybeStartGorillasComputerTurn() {
+    if (!gorillasState || gorillasState.winner || gorillasState.projectile || !isGorillasComputerTurn()) return;
+    renderGorillasControls();
+    gorillasStatus.textContent = `${getGorillasPlayerName(gorillasTurn)} is lining up a computer shot. ${getGorillasWindLabel()}.`;
+    gorillasComputerTimer = window.setTimeout(() => {
+      if (!gorillasState || gorillasState.winner || !isGorillasComputerTurn()) return;
+      const shot = pickGorillasComputerShot();
+      gorillasAngle.value = String(shot.angle);
+      gorillasPower.value = String(shot.power);
+      normalizeGorillasInputs();
+      drawGorillas();
+      fireGorillasShot();
+    }, 850);
+  }
+
+  function quickGorillasShot() {
+    if (!gorillasState || gorillasState.projectile || gorillasState.winner) return;
+    const side = getGorillasSide(gorillasTurn);
+    const shot = side === 'right'
+      ? pickGorillasComputerShot()
+      : {
+          angle: 38 + Math.round(Math.random() * 18),
+          power: 58 + Math.round(Math.random() * 26),
+        };
+    gorillasAngle.value = String(shot.angle);
+    gorillasPower.value = String(shot.power);
+    normalizeGorillasInputs();
+    renderGorillasControls();
+    gorillasStatus.textContent = `Coach shot set for ${getGorillasPlayerName(gorillasTurn)}. Check the preview, then throw or fine-tune.`;
+    drawGorillas();
+  }
+
   function resetGorillasGame() {
     stopGorillas();
+    saveGorillasSettings();
     gorillasState = createGorillasState();
     gorillasTurn = 0;
     gorillasLastFrameTs = 0;
     renderGorillasScore();
     renderGorillasControls();
-    gorillasStatus.textContent = `New skyline loaded. Wind is ${getGorillasWindLabel()}. Set angle and power, then throw.`;
+    gorillasStatus.textContent = `New skyline loaded. ${getGorillasWindLabel()}. First to ${getGorillasTargetScore()}.`;
     drawGorillas();
+    maybeStartGorillasComputerTurn();
   }
 
   function showGorillasSummary() {
     stopGorillas();
     showSection('summary');
+    const rightName = gorillasSettings.opponent === 'computer' ? 'Computer' : (players[1] ? players[1].name : 'P2');
     const leader = gorillasState.scoreLeft === gorillasState.scoreRight
       ? null
-      : (gorillasState.scoreLeft > gorillasState.scoreRight ? players[0] : players[1]);
+      : (gorillasState.scoreLeft > gorillasState.scoreRight ? (players[0] || { name: 'P1' }) : { name: rightName });
     summaryText.textContent = leader
       ? `${leader.name} wins Banana Towers, ${gorillasState.scoreLeft} to ${gorillasState.scoreRight}.`
       : `Banana Towers ends in a tie, ${gorillasState.scoreLeft} to ${gorillasState.scoreRight}.`;
     summaryList.innerHTML = '';
-    const li = document.createElement('li');
-    li.textContent = 'Each turn: pick angle, pick power, throw banana, then swap turns.';
-    summaryList.appendChild(li);
+    [
+      `Match mode: ${gorillasSettings.match === 'sudden' ? 'Sudden Banana' : `first to ${getGorillasTargetScore()}`}.`,
+      gorillasState.shotHistory.length ? `Best recent moment: ${gorillasState.shotHistory[gorillasState.shotHistory.length - 1].result}.` : 'No bananas were thrown yet.',
+      'Prize idea: winner chooses the next mini-game, loser names the next banana.',
+    ].forEach(text => {
+      const li = document.createElement('li');
+      li.textContent = text;
+      summaryList.appendChild(li);
+    });
   }
 
   function resetPongGame() {
@@ -7714,6 +8686,12 @@
     modeRulesHeading.textContent = rules.title;
     modeRulesSummary.textContent = rules.summary;
     modeRulesList.innerHTML = '';
+    if (rules.bestWhen) {
+      const li = document.createElement('li');
+      li.className = 'best-when-rule';
+      li.textContent = rules.bestWhen;
+      modeRulesList.appendChild(li);
+    }
     rules.rules.forEach(rule => {
       const li = document.createElement('li');
       li.textContent = rule;
@@ -7765,8 +8743,22 @@
     }
   }
 
-  function startQuickStart() {
-    const quickModes = ['random', 'scavenger', 'trivia', 'jokes', 'learn', 'look', 'pi', 'pong', 'hideSeek', 'gorillas'];
+  function startQuickStart(intent = 'surprise') {
+    const modeSets = {
+      laugh: ['jokes', 'puns', 'mentalist', 'look'],
+      outside: ['look', 'local', 'scavenger'],
+      learn: ['learn', 'trivia', 'pi'],
+      scored: ['scavenger', 'trivia', 'pi', 'pong', 'gorillas'],
+      surprise: ['random', 'scavenger', 'trivia', 'jokes', 'learn', 'look', 'pi', 'pong', 'hideSeek', 'gorillas'],
+    };
+    let quickModes = (modeSets[intent] || modeSets.surprise).slice();
+    if (tripSettings.quietCar) {
+      quickModes = quickModes.filter(mode => !['jokes', 'pong', 'hideSeek', 'gorillas'].includes(mode));
+    }
+    if (tripSettings.noCameraGames || tripSettings.quietCar) {
+      quickModes = quickModes.filter(mode => mode !== 'emoji');
+    }
+    if (!quickModes.length) quickModes = ['learn', 'look', 'trivia'];
     const mode = quickModes[Math.floor(Math.random() * quickModes.length)];
     selectedCategory = mode;
     if (mode === 'scavenger') {
@@ -7865,6 +8857,14 @@
 
   // Setup section event delegation
   document.addEventListener('click', event => {
+    const quickTarget = event.target.closest('button[data-quick-intent]');
+    if (quickTarget) {
+      const section = quickTarget.closest('.setup-section');
+      if (section && section.id === 'setup-category') {
+        startQuickStart(quickTarget.getAttribute('data-quick-intent'));
+      }
+      return;
+    }
     const target = event.target.closest('button[data-category], button.option-card');
     if (!target) return;
     // Determine which section this belongs to
@@ -7873,7 +8873,7 @@
     if (section.id === 'setup-category') {
       selectedCategory = normalizeCategoryKey(target.getAttribute('data-category'));
       if (selectedCategory === 'quickstart') {
-        startQuickStart();
+        startQuickStart('surprise');
       } else {
         renderModeRules(selectedCategory);
       }
@@ -7980,6 +8980,7 @@
   huntAlphabetButton.addEventListener('click', startAlphabetGame);
   huntEtaButton.addEventListener('click', startEtaGuess);
   showTriviaAnswerButton.addEventListener('click', () => {
+    triviaAnswer.textContent = triviaAnswer.dataset.answer ? `Answer: ${triviaAnswer.dataset.answer}` : triviaAnswer.textContent;
     triviaAnswer.hidden = false;
     renderAwardButtons(triviaAwardButtons, 'Gets Override Point', awardTrivia, triviaQuestionAwarded);
   });
@@ -8093,8 +9094,10 @@
   });
   if (hideSeekCanvas) {
     hideSeekCanvas.addEventListener('pointerdown', event => {
+      hideSeekActiveCanvasPointerId = event.pointerId;
       hideSeekCanvas.setPointerCapture(event.pointerId);
-      handleHideSeekPointer(event);
+      handleHideSeekPointer(event, { start: true });
+      handleHideSeekCanvasDoubleTap(event);
     });
     hideSeekCanvas.addEventListener('pointermove', handleHideSeekPointer);
     hideSeekCanvas.addEventListener('pointerup', releaseHideSeekPointer);
@@ -8193,14 +9196,64 @@
     }
   });
   gorillasFireButton.addEventListener('click', fireGorillasShot);
+  if (gorillasQuickShotButton) {
+    gorillasQuickShotButton.addEventListener('click', quickGorillasShot);
+  }
   gorillasFullscreenButton.addEventListener('click', toggleGorillasFullscreen);
+  if (gorillasDebugButton) {
+    gorillasDebugButton.addEventListener('click', () => {
+      gorillasSettings.debug = !gorillasSettings.debug;
+      saveGorillasSettings();
+      populateGorillasSettings();
+      if (gorillasState) drawGorillas();
+    });
+  }
+  if (gorillasImmersiveExitButton) {
+    gorillasImmersiveExitButton.addEventListener('click', toggleGorillasFullscreen);
+  }
   gorillasResetButton.addEventListener('click', resetGorillasGame);
   gorillasFinishButton.addEventListener('click', showGorillasSummary);
   [gorillasAngle, gorillasPower].forEach(input => {
     input.addEventListener('input', () => {
       normalizeGorillasInputs();
+      renderGorillasControls();
       if (gorillasState && !gorillasState.projectile && !gorillasState.winner) drawGorillas();
     });
+  });
+  [gorillasOpponent, gorillasMatch, gorillasDifficulty].forEach(input => {
+    if (!input) return;
+    input.addEventListener('change', () => {
+      saveGorillasSettings();
+      renderGorillasControls();
+      if (gorillasState && !gorillasState.projectile) {
+        drawGorillas();
+        maybeStartGorillasComputerTurn();
+      }
+    });
+  });
+  document.addEventListener('click', event => {
+    const angleButton = event.target.closest('button[data-banana-angle]');
+    const powerButton = event.target.closest('button[data-banana-power]');
+    if (!angleButton && !powerButton) return;
+    if (!sections.gorillas || !sections.gorillas.contains(event.target)) return;
+    if (gorillasState && (gorillasState.projectile || gorillasState.winner || isGorillasComputerTurn())) return;
+    if (angleButton) {
+      gorillasAngle.value = String((Number(gorillasAngle.value) || 45) + Number(angleButton.dataset.bananaAngle || 0));
+    }
+    if (powerButton) {
+      gorillasPower.value = String((Number(gorillasPower.value) || 70) + Number(powerButton.dataset.bananaPower || 0));
+    }
+    normalizeGorillasInputs();
+    renderGorillasControls();
+    if (gorillasState) drawGorillas();
+  });
+  document.addEventListener('keydown', event => {
+    if (currentSectionKey !== 'gorillas' || event.key !== '`') return;
+    event.preventDefault();
+    gorillasSettings.debug = !gorillasSettings.debug;
+    saveGorillasSettings();
+    populateGorillasSettings();
+    if (gorillasState) drawGorillas();
   });
   secretSubmitButton.addEventListener('click', submitSecretAnswer);
   secretSkipButton.addEventListener('click', skipSecretQuestion);
@@ -8297,6 +9350,7 @@
     tripSettings = normalizeTripSettings(tripSettings);
     populateTripSettingsForm();
     renderPongSettings();
+    populateGorillasSettings();
     applyTripSettings();
     renderPlayerFields();
     passengerConfirmButton.addEventListener('click', confirmPassengerStatus);

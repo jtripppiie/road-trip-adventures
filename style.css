@@ -353,6 +353,25 @@ body.large-text {
   color: var(--color-accent);
 }
 
+.quick-start-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  gap: 0.5rem;
+  width: min(100%, 640px);
+  margin: 0.6rem auto 1rem;
+}
+
+.quick-start-options button {
+  min-height: 3rem;
+  padding: 0.55rem 0.7rem;
+  border: 2px solid var(--color-primary);
+  border-radius: 8px;
+  background: var(--color-card);
+  color: var(--color-primary);
+  cursor: pointer;
+  font-weight: 800;
+}
+
 .mode-group {
   padding: 0.85rem;
   border: 2px solid rgba(9, 35, 63, 0.16);
@@ -382,7 +401,7 @@ body.large-text {
   border: 2px solid var(--color-primary);
   border-radius: 8px;
   padding: 1rem;
-  min-height: 8rem;
+  min-height: 11.25rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -407,6 +426,25 @@ body.large-text {
 .option-title {
   font-weight: bold;
   margin-bottom: 0.25rem;
+}
+
+.option-description,
+.best-for {
+  display: block;
+  max-width: 16rem;
+  font-size: 0.82rem;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.option-description {
+  color: var(--color-text);
+}
+
+.best-for {
+  margin-top: 0.3rem;
+  color: var(--color-primary);
+  font-weight: 800;
 }
 
 .option-subtitle {
@@ -642,6 +680,13 @@ body.large-text {
   background: var(--color-card);
 }
 
+.mode-rules-list .best-when-rule {
+  border-color: rgba(245, 130, 32, 0.35);
+  background: rgba(245, 130, 32, 0.12);
+  color: var(--color-primary);
+  font-weight: 800;
+}
+
 .team-scoreboard {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -857,10 +902,32 @@ body.large-text {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.gorillas-howto {
+  display: grid;
+  gap: 0.2rem;
+  margin-bottom: 0.85rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 8px;
+  background: rgba(46, 199, 211, 0.14);
+  color: var(--color-primary);
+  text-align: left;
+}
+
+.gorillas-howto strong,
+.gorillas-howto span {
+  display: block;
+}
+
+.gorillas-mode-controls,
 .gorillas-setup {
   display: grid;
-  grid-template-columns: repeat(2, minmax(120px, 1fr));
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
   gap: 0.75rem;
+}
+
+.gorillas-setup {
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
+  margin-top: 0.75rem;
 }
 
 .gorillas-setup input {
@@ -869,6 +936,46 @@ body.large-text {
   border-radius: 8px;
   text-align: center;
   font-weight: 900;
+}
+
+.banana-adjust-row {
+  display: grid;
+  grid-template-columns: minmax(3rem, 0.6fr) minmax(4rem, 1fr) minmax(3rem, 0.6fr);
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.banana-step-button {
+  width: auto;
+  min-height: 3rem;
+  margin-top: 0;
+  padding: 0.45rem 0.55rem;
+}
+
+.gorillas-shot-summary {
+  margin: 0.85rem 0 0;
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  background: rgba(245, 130, 32, 0.12);
+  color: var(--color-primary);
+  font-weight: 800;
+}
+
+.gorillas-shot-history {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.gorillas-shot-history li {
+  padding: 0.45rem 0.6rem;
+  border: 1px solid rgba(9, 35, 63, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  font-weight: 800;
 }
 
 .gorillas-control-card {
@@ -913,6 +1020,13 @@ body.large-text {
   max-width: 100%;
   background: #fff2d8;
   color: #6b3b00;
+  font-weight: 800;
+}
+
+.challenge-next-hint {
+  display: block;
+  margin-top: 0.75rem;
+  color: var(--color-primary);
   font-weight: 800;
 }
 
@@ -1230,46 +1344,6 @@ body.large-text {
   display: flex;
 }
 
-#gorillas-game:fullscreen {
-  display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
-  align-content: start;
-  max-width: none;
-  width: 100vw;
-  height: 100vh;
-  padding: 0.75rem;
-  overflow: auto;
-  background: var(--color-background);
-}
-
-#gorillas-game:fullscreen .mode-header {
-  margin-bottom: 0.5rem;
-}
-
-#gorillas-game:fullscreen .gorillas-control-card {
-  position: sticky;
-  top: 0;
-  z-index: 3;
-  max-width: 1000px;
-  margin: 0 auto 0.5rem;
-  padding: 0.6rem;
-  box-shadow: 0 8px 20px rgba(9, 35, 63, 0.18);
-}
-
-#gorillas-game:fullscreen .gorillas-setup {
-  grid-template-columns: repeat(2, minmax(120px, 1fr));
-}
-
-#gorillas-game:fullscreen .pong-canvas {
-  width: min(100%, 1220px);
-  max-height: 62vh;
-  margin: 0.5rem auto;
-}
-
-#gorillas-game:fullscreen .adventure-actions {
-  margin-top: 0.5rem;
-}
-
 /* CSS-based "pseudo" full screen for browsers without the Fullscreen API
    (notably iPhone Safari). The .is-immersive class is toggled in script.js and
    mirrors the native :fullscreen layout, filling the entire viewport edge to
@@ -1325,6 +1399,7 @@ body.immersive-lock {
   background: rgba(8, 18, 32, 0.85);
 }
 
+#gorillas-game:fullscreen,
 #gorillas-game.is-immersive {
   position: fixed;
   inset: 0;
@@ -1334,40 +1409,174 @@ body.immersive-lock {
   width: 100dvw;
   height: 100vh;
   height: 100dvh;
-  padding: 0.75rem;
-  overflow: auto;
-  background: var(--color-background);
-  display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
-  align-content: start;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  background: #081220;
+  display: block;
 }
 
+#gorillas-game:fullscreen .mode-header,
 #gorillas-game.is-immersive .mode-header {
-  margin-bottom: 0.5rem;
+  display: none !important;
 }
 
+#gorillas-game:fullscreen .gorillas-control-card,
 #gorillas-game.is-immersive .gorillas-control-card {
-  position: sticky;
-  top: 0;
-  z-index: 3;
-  max-width: 1000px;
-  margin: 0 auto 0.5rem;
-  padding: 0.6rem;
-  box-shadow: 0 8px 20px rgba(9, 35, 63, 0.18);
+  position: absolute;
+  left: max(0.5rem, env(safe-area-inset-left));
+  bottom: max(0.5rem, env(safe-area-inset-bottom));
+  z-index: 9;
+  max-width: min(54vw, 34rem);
+  margin: 0;
+  padding: 0.45rem;
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(6, 21, 36, 0.72);
+  color: #fff;
+  box-shadow: none;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
 }
 
+#gorillas-game:fullscreen .gorillas-howto,
+#gorillas-game.is-immersive .gorillas-howto {
+  display: none;
+}
+
+#gorillas-game:fullscreen .gorillas-mode-controls,
+#gorillas-game.is-immersive .gorillas-mode-controls {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.35rem;
+  margin-bottom: 0.4rem;
+}
+
+#gorillas-game:fullscreen .gorillas-setup,
 #gorillas-game.is-immersive .gorillas-setup {
-  grid-template-columns: repeat(2, minmax(120px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin-top: 0;
 }
 
+#gorillas-game:fullscreen .team-name-field,
+#gorillas-game.is-immersive .team-name-field {
+  color: #fff;
+}
+
+#gorillas-game:fullscreen .team-name-field input,
+#gorillas-game.is-immersive .team-name-field input,
+#gorillas-game:fullscreen .team-name-field select,
+#gorillas-game.is-immersive .team-name-field select {
+  min-height: 2.25rem;
+  padding: 0.3rem 0.45rem;
+}
+
+#gorillas-game:fullscreen .banana-step-button,
+#gorillas-game.is-immersive .banana-step-button {
+  min-height: 2.25rem;
+  padding: 0.25rem 0.35rem;
+  font-size: 0.78rem;
+}
+
+#gorillas-game:fullscreen .gorillas-shot-summary,
+#gorillas-game.is-immersive .gorillas-shot-summary,
+#gorillas-game:fullscreen .gorillas-shot-history,
+#gorillas-game.is-immersive .gorillas-shot-history {
+  display: none;
+}
+
+#gorillas-game:fullscreen .pong-canvas,
 #gorillas-game.is-immersive .pong-canvas {
-  width: min(100%, 1220px);
-  max-height: 62vh;
-  margin: 0.5rem auto;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  object-fit: contain;
+  touch-action: none;
 }
 
+#gorillas-game:fullscreen #gorillas-status,
+#gorillas-game.is-immersive #gorillas-status {
+  position: absolute;
+  top: max(0.5rem, env(safe-area-inset-top));
+  left: max(0.5rem, env(safe-area-inset-left));
+  z-index: 8;
+  max-width: min(52vw, 28rem);
+  margin: 0;
+  padding: 0.45rem 0.7rem;
+  color: #fff;
+  background: rgba(6, 21, 36, 0.72);
+  border-radius: 10px;
+  font-size: 0.86rem;
+  line-height: 1.2;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+#gorillas-game:fullscreen .adventure-actions,
 #gorillas-game.is-immersive .adventure-actions {
-  margin-top: 0.5rem;
+  position: absolute;
+  right: max(0.5rem, env(safe-area-inset-right));
+  bottom: max(0.5rem, env(safe-area-inset-bottom));
+  z-index: 9;
+  max-width: min(48vw, 24rem);
+  margin: 0;
+  padding: 0.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  background: rgba(6, 21, 36, 0.55);
+  border-radius: 10px;
+}
+
+#gorillas-game:fullscreen .adventure-actions button,
+#gorillas-game.is-immersive .adventure-actions button {
+  width: auto;
+  min-width: 0;
+  min-height: 2.2rem;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+#gorillas-game:fullscreen #gorillas-reset,
+#gorillas-game.is-immersive #gorillas-reset,
+#gorillas-game:fullscreen #gorillas-finish,
+#gorillas-game.is-immersive #gorillas-finish {
+  display: none !important;
+}
+
+#gorillas-game:fullscreen .immersive-exit,
+#gorillas-game.is-immersive .immersive-exit {
+  display: flex;
+}
+
+@media (max-width: 740px) {
+  #gorillas-game:fullscreen .gorillas-control-card,
+  #gorillas-game.is-immersive .gorillas-control-card,
+  #gorillas-game:fullscreen .adventure-actions,
+  #gorillas-game.is-immersive .adventure-actions {
+    max-width: calc(50vw - 0.75rem);
+  }
+
+  #gorillas-game:fullscreen .gorillas-setup,
+  #gorillas-game.is-immersive .gorillas-setup {
+    grid-template-columns: 1fr;
+  }
+
+  #gorillas-game:fullscreen .gorillas-mode-controls,
+  #gorillas-game.is-immersive .gorillas-mode-controls {
+    grid-template-columns: 1fr;
+  }
+
+  #gorillas-game:fullscreen #gorillas-status,
+  #gorillas-game.is-immersive #gorillas-status {
+    max-width: calc(100vw - 4.5rem);
+    font-size: 0.78rem;
+  }
 }
 
 /* Hide & Seek full screen keeps its movement pad and action buttons (it needs
@@ -2152,7 +2361,11 @@ body.reduce-motion .stamp.earned {
 
   .option-card {
     padding: 0.75rem 0.5rem;
-    min-height: 6.75rem;
+    min-height: 10.5rem;
+  }
+
+  .quick-start-options {
+    grid-template-columns: 1fr;
   }
 
   .team-setup-grid {
@@ -2241,6 +2454,11 @@ body.reduce-motion .stamp.earned {
 
   .trivia-category-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gorillas-mode-controls,
+  .gorillas-setup {
+    grid-template-columns: 1fr;
   }
 
   .trivia-choices {
