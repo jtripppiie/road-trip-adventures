@@ -17,7 +17,7 @@ This project was built with **no backend**, **no user accounts** and **no data c
 - **Joke Vote:** Let each player tell clean jokes and award Dad Joke or Mom Joke honors.
 - **Emoji Face-Off:** Copy emoji expressions with an optional local camera snap, then vote for the closest match. Photos are not uploaded or saved by the app.
 - **Pi Digits:** See who can recite the most digits of pi and track scores for every player.
-- **Hide & Seek Adventure:** Play a local pass-and-play canvas game on a responsive 1200x675 board with a 1-minute hiding scramble, limited inspection-based searches, best-of-5 default match, sprint stamina, clearer exact-spot feedback, stealth bonuses, real hiding spot states, listen clues, particles, lighting, cover quality, obstacles, room transitions and role swaps.
+- **Hide & Seek Adventure:** Play a local pass-and-play canvas game on a responsive 1200x675 board with a 1-minute hiding scramble, limited inspection-based searches, best-of-5 default match, sprint stamina, clearer exact-spot feedback, forgiving inspect range, short-lived canvas callouts, stealth bonuses, real hiding spot states, listen clues, particles, lighting, cover quality, obstacles, room transitions and role swaps.
 - **20 Questions:** Play app-guesses or computer-hides rounds with a visible 20-question count, role prompts, optional category ideas, yes/no/sometimes answers, and reveal/play-again flow.
 - **Banana Towers and Road Pong:** Passenger-safe arcade games with local-only scoring, touch controls, clearer round feedback, and lightweight difficulty tuning.
 - **Dynamic adventures:** The app builds an adventure from a pool of questions and prompts.  Timed challenges show a 15 second countdown.
