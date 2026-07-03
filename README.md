@@ -4,7 +4,7 @@
 
 Road Trip Adventures is a lightweight, static web application designed to make road trips more fun for passengers. Scan a QR code, add player initials, pick a mode, and play quick games that encourage people to look outside, laugh together, learn something new, explore local trivia, and compete gently.
 
-This project was built with **no backend**, **no user accounts** and **no data collection**.  It is intended to run on [GitHub Pages](https://www.wikiwand.com/en/GitHub_Pages) or any static web host.  All game state lives only in the browser’s memory.  When you close the tab, the adventure disappears and nothing is saved on a server.
+This project was built with **no backend**, **no user accounts** and **no data collection**.  It is intended to run on [GitHub Pages](https://www.wikiwand.com/en/GitHub_Pages) or any static web host. Runtime state lives in the browser, and optional players, preferences, settings, and game history are stored only in local browser storage on the device. Nothing is saved on a server.
 
 ## Features
 
@@ -24,7 +24,7 @@ This project was built with **no backend**, **no user accounts** and **no data c
 - **Progress bar:** See how far along your adventure you are.
 - **Summary:** At the end, get a breakdown of how many discoveries, laughs, facts and wins you achieved.
 - **Accessibility options:** Toggle large text, high contrast and reduced motion.  All interactive elements have clear focus styles, ARIA labels and live region announcements.
-- **Privacy friendly:** No tracking, analytics, data collection, or location sensors. Local trivia is selected manually by region.
+- **Privacy friendly:** No tracking, analytics, data collection, or location sensors. Local trivia is selected manually by region, and saved device data can be cleared from Trip Settings.
 
 ## Project Layout
 
@@ -149,6 +149,8 @@ If you modify the UI, refer to the official [Web Content Accessibility Guidel
 ### Privacy and safety
 
 Road Trip Adventures does not collect or store any personal information. Scores, preferences and temporary game state are stored in your browser’s localStorage or sessionStorage. Local trivia is based only on the region a player chooses manually. The app does not use GPS, browser geolocation, or location sensors.
+
+Use **Trip Settings -> Clear Saved Data** to remove saved players, accessibility preferences, trip settings, and local game history from the current device.
 
 All content should remain family friendly: avoid profanity, sexual or violent themes, hate speech or political persuasion.  Activities should be safe for passengers and should never encourage drivers to look at a screen or perform a dangerous action.  Parents should feel comfortable with any prompt being read aloud in the car.  See `AGENT.md` for more details on content guidelines.
 

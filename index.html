@@ -3,8 +3,8 @@
 
   This single‑page application is intentionally built as a fully static website.
   It runs entirely on the client with no backend server, logins or databases.
-  All game state lives only in the current browser session, and no data is
-  transmitted or persisted anywhere else. See README.md and AGENT.md for
+  Game state and preferences stay on this device, with no backend server and
+  no trip data transmitted anywhere else. See README.md and AGENT.md for
   further details about the project philosophy and constraints.
 -->
 <!DOCTYPE html>
@@ -13,7 +13,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Road Trip Adventures</title>
-  <link rel="stylesheet" href="style.css?v=25" />
+  <link rel="stylesheet" href="style.css?v=26" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#1f7a8c" />
   <link rel="icon" href="assets/roadside-logo.png" />
@@ -214,13 +214,15 @@
               <span class="option-description">Pass-and-play map searching with secret hiding spots.</span>
               <span class="mode-pill">Party</span>
               <span class="best-for">Best when: two players can pass the phone</span>
-            </button>            <button class="option-card" data-category="twenty">
+            </button>
+            <button class="option-card" data-category="twenty">
               <span class="option-emoji" aria-hidden="true">❓</span>
               <span class="option-title">20 Questions</span>
               <span class="option-description">One secret thing, yes-or-no clues, and a final guess.</span>
               <span class="mode-pill">Party</span>
               <span class="best-for">Best for: quiet guessing together</span>
-            </button>          </div>
+            </button>
+          </div>
         </section>
 
         <section class="mode-group" aria-labelledby="mode-bonus-heading">
@@ -246,7 +248,8 @@
               <span class="option-description">Launch bananas across a skyline with wind and angles.</span>
               <span class="mode-pill scored">Scored</span>
               <span class="best-for">Best in: landscape, two players</span>
-            </button>            <button class="option-card" data-category="puns">
+            </button>
+            <button class="option-card" data-category="puns">
               <span class="option-emoji" aria-hidden="true">🤪</span>
               <span class="option-title">Pun Generator</span>
               <span class="option-description">Type a word and get groan-worthy lines to read aloud.</span>
@@ -259,7 +262,8 @@
               <span class="option-description">Harmless magic-style tricks with numbers and choices.</span>
               <span class="mode-pill">Magic</span>
               <span class="best-for">Best for: one reader, many guessers</span>
-            </button>          </div>
+            </button>
+          </div>
         </section>
       </div>
     </section>
@@ -330,6 +334,12 @@
       <div class="adventure-actions">
         <button id="save-trip-settings" class="primary-button">Save Settings</button>
         <button id="close-trip-settings" class="secondary-button">Back</button>
+      </div>
+      <div class="local-data-panel">
+        <h3>Saved Data</h3>
+        <p>Clear players, preferences, settings, and local game history stored on this device.</p>
+        <button id="clear-saved-data" class="danger-button" type="button">Clear Saved Data</button>
+        <p id="clear-saved-data-status" class="settings-status" aria-live="polite"></p>
       </div>
     </section>
 
@@ -993,7 +1003,7 @@
   <script src="js/data/scavenger.js"></script>
   <script src="js/data/questions.js"></script>
   <script src="js/data/jokes.js"></script>
-  <script src="js/games/hide-seek-data.js?v=25"></script>
+  <script src="js/games/hide-seek-data.js?v=26"></script>
   <script src="js/games/hide-seek-art.js"></script>
   <script src="js/games/pong-data.js"></script>
   <script src="js/games/pong-art.js"></script>
@@ -1002,7 +1012,7 @@
        paint lean; uncomment the line below to make the global `kontra` object
        available for future engine-powered games. -->
   <!-- <script src="vendor/kontra.min.js"></script> -->
-  <script src="script.js?v=25"></script>
+  <script src="script.js?v=26"></script>
   <script>
     if ('serviceWorker' in navigator) {
       // Reload once when a new service worker takes control, so a fresh deploy

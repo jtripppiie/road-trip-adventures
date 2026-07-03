@@ -11,7 +11,7 @@
 (() => {
   // Visible build version. Bump this (and CACHE_VERSION in sw.js) on every
   // deploy so the on-screen badge confirms which build is actually live.
-  const APP_VERSION = 'v25 · 2026-06-28';
+  const APP_VERSION = 'v26 · 2026-07-03';
   const versionBadge = document.getElementById('app-version');
   if (versionBadge) {
     versionBadge.textContent = APP_VERSION;
@@ -72,6 +72,14 @@
       localStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
       // localStorage can fail in private browsing; the game still works in memory.
+    }
+  }
+
+  function removeStoredValue(key) {
+    try {
+      localStorage.removeItem(key);
+    } catch (error) {
+      // Clearing saved data is best-effort when browser storage is blocked.
     }
   }
 
@@ -890,6 +898,27 @@
 
   const emojiPrompts = ['😜', '😮', '🤨', '😎', '😭', '😡', '🤯', '🥳', '😴', '😬', '🤠', '😇'];
   const triviaDatabase = buildTriviaDatabase();
+  const savedDataKeys = [
+    'largeText',
+    'highContrast',
+    'reduceMotion',
+    'rtaAdventureHistory',
+    'rtaCarJudgeId',
+    'rtaGorillasSettings',
+    'rtaHideSeekDebug',
+    'rtaHideSeekSolo',
+    'rtaHuntTheme',
+    'rtaLastLearnTopic',
+    'rtaLastTriviaCategory',
+    'rtaLastTriviaDifficulty',
+    'rtaPlayers',
+    'rtaPongDebug',
+    'rtaPongSettings',
+    'rtaScavengerHistory',
+    'rtaTripSettings',
+    'rtaTriviaHistory',
+    'rtaTwentyLearned',
+  ];
   let triviaHistory = getStoredJson('rtaTriviaHistory', {});
   let scavengerHistory = getStoredJson('rtaScavengerHistory', {});
   let adventureHistory = getStoredJson('rtaAdventureHistory', {});
@@ -1084,12 +1113,13 @@
   let gorillasTurn = 0;
   let gorillasLastFrameTs = 0;
   let gorillasBuildingLayer = null;
-  let gorillasSettings = Object.assign({
+  const defaultGorillasSettings = {
     opponent: 'local',
     match: '3',
     difficulty: 'normal',
     debug: false,
-  }, getStoredJson('rtaGorillasSettings', {}));
+  };
+  let gorillasSettings = Object.assign({}, defaultGorillasSettings, getStoredJson('rtaGorillasSettings', {}));
   let gorillasComputerTimer = null;
   let logoClickCount = 0;
   let logoClickTimer = null;
@@ -1192,6 +1222,8 @@
   const settingHardTrivia = document.getElementById('setting-hard-trivia');
   const saveTripSettingsButton = document.getElementById('save-trip-settings');
   const closeTripSettingsButton = document.getElementById('close-trip-settings');
+  const clearSavedDataButton = document.getElementById('clear-saved-data');
+  const clearSavedDataStatus = document.getElementById('clear-saved-data-status');
   const learnTopicGrid = document.getElementById('learn-topic-grid');
   const huntGrid = document.getElementById('hunt-grid');
   const huntStatus = document.getElementById('hunt-status');
@@ -1627,6 +1659,53 @@
     setStoredJson('rtaTripSettings', tripSettings);
     applyTripSettings();
     showSection('category');
+  }
+
+  function resetSavedDataState() {
+    savedDataKeys.forEach(removeStoredValue);
+    body.classList.remove('large-text', 'high-contrast', 'reduce-motion');
+    optionLargeText.checked = false;
+    optionHighContrast.checked = false;
+    optionReduceMotion.checked = false;
+    triviaHistory = {};
+    scavengerHistory = {};
+    adventureHistory = {};
+    tripSettings = Object.assign({}, defaultTripSettings);
+    selectedAge = tripSettings.ageGroup;
+    selectedLearnTopic = 'all';
+    activeTriviaCategory = 'mixed';
+    activeTriviaDifficulty = 'medium';
+    hideSeekDebugEnabled = false;
+    hideSeekSoloEnabled = false;
+    activeHuntTheme = 'mixed';
+    pongSettings = Object.assign({}, defaultPongSettings);
+    pongDebugEnabled = false;
+    gorillasSettings = Object.assign({}, defaultGorillasSettings);
+    players = [
+      { id: 'p1', name: 'P1' },
+      { id: 'p2', name: 'P2' },
+    ];
+    carJudgeId = '';
+    resetGame();
+    resetHunt();
+    resetHideSeek();
+    stopEmojiCamera();
+    stopPong();
+    stopGorillas();
+    triviaDeck = [];
+    triviaIndex = 0;
+    regionCode = null;
+    selectedCategory = null;
+    sectionHistory = [];
+    populateTripSettingsForm();
+    applyTripSettings();
+    renderPlayerFields();
+    renderLearnTopics();
+    renderTriviaDifficultyButtons();
+    if (clearSavedDataStatus) {
+      clearSavedDataStatus.textContent = 'Saved settings, players, and local game history were cleared on this device.';
+    }
+    showSection('players', { replace: true });
   }
 
   function applyTripSettings() {
@@ -8837,6 +8916,10 @@
   saveTripSettingsButton.addEventListener('click', saveTripSettings);
   closeTripSettingsButton.addEventListener('click', () => {
     showSection('category');
+  });
+  clearSavedDataButton.addEventListener('click', () => {
+    if (!window.confirm('Clear saved players, settings, preferences, and local game history on this device?')) return;
+    resetSavedDataState();
   });
   modeRulesStartButton.addEventListener('click', launchSelectedMode);
   modeRulesBackButton.addEventListener('click', () => {
