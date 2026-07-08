@@ -916,12 +916,14 @@
     'rtaPongSettings',
     'rtaScavengerHistory',
     'rtaTripSettings',
+    'rtaTripMemories',
     'rtaTriviaHistory',
     'rtaTwentyLearned',
   ];
   let triviaHistory = getStoredJson('rtaTriviaHistory', {});
   let scavengerHistory = getStoredJson('rtaScavengerHistory', {});
   let adventureHistory = getStoredJson('rtaAdventureHistory', {});
+  let tripMemories = getStoredJson('rtaTripMemories', []);
   const defaultTripSettings = {
     gameLength: 'long',
     tripPreset: 'any',
@@ -1201,6 +1203,10 @@
   const skipTimerButton = document.getElementById('skip-timer');
   const summaryText = document.getElementById('summary-text');
   const summaryList = document.getElementById('summary-list');
+  const memoryType = document.getElementById('memory-type');
+  const memoryText = document.getElementById('memory-text');
+  const saveMemoryButton = document.getElementById('save-memory');
+  const memoryList = document.getElementById('memory-list');
   const playerFields = document.getElementById('player-fields');
   const carJudgeSelect = document.getElementById('car-judge');
   const addPlayerButton = document.getElementById('add-player');
@@ -1670,6 +1676,7 @@
     triviaHistory = {};
     scavengerHistory = {};
     adventureHistory = {};
+    tripMemories = [];
     tripSettings = Object.assign({}, defaultTripSettings);
     selectedAge = tripSettings.ageGroup;
     selectedLearnTopic = 'all';
@@ -1702,6 +1709,7 @@
     renderPlayerFields();
     renderLearnTopics();
     renderTriviaDifficultyButtons();
+    renderTripMemories();
     if (clearSavedDataStatus) {
       clearSavedDataStatus.textContent = 'Saved settings, players, and local game history were cleared on this device.';
     }
@@ -1796,6 +1804,9 @@
       if (heading) {
         heading.setAttribute('tabindex', '-1');
         heading.focus();
+      }
+      if (key === 'summary') {
+        renderTripMemories();
       }
       if (!options.skipBrowserHistory) {
         syncBrowserHistory(key, Boolean(options.replace));
@@ -2195,6 +2206,46 @@
     }
     nextButton.hidden = false;
     updateProgress();
+  }
+
+  function renderTripMemories() {
+    if (!memoryList) return;
+    tripMemories = Array.isArray(tripMemories) ? tripMemories : [];
+    memoryList.innerHTML = '';
+    if (!tripMemories.length) {
+      const empty = document.createElement('li');
+      empty.textContent = 'No trip memories saved yet.';
+      memoryList.appendChild(empty);
+      return;
+    }
+    tripMemories.slice().reverse().forEach(memory => {
+      const item = document.createElement('li');
+      const label = document.createElement('strong');
+      label.textContent = memory.type || 'Trip memory';
+      const text = document.createElement('span');
+      text.textContent = memory.text || '';
+      item.appendChild(label);
+      item.appendChild(text);
+      memoryList.appendChild(item);
+    });
+  }
+
+  function saveTripMemory() {
+    const text = memoryText.value.trim();
+    if (!text) {
+      memoryText.focus();
+      return;
+    }
+    tripMemories = Array.isArray(tripMemories) ? tripMemories : [];
+    tripMemories.push({
+      type: memoryType.value,
+      text,
+      savedAt: new Date().toISOString(),
+    });
+    tripMemories = tripMemories.slice(-12);
+    setStoredJson('rtaTripMemories', tripMemories);
+    memoryText.value = '';
+    renderTripMemories();
   }
 
   function showSummary() {
@@ -9049,6 +9100,8 @@
   startOverButton.addEventListener('click', () => {
     goHome();
   });
+
+  saveMemoryButton.addEventListener('click', saveTripMemory);
 
   drawHuntTargetsButton.addEventListener('click', drawFreshHuntTargets);
   resetHuntButton.addEventListener('click', resetHunt);

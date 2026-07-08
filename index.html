@@ -934,6 +934,28 @@
       <h2>Adventure Complete</h2>
       <p id="summary-text"></p>
       <ul id="summary-list" class="summary-list"></ul>
+      <article class="memory-card" aria-labelledby="memory-heading">
+        <span class="challenge-badge">Trip Memory</span>
+        <h3 id="memory-heading">Save a moment</h3>
+        <div class="memory-form">
+          <label class="team-name-field" for="memory-type">
+            <span>Moment type</span>
+            <select id="memory-type">
+              <option value="Funniest quote">Funniest quote</option>
+              <option value="Weirdest sighting">Weirdest sighting</option>
+              <option value="Best wrong answer">Best wrong answer</option>
+              <option value="Trip MVP">Trip MVP</option>
+              <option value="Favorite fact">Favorite fact</option>
+            </select>
+          </label>
+          <label class="team-name-field memory-text-field" for="memory-text">
+            <span>What happened?</span>
+            <textarea id="memory-text" rows="3" maxlength="160" placeholder="Type the car's best moment..."></textarea>
+          </label>
+          <button id="save-memory" class="secondary-button" type="button">Save Moment</button>
+        </div>
+        <ul id="memory-list" class="memory-list"></ul>
+      </article>
       <button id="play-again" class="primary-button">Play Again</button>
       <button id="start-over" class="secondary-button">Start Over</button>
     </section>

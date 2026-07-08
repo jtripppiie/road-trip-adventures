@@ -2226,6 +2226,52 @@ body #hide-seek-game.is-immersive #hide-seek-finish {
   overflow-wrap: anywhere;
 }
 
+.memory-card {
+  margin: 1rem auto;
+  padding: 1rem;
+  max-width: 640px;
+  text-align: left;
+  background: var(--color-card);
+  border: 2px solid rgba(9, 35, 63, 0.14);
+  border-radius: 8px;
+}
+
+.memory-card h3 {
+  margin: 0.4rem 0 0.75rem;
+  color: var(--color-primary);
+}
+
+.memory-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.memory-text-field textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.memory-list {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.memory-list li {
+  padding: 0.6rem 0.75rem;
+  background: rgba(46, 199, 211, 0.12);
+  border-left: 4px solid var(--color-accent);
+  border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+
+.memory-list strong {
+  display: block;
+  color: var(--color-primary);
+}
+
 /* Footer */
 .app-footer {
   margin-top: auto;
