@@ -2092,6 +2092,86 @@
       hint: 'Small door, miniature window, fairy door, utility hatch, or tiny facade.',
       themes: ['weird', 'jackpot', 'places'],
     },
+    {
+      id: 'solar-panels-visible', emoji: '☀️', label: 'Solar panels',
+      hint: 'Roof, field, parking canopy, road equipment, or portable panel.',
+      themes: ['places', 'nature'],
+    },
+    {
+      id: 'water-tower-with-name', emoji: '💧', label: 'Named water tower',
+      hint: 'A town, school, company, mascot, or slogan appears on the tower.',
+      themes: ['places', 'signs'],
+    },
+    {
+      id: 'wildlife-crossing-sign', emoji: '🦌', label: 'Wildlife crossing sign',
+      hint: 'Deer, duck, turtle, bear, cattle, horse, or another animal warning.',
+      themes: ['signs', 'nature'],
+    },
+    {
+      id: 'road-with-animal-name', emoji: '🐾', label: 'Animal-named road',
+      hint: 'Any street, road, trail, exit, or neighborhood named after an animal.',
+      themes: ['signs', 'nature'],
+    },
+    {
+      id: 'three-level-transport', emoji: '🌉', label: 'Three travel levels',
+      hint: 'See travel above, beside, or below you—such as a bridge, road, track, or trail.',
+      themes: ['places', 'vehicles', 'jackpot'],
+    },
+    {
+      id: 'old-new-buildings', emoji: '🏘️', label: 'Old and new buildings',
+      hint: 'Two visible buildings that clearly come from different eras.',
+      themes: ['places'],
+    },
+    {
+      id: 'business-with-rhyming-name', emoji: '🎵', label: 'Rhyming business name',
+      hint: 'Two words on one business sign rhyme or nearly rhyme.',
+      themes: ['signs', 'places', 'jackpot'],
+    },
+    {
+      id: 'bell-tower-visible', emoji: '🔔', label: 'Bell tower',
+      hint: 'A visible bell or bell tower on a school, station, civic building, or place of worship.',
+      themes: ['places', 'signs'],
+    },
+    {
+      id: 'wind-powered-object', emoji: '💨', label: 'Wind-powered object',
+      hint: 'Wind turbine, windmill, weather vane, windsock, pinwheel, or sail.',
+      themes: ['nature', 'places'],
+    },
+    {
+      id: 'vehicle-carrying-bicycles', emoji: '🚲', label: 'Vehicle carrying bikes',
+      hint: 'Bicycles on a roof rack, rear rack, trailer, truck bed, bus, or RV.',
+      themes: ['vehicles', 'easy'],
+    },
+    {
+      id: 'hand-painted-sign', emoji: '🖌️', label: 'Hand-painted sign',
+      hint: 'Brush lettering, homemade poster, painted board, or clearly handmade message.',
+      themes: ['signs', 'weird'],
+    },
+    {
+      id: 'bird-on-a-wire', emoji: '🐦', label: 'Bird on a wire',
+      hint: 'One or more real birds perched on a utility wire, fence wire, or cable.',
+      themes: ['nature', 'easy'],
+    },
+    {
+      id: 'two-kinds-of-farm-field', emoji: '🌾', label: 'Two farm clues',
+      hint: 'Find two of these together: crop rows, barn, silo, tractor, livestock, or hay.',
+      themes: ['nature', 'places'],
+    },
+    {
+      id: 'vehicle-with-ladder', emoji: '🪜', label: 'Vehicle with a ladder',
+      hint: 'Ladder mounted on, carried by, or built into a truck, van, trailer, or RV.',
+      themes: ['vehicles', 'easy'],
+    },
+    {
+      id: 'building-with-date', emoji: '📅', label: 'Date on a building',
+      hint: 'A year carved, painted, posted, or displayed on a building or cornerstone.',
+      themes: ['places', 'signs'],
+    },
+    {
+      id: 'nature-heart-shape', emoji: '💚', label: 'Heart shape in nature',
+      hint: 'A leaf, rock, cloud, shadow, opening, or natural outline shaped like a heart.',
+      themes: ['nature', 'jackpot'],
+    },
   ];
 
   const scavengerItems = flattenSections([

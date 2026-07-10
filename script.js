@@ -2033,12 +2033,13 @@
     if (!pool.length) return [];
     const used = new Set(adventureHistory[historyKey] || []);
     let available = pool.filter(prompt => !used.has(prompt.id));
-    if (!available.length) {
-      adventureHistory[historyKey] = [];
-      setStoredJson('rtaAdventureHistory', adventureHistory);
-      available = pool.slice();
-    }
     const selected = shuffle(available.slice()).slice(0, count);
+    if (selected.length < count) {
+      const selectedIds = new Set(selected.map(prompt => prompt.id));
+      const refill = shuffle(pool.filter(prompt => !selectedIds.has(prompt.id)));
+      selected.push(...refill.slice(0, count - selected.length));
+      adventureHistory[historyKey] = [];
+    }
     adventureHistory[historyKey] = adventureHistory[historyKey] || [];
     selected.forEach(prompt => {
       if (!adventureHistory[historyKey].includes(prompt.id)) {

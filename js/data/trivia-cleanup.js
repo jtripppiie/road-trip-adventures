@@ -105,6 +105,78 @@
         'A phone call to every tower.',
       ],
     },
+    {
+      id: 'roadside-rumble-strips', category: 'cartrivia', difficulty: 'easy',
+      question: 'What are rumble strips designed to do when a vehicle’s tires cross them?',
+      answer: 'Make noise and vibration.',
+      choices: ['Make noise and vibration.', 'Measure fuel use.', 'Wash the tires.', 'Charge the battery.'],
+    },
+    {
+      id: 'roadside-interstate-even-number', category: 'cartrivia', difficulty: 'medium',
+      question: 'In the main U.S. Interstate numbering system, even-numbered routes generally run in which direction?',
+      answer: 'East and west.',
+      choices: ['East and west.', 'North and south.', 'Only toward capitals.', 'In complete circles.'],
+    },
+    {
+      id: 'geography-estuary', category: 'geography', difficulty: 'medium',
+      question: 'What is an estuary?',
+      answer: 'A place where river water meets ocean water.',
+      choices: ['A place where river water meets ocean water.', 'A lake inside a volcano.', 'A frozen desert valley.', 'A river flowing underground.'],
+    },
+    {
+      id: 'science-thunder-after-lightning', category: 'science', difficulty: 'easy',
+      question: 'Why do you usually see lightning before hearing its thunder?',
+      answer: 'Light travels faster than sound.',
+      choices: ['Light travels faster than sound.', 'Thunder forms much later.', 'Clouds block sound completely.', 'Lightning is always closer.'],
+    },
+    {
+      id: 'animals-geese-v-formation', category: 'animals', difficulty: 'easy',
+      question: 'Why can flying in a V formation help migrating geese?',
+      answer: 'It helps them save energy.',
+      choices: ['It helps them save energy.', 'It keeps their feathers dry.', 'It hides them from the Sun.', 'It makes every goose the leader.'],
+    },
+    {
+      id: 'nationalparks-geysers-yellowstone', category: 'nationalparks', difficulty: 'easy',
+      question: 'Which U.S. national park is especially famous for Old Faithful and many other geysers?',
+      answer: 'Yellowstone.',
+      choices: ['Yellowstone.', 'Acadia.', 'Everglades.', 'Shenandoah.'],
+    },
+    {
+      id: 'food-maple-syrup-source', category: 'food', difficulty: 'easy',
+      question: 'Traditional maple syrup begins as sap collected from what?',
+      answer: 'Maple trees.',
+      choices: ['Maple trees.', 'Cactus flowers.', 'Coconut palms.', 'Grape vines.'],
+    },
+    {
+      id: 'biology-tree-rings', category: 'biology', difficulty: 'easy',
+      question: 'What can the growth rings in a tree trunk help reveal?',
+      answer: 'The tree’s age and growing conditions.',
+      choices: ['The tree’s age and growing conditions.', 'The exact time of day.', 'The direction birds migrate.', 'The depth of nearby rivers.'],
+    },
+    {
+      id: 'landmarks-liberty-copper', category: 'landmarks', difficulty: 'medium',
+      question: 'What metal forms the outer surface of the Statue of Liberty?',
+      answer: 'Copper.',
+      choices: ['Copper.', 'Silver.', 'Iron.', 'Aluminum.'],
+    },
+    {
+      id: 'space-moon-gravity', category: 'space', difficulty: 'easy',
+      question: 'Compared with Earth, the Moon has about what fraction of Earth’s surface gravity?',
+      answer: 'One sixth.',
+      choices: ['One sixth.', 'One half.', 'The same amount.', 'Twice as much.'],
+    },
+    {
+      id: 'technology-qr-meaning', category: 'technology', difficulty: 'medium',
+      question: 'What do the letters QR stand for in QR code?',
+      answer: 'Quick Response.',
+      choices: ['Quick Response.', 'Quality Reading.', 'Query Route.', 'Quiet Radio.'],
+    },
+    {
+      id: 'weather-cumulonimbus', category: 'science', difficulty: 'medium',
+      question: 'Which tall cloud type is most closely associated with thunderstorms?',
+      answer: 'Cumulonimbus.',
+      choices: ['Cumulonimbus.', 'Cirrus.', 'Stratus.', 'Fog.'],
+    },
   ];
 
   window.RTA_TRIVIA_QUESTIONS = (window.RTA_TRIVIA_QUESTIONS || []).concat(curatedRoadTripQuestions);
