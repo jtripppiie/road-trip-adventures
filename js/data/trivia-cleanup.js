@@ -109,6 +109,141 @@
 
   window.RTA_TRIVIA_QUESTIONS = (window.RTA_TRIVIA_QUESTIONS || []).concat(curatedRoadTripQuestions);
 
+  const questionPolishById = {
+    'parks-acadia-state': {
+      question: 'A rocky Atlantic park with carriage roads, tide pools, and Cadillac Mountain points you to what state?',
+      difficulty: 'medium',
+    },
+    'parks-everglades-state': {
+      question: 'If a park protects sawgrass marsh, mangroves, alligators, and crocodiles, what state are you visiting?',
+      difficulty: 'easy',
+    },
+    'parks-zion-state': {
+      question: 'The park with Zion Canyon, Angels Landing, and the Narrows is in which red-rock state?',
+      difficulty: 'easy',
+    },
+    'parks-big-bend-state': {
+      question: 'Big Bend follows a huge curve of the Rio Grande along the border of what state?',
+      difficulty: 'medium',
+    },
+    'parks-joshua-tree-state': {
+      question: 'Joshua Tree mixes Mojave and Colorado Desert landscapes in what state?',
+      difficulty: 'medium',
+    },
+    'parks-canyonlands-state': {
+      question: 'Canyonlands is carved by the Colorado and Green Rivers near Moab in what state?',
+      difficulty: 'medium',
+    },
+    'parks-hot-springs-state': {
+      question: 'Bathhouse Row and naturally heated spring water are the giveaway clues for what state?',
+      difficulty: 'medium',
+    },
+    'parks-kings-canyon-state': {
+      question: 'Kings Canyon sits beside Sequoia in the Sierra Nevada of what state?',
+      difficulty: 'medium',
+    },
+    'parks-white-sands-state': {
+      question: 'White Sands protects bright gypsum dunes near Alamogordo in what state?',
+      difficulty: 'medium',
+    },
+    'parks-great-sand-dunes-state': {
+      question: 'The tallest sand dunes in North America rise below the Sangre de Cristo Mountains in what state?',
+      difficulty: 'medium',
+    },
+    'parks-voyageurs-state': {
+      question: 'Voyageurs is a water-and-islands park along the Canadian border in what state?',
+      difficulty: 'medium',
+    },
+    'parks-isle-royale-state': {
+      question: 'Remote Isle Royale sits in Lake Superior but belongs to what state?',
+      difficulty: 'hard',
+    },
+    'parks-congaree-state': {
+      question: 'Congaree protects old-growth bottomland hardwood forest near Columbia in what state?',
+      difficulty: 'medium',
+    },
+    'parks-guadalupe-peak': {
+      question: 'Guadalupe Peak, protected inside Guadalupe Mountains National Park, is the highest point of what state?',
+      difficulty: 'medium',
+    },
+    'parks-north-cascades-state': {
+      question: 'North Cascades protects jagged peaks and glacier-fed lakes near the Canadian border in what state?',
+      difficulty: 'medium',
+    },
+    'parks-grand-teton-state': {
+      question: 'Grand Teton rises above Jackson Hole just south of Yellowstone in what state?',
+      difficulty: 'easy',
+    },
+    'parks-kenai-state': {
+      question: 'Kenai Fjords is the place for tidewater glaciers, fjords, and coastal wildlife in what state?',
+      difficulty: 'easy',
+    },
+    'parks-arches-state': {
+      question: 'More than 2,000 natural stone arches near Moab point to what state?',
+      difficulty: 'easy',
+    },
+    'parks-crater-lake-state': {
+      question: 'A deep blue lake filling an ancient volcano caldera is the signature park of what state?',
+      difficulty: 'medium',
+    },
+    'parks-bryce-state': {
+      question: 'Bryce Canyon\'s orange hoodoo amphitheaters belong to what state?',
+      difficulty: 'easy',
+    },
+    'parks-mammoth-cave-state': {
+      question: 'The world\'s longest known cave system runs under rolling hills in what state?',
+      difficulty: 'medium',
+    },
+    'parks-shenandoah-state': {
+      question: 'Skyline Drive follows the Blue Ridge Mountains through Shenandoah in what state?',
+      difficulty: 'medium',
+    },
+    'parks-carlsbad-state': {
+      question: 'Carlsbad Caverns hides huge limestone rooms under the Chihuahuan Desert in what state?',
+      difficulty: 'medium',
+    },
+    'parks-badlands-state': {
+      question: 'Layered fossil beds and sharp prairie buttes make Badlands a landmark in what state?',
+      difficulty: 'medium',
+    },
+    'parks-biscayne-state': {
+      question: 'Biscayne is mostly water, coral reef, and islands just south of Miami in what state?',
+      difficulty: 'easy',
+    },
+    'parks-cuyahoga-state': {
+      question: 'Cuyahoga Valley follows a river corridor between Cleveland and Akron in what state?',
+      difficulty: 'medium',
+    },
+    'parks-gateway-arch-state': {
+      question: 'The smallest U.S. national park centers on St. Louis\'s Gateway Arch in what state?',
+      difficulty: 'easy',
+    },
+    'parks-glacier-state': {
+      question: 'Going-to-the-Sun Road crosses Glacier National Park in what state?',
+      difficulty: 'medium',
+    },
+    'parks-hawaii-volcanoes-state': {
+      question: 'Kilauea and Mauna Loa are protected inside Hawaiʻi Volcanoes National Park in what state?',
+      difficulty: 'easy',
+    },
+    'parks-petrified-state': {
+      question: 'Rainbow-colored badlands and fossilized logs mark Petrified Forest in what state?',
+      difficulty: 'medium',
+    },
+    'parks-rocky-mountain-state': {
+      question: 'Trail Ridge Road climbs above 12,000 feet in Rocky Mountain National Park in what state?',
+      difficulty: 'easy',
+    },
+    'alaska-brown-bears': {
+      question: 'Roughly what share of the world\'s brown bears live in Alaska?',
+      difficulty: 'hard',
+    },
+    'alaska-bald-eagles': {
+      question: 'Alaska has one of the country\'s largest populations of which white-headed raptor?',
+      difficulty: 'easy',
+    },
+  };
+
   const questions = window.RTA_TRIVIA_QUESTIONS || [];
   const seenExactQuestions = new Set();
   const seenLooseQuestions = new Set();
@@ -141,6 +276,10 @@
   }
 
   function polishQuestion(item) {
+    if (questionPolishById[item.id]) {
+      Object.assign(item, questionPolishById[item.id]);
+    }
+
     if (item.id === 'nationalparks-how-many-u-s-national-parks-are-there-as-of-2026') {
       item.question = 'How many U.S. national parks are there in the National Park Service count used by this game?';
       item.answer = '63.';

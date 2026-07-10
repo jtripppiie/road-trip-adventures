@@ -1095,6 +1095,7 @@
   let emojiScore = {};
   let emojiFaceAwarded = false;
   let emojiStream = null;
+  let emojiCameraRequestId = 0;
   let piScore = {};
   const pongData = window.RTA_PONG_DATA || {};
   const defaultPongSettings = pongData.defaultSettings || {
@@ -6869,19 +6870,28 @@
       return;
     }
 
+    const requestId = ++emojiCameraRequestId;
     try {
-      emojiStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+      if (requestId !== emojiCameraRequestId || currentSectionKey !== 'emoji') {
+        stream.getTracks().forEach(track => track.stop());
+        return;
+      }
+      stopEmojiCamera(false);
+      emojiStream = stream;
       emojiVideo.srcObject = emojiStream;
       emojiVideo.hidden = false;
       emojiCanvas.hidden = true;
       captureEmojiButton.disabled = false;
       emojiCameraMessage.textContent = 'Match the emoji, then snap the face.';
     } catch (error) {
+      if (requestId !== emojiCameraRequestId || currentSectionKey !== 'emoji') return;
       emojiCameraMessage.textContent = 'Camera permission was not granted. You can still play by posing and voting without photos.';
     }
   }
 
-  function stopEmojiCamera() {
+  function stopEmojiCamera(cancelPendingRequest = true) {
+    if (cancelPendingRequest) emojiCameraRequestId++;
     if (!emojiStream) return;
     emojiStream.getTracks().forEach(track => track.stop());
     emojiStream = null;
@@ -9401,19 +9411,48 @@
     }
   });
 
-  aboutButton.addEventListener('click', () => {
-    aboutModal.hidden = false;
-    // Trap focus inside the modal
-    closeAbout.focus();
-  });
-  closeAbout.addEventListener('click', () => {
-    aboutModal.hidden = true;
-    aboutButton.focus();
-  });
+  let modalReturnFocus = null;
+
+  function openModal(modal, initialFocus) {
+    modalReturnFocus = document.activeElement;
+    modal.hidden = false;
+    initialFocus.focus();
+  }
+
+  function closeModal(modal, fallbackFocus) {
+    modal.hidden = true;
+    const returnTarget = modalReturnFocus && document.contains(modalReturnFocus)
+      ? modalReturnFocus
+      : fallbackFocus;
+    modalReturnFocus = null;
+    returnTarget.focus();
+  }
+
+  function trapModalFocus(event, modal) {
+    if (event.key !== 'Tab' || modal.hidden) return;
+    const focusable = Array.from(modal.querySelectorAll(
+      'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+    )).filter(element => !element.hidden);
+    if (!focusable.length) {
+      event.preventDefault();
+      return;
+    }
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  aboutButton.addEventListener('click', () => openModal(aboutModal, closeAbout));
+  closeAbout.addEventListener('click', () => closeModal(aboutModal, aboutButton));
   feedbackButton.addEventListener('click', () => {
-    feedbackModal.hidden = false;
+    openModal(feedbackModal, feedbackText);
     feedbackStatus.textContent = '';
-    feedbackText.focus();
   });
   copyFeedbackButton.addEventListener('click', async () => {
     const text = feedbackText.value.trim();
@@ -9438,21 +9477,18 @@
       feedbackStatus.textContent = 'Copy failed. Select the text and copy it manually.';
     }
   });
-  closeFeedbackButton.addEventListener('click', () => {
-    feedbackModal.hidden = true;
-    feedbackButton.focus();
-  });
+  closeFeedbackButton.addEventListener('click', () => closeModal(feedbackModal, feedbackButton));
 
   // Hide modal on Escape
   document.addEventListener('keydown', e => {
+    trapModalFocus(e, aboutModal);
+    trapModalFocus(e, feedbackModal);
     if (e.key === 'Escape') {
       if (!aboutModal.hidden) {
-        aboutModal.hidden = true;
-        aboutButton.focus();
+        closeModal(aboutModal, aboutButton);
       }
       if (!feedbackModal.hidden) {
-        feedbackModal.hidden = true;
-        feedbackButton.focus();
+        closeModal(feedbackModal, feedbackButton);
       }
       if (logoPrank && !logoPrank.hidden) {
         logoPrank.hidden = true;
