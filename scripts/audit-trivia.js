@@ -16,8 +16,10 @@ eval(`triviaBaseQuestions = [${baseMatch[1]}\n];`);
 
 global.window = {};
 require(path.join(root, 'js/data/trivia.js'));
+require(path.join(root, 'js/data/decades-trivia.js'));
 require(path.join(root, 'js/data/community-trivia.js'));
 require(path.join(root, 'js/data/oak-island.js'));
+require(path.join(root, 'js/data/trivia-cleanup.js'));
 
 const externalQuestions = window.RTA_TRIVIA_QUESTIONS || [];
 const errors = [];

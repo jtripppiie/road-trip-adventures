@@ -3,8 +3,8 @@
 
   This single‑page application is intentionally built as a fully static website.
   It runs entirely on the client with no backend server, logins or databases.
-  All game state lives only in the current browser session, and no data is
-  transmitted or persisted anywhere else. See README.md and AGENT.md for
+  Game state and preferences stay on this device, with no backend server and
+  no trip data transmitted anywhere else. See README.md and AGENT.md for
   further details about the project philosophy and constraints.
 -->
 <!DOCTYPE html>
@@ -13,7 +13,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Road Trip Adventures</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=27" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#1f7a8c" />
   <link rel="icon" href="assets/roadside-logo.png" />
@@ -116,11 +116,19 @@
       <h2 id="setup-category-heading">What should the car play?</h2>
       <p>Scored games crown a winner. Explore modes are just prompts to get everyone looking, laughing, and talking.</p>
       <button id="open-trip-settings" class="secondary-button settings-button">Trip Settings</button>
-      <button class="quick-start-card" data-category="quickstart">
-        <span class="option-emoji" aria-hidden="true">🚗</span>
-        <span class="option-title">Start a Road Trip Mix</span>
-        <span class="option-subtitle">Let the app pick a game and get moving.</span>
+      <button class="quick-start-card quest-launch-card" data-category="quest">
+        <span class="option-emoji" aria-hidden="true">🗺️</span>
+        <span class="option-title">Start the Road Trip Quest</span>
+        <span class="option-subtitle">Scavenger finds, trivia showdowns, and 20 Questions—with one shared scoreboard.</span>
+        <span class="quest-launch-meta">One tap · 9 rounds · everyone plays</span>
       </button>
+      <div class="quick-start-options" aria-label="Quick start choices">
+        <button type="button" data-quick-intent="laugh">Make us laugh</button>
+        <button type="button" data-quick-intent="outside">Look outside</button>
+        <button type="button" data-quick-intent="learn">Learn something</button>
+        <button type="button" data-quick-intent="scored">Play scored</button>
+        <button type="button" data-quick-intent="surprise">Surprise us</button>
+      </div>
       <div class="mode-group-list" aria-label="Adventure categories">
         <section class="mode-group" aria-labelledby="mode-look-heading">
           <h3 id="mode-look-heading">Look Outside</h3>
@@ -128,17 +136,23 @@
             <button class="option-card" data-category="look">
               <span class="option-emoji" aria-hidden="true">👀</span>
               <span class="option-title">Window Quests</span>
+              <span class="option-description">Turn real scenery into stories, clues, and tiny debates.</span>
               <span class="mode-pill">Just for fun</span>
+              <span class="best-for">Best for: quick, creative, all ages</span>
             </button>
             <button class="option-card" data-category="local">
               <span class="option-emoji" aria-hidden="true">🌎</span>
               <span class="option-title">Local Explorer</span>
+              <span class="option-description">Choose a region manually and notice what makes it different.</span>
               <span class="mode-pill">Just for fun</span>
+              <span class="best-for">Best when: someone can read aloud</span>
             </button>
             <button class="option-card" data-category="scavenger">
               <span class="option-emoji" aria-hidden="true">🔎</span>
               <span class="option-title">Scavenger Hunt</span>
+              <span class="option-description">Race to spot real roadside targets the car can verify.</span>
               <span class="mode-pill scored">Scored</span>
+              <span class="best-for">Best for: active, competitive passengers</span>
             </button>
           </div>
         </section>
@@ -149,22 +163,30 @@
             <button class="option-card" data-category="learn">
               <span class="option-emoji" aria-hidden="true">🧠</span>
               <span class="option-title">Learn Something</span>
+              <span class="option-description">Short facts and questions to pass around the car.</span>
               <span class="mode-pill">Just for fun</span>
+              <span class="best-for">Best for: quiet car, curious readers</span>
             </button>
             <button class="option-card" data-category="trivia">
               <span class="option-emoji" aria-hidden="true">🧩</span>
               <span class="option-title">Trivia Run</span>
+              <span class="option-description">Take turns answering multiple-choice road-trip trivia.</span>
               <span class="mode-pill scored">Scored</span>
+              <span class="best-for">Best for: longer, seated play</span>
             </button>
             <button class="option-card" data-category="pi">
               <span class="option-emoji" aria-hidden="true">π</span>
               <span class="option-title">Pi Digits</span>
+              <span class="option-description">Recite digits, enter scores, and crown the memory champ.</span>
               <span class="mode-pill scored">Scored</span>
+              <span class="best-for">Best for: quiet challenge rounds</span>
             </button>
             <button class="option-card" data-category="calculator">
               <span class="option-emoji" aria-hidden="true">🧮</span>
               <span class="option-title">Trip Calculator</span>
+              <span class="option-description">Compare travel times and turn the route into road math.</span>
               <span class="mode-pill">Tool</span>
+              <span class="best-for">Best when: estimating, not driving</span>
             </button>
           </div>
         </section>
@@ -176,22 +198,39 @@
             <button class="option-card" data-category="jokes">
               <span class="option-emoji" aria-hidden="true">🎤</span>
               <span class="option-title">Joke Vote</span>
+              <span class="option-description">Read jokes aloud and vote for the biggest laugh.</span>
               <span class="mode-pill scored">Scored</span>
+              <span class="best-for">Best for: silly group energy</span>
             </button>
             <button class="option-card" data-category="emoji">
               <span class="option-emoji" aria-hidden="true">😜</span>
               <span class="option-title">Emoji Face‑Off</span>
+              <span class="option-description">Copy the emoji face, then vote for the closest match.</span>
               <span class="mode-pill scored">Scored</span>
+              <span class="best-for">Best when: passengers are stopped or settled</span>
             </button>
             <button class="option-card" data-category="hide-seek">
               <span class="option-emoji" aria-hidden="true">🫥</span>
               <span class="option-title">Hide & Seek</span>
+              <span class="option-description">Pass-and-play map searching with secret hiding spots.</span>
               <span class="mode-pill">Party</span>
-            </button>            <button class="option-card" data-category="twenty">
+              <span class="best-for">Best when: two players can pass the phone</span>
+            </button>
+            <button class="option-card" data-category="twenty">
               <span class="option-emoji" aria-hidden="true">❓</span>
               <span class="option-title">20 Questions</span>
+              <span class="option-description">One secret thing, yes-or-no clues, and a final guess.</span>
               <span class="mode-pill">Party</span>
-            </button>          </div>
+              <span class="best-for">Best for: quiet guessing together</span>
+            </button>
+            <button class="option-card" data-category="cardGames">
+              <span class="option-emoji" aria-hidden="true">🃏</span>
+              <span class="option-title">Card Game Guide</span>
+              <span class="option-description">Pick a game and get quick, family-friendly rules for a standard deck.</span>
+              <span class="mode-pill">Guide</span>
+              <span class="best-for">Best when: the car is safely parked</span>
+            </button>
+          </div>
         </section>
 
         <section class="mode-group" aria-labelledby="mode-bonus-heading">
@@ -200,27 +239,39 @@
             <button class="option-card" data-category="random">
               <span class="option-emoji" aria-hidden="true">🎲</span>
               <span class="option-title">Surprise Me</span>
+              <span class="option-description">A mixed prompt run when nobody wants to choose.</span>
               <span class="mode-pill">Mixed</span>
+              <span class="best-for">Best for: instant momentum</span>
             </button>
             <button class="option-card" data-category="pong">
               <span class="option-emoji" aria-hidden="true">🏓</span>
               <span class="option-title">Road Pong</span>
+              <span class="option-description">Touch arcade pong for one or two passengers.</span>
               <span class="mode-pill scored">Scored</span>
+              <span class="best-for">Best for: quick arcade breaks</span>
             </button>
             <button class="option-card" data-category="gorillas">
               <span class="option-emoji" aria-hidden="true">🍌</span>
               <span class="option-title">Banana Towers</span>
+              <span class="option-description">Launch bananas across a skyline with wind and angles.</span>
               <span class="mode-pill scored">Scored</span>
-            </button>            <button class="option-card" data-category="puns">
+              <span class="best-for">Best in: landscape, two players</span>
+            </button>
+            <button class="option-card" data-category="puns">
               <span class="option-emoji" aria-hidden="true">🤪</span>
               <span class="option-title">Pun Generator</span>
+              <span class="option-description">Type a word and get groan-worthy lines to read aloud.</span>
               <span class="mode-pill">Tool</span>
+              <span class="best-for">Best for: quick laughs</span>
             </button>
             <button class="option-card" data-category="mentalist">
               <span class="option-emoji" aria-hidden="true">🔮</span>
               <span class="option-title">Road Trip Mentalist</span>
+              <span class="option-description">Harmless magic-style tricks with numbers and choices.</span>
               <span class="mode-pill">Magic</span>
-            </button>          </div>
+              <span class="best-for">Best for: one reader, many guessers</span>
+            </button>
+          </div>
         </section>
       </div>
     </section>
@@ -263,6 +314,18 @@
             <option value="night">Night drive</option>
           </select>
         </label>
+        <label class="team-name-field" for="setting-age-group">
+          <span>Player age mix</span>
+          <select id="setting-age-group">
+            <option value="kids">Younger kids</option>
+            <option value="mixed">Mixed ages</option>
+            <option value="teens">Teens/adults</option>
+          </select>
+        </label>
+        <label class="checkbox-row" for="setting-quiet-car">
+          <input id="setting-quiet-car" type="checkbox" />
+          <span>Quiet car mode</span>
+        </label>
         <label class="checkbox-row" for="setting-no-camera">
           <input id="setting-no-camera" type="checkbox" />
           <span>No camera games</span>
@@ -279,6 +342,12 @@
       <div class="adventure-actions">
         <button id="save-trip-settings" class="primary-button">Save Settings</button>
         <button id="close-trip-settings" class="secondary-button">Back</button>
+      </div>
+      <div class="local-data-panel">
+        <h3>Saved Data</h3>
+        <p>Clear players, preferences, settings, and local game history stored on this device.</p>
+        <button id="clear-saved-data" class="danger-button" type="button">Clear Saved Data</button>
+        <p id="clear-saved-data-status" class="settings-status" aria-live="polite"></p>
       </div>
     </section>
 
@@ -355,6 +424,40 @@
         <button id="extend-timer" class="secondary-button" hidden>+10 seconds</button>
         <button id="skip-timer" class="secondary-button" hidden>Skip timer</button>
         <button id="next-challenge" class="primary-button" hidden>Stamp It</button>
+      </div>
+    </section>
+
+    <!-- Flagship mixed quest: one shared loop across the three strongest road games -->
+    <section id="road-quest" hidden>
+      <div class="mode-header">
+        <div>
+          <span class="challenge-badge">Flagship Adventure</span>
+          <h2 id="quest-heading">Road Trip Quest</h2>
+          <p id="quest-intro">Three games. One scoreboard. Look up, think fast, and solve the mystery together.</p>
+        </div>
+        <div id="quest-round-label" class="hunt-route" aria-label="Quest progress">Round 1 of 9</div>
+      </div>
+      <div id="quest-scoreboard" class="team-scoreboard" aria-live="polite"></div>
+      <div class="quest-map" aria-label="Quest stages">
+        <span data-quest-stage="scavenger">🔎 Spot</span>
+        <span data-quest-stage="trivia">🧠 Think</span>
+        <span data-quest-stage="twenty">❓ Solve</span>
+      </div>
+      <article id="quest-card" class="quest-card" aria-live="polite">
+        <div class="quest-card-topline">
+          <span id="quest-type" class="challenge-badge">Scavenger</span>
+          <span id="quest-points" class="quest-points">Worth 1 point</span>
+        </div>
+        <p id="quest-handoff" class="handoff-prompt"></p>
+        <h3 id="quest-prompt"></h3>
+        <p id="quest-detail"></p>
+        <div id="quest-actions" class="quest-actions"></div>
+        <p id="quest-feedback" class="quest-feedback" aria-live="polite"></p>
+      </article>
+      <div class="adventure-actions">
+        <button id="quest-skip" class="secondary-button">Swap Challenge</button>
+        <button id="quest-next" class="primary-button" hidden>Next Round</button>
+        <button id="quest-finish" class="secondary-button">End Quest</button>
       </div>
     </section>
 
@@ -532,7 +635,7 @@
       <div id="hide-seek-scoreboard" class="team-scoreboard" aria-live="polite"></div>
       <article class="trivia-card">
         <span id="hide-seek-badge" class="challenge-badge">Setup</span>
-        <p id="hide-seek-status" class="hunt-status">Pick a map, difficulty, and match length. Hiders get a minute to settle into cover. Seekers only get a handful of real checks, so room choices matter.</p>
+        <p id="hide-seek-status" class="hunt-status">Pick a map, difficulty, and match length. Hiders lock in real cover. Seekers inspect exact spots, and each wrong new check spends a search.</p>
         <div class="hide-seek-setup">
           <label class="team-name-field" for="hide-seek-mode">
             <span>Map</span>
@@ -604,8 +707,8 @@
       </div>
       <div class="adventure-actions">
         <button id="hide-seek-start" class="primary-button">Start Match</button>
-        <button id="hide-seek-found" class="primary-button" hidden>Hide / Inspect</button>
-        <button id="hide-seek-special" class="secondary-button" hidden>Listen</button>
+        <button id="hide-seek-found" class="primary-button" hidden>Hide Here</button>
+        <button id="hide-seek-special" class="secondary-button" hidden>Peek</button>
         <button id="hide-seek-sprint" class="secondary-button" hidden>Sprint</button>
         <button id="hide-seek-next" class="secondary-button" hidden>Next Round</button>
         <button id="hide-seek-solo" class="secondary-button" aria-pressed="false">Solo vs Computer: Off</button>
@@ -752,30 +855,94 @@
       <div class="mode-header">
         <div>
           <h2 id="gorillas-heading">Banana Towers</h2>
-          <p>Player one sets the shot, throws the banana, then the other player gets a turn.</p>
+          <p>Pick angle and power, read the preview coach, throw a banana, then adjust from the last shot.</p>
         </div>
         <div id="gorillas-score" class="emoji-target" aria-label="Banana Towers score">0 : 0</div>
       </div>
       <article class="trivia-card gorillas-control-card">
+        <div class="gorillas-howto">
+          <strong>How to play</strong>
+          <span>1. Pick angle and power. 2. Check wind and preview. 3. Throw. 4. Use the hint. 5. First to the match target wins.</span>
+        </div>
+        <div class="gorillas-mode-controls" aria-label="Banana Towers match settings">
+          <label class="team-name-field" for="gorillas-opponent">
+            <span>Opponent</span>
+            <select id="gorillas-opponent">
+              <option value="local">Local Player</option>
+              <option value="computer">Computer</option>
+            </select>
+          </label>
+          <label class="team-name-field" for="gorillas-match">
+            <span>Match</span>
+            <select id="gorillas-match">
+              <option value="3">First to 3</option>
+              <option value="5">First to 5</option>
+              <option value="sudden">Sudden Banana</option>
+            </select>
+          </label>
+          <label class="team-name-field" for="gorillas-difficulty">
+            <span>Computer</span>
+            <select id="gorillas-difficulty">
+              <option value="easy">Easy</option>
+              <option value="normal">Normal</option>
+              <option value="hard">Hard</option>
+            </select>
+          </label>
+        </div>
         <div class="gorillas-setup">
           <label class="team-name-field" for="gorillas-angle">
             <span>Angle</span>
-            <input id="gorillas-angle" type="number" min="10" max="80" value="45" inputmode="numeric" />
+            <span class="banana-adjust-row">
+              <button type="button" class="secondary-button banana-step-button" data-banana-angle="-5">-5</button>
+              <input id="gorillas-angle" type="number" min="10" max="80" value="45" inputmode="numeric" />
+              <button type="button" class="secondary-button banana-step-button" data-banana-angle="5">+5</button>
+            </span>
           </label>
           <label class="team-name-field" for="gorillas-power">
             <span>Power</span>
-            <input id="gorillas-power" type="number" min="20" max="100" value="70" inputmode="numeric" />
+            <span class="banana-adjust-row">
+              <button type="button" class="secondary-button banana-step-button" data-banana-power="-10">-10</button>
+              <input id="gorillas-power" type="number" min="20" max="100" value="70" inputmode="numeric" />
+              <button type="button" class="secondary-button banana-step-button" data-banana-power="10">+10</button>
+            </span>
           </label>
         </div>
+        <p id="gorillas-shot-summary" class="gorillas-shot-summary">Preview shows the first part of your banana path. Wind may still push it.</p>
+        <ol id="gorillas-shot-history" class="gorillas-shot-history" aria-label="Last Banana Towers shots"></ol>
       </article>
       <canvas id="gorillas-canvas" class="pong-canvas" width="720" height="420" aria-label="Banana Towers game board"></canvas>
+      <button id="gorillas-immersive-exit" class="immersive-exit" type="button" aria-label="Exit full screen">✕</button>
       <p id="gorillas-status" class="hunt-status" aria-live="polite">Set your angle and power, then launch the banana.</p>
       <div class="adventure-actions">
         <button id="gorillas-fire" class="primary-button">Throw Banana</button>
+        <button id="gorillas-quick-shot" class="secondary-button">Coach Shot</button>
         <button id="gorillas-fullscreen" class="secondary-button">Full Screen</button>
+        <button id="gorillas-debug" class="secondary-button" aria-pressed="false">Debug: Off</button>
         <button id="gorillas-reset" class="secondary-button">Reset Game</button>
         <button id="gorillas-finish" class="secondary-button">Finish Game</button>
       </div>
+    </section>
+
+    <section id="card-games" hidden>
+      <div class="mode-header">
+        <div>
+          <h2>Card Game Guide</h2>
+          <p>Choose a game for your group. Play only when safely parked or at your destination.</p>
+        </div>
+        <div class="hunt-route" aria-label="Card game guide">Deal → Play</div>
+      </div>
+      <div id="card-game-grid" class="trivia-category-grid" aria-label="Card games"></div>
+      <article id="card-game-rules" class="trivia-card" aria-live="polite" hidden>
+        <span id="card-game-badge" class="challenge-badge">Card Game</span>
+        <h3 id="card-game-name"></h3>
+        <p id="card-game-meta"></p>
+        <h4>Goal</h4>
+        <p id="card-game-goal"></p>
+        <h4>How to play</h4>
+        <ol id="card-game-steps"></ol>
+        <p id="card-game-tip" class="privacy-note"></p>
+        <button id="another-card-game" class="primary-button">Suggest Another</button>
+      </article>
     </section>
 
     <!-- Hidden local-only admin vault -->
@@ -831,6 +998,28 @@
       <h2>Adventure Complete</h2>
       <p id="summary-text"></p>
       <ul id="summary-list" class="summary-list"></ul>
+      <article class="memory-card" aria-labelledby="memory-heading">
+        <span class="challenge-badge">Trip Memory</span>
+        <h3 id="memory-heading">Save a moment</h3>
+        <div class="memory-form">
+          <label class="team-name-field" for="memory-type">
+            <span>Moment type</span>
+            <select id="memory-type">
+              <option value="Funniest quote">Funniest quote</option>
+              <option value="Weirdest sighting">Weirdest sighting</option>
+              <option value="Best wrong answer">Best wrong answer</option>
+              <option value="Trip MVP">Trip MVP</option>
+              <option value="Favorite fact">Favorite fact</option>
+            </select>
+          </label>
+          <label class="team-name-field memory-text-field" for="memory-text">
+            <span>What happened?</span>
+            <textarea id="memory-text" rows="3" maxlength="160" placeholder="Type the car's best moment..."></textarea>
+          </label>
+          <button id="save-memory" class="secondary-button" type="button">Save Moment</button>
+        </div>
+        <ul id="memory-list" class="memory-list"></ul>
+      </article>
       <button id="play-again" class="primary-button">Play Again</button>
       <button id="start-over" class="secondary-button">Start Over</button>
     </section>
@@ -859,7 +1048,7 @@
   <div id="about-modal" class="modal" hidden>
     <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="about-title">
       <h2 id="about-title">About Road Trip Adventures</h2>
-      <p>Road Trip Adventures was built to help everyone enjoy the ride together. It offers fun challenges that encourage looking outside, laughing together, learning new facts, and gentle competition. There are no accounts, logins or data collection. All progress and preferences stay on your device and disappear when you close the page.</p>
+      <p>Road Trip Adventures was built to help everyone enjoy the ride together. It offers fun challenges that encourage looking outside, laughing together, learning new facts, and gentle competition. There are no accounts, logins or data collection. Players, preferences, and game history stay only on this device until you clear them in Trip Settings.</p>
       <h3>Family‑Friendly Content</h3>
       <p>All activities are designed to be appropriate for families.  We avoid profanity, adult themes, political or religious persuasion, insults and dangerous challenges.  If you ever encounter content that doesn’t feel right, please close the adventure and let the creator know.</p>
       <h3>Privacy</h3>
@@ -894,12 +1083,14 @@
 
   <script src="js/data/themes.js"></script>
   <script src="js/data/trivia.js"></script>
+  <script src="js/data/decades-trivia.js"></script>
   <script src="js/data/community-trivia.js"></script>
   <script src="js/data/oak-island.js"></script>
+  <script src="js/data/trivia-cleanup.js"></script>
   <script src="js/data/scavenger.js"></script>
   <script src="js/data/questions.js"></script>
   <script src="js/data/jokes.js"></script>
-  <script src="js/games/hide-seek-data.js"></script>
+  <script src="js/games/hide-seek-data.js?v=26"></script>
   <script src="js/games/hide-seek-art.js"></script>
   <script src="js/games/pong-data.js"></script>
   <script src="js/games/pong-art.js"></script>
@@ -908,7 +1099,7 @@
        paint lean; uncomment the line below to make the global `kontra` object
        available for future engine-powered games. -->
   <!-- <script src="vendor/kontra.min.js"></script> -->
-  <script src="script.js"></script>
+  <script src="script.js?v=27"></script>
   <script>
     if ('serviceWorker' in navigator) {
       // Reload once when a new service worker takes control, so a fresh deploy

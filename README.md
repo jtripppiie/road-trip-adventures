@@ -4,25 +4,28 @@
 
 Road Trip Adventures is a lightweight, static web application designed to make road trips more fun for passengers. Scan a QR code, add player initials, pick a mode, and play quick games that encourage people to look outside, laugh together, learn something new, explore local trivia, and compete gently.
 
-This project was built with **no backend**, **no user accounts** and **no data collection**.  It is intended to run on [GitHub Pages](https://www.wikiwand.com/en/GitHub_Pages) or any static web host.  All game state lives only in the browser’s memory.  When you close the tab, the adventure disappears and nothing is saved on a server.
+This project was built with **no backend**, **no user accounts** and **no data collection**.  It is intended to run on [GitHub Pages](https://www.wikiwand.com/en/GitHub_Pages) or any static web host. Runtime state lives in the browser, and optional players, preferences, settings, and game history are stored only in local browser storage on the device. Nothing is saved on a server.
 
 ## Features
 
 - **Passenger only:** The app explicitly tells drivers not to play while driving.
 - **Players:** Add 2 to 8 player initials and optionally choose a car judge for games that need a human call.
 - **Organized modes:** Pick from **Look Outside**, **Trivia & Brain**, **Party Games**, and **Bonus** sections.
+- **Road Trip Quest:** Jump into a flagship 9-round mix of scavenger finds, trivia showdowns, and 20 Questions sprints with one shared scoreboard and rotating player roles.
 - **Adventure types:** Play categories like **Look Outside**, **Learn Something**, **Quick Challenges**, **Local Explorer**, **Trip Calculator**, **Road Pong**, **Banana Towers**, or **Hide & Seek Adventure**.
 - **Scavenger Hunt:** Play an any-route hunt where 2 to 8 players tap real-world sightings to claim points.
-- **Trivia Run:** Play broad road-trip trivia across all 50 state capitals, state nicknames, license plates, rivers, remote places, math, science, biology, random facts, food facts, sports, music, TV, K-pop, Taylor Swift and decade trivia.
+- **Trivia Run:** Play broad road-trip trivia across state capitals, license plates, national parks, roadside landmarks, road food, science, animals, sports, music, TV, and decade trivia. Runtime cleanup removes duplicate imported questions, adds difficulty labels, and keeps answer choices exact.
 - **Joke Vote:** Let each player tell clean jokes and award Dad Joke or Mom Joke honors.
 - **Emoji Face-Off:** Copy emoji expressions with an optional local camera snap, then vote for the closest match. Photos are not uploaded or saved by the app.
 - **Pi Digits:** See who can recite the most digits of pi and track scores for every player.
-- **Hide & Seek Adventure:** Play a local pass-and-play canvas game on a responsive 1200x675 board with a 1-minute hiding scramble, limited inspection-based searches, best-of-5 default match, sprint stamina, stealth bonuses, real hiding spot states, listen clues, particles, lighting, cover quality, obstacles, room transitions and role swaps.
+- **Hide & Seek Adventure:** Play a local pass-and-play canvas game on a responsive 1200x675 board with a 1-minute hiding scramble, limited inspection-based searches, best-of-5 default match, sprint stamina, clearer exact-spot feedback, forgiving inspect range, short-lived canvas callouts, stealth bonuses, real hiding spot states, listen clues, particles, lighting, cover quality, obstacles, room transitions and role swaps.
+- **20 Questions:** Play app-guesses or computer-hides rounds with a visible 20-question count, role prompts, optional category ideas, yes/no/sometimes answers, and reveal/play-again flow.
+- **Banana Towers and Road Pong:** Passenger-safe arcade games with local-only scoring, touch controls, clearer round feedback, and lightweight difficulty tuning.
 - **Dynamic adventures:** The app builds an adventure from a pool of questions and prompts.  Timed challenges show a 15 second countdown.
 - **Progress bar:** See how far along your adventure you are.
 - **Summary:** At the end, get a breakdown of how many discoveries, laughs, facts and wins you achieved.
 - **Accessibility options:** Toggle large text, high contrast and reduced motion.  All interactive elements have clear focus styles, ARIA labels and live region announcements.
-- **Privacy friendly:** No tracking, analytics, data collection, or location sensors. Local trivia is selected manually by region.
+- **Privacy friendly:** No tracking, analytics, data collection, or location sensors. Local trivia is selected manually by region, and saved device data can be cleared from Trip Settings.
 
 ## Project Layout
 
@@ -38,6 +41,7 @@ js/
     scavenger.js          # scavenger, lightning, alphabet, and mini-bet data
     trivia.js             # curated offline trivia packs
     community-trivia.js   # larger imported/community trivia pack
+    trivia-cleanup.js     # runtime duplicate cleanup, difficulty tags, small curated additions
   games/
     hide-seek-art.js      # canvas renderers for Hide & Seek objects and rooms
     hide-seek-data.js     # Hide & Seek maps, rooms, exits, objects, obstacles
@@ -146,6 +150,8 @@ If you modify the UI, refer to the official [Web Content Accessibility Guidel
 ### Privacy and safety
 
 Road Trip Adventures does not collect or store any personal information. Scores, preferences and temporary game state are stored in your browser’s localStorage or sessionStorage. Local trivia is based only on the region a player chooses manually. The app does not use GPS, browser geolocation, or location sensors.
+
+Use **Trip Settings -> Clear Saved Data** to remove saved players, accessibility preferences, trip settings, and local game history from the current device.
 
 All content should remain family friendly: avoid profanity, sexual or violent themes, hate speech or political persuasion.  Activities should be safe for passengers and should never encourage drivers to look at a screen or perform a dangerous action.  Parents should feel comfortable with any prompt being read aloud in the car.  See `AGENT.md` for more details on content guidelines.
 

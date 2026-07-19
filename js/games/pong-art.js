@@ -110,6 +110,9 @@
 
       ballTrail: [],
       shakeFrames: 0,
+      rally: 0,
+      lastHitSide: '',
+      lastPoint: null,
 
       targetScore: config.targetScore,
     };
@@ -134,6 +137,7 @@
     state.ball.vy = serve.vy;
 
     state.ballTrail.length = 0;
+    state.rally = 0;
   }
 
   function updateEffects(state) {

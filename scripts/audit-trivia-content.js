@@ -13,8 +13,10 @@ const vm = require('vm');
 const root = path.resolve(__dirname, '..');
 const dataFiles = [
   'js/data/trivia.js',
+  'js/data/decades-trivia.js',
   'js/data/community-trivia.js',
   'js/data/oak-island.js',
+  'js/data/trivia-cleanup.js',
 ];
 
 const sandbox = {
