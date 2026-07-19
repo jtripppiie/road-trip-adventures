@@ -11,7 +11,7 @@
 (() => {
   // Visible build version. Bump this (and CACHE_VERSION in sw.js) on every
   // deploy so the on-screen badge confirms which build is actually live.
-  const APP_VERSION = 'v26 · 2026-07-03';
+  const APP_VERSION = 'v27 · 2026-07-18';
   const versionBadge = document.getElementById('app-version');
   if (versionBadge) {
     versionBadge.textContent = APP_VERSION;
@@ -639,8 +639,6 @@
     { id: 'friends', label: 'Friends', emoji: '☕' },
     { id: 'kpop', label: 'K-pop', emoji: '🎧' },
     { id: 'taylorswift', label: 'Taylor Swift', emoji: '🪩' },
-    { id: 'eighties', label: '80s Trivia', emoji: '📼' },
-    { id: 'nineties', label: '90s Trivia', emoji: '💿' },
     { id: 'twothousands', label: '2000s Trivia', emoji: '📱' },
     { id: 'twentytens', label: '2010s Trivia', emoji: '🔁' },
     { id: 'twentytwenties', label: '2020s Trivia', emoji: '📲' },
@@ -969,6 +967,11 @@
   let activeTriviaCategory = getStoredJson('rtaLastTriviaCategory', 'mixed');
   let activeTriviaDifficulty = getStoredJson('rtaLastTriviaDifficulty', 'medium');
   let triviaQuestionAwarded = false;
+  let questRound = 0;
+  let questRounds = [];
+  let questScore = {};
+  let questResolved = false;
+  let questCurrentItem = null;
   let jokeAwards = { dad: 0, mom: 0, brother: 0, sister: 0 };
   let jokeRound = 1;
   let jokeDecks = { dad: [], mom: [], brother: [], sister: [] };
@@ -1179,6 +1182,7 @@
     learnTopics: document.getElementById('learn-topics'),
     region: document.getElementById('setup-region'),
     adventure: document.getElementById('adventure'),
+    quest: document.getElementById('road-quest'),
     scavenger: document.getElementById('scavenger'),
     trivia: document.getElementById('trivia'),
     jokes: document.getElementById('jokes'),
@@ -1190,11 +1194,21 @@
     gorillas: document.getElementById('gorillas-game'),
     puns: document.getElementById('pun-game'),
     mentalist: document.getElementById('mentalist'),
+    cardGames: document.getElementById('card-games'),
     admin: document.getElementById('admin-mode'),
     secret: document.getElementById('secret-mode'),
     summary: document.getElementById('summary'),
   };
   const progressBar = document.getElementById('progress-bar');
+  const cardGameGrid = document.getElementById('card-game-grid');
+  const cardGameRules = document.getElementById('card-game-rules');
+  const cardGameBadge = document.getElementById('card-game-badge');
+  const cardGameName = document.getElementById('card-game-name');
+  const cardGameMeta = document.getElementById('card-game-meta');
+  const cardGameGoal = document.getElementById('card-game-goal');
+  const cardGameSteps = document.getElementById('card-game-steps');
+  const cardGameTip = document.getElementById('card-game-tip');
+  const anotherCardGameButton = document.getElementById('another-card-game');
   const progressFill = document.getElementById('progress-fill');
   const stampTrail = document.getElementById('stamp-trail');
   const challengeContainer = document.getElementById('challenge-container');
@@ -1233,6 +1247,18 @@
   const clearSavedDataStatus = document.getElementById('clear-saved-data-status');
   const learnTopicGrid = document.getElementById('learn-topic-grid');
   const huntGrid = document.getElementById('hunt-grid');
+  const questScoreboard = document.getElementById('quest-scoreboard');
+  const questRoundLabel = document.getElementById('quest-round-label');
+  const questType = document.getElementById('quest-type');
+  const questPoints = document.getElementById('quest-points');
+  const questHandoff = document.getElementById('quest-handoff');
+  const questPrompt = document.getElementById('quest-prompt');
+  const questDetail = document.getElementById('quest-detail');
+  const questActions = document.getElementById('quest-actions');
+  const questFeedback = document.getElementById('quest-feedback');
+  const questNextButton = document.getElementById('quest-next');
+  const questSkipButton = document.getElementById('quest-skip');
+  const questFinishButton = document.getElementById('quest-finish');
   const huntStatus = document.getElementById('hunt-status');
   const huntScoreboard = document.getElementById('hunt-scoreboard');
   const huntRoute = document.getElementById('hunt-route');
@@ -1416,6 +1442,19 @@
   }
 
   const modeRuleCards = {
+    quest: {
+      title: 'Road Trip Quest',
+      type: 'Flagship Scored Game',
+      scored: true,
+      summary: 'A fast, varied road adventure combining scavenger finds, trivia, and 20 Questions on one scoreboard.',
+      bestWhen: 'Best when the whole car wants variety without choosing a new game every few minutes.',
+      rules: [
+        'Play 9 rounds in a Spot → Think → Solve rhythm.',
+        'The app rotates turns and keeps one score across every game.',
+        'Scavenger finds must be visible and verified by the car.',
+        'Trivia scores automatically. In 20 Questions, the guesser scores when the secret is solved.',
+      ],
+    },
     look: {
       title: 'Window Quests',
       type: 'Just for fun',
@@ -1498,6 +1537,18 @@
         'Enter miles left.',
         'Compare two speeds.',
         'Use it as road math, not a driving recommendation.',
+      ],
+    },
+    cardGames: {
+      title: 'Card Game Guide',
+      type: 'Game Guide',
+      scored: false,
+      summary: 'Find a family-friendly game for a standard 52-card deck and learn it quickly.',
+      bestWhen: 'Best at a rest stop, hotel, campsite, or destination—not in a moving car.',
+      rules: [
+        'Choose a game that fits your player count and time.',
+        'The guide explains the goal, setup, and turn rules.',
+        'Use house rules if everyone agrees before the deal.',
       ],
     },
     jokes: {
@@ -8846,8 +8897,118 @@
     showSection('rules');
   }
 
+  const cardGameGuide = [
+    { name: 'Go Fish', players: '2–6', time: '10–20 min', level: 'Easy', goal: 'Collect the most sets of four cards with the same rank.', steps: ['Deal 5 cards each, or 7 cards each for 2 players. Put the rest face down.', 'On your turn, ask one player for a rank already in your hand, such as “Do you have any 8s?”', 'If they have that rank, they give you every matching card and you ask again. Otherwise, draw one card: “Go fish!”', 'Place every completed set of four face up. When no cards remain, the player with the most sets wins.'], tip: 'For younger kids, collect pairs instead of sets of four.' },
+    { name: 'Crazy Eights', players: '2–7', time: '10–20 min', level: 'Easy', goal: 'Be the first player to get rid of every card in your hand.', steps: ['Deal 5 cards each, or 7 for 2 players. Turn one card face up beside the draw pile.', 'Play one card matching the top card’s suit or rank.', 'An 8 is wild: play it at any time and name the suit that continues.', 'If you cannot play, draw until you can play or agree to draw just one. First player with no cards wins.'], tip: 'Decide which drawing rule you will use before starting.' },
+    { name: 'War', players: '2', time: '10–25 min', level: 'Very easy', goal: 'Win the whole deck by turning over higher cards.', steps: ['Split the shuffled deck evenly. Keep cards face down.', 'Both players turn over their top card together. Higher rank takes both cards; aces are high.', 'On a tie, each player puts three cards face down and one face up. The higher new card takes everything.', 'Keep won cards in a face-down pile. The player who collects the deck wins.'], tip: 'For a shorter game, stop after 10 minutes and count cards.' },
+    { name: 'Old Maid', players: '3–6', time: '10–20 min', level: 'Easy', goal: 'Make pairs and avoid being left with the unmatched queen.', steps: ['Remove one queen, shuffle, and deal all cards.', 'Everyone removes matching pairs of the same rank from their hand.', 'On your turn, draw one hidden card from the player on your left. Put down any new pair.', 'Continue until every pair is gone. The player holding the unmatched queen is the Old Maid.'], tip: 'Rename the unmatched card “Silly Goose” for a friendlier finish.' },
+    { name: 'Slapjack', players: '2–6', time: '10–20 min', level: 'Fast', goal: 'Win all the cards by being first to slap each jack.', steps: ['Deal the deck evenly face down. Players do not look at their cards.', 'Take turns flipping one top card face up into the middle.', 'When a jack appears, everyone may slap the pile. First hand down wins the pile.', 'A player with no cards may still slap the next jack to get back in. Last player with cards wins.'], tip: 'Use one-finger taps instead of slaps in small spaces.' },
+    { name: 'Snap', players: '2–6', time: '10–15 min', level: 'Fast', goal: 'Win cards by spotting matching ranks first.', steps: ['Deal all cards face down as evenly as possible.', 'Players take turns flipping a card onto their own face-up pile.', 'When the top cards of any two piles match in rank, the first player to call “Snap!” wins both piles.', 'Add won cards beneath your face-down stack. The player who eventually holds all cards wins.'], tip: 'For a shorter round, set a timer and count cards when it rings.' },
+    { name: 'Memory', players: '1–6', time: '10–20 min', level: 'Easy', goal: 'Remember card locations and collect the most matching pairs.', steps: ['Choose 10–20 matching pairs and lay them face down in a neat grid.', 'On your turn, flip two cards so everyone can see them.', 'If the ranks match, keep the pair and take another turn. If not, turn them face down again.', 'When the grid is empty, the player with the most pairs wins.'], tip: 'Use fewer pairs for younger players and add more as they improve.' },
+    { name: 'Spoons', players: '3–8', time: '10–20 min', level: 'Lively', goal: 'Collect four cards of one rank, then grab a spoon.', steps: ['Place one fewer spoon than players in the center. Deal 4 cards to everyone.', 'The dealer draws one card, keeps or passes one card left, and everyone continues passing cards left.', 'When you collect four of a rank, quietly take a spoon. Everyone else then grabs one too.', 'The player without a spoon gets a letter in SPOONS. Spell the word and you are out; last player remains wins.'], tip: 'Play only at a table and use soft objects instead of spoons if needed.' },
+    { name: 'Golf (Card Game)', players: '2–6', time: '20–30 min', level: 'Medium', goal: 'Finish with the lowest score after several rounds.', steps: ['Deal 6 cards face down to each player in a 2-by-3 grid. Each player turns any two face up.', 'On your turn, draw from the deck or discard pile and swap it for one grid card, or discard it.', 'Matching cards in the same column cancel to zero. Kings score zero; number cards score their number.', 'A round ends when one grid is all face up. Add scores and play 9 rounds—or 3 for a quick game. Lowest total wins.'], tip: 'Agree on face-card scores before playing; house rules vary.' },
+    { name: 'President', players: '4–7', time: '20–30 min', level: 'Medium', goal: 'Be the first to play every card in your hand.', steps: ['Deal all cards. The player with the 3 of clubs starts by playing it alone or as part of a set.', 'Going clockwise, play the same number of cards at a higher rank, or pass.', 'When everyone else passes, clear the pile. The last player to play starts any new single or matching set.', 'First player out wins the round. Continue until everyone has finished.'], tip: 'Use “First,” “Second,” and so on as titles to keep it family-friendly.' },
+    { name: 'Rummy', players: '2–6', time: '20–40 min', level: 'Medium', goal: 'Make sets of equal ranks and runs of consecutive cards in one suit.', steps: ['Deal 10 cards for 2 players, 7 for 3–4, or 6 for 5–6. Start a discard pile.', 'On your turn, draw one card from the deck or discard pile.', 'Lay down sets of 3 or more matching ranks or suited runs of 3 or more. You may add to played melds.', 'End your turn by discarding. The first player to use every card wins the hand.'], tip: 'Skip scoring for a simple kids’ version: first out wins.' },
+    { name: 'Cheat / I Doubt It', players: '3–8', time: '15–30 min', level: 'Bluffing', goal: 'Be the first to get rid of all your cards by playing ranks in order.', steps: ['Deal all cards. Players place cards face down, starting with aces, then 2s, and continuing through kings.', 'Say how many of the required rank you are playing. You may tell the truth or bluff.', 'Before the next play, anyone may say “I doubt it!” Check the cards.', 'If the claim was false, the player takes the pile. If it was true, the challenger takes it. First player with no cards wins.'], tip: 'Call the game “I Doubt It” and keep the bluffing playful.' },
+  ];
+  cardGameGuide.push(
+    { name: 'Speed', players: '2', time: '5–10 min', level: 'Fast', goal: 'Play every card before your opponent.', steps: ['Give each player 20 cards: 5 in hand and 15 in a face-down draw pile. Put two face-up starter piles between you.', 'Both players play at the same time. Add a card one rank higher or lower than either center card; suits do not matter.', 'Refill your hand to 5 from your draw pile whenever possible.', 'If both players are stuck, flip new starter cards. First to use their hand and draw pile wins.'], tip: 'Keep cards on the table and pause if play gets too wild.' },
+    { name: 'Egyptian Rat Screw', players: '2–6', time: '15–30 min', level: 'Fast', goal: 'Win the deck by collecting piles and spotting slap patterns.', steps: ['Deal all cards face down. Take turns placing one card face up in the center.', 'When a face card appears, the next player gets a limited number of chances to play another face card: jack 1, queen 2, king 3, ace 4.', 'If they fail, the player who laid the face card wins the pile.', 'Anyone may win the pile by being first to tap an agreed pattern, such as doubles or sandwiches.'], tip: 'Agree on slap patterns first and use gentle one-finger taps.' },
+    { name: 'Kings in the Corner', players: '2–4', time: '20–30 min', level: 'Medium', goal: 'Be first to play all your cards into descending, alternating-color piles.', steps: ['Deal 7 cards each. Put four cards face up around the draw pile.', 'Play cards downward in rank while alternating red and black. Move whole piles when the sequence fits.', 'Only kings may begin piles in the four empty corner spaces.', 'Draw one card at the end of your turn. First player with no cards wins.'], tip: 'Lay the center out with plenty of space before starting.' },
+    { name: 'Palace', players: '2–5', time: '20–35 min', level: 'Medium', goal: 'Get rid of your hand, then your face-up and face-down table cards.', steps: ['Deal each player 3 face-down table cards, 3 face-up cards on top, and 3 hand cards.', 'Play a card equal to or higher than the pile’s top rank. Play matching ranks together.', 'If you cannot play, pick up the pile. Refill your hand to 3 while the draw deck lasts.', 'After your hand is gone, play face-up table cards, then face-down cards blindly. First player out wins.'], tip: 'Common special-card rules vary; start without them or agree before dealing.' },
+    { name: 'Sevens', players: '3–8', time: '15–25 min', level: 'Easy', goal: 'Be first to place all your cards into four suit sequences.', steps: ['Deal all cards. The player holding the 7 of diamonds plays it first.', 'On your turn, play another 7 or the next higher or lower card beside a matching suit.', 'A suit grows down toward ace and up toward king.', 'If you cannot play, pass. First player with no cards wins.'], tip: 'Arrange each suit in a clear horizontal row.' },
+    { name: 'Beggar My Neighbor', players: '2–6', time: '10–25 min', level: 'Easy', goal: 'Collect the deck through face-card challenges.', steps: ['Deal all cards face down. Players take turns flipping their top card into one center pile.', 'A face card challenges the next player: jack gives 1 chance, queen 2, king 3, ace 4.', 'The challenged player flips that many cards, stopping if another face card appears and reverses the challenge.', 'If no face card appears, the challenger collects the pile. The last player with cards wins.'], tip: 'This game needs no decisions, making it good for younger players.' },
+    { name: 'Chase the Ace', players: '3–8', time: '10–20 min', level: 'Easy', goal: 'Avoid ending the round with the lowest card.', steps: ['Give each player 3 tokens and deal one card face down to everyone.', 'Starting left of the dealer, keep your card or swap it with the next player. A king blocks a swap.', 'The dealer may keep their card or swap with the top card of the deck.', 'Reveal cards. Lowest rank loses a token; tied lowest players each lose one. Last player with tokens wins.'], tip: 'Use coins, crackers, or paper squares as tokens.' },
+    { name: 'Rolling Stone', players: '4–6', time: '15–25 min', level: 'Easy', goal: 'Be the first to empty your hand by following suit.', steps: ['Deal 8 cards each. The player left of the dealer leads any card.', 'Everyone must play the same suit if able. Highest card of the led suit wins and leads next.', 'If a player cannot follow suit, they pick up the whole played pile and the round stops.', 'That player leads a new round. First player with no cards wins.'], tip: 'Sort your hand by suit to make turns quicker.' },
+    { name: 'Screw Your Neighbor', players: '3–10', time: '10–20 min', level: 'Easy', goal: 'Avoid having the lowest card after everyone chooses whether to trade.', steps: ['Give everyone 3 tokens and deal one card each.', 'In turn, keep your card or trade with the player to your left; a king cannot be taken.', 'The dealer may trade with the top of the deck.', 'Reveal together. Lowest card loses a token. Last player with a token wins.'], tip: 'For kids, call it “Trade Your Neighbor.”' },
+    { name: 'Twenty-One', players: '2–7', time: '10–20 min', level: 'Math', goal: 'Build a hand closer to 21 than the dealer without going over.', steps: ['Choose one player as dealer. Deal two cards to each player and the dealer.', 'Number cards count as shown, face cards count 10, and aces count 1 or 11.', 'Players choose to take another card or stop. Going over 21 ends that hand.', 'Dealer draws to 17. Closest to 21 without going over wins. Use points, never real money.'], tip: 'Great for addition practice; keep it chip-free and family-only.' },
+    { name: 'Thirty-One', players: '2–8', time: '15–25 min', level: 'Medium', goal: 'Make the highest total in one suit, up to 31.', steps: ['Deal 3 cards each and turn one card face up beside the draw pile.', 'On your turn, draw one card and discard one.', 'Count only your best single suit: aces are 11, face cards 10, and number cards face value.', 'Knock when you think your hand is strong. Everyone else gets one final turn; lowest score loses a token.'], tip: 'Play one hand without tokens for a very quick round.' },
+    { name: 'Pig', players: '3–13', time: '10–20 min', level: 'Lively', goal: 'Collect four matching ranks and quietly signal first.', steps: ['Give each player 4 cards. The dealer draws one card and passes one card left.', 'Everyone simultaneously keeps passing one unwanted card left.', 'When you have four of a rank, quietly touch your nose.', 'Other players copy the signal when they notice. Last to signal gets a letter in PIG; spell PIG and you are out.'], tip: 'Choose a different quiet signal each round.' },
+    { name: 'Mao', players: '3–8', time: '20–40 min', level: 'Mystery', goal: 'Discover the hidden rules and be first to empty your hand.', steps: ['One experienced player acts as guide and explains only that play resembles Crazy Eights.', 'Players take turns matching suit or rank while observing secret rules.', 'Breaking a rule earns a penalty card plus a short explanation of the mistake, but not the rule itself.', 'The first player to empty their hand wins and may add a new fair rule next round.'], tip: 'Keep penalties kind and skip this game if mystery rules frustrate the group.' },
+    { name: 'Klondike Solitaire', players: '1', time: '10–30 min', level: 'Solo', goal: 'Move all cards to four suited foundation piles from ace through king.', steps: ['Deal 7 tableau columns with 1 through 7 cards; only each top card is face up.', 'Build tableau columns downward in alternating colors. Move face-up sequences together.', 'Turn hidden tableau cards face up when uncovered. Empty columns may hold a king or king-led sequence.', 'Use the stock for extra cards and build four foundations upward by suit from ace.'], tip: 'Draw one stock card at a time for an easier game.' },
+    { name: 'Clock Solitaire', players: '1', time: '10–15 min', level: 'Solo', goal: 'Reveal every card before all four kings appear.', steps: ['Deal 13 face-down piles of 4 cards in a clock shape: 12 around and one in the center.', 'Flip the top center card and place it face up under the clock position matching its rank; aces are 1 and queens 12.', 'Take the top face-down card from that position and repeat.', 'Kings go in the center. You win if every other card is revealed before the fourth king ends the game.'], tip: 'This is mostly luck, so it works as a quick quiet activity.' },
+    { name: 'Pyramid Solitaire', players: '1', time: '10–20 min', level: 'Math', goal: 'Remove the pyramid by pairing exposed cards that total 13.', steps: ['Deal 28 cards in a 7-row pyramid, overlapping each row. Only uncovered cards may be used.', 'Remove kings by themselves. Pair exposed cards totaling 13: queen+ace, jack+2, 10+3, and so on.', 'Turn cards from the remaining stock to find more pairs.', 'Clear the whole pyramid to win.'], tip: 'Keep a small list of the pairs that make 13 nearby.' },
+    { name: 'Accordion Solitaire', players: '1', time: '10–25 min', level: 'Strategy', goal: 'Compress the entire deck into one pile.', steps: ['Deal cards face up in a row, one at a time.', 'Move a pile onto the pile immediately to its left or three places to its left when top cards match in suit or rank.', 'After every move, close the gap and look for new matches.', 'Continue dealing and combining. Finishing with one pile is a win.'], tip: 'Even getting down to five piles is a strong result.' },
+    { name: 'Garbage', players: '2–4', time: '15–25 min', level: 'Easy', goal: 'Fill ten positions in order from ace through 10.', steps: ['Deal each player 10 face-down cards in two rows of five. Put the rest in a draw pile.', 'Draw a card. Place an ace in position 1, a 2 in position 2, and so on through 10, picking up the replaced card.', 'Jacks are wild; queens and kings end your turn.', 'First to fill all 10 positions wins. In later rounds, the winner needs one fewer position.'], tip: 'Lay number labels under the first row for beginning players.' }
+  );
+  cardGameGuide.push(
+    { name: 'Spit', players: '2', time: '5–10 min', level: 'Very fast', goal: 'Empty all five of your stock piles before your opponent.', steps: ['Each player makes five stock piles containing 1 through 5 cards, with each top card face up. Hold the remaining cards as a spit pile.', 'Say “Spit!” and both players flip one spit card into the center.', 'Play simultaneously from your stock piles onto either center pile, going one rank up or down.', 'When nobody can play, flip new spit cards. The first player to clear all stock piles wins.'], tip: 'Leave plenty of table space and use one hand only.' },
+    { name: 'Nertz', players: '2–6', time: '15–30 min', level: 'Very fast', goal: 'Clear your personal Nertz pile while building shared suited piles.', steps: ['Each player needs a deck with a different back. Make a 13-card Nertz pile and four working piles.', 'Everyone plays at once, building shared ace-to-king piles by suit.', 'Build personal working piles downward in alternating colors and turn through your remaining cards.', 'Call “Nertz!” when your Nertz pile is empty. Score shared cards minus cards left in your Nertz pile.'], tip: 'This needs one separate deck per player or team.' },
+    { name: 'Peanut Butter', players: '4–8', time: '10–20 min', level: 'Team', goal: 'Quietly signal your teammate when you collect four matching cards.', steps: ['Split into pairs sitting across from each other. Each pair chooses a secret signal.', 'Deal 4 cards each and place 4 face-up cards in the center.', 'Everyone swaps one card at a time with center cards. Refresh the center when nobody wants them.', 'When you have four of a rank, signal your teammate. If they call “Peanut butter!” first, your team scores.'], tip: 'Signals should be subtle, safe, and agreed on before play.' },
+    { name: 'Hearts', players: '3–5', time: '25–45 min', level: 'Strategy', goal: 'Finish with the fewest points by avoiding hearts and the queen of spades.', steps: ['With 4 players, deal 13 cards each and pass 3 cards as directed for that hand.', 'The 2 of clubs leads. Follow suit if possible; highest card of the led suit takes the trick.', 'Each heart is 1 point and the queen of spades is 13. Hearts cannot lead until broken.', 'Play to an agreed total such as 50 for kids or 100 traditionally. Lowest score wins.'], tip: 'Play one practice hand face up to teach trick-taking.' },
+    { name: 'Oh Hell', players: '3–7', time: '25–45 min', level: 'Strategy', goal: 'Predict exactly how many tricks you will win.', steps: ['Deal a changing number of cards each round. Turn one remaining card to choose trump.', 'Each player predicts how many tricks they will take.', 'Follow the led suit when able. Highest trump wins, or highest card of the led suit if no trump appears.', 'Score for making your prediction exactly. Highest score after the agreed rounds wins.'], tip: 'Start with 3-card hands while everyone learns.' },
+    { name: 'Spades', players: '4', time: '30–60 min', level: 'Team strategy', goal: 'Work with your partner to win at least the number of tricks your team bids.', steps: ['Sit across from your partner and deal 13 cards each.', 'Each player bids how many tricks they expect to win. Add partners’ bids.', 'Follow suit when possible. Spades beat other suits but cannot lead until broken.', 'Teams score for reaching their bid and lose points for missing it. Choose a short target such as 200.'], tip: 'Skip advanced nil bids for the first game.' },
+    { name: 'Euchre', players: '4', time: '25–40 min', level: 'Strategy', goal: 'Work with a partner to win tricks using a chosen trump suit.', steps: ['Use cards 9 through ace and deal 5 to each player.', 'Turn one card up. Players may choose its suit as trump or pass; a second round allows another suit.', 'The jack of trump is highest, followed by the jack of the same color.', 'The team naming trump needs at least 3 of 5 tricks. First team to 10 points wins.'], tip: 'Keep a trump-rank reminder visible for new players.' },
+    { name: 'Fan Tan', players: '3–8', time: '15–30 min', level: 'Easy strategy', goal: 'Be first to add every card to four suit rows.', steps: ['Deal all cards. The player with the 7 of diamonds starts.', 'Play another 7 or add the next card above or below a card already in the same suit row.', 'If you cannot play, pass.', 'First player to empty their hand wins.'], tip: 'This is also called Sevens; this version emphasizes building all four rows.' },
+    { name: 'Scopa-Inspired Capture', players: '2–4', time: '20–30 min', level: 'Math', goal: 'Capture the most table cards by matching ranks or sums.', steps: ['Use cards ace through 10 and deal 3 cards each, plus 4 face up on the table.', 'Play one card. Capture a table card of the same value or a group whose values add to your card.', 'If you cannot capture, leave your card face up on the table.', 'Deal new hands until the deck is gone. Score one point per capture set or simply count captured cards.'], tip: 'This simplified version teaches addition without special scoring.' },
+    { name: 'Card Bingo', players: '2–8', time: '10–20 min', level: 'Kids', goal: 'Cover a row of card ranks before anyone else.', steps: ['Give each player 9 face-up cards in a 3-by-3 grid. Keep the rest as the caller deck.', 'The caller turns over one card at a time and names its rank.', 'Players flip over one matching rank in their grid if they have it.', 'First to flip a complete row, column, or diagonal calls “Bingo!” and wins.'], tip: 'Ignore suits so matches happen more often.' },
+    { name: 'Higher or Lower', players: '1–8', time: '5–15 min', level: 'Guessing', goal: 'Build the longest streak by predicting the next card.', steps: ['Shuffle and turn one card face up.', 'Before revealing the next card, guess whether its rank will be higher or lower. Decide whether ace is high or low first.', 'A correct guess adds one to the streak; a wrong guess ends it.', 'Take turns attempting streaks. Longest streak wins.'], tip: 'Allow “same” as a third guess for a harder version.' },
+    { name: 'Red or Black', players: '1–8', time: '5–10 min', level: 'Very easy', goal: 'Make the most correct color guesses in a row.', steps: ['Shuffle the deck and keep it face down.', 'Guess whether the next card will be red or black.', 'Reveal the card and keep going after correct guesses.', 'A wrong guess ends the turn. Record the streak and pass the deck.'], tip: 'Great for very young players learning card colors.' },
+    { name: 'Suit Race', players: '2–4', time: '10–15 min', level: 'Kids', goal: 'Be first to collect one card from every suit in the target ranks.', steps: ['Deal 5 cards each and place the rest face down.', 'Choose a target such as collecting all four suits of any one rank.', 'On your turn, draw one card and discard one face up.', 'First to show all four suits of a rank wins. For an easier game, collect any one card of each suit.'], tip: 'The easier four-suit version is ideal for preschool-age players.' },
+    { name: 'Build the Road', players: '1–6', time: '10–20 min', level: 'Cooperative', goal: 'Work together to build four complete suit roads from ace to king.', steps: ['Deal 5 cards to each player. Keep the rest as a shared draw pile.', 'On a turn, play the next needed card onto any suited road or discard one card.', 'Players may describe what they need but should not show hidden hands.', 'Draw back to 5. Everyone wins if all four roads reach king before the draw pile and hands run out.'], tip: 'For younger kids, build only ace through 7.' },
+    { name: 'Card Charades', players: '3–10', time: '10–30 min', level: 'Party', goal: 'Earn cards by acting out prompts inspired by their suits and ranks.', steps: ['Assign a theme to each suit: hearts=animals, diamonds=jobs, clubs=actions, spades=characters.', 'Draw a card. Its suit gives the theme and its rank can select from a numbered prompt list the group creates.', 'Act silently while everyone guesses for up to one minute.', 'The first correct guess keeps the card. Most cards at the end wins.'], tip: 'Let kids invent the prompt list before the game.' }
+  );
+  cardGameGuide.push(
+    { name: 'Snapdragon', players: '2–6', time: '10–15 min', level: 'Pattern spotting', goal: 'Collect cards by quickly spotting shared suits or ranks.', steps: ['Deal 7 cards each and put one card face up.', 'On your turn, play a card matching either suit or rank.', 'If your card matches both suit and rank through an agreed wild-card rule, call “Snapdragon!” for a bonus turn.', 'If you cannot play, draw one. First player out wins.'], tip: 'Remove the bonus rule for younger children.' },
+    { name: 'Go Boom', players: '2–7', time: '15–25 min', level: 'Easy', goal: 'Be first to empty your hand by following rank or suit.', steps: ['Deal 7 cards each. The player left of the dealer leads any card.', 'Follow either the led suit or the led rank if possible.', 'If unable, draw until you can play. Highest card of the led suit wins the trick.', 'The trick winner leads next. First player with no cards wins.'], tip: 'Cap drawing at three cards for shorter rounds.' },
+    { name: 'Switch', players: '2–8', time: '15–25 min', level: 'Easy', goal: 'Play all your cards using matching suits and ranks.', steps: ['Deal 7 cards each and turn up one starter card.', 'Match the top card by suit or rank.', 'Agree on action cards, such as 2=draw two, 8=skip, and jack=change suit.', 'Draw one if unable to play. First player out wins.'], tip: 'Write the chosen action cards on a small rule card.' },
+    { name: 'Knockout Whist', players: '3–7', time: '20–35 min', level: 'Trick-taking', goal: 'Win at least one trick each round and be the last player remaining.', steps: ['Deal 7 cards each in round one, then one fewer each new round.', 'Turn a card for trump. The player left of the dealer leads.', 'Follow suit if possible; highest trump wins, otherwise highest led suit wins.', 'Anyone winning no tricks is knocked out. Last remaining player wins.'], tip: 'Give younger players one free life.' },
+    { name: '99', players: '2–6', time: '15–25 min', level: 'Math', goal: 'Avoid making the running total exceed 99.', steps: ['Deal 3 cards each. Begin with a total of zero.', 'Play one card, announce the new total, and draw back to 3.', 'Number cards add their value; agree on helpful special cards such as 9=pass and 10=minus ten.', 'A player who pushes the total above 99 loses a token. Last player with tokens wins.'], tip: 'Keep a written list of special-card values visible.' },
+    { name: 'Golf — Four Card', players: '2–6', time: '15–25 min', level: 'Medium', goal: 'Make the lowest-scoring square of four cards.', steps: ['Deal 4 face-down cards to each player in a square. Each player looks secretly at two.', 'Draw from the deck or discard pile, then replace one card or discard the draw.', 'Kings score zero, pairs in a column cancel, and other cards use agreed values.', 'When one player reveals all four cards, others take one final turn. Lowest score wins.'], tip: 'Play four rounds instead of nine for a quick game.' },
+    { name: 'James Bond', players: '2–4', time: '10–20 min', level: 'Fast collecting', goal: 'Turn all your four-card piles into matching ranks.', steps: ['Deal each player several face-down piles of 4 cards. Put 4 cards face up in the center.', 'Pick up one personal pile at a time and swap single cards with the center.', 'Work quickly but take only one center card at a time.', 'First player whose piles each contain four matching ranks calls “Bond!” and wins.'], tip: 'Use fewer piles for younger players.' },
+    { name: 'Kemps', players: '4–8', time: '15–30 min', level: 'Team signals', goal: 'Collect four of a rank and get your partner to call it.', steps: ['Form teams of two and agree on a secret signal.', 'Deal 4 cards each and place 4 face up in the center.', 'Everyone swaps cards with the center at the same time. Refresh unwanted center cards.', 'Signal when you have four matching ranks. Your partner calls “Kemps!” to score.'], tip: 'Ban signals that involve touching another player.' },
+    { name: 'Irish Snap', players: '2–8', time: '10–20 min', level: 'Fast', goal: 'Avoid collecting the center pile.', steps: ['Deal all cards face down. Players take turns flipping one card into the center.', 'As cards are played, say ranks in order: ace, two, three, through king, then repeat.', 'If the spoken rank matches the played card, everyone taps the pile.', 'The last player to tap takes the pile. First player to lose all cards and survive the next snap wins.'], tip: 'Use gentle taps and a soft play surface.' },
+    { name: 'Concentration Race', players: '2–6', time: '10–20 min', level: 'Memory', goal: 'Collect matching pairs before the grid is cleared.', steps: ['Choose matching pairs and lay them face down in rows.', 'Each player flips two cards on a turn.', 'A match is kept, but the turn passes immediately to keep the pace moving.', 'When all pairs are found, most pairs wins.'], tip: 'Unlike regular Memory, every player gets one turn at a time.' },
+    { name: 'Four Corners', players: '2–5', time: '15–25 min', level: 'Building', goal: 'Play all your cards onto four ascending suit piles.', steps: ['Deal 5 cards each and place four face-up starter cards in a square.', 'Build on each starter in the same suit, wrapping king back to ace if agreed.', 'Play as many legal cards as possible, then draw back to 5.', 'When the deck runs out, first player to empty their hand wins.'], tip: 'Use aces as starters for an easier version.' },
+    { name: 'Card Dominoes', players: '2–8', time: '15–25 min', level: 'Easy strategy', goal: 'Be first to add every card to the growing suit layouts.', steps: ['Deal all cards. Choose a starting rank, usually 7.', 'Play a starter card or the next higher or lower card in the same suit.', 'If you cannot play, pass.', 'First player to empty their hand wins.'], tip: 'Use 5 as the starting rank with younger kids and a reduced deck.' },
+    { name: 'Slap the Sandwich', players: '2–6', time: '10–20 min', level: 'Fast', goal: 'Win piles by spotting a matching pair separated by one card.', steps: ['Deal all cards face down.', 'Take turns flipping one card into a center pile.', 'When the newest card matches the card two places below it, players tap the pile.', 'First tap wins the pile. The player who collects all cards wins.'], tip: 'Add doubles as a second pattern when players are ready.' },
+    { name: 'Cooperative Countdown', players: '1–6', time: '10–20 min', level: 'Cooperative', goal: 'Build four countdown piles from king to ace before options run out.', steps: ['Deal 5 cards each and turn 4 cards face up as shared work spaces.', 'Players take turns adding the next lower rank, regardless of suit.', 'If no play is possible, replace one workspace card from the draw pile.', 'Everyone wins if four complete king-to-ace countdowns are built.'], tip: 'Players may discuss their hands for a fully cooperative game.' },
+    { name: 'Story Deck', players: '2–10', time: '10–30 min', level: 'Creative', goal: 'Build a funny group story using card-inspired prompts.', steps: ['Assign meanings: hearts=people, diamonds=places, clubs=actions, spades=problems.', 'Draw a card and add one sentence matching its suit.', 'Use the rank to add intensity: low cards are ordinary and high cards are dramatic.', 'End the story when an ace appears or after everyone has contributed three times.'], tip: 'There is no winner; save the funniest line as a trip memory.' }
+  );
+  let lastSuggestedCardGame = -1;
+
+  function showCardGame(index) {
+    const game = cardGameGuide[index];
+    if (!game) return;
+    lastSuggestedCardGame = index;
+    cardGameBadge.textContent = game.level;
+    cardGameName.textContent = game.name;
+    cardGameMeta.textContent = `${game.players} players · ${game.time}`;
+    cardGameGoal.textContent = game.goal;
+    cardGameSteps.innerHTML = '';
+    game.steps.forEach(step => {
+      const item = document.createElement('li');
+      item.textContent = step;
+      cardGameSteps.appendChild(item);
+    });
+    cardGameTip.textContent = `Family tip: ${game.tip}`;
+    cardGameRules.hidden = false;
+    cardGameRules.scrollIntoView({ behavior: tripSettings.reduceMotion ? 'auto' : 'smooth', block: 'start' });
+  }
+
+  function startCardGameGuide() {
+    cardGameGrid.innerHTML = '';
+    cardGameGuide.forEach((game, index) => {
+      const button = document.createElement('button');
+      button.className = 'option-card trivia-category-card';
+      button.innerHTML = `<span class="option-emoji" aria-hidden="true">🃏</span><span class="option-title">${game.name}</span><span class="option-description">${game.players} players · ${game.time} · ${game.level}</span>`;
+      button.addEventListener('click', () => showCardGame(index));
+      cardGameGrid.appendChild(button);
+    });
+    cardGameRules.hidden = true;
+    showSection('cardGames');
+  }
+
+  anotherCardGameButton.addEventListener('click', () => {
+    let index = Math.floor(Math.random() * cardGameGuide.length);
+    if (cardGameGuide.length > 1 && index === lastSuggestedCardGame) index = (index + 1) % cardGameGuide.length;
+    showCardGame(index);
+  });
+
   function launchSelectedMode() {
-    if (selectedCategory === 'local') {
+    if (selectedCategory === 'quest') {
+      startRoadQuest();
+    } else if (selectedCategory === 'local') {
       showSection('region');
     } else if (selectedCategory === 'scavenger') {
       startScavengerHunt();
@@ -8872,6 +9033,8 @@
       startPunGenerator();
     } else if (selectedCategory === 'mentalist') {
       startMentalist();
+    } else if (selectedCategory === 'cardGames') {
+      startCardGameGuide();
     } else if (selectedCategory === 'twenty') {
       resetGame();
       showSection('scavenger');
@@ -8882,6 +9045,165 @@
       regionCode = '*';
       startAdventure();
     }
+  }
+
+  function getQuestTriviaItem() {
+    let candidates = triviaDatabase.filter(triviaItemAllowedBySettings);
+    if (!candidates.length) candidates = triviaDatabase.slice();
+    return candidates[Math.floor(Math.random() * candidates.length)];
+  }
+
+  function getQuestScavengerItem() {
+    const routeMatches = activeScavengerItems.filter(item => (
+      huntItemMatchesTripPreset(item) && huntItemMatchesTheme(item, activeHuntTheme || 'mixed')
+    ));
+    const basePool = routeMatches.length ? routeMatches : activeScavengerItems;
+    const candidates = basePool.filter(item => !questRounds.some(round => (
+      round.item && round.item.id === item.id
+    )));
+    const pool = candidates.length ? candidates : basePool;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  function buildQuestRounds() {
+    const count = tripSettings.gameLength === 'long' ? 12 : 9;
+    const pattern = ['scavenger', 'trivia', 'twenty'];
+    return Array.from({ length: count }, (_, index) => ({ type: pattern[index % pattern.length] }));
+  }
+
+  function startRoadQuest() {
+    resetGame();
+    selectedCategory = 'quest';
+    questRound = 0;
+    questRounds = buildQuestRounds();
+    questScore = createScoreMap();
+    questResolved = false;
+    questCurrentItem = null;
+    renderScoreboard(questScoreboard, questScore);
+    showSection('quest');
+    renderQuestRound();
+  }
+
+  function setQuestStage(type) {
+    document.querySelectorAll('[data-quest-stage]').forEach(stage => {
+      const stageIndex = ['scavenger', 'trivia', 'twenty'].indexOf(stage.dataset.questStage);
+      const currentIndex = ['scavenger', 'trivia', 'twenty'].indexOf(type);
+      stage.classList.toggle('active', stage.dataset.questStage === type);
+      stage.classList.toggle('complete', stageIndex < currentIndex);
+    });
+  }
+
+  function addQuestAction(label, handler, className = '') {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = label;
+    if (className) button.className = className;
+    button.addEventListener('click', handler);
+    questActions.appendChild(button);
+    return button;
+  }
+
+  function resolveQuest(playerId, message) {
+    if (questResolved) return;
+    questResolved = true;
+    if (playerId) {
+      questScore[playerId] = (questScore[playerId] || 0) + 1;
+      renderScoreboard(questScoreboard, questScore);
+    }
+    Array.from(questActions.querySelectorAll('button')).forEach(button => {
+      button.disabled = true;
+    });
+    questFeedback.textContent = message;
+    questNextButton.hidden = false;
+    questSkipButton.hidden = true;
+  }
+
+  function renderQuestScavenger() {
+    const item = getQuestScavengerItem();
+    questCurrentItem = item;
+    questRounds[questRound].item = item;
+    questType.textContent = '🔎 Scavenger Find';
+    questHandoff.textContent = 'Everybody looks. First clear call gets the point.';
+    questPrompt.textContent = item ? item.label : 'Spot something unusual outside.';
+    questDetail.textContent = 'Point it out so another passenger can verify it.';
+    players.forEach(player => {
+      addQuestAction(`${player.name} spotted it`, () => resolveQuest(player.id, `${player.name} claims the find. Eyes up—next challenge ahead.`));
+    });
+  }
+
+  function renderQuestTrivia() {
+    const item = getQuestTriviaItem();
+    const playerId = getTurnPlayerId(questRound);
+    questCurrentItem = item;
+    questRounds[questRound].item = item;
+    questType.textContent = '🧠 Trivia Showdown';
+    questHandoff.textContent = `${getTurnPlayerName(questRound)} answers. Everyone else: poker faces.`;
+    questPrompt.textContent = item.question;
+    questDetail.textContent = 'Choose once. The answer reveals immediately.';
+    getTriviaChoices(item).forEach(choice => {
+      addQuestAction(choice, event => {
+        const correct = choice === item.answer;
+        event.currentTarget.classList.add(correct ? 'correct' : 'incorrect');
+        Array.from(questActions.querySelectorAll('button')).forEach(button => {
+          if (button.textContent === item.answer) button.classList.add('correct');
+        });
+        resolveQuest(correct ? playerId : null, correct
+          ? `Correct—${getTurnPlayerName(questRound)} takes the point.`
+          : `Wrong exit. The answer is ${item.answer}`);
+      });
+    });
+  }
+
+  function renderQuestTwenty() {
+    const secretKeeperIndex = questRound % players.length;
+    const guesserIndex = (secretKeeperIndex + 1) % players.length;
+    const secretKeeper = players[secretKeeperIndex];
+    const guesser = players[guesserIndex];
+    const prompts = [
+      'Is it alive?', 'Can you hold it?', 'Would you find it outdoors?',
+      'Is it bigger than a backpack?', 'Does it make a sound?', 'Is it made by people?',
+      'Would you see one on this trip?', 'Can it move by itself?', 'Is it usually one color?',
+    ];
+    questCurrentItem = { prompts: shuffle(prompts).slice(0, 3) };
+    questType.textContent = '❓ 20 Questions Sprint';
+    questHandoff.textContent = `${secretKeeper.name}: think of a person, place, animal, food, or object. ${guesser.name} leads the guessing.`;
+    questPrompt.textContent = 'Solve the secret in 3 questions';
+    questDetail.textContent = `Try these: ${questCurrentItem.prompts.join(' · ')}`;
+    addQuestAction('We guessed it!', () => resolveQuest(guesser.id, `${guesser.name} cracked the mystery and scores.`));
+    addQuestAction('Secret survived', () => resolveQuest(secretKeeper.id, `${secretKeeper.name} kept the secret and scores.`));
+  }
+
+  function renderQuestRound() {
+    if (questRound >= questRounds.length) {
+      showQuestSummary();
+      return;
+    }
+    const round = questRounds[questRound];
+    questResolved = false;
+    questCurrentItem = null;
+    questActions.innerHTML = '';
+    questFeedback.textContent = '';
+    questNextButton.hidden = true;
+    questSkipButton.hidden = false;
+    questRoundLabel.textContent = `Round ${questRound + 1} of ${questRounds.length}`;
+    questPoints.textContent = 'Worth 1 point';
+    setQuestStage(round.type);
+    if (round.type === 'scavenger') renderQuestScavenger();
+    if (round.type === 'trivia') renderQuestTrivia();
+    if (round.type === 'twenty') renderQuestTwenty();
+  }
+
+  function showQuestSummary() {
+    showSection('summary');
+    const leaders = getWinningPlayers(questScore);
+    const winner = formatWinner(leaders, leader => `${leader.name} conquered the Road Trip Quest`, 'The quest ends in a tie');
+    summaryText.textContent = `${winner}. ${players.map(player => `${player.name}: ${questScore[player.id] || 0}`).join(', ')}.`;
+    summaryList.innerHTML = '';
+    ['Roadside detective work completed.', 'Brains tested under highway conditions.', 'At least one mystery survived—or almost did.'].forEach(text => {
+      const item = document.createElement('li');
+      item.textContent = text;
+      summaryList.appendChild(item);
+    });
   }
 
   function startQuickStart(intent = 'surprise') {
@@ -9065,6 +9387,10 @@
   });
 
   playAgainButton.addEventListener('click', () => {
+    if (selectedCategory === 'quest') {
+      startRoadQuest();
+      return;
+    }
     if (selectedCategory === 'scavenger') {
       startScavengerHunt();
       return;
@@ -9113,6 +9439,13 @@
   });
 
   saveMemoryButton.addEventListener('click', saveTripMemory);
+
+  questNextButton.addEventListener('click', () => {
+    questRound++;
+    renderQuestRound();
+  });
+  questSkipButton.addEventListener('click', renderQuestRound);
+  questFinishButton.addEventListener('click', showQuestSummary);
 
   drawHuntTargetsButton.addEventListener('click', drawFreshHuntTargets);
   resetHuntButton.addEventListener('click', resetHunt);

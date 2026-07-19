@@ -13,7 +13,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Road Trip Adventures</title>
-  <link rel="stylesheet" href="style.css?v=26" />
+  <link rel="stylesheet" href="style.css?v=27" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#1f7a8c" />
   <link rel="icon" href="assets/roadside-logo.png" />
@@ -116,10 +116,11 @@
       <h2 id="setup-category-heading">What should the car play?</h2>
       <p>Scored games crown a winner. Explore modes are just prompts to get everyone looking, laughing, and talking.</p>
       <button id="open-trip-settings" class="secondary-button settings-button">Trip Settings</button>
-      <button class="quick-start-card" data-category="quickstart">
-        <span class="option-emoji" aria-hidden="true">🚗</span>
-        <span class="option-title">Start a Road Trip Mix</span>
-        <span class="option-subtitle">Pick a vibe below, or tap here for a balanced passenger mix.</span>
+      <button class="quick-start-card quest-launch-card" data-category="quest">
+        <span class="option-emoji" aria-hidden="true">🗺️</span>
+        <span class="option-title">Start the Road Trip Quest</span>
+        <span class="option-subtitle">Scavenger finds, trivia showdowns, and 20 Questions—with one shared scoreboard.</span>
+        <span class="quest-launch-meta">One tap · 9 rounds · everyone plays</span>
       </button>
       <div class="quick-start-options" aria-label="Quick start choices">
         <button type="button" data-quick-intent="laugh">Make us laugh</button>
@@ -221,6 +222,13 @@
               <span class="option-description">One secret thing, yes-or-no clues, and a final guess.</span>
               <span class="mode-pill">Party</span>
               <span class="best-for">Best for: quiet guessing together</span>
+            </button>
+            <button class="option-card" data-category="cardGames">
+              <span class="option-emoji" aria-hidden="true">🃏</span>
+              <span class="option-title">Card Game Guide</span>
+              <span class="option-description">Pick a game and get quick, family-friendly rules for a standard deck.</span>
+              <span class="mode-pill">Guide</span>
+              <span class="best-for">Best when: the car is safely parked</span>
             </button>
           </div>
         </section>
@@ -416,6 +424,40 @@
         <button id="extend-timer" class="secondary-button" hidden>+10 seconds</button>
         <button id="skip-timer" class="secondary-button" hidden>Skip timer</button>
         <button id="next-challenge" class="primary-button" hidden>Stamp It</button>
+      </div>
+    </section>
+
+    <!-- Flagship mixed quest: one shared loop across the three strongest road games -->
+    <section id="road-quest" hidden>
+      <div class="mode-header">
+        <div>
+          <span class="challenge-badge">Flagship Adventure</span>
+          <h2 id="quest-heading">Road Trip Quest</h2>
+          <p id="quest-intro">Three games. One scoreboard. Look up, think fast, and solve the mystery together.</p>
+        </div>
+        <div id="quest-round-label" class="hunt-route" aria-label="Quest progress">Round 1 of 9</div>
+      </div>
+      <div id="quest-scoreboard" class="team-scoreboard" aria-live="polite"></div>
+      <div class="quest-map" aria-label="Quest stages">
+        <span data-quest-stage="scavenger">🔎 Spot</span>
+        <span data-quest-stage="trivia">🧠 Think</span>
+        <span data-quest-stage="twenty">❓ Solve</span>
+      </div>
+      <article id="quest-card" class="quest-card" aria-live="polite">
+        <div class="quest-card-topline">
+          <span id="quest-type" class="challenge-badge">Scavenger</span>
+          <span id="quest-points" class="quest-points">Worth 1 point</span>
+        </div>
+        <p id="quest-handoff" class="handoff-prompt"></p>
+        <h3 id="quest-prompt"></h3>
+        <p id="quest-detail"></p>
+        <div id="quest-actions" class="quest-actions"></div>
+        <p id="quest-feedback" class="quest-feedback" aria-live="polite"></p>
+      </article>
+      <div class="adventure-actions">
+        <button id="quest-skip" class="secondary-button">Swap Challenge</button>
+        <button id="quest-next" class="primary-button" hidden>Next Round</button>
+        <button id="quest-finish" class="secondary-button">End Quest</button>
       </div>
     </section>
 
@@ -881,6 +923,28 @@
       </div>
     </section>
 
+    <section id="card-games" hidden>
+      <div class="mode-header">
+        <div>
+          <h2>Card Game Guide</h2>
+          <p>Choose a game for your group. Play only when safely parked or at your destination.</p>
+        </div>
+        <div class="hunt-route" aria-label="Card game guide">Deal → Play</div>
+      </div>
+      <div id="card-game-grid" class="trivia-category-grid" aria-label="Card games"></div>
+      <article id="card-game-rules" class="trivia-card" aria-live="polite" hidden>
+        <span id="card-game-badge" class="challenge-badge">Card Game</span>
+        <h3 id="card-game-name"></h3>
+        <p id="card-game-meta"></p>
+        <h4>Goal</h4>
+        <p id="card-game-goal"></p>
+        <h4>How to play</h4>
+        <ol id="card-game-steps"></ol>
+        <p id="card-game-tip" class="privacy-note"></p>
+        <button id="another-card-game" class="primary-button">Suggest Another</button>
+      </article>
+    </section>
+
     <!-- Hidden local-only admin vault -->
     <section id="admin-mode" hidden>
       <div class="mode-header">
@@ -1019,6 +1083,7 @@
 
   <script src="js/data/themes.js"></script>
   <script src="js/data/trivia.js"></script>
+  <script src="js/data/decades-trivia.js"></script>
   <script src="js/data/community-trivia.js"></script>
   <script src="js/data/oak-island.js"></script>
   <script src="js/data/trivia-cleanup.js"></script>
@@ -1034,7 +1099,7 @@
        paint lean; uncomment the line below to make the global `kontra` object
        available for future engine-powered games. -->
   <!-- <script src="vendor/kontra.min.js"></script> -->
-  <script src="script.js?v=26"></script>
+  <script src="script.js?v=27"></script>
   <script>
     if ('serviceWorker' in navigator) {
       // Reload once when a new service worker takes control, so a fresh deploy

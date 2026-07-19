@@ -12,6 +12,7 @@ require(path.join(root, 'js/data/themes.js'));
 require(path.join(root, 'js/data/questions.js'));
 require(path.join(root, 'js/data/scavenger.js'));
 require(path.join(root, 'js/data/trivia.js'));
+require(path.join(root, 'js/data/decades-trivia.js'));
 require(path.join(root, 'js/data/community-trivia.js'));
 require(path.join(root, 'js/data/oak-island.js'));
 require(path.join(root, 'js/games/hide-seek-data.js'));

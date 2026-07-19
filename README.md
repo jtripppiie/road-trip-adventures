@@ -11,6 +11,7 @@ This project was built with **no backend**, **no user accounts** and **no data c
 - **Passenger only:** The app explicitly tells drivers not to play while driving.
 - **Players:** Add 2 to 8 player initials and optionally choose a car judge for games that need a human call.
 - **Organized modes:** Pick from **Look Outside**, **Trivia & Brain**, **Party Games**, and **Bonus** sections.
+- **Road Trip Quest:** Jump into a flagship 9-round mix of scavenger finds, trivia showdowns, and 20 Questions sprints with one shared scoreboard and rotating player roles.
 - **Adventure types:** Play categories like **Look Outside**, **Learn Something**, **Quick Challenges**, **Local Explorer**, **Trip Calculator**, **Road Pong**, **Banana Towers**, or **Hide & Seek Adventure**.
 - **Scavenger Hunt:** Play an any-route hunt where 2 to 8 players tap real-world sightings to claim points.
 - **Trivia Run:** Play broad road-trip trivia across state capitals, license plates, national parks, roadside landmarks, road food, science, animals, sports, music, TV, and decade trivia. Runtime cleanup removes duplicate imported questions, adds difficulty labels, and keeps answer choices exact.
